@@ -539,6 +539,9 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .numrow{display:flex;gap:8px;align-items:center}.numrow input{width:140px;min-height:40px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:6px 10px;font:inherit;background:var(--panel);color:var(--ink)}
 @media print{.appbar,.bnav,.qbar,.moresheet,footer,#qSubmit{display:none!important}.wrap[hidden]{display:none!important}.q{break-inside:avoid}}
 
+.srvtab tr.srv td{background:var(--accent-soft);font-weight:600}
+.srvtab td,.srvtab th{text-align:left}
+
 </style>
 </head>
 <body>
@@ -1228,7 +1231,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v2.1</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
+<footer><b>Groundwave Propagation Lab v2.2</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
 
 <script>
 "use strict";
@@ -1511,6 +1514,11 @@ function cellLevel(dkm,p,extraLoss=0){ const T=CELL_TECH[p.tech]||CELL_TECH["4g"
   return {ref,L,dlm,ulm,m:Math.min(dlm,ulm),lim:ulm<dlm?"uplink":"downlink",eff:ref-Math.max(0,dlm-ulm)}; }
 /* effective level (dBm): the reference-signal level, lowered where the uplink runs out first */
 function cellRxdBm(dkm,p){ return cellLevel(dkm,p).eff; }
+/* verdict from the measured level (RSRP/RSCP/RxLev bands) and the uplink */
+function cellVerdict(c,tech){ const T=CELL_TECH[tech]||CELL_TECH["4g"], b=T.bands;
+  if(c.dlm<0) return ["No service","bad"]; if(c.ulm<0) return ["No service · uplink fails","bad"];
+  let q=c.ref>=b[0]?["Excellent","good"]:c.ref>=b[1]?["Good","good"]:c.ref>=b[2]?["Fair","warn"]:["Poor (cell edge)","warn"];
+  if(c.ulm<3) q=["Poor · uplink weak","warn"]; return q; }
 function cellQuality(v,tech){ const T=CELL_TECH[tech]||CELL_TECH["4g"], b=T.bands; if(v===null||v<T.thr) return ["No service","bad"]; if(v>=b[0]) return ["Excellent","good"]; if(v>=b[1]) return ["Good","good"]; if(v>=b[2]) return ["Fair","warn"]; return ["Poor (cell edge)","warn"]; }
 /* single-cell radius: furthest distance where both links still work (and the GSM timing-advance limit) */
 function cellRange(p){ let dl=0,ul=0,both=0; for(let i=0;i<=500;i++){ const d=0.02*Math.pow(300/0.02,i/500), c=cellLevel(d,p); if(c.dlm>=0) dl=d; if(c.ulm>=0) ul=d; if(c.m>=0) both=d; }
@@ -2036,7 +2044,7 @@ function readouts(){
     if(p.type==="combined"){ tiles.push({k:"Fading zone",tip:"Ground and sky wave arrive within 6 dB of each other and interfere, so the signal swells and fades.",val:A.fade?`${fmtD(A.fade.a)}–${fmtD(A.fade.b)} km`:"none",sub:A.fade?"expect fading & distortion":"one wave always dominates",cls:A.fade?"warn":"good"});
       if(A.fade) sent.push(`Expect <b>fading</b> between about ${fmtD(A.fade.a)} and ${fmtD(A.fade.b)} km.`); }
   }
-  if(p.type==="cell"){ const T=CELL_TECH[p.tech]||CELL_TECH["4g"], cr=cellRange(p), c1=cellLevel(1,p), q=cellQuality(c1.eff,p.tech), rr=T.real[p.env==="industrial"?"urban":p.env]||T.real.urban;
+  if(p.type==="cell"){ const T=CELL_TECH[p.tech]||CELL_TECH["4g"], cr=cellRange(p), c1=cellLevel(1,p), q=cellVerdict(c1,p.tech), rr=T.real[p.env==="industrial"?"urban":p.env]||T.real.urban;
     tiles.push({k:"Single-cell radius",tip:"Furthest distance at which one cell still works in both directions: the phone hears the tower (downlink) and the tower hears the phone (uplink).",val:cr.r<1?`${Math.round(cr.r*1000)} m`:`${fmtD(cr.r)} km`,sub:`downlink ${cr.dl<1?Math.round(cr.dl*1000)+" m":fmtD(cr.dl)+" km"} · uplink ${cr.ul<1?Math.round(cr.ul*1000)+" m":fmtD(cr.ul)+" km"}${cr.ta?" · GSM timing-advance limit 35 km":""} · ${cr.lim}-limited`,cls:"info"});
     tiles.push({k:"Typical real cell radius",tip:"Typical radius operators design for this technology and area (industry practice). Real cells are made smaller for capacity and to limit interference.",val:`${rr[0]}–${rr[1]} km`,sub:`${T.sys} · ${p.env} design practice`,cls:"info"});
     tiles.push({k:`${T.meas} at 1 km`,tip:`Level the phone reports (${T.meas}, ${T.bw}). Excellent ≥ ${T.bands[0]}, good ≥ ${T.bands[1]}, fair ≥ ${T.bands[2]}, cell edge ${T.thr} dBm.`,val:`${c1.ref.toFixed(0)} dBm`,sub:`${q[0]} · uplink margin ${c1.ulm.toFixed(0)} dB`,cls:q[1]});
@@ -2479,7 +2487,7 @@ function updateMeter(p,io,thr,dt){
   else if(tot>=thr+20){ q="Excellent reception"; cls="var(--good)"; }
   else if(tot>=thr+6){ q="Good reception"; cls="var(--good)"; }
   else { q="Weak but usable"; cls="var(--warn)"; }
-  if(p.type==="cell"){ const cq=cellQuality(tot===null?null:dBuV2dBm(tot,p.f),p.tech); q=cq[0]==="No service"?"No service":cq[0]+" signal"; cls=cq[1]==="good"?"var(--good)":cq[1]==="warn"?"var(--warn)":"var(--bad)"; }
+  if(p.type==="cell"){ const cq=cellVerdict(cellLevel(AN.rx,p),p.tech); q=cq[0]==="No service"?"No service":cq[0]+" signal"; cls=cq[1]==="good"?"var(--good)":cq[1]==="warn"?"var(--warn)":"var(--bad)"; }
   const qe=$("quality"); qe.textContent=q; qe.style.color=cls;
   // live HUD on the animation
   const isCell=p.type==="cell", fmtV=v=>v===null?"—":isCell?`${dBuV2dBm(v,p.f).toFixed(0)} dBm`:fmtField(v);
@@ -2597,13 +2605,19 @@ function computePathFor(a,b){
 }
 function computePath(){ MP.path=computePathFor(MP.tx,MP.rx); }
 function baseModel(){ return models.find(m=>String(m.id)===$("mapModel").value)||sel(); }
-function paramsFor(P,rx,T){
+/* technology used on the map: the coverage selector wins, otherwise the model's own technology */
+function mapCellTech(){ if(MP.cov&&MP.cov.tech&&MP.cov.tech!=="off") return MP.cov.tech; const b=baseModel().p; return b.type==="cell"?b.tech:null; }
+function paramsFor(P,rx,T,tx){
+  tx=tx||MP.tx;
   const p=JSON.parse(JSON.stringify(baseModel().p));
-  const mid=gcPoint(MP.tx,rx,0.5);
+  const ct=mapCellTech();
+  if(ct){ const C=CELL_TECH[ct]; Object.assign(p,{type:"cell",tech:ct,f:C.f,P:p.type==="cell"&&p.tech===ct?p.P:C.P,env:MP.cov.env,indoor:MP.cov.indoor}); }
+  const phone=!!ct||p.type==="cell";
+  const mid=gcPoint(tx,rx,0.5);
   return Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,rxDist:Math.max(P.dist,0.5),
-    htx:MP.txH,hrx:rx.h,terrainLossDb:(MP.useTerrain&&T)?T.loss:0,profile:(MP.useTerrain&&T&&T.prof)?T.prof:null,
-    gmlat:+geomagLat(mid.lat,mid.lon).toFixed(1),azi:+bearing(MP.tx,rx).toFixed(0),seaFrac:clamp(1-P.landPct/100,0,1),
-    pathLabel:`${MP.tx.name} → ${rx.name}, ${P.landPct}% land`});
+    htx:tx.h,hrx:phone?1.5:rx.h,terrainLossDb:(MP.useTerrain&&T)?T.loss:0,profile:(MP.useTerrain&&T&&T.prof)?T.prof:null,
+    gmlat:+geomagLat(mid.lat,mid.lon).toFixed(1),azi:+bearing(tx,rx).toFixed(0),seaFrac:clamp(1-P.landPct/100,0,1),
+    pathLabel:`${tx.name} → ${rx.name}, ${P.landPct}% land`});
 }
 /* dipole geomagnetic latitude (IGRF-13 pole 80.65° N, 72.68° W) */
 function geomagLat(lat,lon){ const a=toRad(80.65), b=toRad(-72.68), f=toRad(lat), l=toRad(lon); return toDeg(Math.asin(Math.sin(f)*Math.sin(a)+Math.cos(f)*Math.cos(a)*Math.cos(l-b))); }
@@ -2726,23 +2740,38 @@ async function terrainFor(P,rx,onTerrain){
 function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(threshold(p));
   const ok=r.t!==null&&r.t>=thr, fading=r.g!==null&&r.s!==null&&Math.abs(r.g-r.s)<6&&Math.max(r.g,r.s)>thr-6;
   let v,cls; if(!ok){v="No reliable reception";cls="bad";} else if(fading){v="Receivable, with fading";cls="warn";} else if(r.t>=thr+20){v="Excellent";cls="good";} else {v="Good";cls="good";}
-  if(p.type==="cell"){ const lv=r.t===null?null:dBuV2dBm(r.t,p.f), q=cellQuality(lv,p.tech), c=cellLevel(p.rxDist,p,(p.terrainLossDb&&cellModelAt(p.rxDist,p)!=="p1812")?p.terrainLossDb:0), T=CELL_TECH[p.tech];
-    v=`${q[0]} · ${T.meas} ${c.ref.toFixed(0)} dBm${c.ulm<0?" · uplink fails":""}`; cls=q[1]; return {...r,thr,ok:lv!==null&&lv>=T.thr,fading:false,verdict:v,cls,cell:c}; }
+  if(p.type==="cell"){ const c=cellLevel(p.rxDist,p,(p.terrainLossDb&&cellModelAt(p.rxDist,p)!=="p1812")?p.terrainLossDb:0), q=cellVerdict(c,p.tech);
+    return {...r,thr,ok:c.m>=0,fading:false,verdict:q[0],cls:q[1],cell:c}; }
   return {...r,thr,ok,fading,verdict:v,cls}; }
-function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
+/* every transmitter is evaluated; the receiver is served by the strongest one that carries the technology */
+function predictMulti(rx,Tsel){
+  const ct=mapCellTech(), all=[];
+  MP.txs.forEach((tx,i)=>{
+    if(ct&&!(tx.techs||["2g","3g","4g"]).includes(ct)){ all.push({i,tx,skip:true}); return; }
+    const P=computePathFor(tx,rx), T=i===MP.ti?Tsel:null, p=paramsFor(P,rx,T,tx);
+    let G=0; if(ct&&tx.sector&&tx.sector!=="omni"){ const el=toDeg(Math.atan(((tx.h||30)-1.5)/(Math.max(P.dist,0.02)*1000))); G=antGain(tx,bearing(tx,rx),el); p.P*=Math.pow(10,G/10); }
+    const pr=predict(p); all.push({i,tx,P,p,pred:pr,G,dist:P.dist,terrain:!!T});
+  });
+  const key=a=>a.pred.cell?a.pred.cell.m:a.pred.t; const cand=all.filter(a=>!a.skip&&a.pred.t!==null).sort((a,b)=>key(b)-key(a));
+  if(!cand.length){ const any=all.find(a=>!a.skip);
+    const base=any?any.pred:{t:null,g:null,s:null,thr:null};
+    return {...base,ok:false,fading:false,verdict:ct?`No ${TECH_LABEL[ct]||ct} transmitter on the map`:"No reliable reception",cls:"bad",servers:all,server:null,noServer:!any}; }
+  const b=cand[0]; return {...b.pred,servers:all,server:b,ranked:cand};
+}
+function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.txs.map(t=>[t.lat,t.lon,t.h,t.techs,t.sector,t.az,t.tilt]),MP.ti,MP.cov&&[MP.cov.tech,MP.cov.env,MP.cov.indoor],MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
 let siteQueue=Promise.resolve();
 function refreshSites(){
   for(const rx of MP.rxs){
     const sig=siteSig(rx), cur=MP.res.get(rx.id);
     if(cur&&cur.sig===sig) continue;
     const P=computePathFor(MP.tx,rx);
-    const entry={sig,P,T:null,pred:predict(paramsFor(P,rx,null)),loading:true};
+    const entry={sig,P,T:null,pred:predictMulti(rx,null),loading:true};
     MP.res.set(rx.id,entry);
     siteQueue=siteQueue.then(async()=>{
       if(MP.res.get(rx.id)!==entry) return;
-      const show=T=>{ entry.T=T; entry.loading=false; entry.pred=predict(paramsFor(P,rx,T)); if(MP.res.get(rx.id)===entry){ renderSites(); if(rx.id===MP.rx.id) renderActive(); drawMap(); } };
+      const show=T=>{ entry.T=T; entry.loading=false; entry.pred=predictMulti(rx,T); if(MP.res.get(rx.id)===entry){ renderSites(); if(rx.id===MP.rx.id) renderActive(); drawMap(); } };
       try{ entry.T=await terrainFor(P,rx,show); }catch(e){ entry.T=entry.T||null; }
-      entry.loading=false; entry.pred=predict(paramsFor(P,rx,entry.T));
+      entry.loading=false; entry.pred=predictMulti(rx,entry.T);
       if(MP.res.get(rx.id)===entry){ renderSites(); if(rx.id===MP.rx.id) renderActive(); drawMap(); }
     });
   }
@@ -2985,7 +3014,7 @@ function pathModel(){
 function setPoint(which,pt){
   if(pt.auto){ delete pt.auto; pt.autoName=true; }
   if(which==="tx") MP.tx={id:MP.tx.id,h:MP.tx.h,...pt};
-  else if(which==="addtx"){ MP.txs.push({id:MP.nextTx++,h:+$("txH").value||120,techs:["2g","3g","4g"],sector:"omni",az:0,tilt:2,...pt}); MP.ti=MP.txs.length-1; }
+  else if(which==="addtx"){ MP.txs.push({id:MP.nextTx++,h:mapCellTech()?30:(+$("txH").value||120),techs:["2g","3g","4g","5g"],sector:"omni",az:0,tilt:2,...pt}); MP.ti=MP.txs.length-1; }
   else if(which==="add"){ MP.rxs.push({id:MP.nextRx++,h:+$("rxH").value||10,...pt}); MP.ai=MP.rxs.length-1; }
   else MP.rx={id:MP.rx.id,h:MP.rx.h,...pt};
   MP.path=null; updateMap();
@@ -3011,21 +3040,26 @@ function renderActive(){
   $("profName").textContent=`T${MP.ti+1} ${MP.tx.name} → R${MP.ai+1} ${MP.rx.name}`;
   const sunEl=toDeg(Math.asin(clamp(P.cosMid,-1,1))), ph=phaseOf(P.cosMid), phTxt={day:"daytime",dusk:"twilight",night:"night"}[ph];
   const via=pr.g!==null&&(pr.s===null||pr.g>=pr.s)?"mostly by ground wave":"mostly by sky wave";
-  $("mapVerdict").innerHTML=`<p class="eyebrow" style="margin:0">Prediction at R${MP.ai+1} · ${esc(MP.rx.name)}</p>
+  const isCell=p.type==="cell"||!!mapCellTech(), ct=mapCellTech(), CT=ct?CELL_TECH[ct]:null;
+  const lvl=(v,pp)=>v===null||v===undefined?"—":isCell?`${(pp&&pp.cell?pp.cell.ref:dBuV2dBm(v,CT?CT.f:p.f)).toFixed(0)} dBm`:fmtField(v);
+  const sv=pr.server, svTxt=sv?`Served by <b>T${sv.i+1} · ${esc(sv.tx.name)}</b>, ${fmtD(sv.dist)} km away${sv.i!==MP.ti?" (smooth-earth estimate: select it to load its terrain)":""}.`:(pr.noServer?`None of the ${MP.txs.length} transmitters carries ${TECH_LABEL[ct]||""}. Tick ${TECH_LABEL[ct]||""} under Networks in the Transmitters table, add a tower with + Transmitter, or use Find towers.`:"");
+  const rows=(pr.servers||[]).map(a=>`<tr${sv&&a.i===sv.i?' class="srv"':""}><td>T${a.i+1} · ${esc(a.tx.name)}</td><td class="mono">${a.skip?"—":fmtD(a.dist)+" km"}</td><td class="mono">${a.skip?`no ${TECH_LABEL[ct]||""}`:lvl(a.pred.t,a.pred)}</td><td>${a.skip?"":`<span class="pill ${a.pred.cls}">${esc(a.pred.verdict.split(" · ")[0])}</span>`}${sv&&a.i===sv.i?" ★ serving":""}</td></tr>`).join("");
+  $("mapVerdict").innerHTML=`<p class="eyebrow" style="margin:0">Prediction at R${MP.ai+1} · ${esc(MP.rx.name)}${ct?` · ${TECH_LABEL[ct]} ${CT.name.split(" ").slice(1).join(" ")}`:""}</p>
     <div class="big" style="color:var(--${pr.cls})">${pr.verdict}${r.loading?' <span class="muted" style="font-size:13px;font-weight:500">(terrain loading…)</span>':""}</div>
-    <div class="val">${fmtField(pr.t)}</div>
-    <p class="muted" style="font-size:14px">${pr.ok?`Arrives ${via}.`:`Below the ${fmtField(pr.thr)} needed.`} ${fmtF(p.f)}, ${fmtP(p.P)}, ${phTxt} at the path midpoint.${T&&MP.useTerrain&&T.loss>0.5?` Terrain costs about ${T.loss.toFixed(1)} dB.`:""}</p>`;
+    <div class="val">${lvl(pr.t,pr)}${isCell?` <span class="muted" style="font-size:14px">${CT.meas}</span>`:""}</div>
+    <p class="muted" style="font-size:14px">${svTxt} ${isCell?(sv&&sv.pred.cell?`Cell edge ${CT.thr} dBm · uplink margin ${sv.pred.cell.ulm.toFixed(0)} dB · this cell's radius ≈ ${fmtD(cellRange(sv.p).r)} km (phone at 1.5 m, ${MP.cov.env}${MP.cov.indoor?", indoors":""}).`:""):(pr.ok?"":`Below the ${fmtField(pr.thr)} needed.`)} ${fmtF(sv?sv.p.f:p.f)}, ${fmtP(sv?sv.p.P:p.P)}${isCell?" EIRP":""}, ${phTxt}.${T&&MP.useTerrain&&T.loss>0.5&&(!sv||sv.i===MP.ti)?` Terrain costs about ${T.loss.toFixed(1)} dB.`:""}</p>
+    ${MP.txs.length>1||pr.noServer?`<div class="tablewrap"><table class="fs srvtab"><tr><th>Transmitter</th><th>Distance</th><th>${isCell?CT.meas:"Field"}</th><th>Result</th></tr>${rows}</table></div>`:""}`;
   const tiles=[
     ["Distance",`${fmtD(P.dist)} km`,`bearing ${P.brg.toFixed(0)}° · ${P.landPct}% land`,"info"],
     ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
     ["Obstacle method",T?(T.dbx?`delta-Bullington · ${T.dbx.Ld.toFixed(1)} dB`:"single knife-edge"):"…",T?(T.dbx?`${T.method} · Bullington ${T.dbx.Lbulla.toFixed(1)} dB, smooth ${T.dbx.Lsmooth.toFixed(1)} dB`:T.method):"","info"],
     ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?(T.ob&&T.loss>0.05?(T.ob.kind==="building"?"caused by a building":(T.peakName?`at ${T.peakName}`:`ridge at ${fmtD(T.ob.dm/1000)} km`)):`highest ${Math.round(T.maxE)} m`)+` · Δh ${Math.round(T.dh)} m`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"],
-    ["Line of sight",T?(T.los?"Yes":"No"):"…",T?`masts ${T.txH} m / ${T.rxH} m`:"","info"],
+    ["Line of sight",T?(T.los?"Yes":"No"):"…",T?(isCell?`T${MP.ti+1} mast ${T.txH} m / phone 1.5 m`:`masts ${T.txH} m / ${T.rxH} m`):"","info"],
     ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmPending?"loading…":T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
     ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
-    ["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],
-    ["Needed",fmtField(pr.thr),"minimum usable","info"]];
-  $("tSum").innerHTML=`<span class="pill ${pr.cls}">${pr.verdict}</span><span class="mono">${fmtField(pr.t)}</span><span class="muted">${fmtD(P.dist)} km · ${T?(T.loss>0.05?"terrain −"+T.loss.toFixed(1)+" dB":"no terrain loss"):"terrain loading…"} · ${T?(T.los?"line of sight clear":"line of sight blocked"):""}</span>`;
+    ...(isCell?[["Cell edge",`${CT.thr} dBm`,`${CT.meas} · uplink ≤ ${CT.ul} dB`,"info"],["Typical real cell radius",`${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][0]}–${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][1]} km`,`${CT.sys} · ${MP.cov.env}`,"info"]]
+      :[["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],["Needed",fmtField(pr.thr),"minimum usable","info"]])];
+  $("tSum").innerHTML=`<span class="pill ${pr.cls}">${pr.verdict}</span><span class="mono">${lvl(pr.t,pr)}</span><span class="muted">${fmtD(P.dist)} km · ${T?(T.loss>0.05?"terrain −"+T.loss.toFixed(1)+" dB":"no terrain loss"):"terrain loading…"} · ${T?(T.los?"line of sight clear":"line of sight blocked"):""}</span>`;
   $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
   $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
   const note=$("terrainNote");
@@ -3082,7 +3116,7 @@ function renderSites(){
       <td><input type="number" class="ah" min="0" max="500" step="1" value="${rx.h}" aria-label="Receiver ${i+1} antenna height" style="width:76px"></td>
       <td class="mono">${r?fmtD(r.P.dist)+" km":"…"}</td>
       <td class="mono">${T?(T.loss>0.05?"−"+T.loss.toFixed(1)+" dB":"0 dB"):"…"}</td>
-      <td class="mono">${pr?fmtField(pr.t):"…"}</td>
+      <td class="mono">${pr?(mapCellTech()?(pr.cell?pr.cell.ref.toFixed(0)+" dBm":"—"):fmtField(pr.t))+(pr.server&&MP.txs.length>1?` <span class="muted">via T${pr.server.i+1}</span>`:""):"…"}</td>
       <td>${pr?`<span class="pill ${pr.cls}">${pr.verdict}</span>`:"…"}</td>
       <td><button class="iconbtn del" type="button" aria-label="Remove receiver ${i+1}" ${MP.rxs.length===1?"disabled":""}>✕</button></td></tr>`; }).join("");
   $("sitesTable").innerHTML=`<tr><th></th><th>Site</th><th>Lat, lon</th><th>Ground</th><th>Antenna (m)</th><th>Distance</th><th>Terrain</th><th>Signal</th><th>Reception</th><th></th></tr>`+rows;
@@ -3399,9 +3433,9 @@ function bindCells(){
   try{ const k=localStorage.getItem("gwlab-ocid-key"); if(k){ $("ocidKey").value=k; $("ocidRemember").checked=true; } }catch(e){}
   $("ocidApi").addEventListener("click",()=>ocidApiAround(MP.me||MP.rx));
   $("useCells").addEventListener("change",e=>{ MP.useCells=e.target.checked; drawMap(); renderMyCoverage(); });
-  document.querySelectorAll('input[name="covTech"]').forEach(r=>r.addEventListener("change",e=>{ MP.cov.tech=e.target.value; drawMap(); }));
-  $("covEnv").addEventListener("change",e=>{ MP.cov.env=e.target.value; drawMap(); renderMyCoverage(); });
-  $("covIndoor").addEventListener("change",e=>{ MP.cov.indoor=e.target.checked; drawMap(); renderMyCoverage(); });
+  document.querySelectorAll('input[name="covTech"]').forEach(r=>r.addEventListener("change",e=>{ MP.cov.tech=e.target.value; updateMap(); }));
+  $("covEnv").addEventListener("change",e=>{ MP.cov.env=e.target.value; updateMap(); });
+  $("covIndoor").addEventListener("change",e=>{ MP.cov.indoor=e.target.checked; updateMap(); });
   const setMe=(lat,lon,name)=>{ MP.me={lat,lon,name:name||"My location",autoName:!name}; autoName(MP.me); renderMyCoverage(); MP.view={lon,lat,z:Math.max(MP.view?MP.view.z:12,13)}; drawMap(); };
   let topLevel=false; try{ topLevel=window.top===window.self; }catch(e){}
   $("setMe").addEventListener("click",()=>{
@@ -3487,7 +3521,7 @@ function explainCalc(p,d){
     step("Uplink margin","MAPL_UL − total path loss"+(burstNoise(p,17,3)?" − base-station burst noise":""),c.ulm,"dB");
     step("Limiting link",c.lim,Math.min(c.dlm,c.ulm),"dB");
     step("Single-cell radius","furthest distance where both margins ≥ 0"+(T.ta?" (GSM timing advance ≤ 35 km)":""),cr.r,"km");
-    const q=cellQuality(c.eff,p.tech); (q[1]==="bad"?warn:ok)(`At ${fmtD(d)} km: ${q[0]} (${T.meas} ${c.ref.toFixed(0)} dBm, uplink margin ${c.ulm.toFixed(0)} dB).`);
+    const q=cellVerdict(c,p.tech); (q[1]==="bad"?warn:ok)(`At ${fmtD(d)} km: ${q[0]} (${T.meas} ${c.ref.toFixed(0)} dBm, uplink margin ${c.ulm.toFixed(0)} dB).`);
     if(c.ulm<c.dlm) warn("The uplink fails before the downlink here. More tower power does not help; only a closer or taller site does.");
     flareSteps(p,step,warn,ok);
     warn("Median models (Hata, UMa, P.1812) are statistical. Real sites need calibration with drive tests.");
