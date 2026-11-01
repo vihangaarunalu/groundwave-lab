@@ -424,6 +424,53 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .rxbar input{flex:1 1 260px}
 @media (max-width:700px){.rxhud{top:auto;bottom:10px;width:auto;right:60px}}
 
+/* mobile coverage + pin tools */
+.mobilecard .badge{margin-left:6px;vertical-align:middle}
+.mycov{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.mycov .tile .btn{justify-self:start;margin-top:4px}
+.covbar{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:flex-end}
+.covbar .field{min-width:180px}
+.covstat{font-family:var(--font-mono);font-size:14px;padding-bottom:8px}
+.covlegend{font-size:12px}
+.pintools{position:absolute;z-index:5;transform:translate(-50%,0);display:flex;gap:4px}
+.pinbtn{background:#16202e;color:#fff;border:2px solid #fff;border-radius:999px;font:inherit;font-size:12px;font-weight:700;padding:3px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap}
+.pinbtn.del{background:#c2413a}
+.pinbtn:hover{filter:brightness(1.15)}
+.renbox{position:absolute;z-index:6;transform:translate(-50%,0);width:260px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.renbox .chip{justify-self:start}
+.txtbl .netchips{display:flex;gap:3px}
+.txtbl .netchips .chip{min-height:26px;padding:2px 7px;font-size:11.5px}
+.txtbl select,.txtbl input[type=number]{min-height:32px;padding:3px 6px;width:auto}
+
+/* ===== v1.3 responsive fixes ===== */
+@media (max-width:1020px){ .lab,.animgrid,.mapgrid{grid-template-columns:1fr} }
+.brand{flex:1 1 auto;min-width:0}
+@media (max-width:760px){
+  .brand small{display:none}
+  .brand h1{font-size:1.05rem}
+  .appbar-in{padding:8px 12px 0;gap:6px}
+  .themebtn{height:32px;padding:0 9px;font-size:12px;margin-bottom:0}
+  .wrap{padding:16px 12px 40px;gap:14px}
+  .card{padding:16px}
+  .expbar-top .row{width:100%}
+  .expbar-top .row .btn{flex:1 1 auto;justify-content:center}
+}
+@media (max-width:700px){
+  .stage .rxhud{position:static;width:auto;border-radius:0;box-shadow:none}
+  .mycov{grid-template-columns:1fr 1fr}
+  .covbar .field{min-width:0;flex:1 1 100%}
+}
+@media (max-width:420px){ .mycov{grid-template-columns:1fr} }
+.wrap > *, .lab > *, .side, .main, .animgrid > *, .expbar, .expbar-top > div{min-width:0}
+@media (max-width:760px){
+  .brand h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .brand svg{width:24px;height:24px}
+  .brand h1 + *{display:none}
+}
+.expbar > *{min-width:0}
+.guide-text{overflow-wrap:anywhere}
+@media (max-width:760px){ .brand{flex:1 1 0} }
+
 </style>
 </head>
 <body>
@@ -761,6 +808,37 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
     </details>
   </section>
 
+  <section class="panel card mobilecard" aria-labelledby="mcH">
+    <div class="chart-head"><h2 id="mcH">Mobile coverage <span class="badge">2G · 3G · 4G · 5G</span></h2>
+      <div class="row"><span class="hint">📍 <b id="meName">not set</b></span><button class="btn primary" id="setMe" type="button">📍 Set my location</button><button class="btn" id="meTowers" type="button">📶 Towers near me (OSM)</button></div></div>
+    <div class="tiles mycov" id="myCov"></div>
+    <div class="covbar">
+      <div class="field"><span class="lbl">Coverage map</span>
+        <div class="seg" role="radiogroup" aria-label="Coverage map technology">
+          <input type="radio" name="covTech" id="cvOff" value="off" checked><label for="cvOff">Off</label>
+          <input type="radio" name="covTech" id="cv2" value="2g"><label for="cv2">2G</label>
+          <input type="radio" name="covTech" id="cv3" value="3g"><label for="cv3">3G</label>
+          <input type="radio" name="covTech" id="cv4" value="4g"><label for="cv4">4G</label>
+          <input type="radio" name="covTech" id="cv5" value="5g"><label for="cv5">5G</label>
+        </div></div>
+      <div class="field"><label for="covEnv">Surroundings</label><select id="covEnv"><option value="industrial">Dense urban</option><option value="urban" selected>Urban</option><option value="suburban">Suburban</option><option value="rural">Rural / open</option></select></div>
+      <label class="check"><input type="checkbox" id="covIndoor"> Indoors (P.2109)</label>
+      <span class="covstat" id="covStat" aria-live="polite"></span>
+    </div>
+    <div class="legend covlegend"><span><i style="border-top:8px solid rgba(0,140,70,.7);width:14px"></i>Excellent ≥ −80 dBm</span><span><i style="border-top:8px solid rgba(90,180,70,.7);width:14px"></i>Good ≥ −90</span><span><i style="border-top:8px solid rgba(235,200,40,.8);width:14px"></i>≥ −100</span><span><i style="border-top:8px solid rgba(240,130,40,.8);width:14px"></i>Fair (cell edge)</span><span><i style="border-top:8px solid rgba(220,50,40,.45);width:14px"></i>Gap / no coverage</span><span>● real cells: <b style="color:#7b8ba3">2G</b> <b style="color:#8a5cc7">3G</b> <b style="color:#2f6fdf">4G</b> <b style="color:#d0368a">5G</b></span></div>
+    <details class="acc plain"><summary>Real network data: OpenCelliD (towers measured by phones)</summary>
+      <div class="acc-body">
+        <p class="hint">OpenCelliD is an open database of real cell sites (2G GSM, 3G UMTS, 4G LTE, 5G NR) with their operator and measured range. Create a free account at opencellid.org, then either import the Sri Lanka file (MCC 413, CSV or .csv.gz) or use your API key to load the cells around your location.</p>
+        <div class="row"><label class="btn" for="ocidFile">⬆ Import OpenCelliD file…</label><input type="file" id="ocidFile" accept=".csv,.gz,text/csv" class="sr">
+          <input type="text" id="ocidKey" placeholder="OpenCelliD API key" aria-label="OpenCelliD API key" style="max-width:240px" autocomplete="off"><label class="check"><input type="checkbox" id="ocidRemember"> Remember on this device</label>
+          <button class="btn" id="ocidApi" type="button">Load cells around my location</button>
+          <label class="check"><input type="checkbox" id="useCells" checked> Use real cells in coverage</label></div>
+        <p class="hint"><b id="cellCount">No real cell data loaded yet</b></p>
+        <p class="hint" id="ocidMsg" role="status"></p>
+        <p class="hint">OpenCelliD positions are estimated from crowd-sourced measurements, so they can be off by tens to hundreds of metres. Antenna height, direction and power aren't in the data, so imported cells are modelled as 30 m omni sites at typical power. For your own sites, set these in the Transmitters table.</p>
+      </div></details>
+  </section>
+
   <div class="mapbox">
     <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
     <div class="map-tl">
@@ -769,6 +847,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
         <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd">+ Receiver</label>
         <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move TX</label>
         <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move RX</label>
+        <input type="radio" name="clickset" id="modeMe" value="me"><label for="modeMe">📍 Me</label>
         <input type="radio" name="clickset" id="modeDel" value="del"><label for="modeDel" class="dellbl">✕ Remove</label>
       </div>
       <button class="btn mapbtn" id="gpsBtn" type="button" hidden>◎ Use my location</button>
@@ -791,7 +870,13 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
       </select>
     </div>
     <div class="map-br" id="attrib"></div>
-    <button class="pindel" id="pinDel" type="button" hidden>✕ Delete</button>
+    <div class="pintools" id="pinTools" hidden><button class="pinbtn" id="pinRen" type="button">✎ Rename</button><button class="pinbtn del" id="pinDel" type="button">✕ Delete</button></div>
+    <div class="renbox" id="renBox" hidden role="dialog" aria-label="Rename pin">
+      <label for="renInput" class="lbl">Pin name</label>
+      <input type="text" id="renInput" maxlength="60">
+      <button class="chip" id="renSug" type="button" hidden></button>
+      <div class="row"><button class="btn primary sm" id="renSave" type="button">Save name</button><button class="btn sm" id="renCancel" type="button">Cancel</button></div>
+    </div>
     <div class="mapmsg" id="mapMsg" role="status" hidden></div>
   </div>
   <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span style="color:#e8862a">○ Secondary edge (Deygout)</span><span>■ Buildings (zoom in)</span></div>
@@ -806,7 +891,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 
   <section class="panel card">
     <div class="chart-head"><h2>Transmitters</h2></div>
-    <div class="tablewrap"><table class="fs sites" id="txTable"></table></div>
+    <div class="tablewrap"><table class="fs sites txtbl" id="txTable"></table></div>
     <div class="chart-head" style="margin-top:6px"><h2>Receiver sites</h2>
       <div class="row"><button class="btn" id="copyCsv" type="button">Copy table (CSV)</button><button class="btn" id="dlCsv" type="button" hidden>Download CSV</button><button class="btn ghost" id="clearRx" type="button">✕ Clear receivers (keep selected)</button></div></div>
     <p class="hint">Paths are from the selected transmitter. Choose "+ Receiver" or "+ Transmitter" on the map and click anywhere in the world to add sites. Select a row to see its path below.</p>
@@ -953,6 +1038,8 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
         <li><b>Animation:</b> watch ground and sky waves travel. Use <i>Quick settings</i> to switch frequency, and ⛶ for full screen.</li>
         <li><b>Map:</b> place transmitters and receivers anywhere in the world. Each site gets a reception verdict.</li>
         <li><b>Terrain profile:</b> see the mountains, buildings and main obstacle between a transmitter and a receiver.</li>
+        <li><b>Plan a cell site (engineers):</b> on the Map, load real cells (OpenCelliD), turn on the <b>Coverage map</b> for 2G/3G/4G/5G and look for red gaps. Add a candidate with <b>+ Transmitter</b>, then set its networks, height, 3-sector azimuth and tilt in the Transmitters table. Watch "covered in view %" change.</li>
+        <li><b>Rename pins:</b> new pins are named from OpenStreetMap automatically. Select a pin and choose <b>✎ Rename</b> (or press F2).</li>
         <li><b>Mobile coverage at home:</b> on the Map, set a receiver at your home (Move RX or Use my location), then choose <b>📶 Find nearest cell towers</b>. Towers mapped in OpenStreetMap are added as transmitters with their heights, ready to simulate 2G–5G.</li>
         <li><b>Learn and Quiz:</b> read the theory and check your understanding.</li>
       </ol>
@@ -2015,7 +2102,7 @@ const FALLBACK=[
   [[80.25,9.83],[80.6,9.45],[80.82,9.27],[81.13,8.75],[81.23,8.57],[81.4,8.15],[81.7,7.72],[81.86,7.2],[81.84,6.87],[81.65,6.45],[81.4,6.25],[81.12,6.12],[80.6,5.93],[80.22,6.03],[80.05,6.25],[79.86,6.93],[79.83,7.2],[79.8,7.9],[79.83,8.03],[79.92,8.6],[79.9,8.98],[80.05,9.3],[79.95,9.65],[80.25,9.83]],
   [[68.2,23.7],[70.0,20.8],[72.8,19.0],[73.5,15.8],[74.8,12.8],[76.3,9.5],[77.5,8.1],[78.2,8.9],[79.3,10.3],[79.9,11.2],[80.3,13.4],[80.2,15.5],[82.3,16.6],[84.8,19.2],[87.0,21.5],[88.6,21.6],[90.5,22.5],[92.0,21.5],[94.3,18.2],[94.6,16.0],[97.6,16.5],[98.5,13.0],[98.5,8.0],[100.3,6.5],[103.4,1.4],[104,10],[106,20],[100,25],[90,28],[80,31],[70,33],[62,25],[66,25],[68.2,23.7]]
 ];
-const DEFAULT_TXS=()=>[{id:1,name:"Colombo",lat:6.93,lon:79.85,h:120}];
+const DEFAULT_TXS=()=>[{id:1,name:"Colombo (broadcast)",lat:6.93,lon:79.85,h:120,techs:[]}];
 const DEFAULT_RXS=()=>[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}];
 const MP={txs:DEFAULT_TXS(),ti:0,nextTx:2,rxs:[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}],ai:0,nextRx:4,
   view:null,mode:"add",polys:[],source:"loading",date:new Date(),path:null,lastModelId:null,useTerrain:true,useBuildings:true,showBulge:false,manual:{tx:0,rx:0},res:new Map(),cover:null,anim:{playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,t:0,last:0}};
@@ -2330,6 +2417,8 @@ function drawMap(){
   // night
   const sp=sunPos(MP.date), cell=10, nightA=vec?0.34:0.24;
   for(let y=0;y<H;y+=cell){ for(let x=0;x<W;x+=cell){ const q=unproj(x+cell/2,y+cell/2); const cz=cosZen(q.lat,q.lon,sp); const a=cz< -0.1?nightA:cz<0.1?nightA*(0.1-cz)/0.2:0; if(a>0){ c.fillStyle=`rgba(10,18,52,${a})`; c.fillRect(x,y,cell,cell);} } }
+  drawCoverage(c,W,H);
+  $("covStat").textContent=MP.covStat?`${TECH_LABEL[MP.covStat.tech]} covered in view: ${MP.covStat.pct}% · ${MP.covStat.towers} site${MP.covStat.towers===1?"":"s"}`:"";
   // coverage circle
   const cov=coverage();
   if(cov.ring){ c.beginPath(); cov.ring.forEach((q,i)=>{ const [x,y]=proj(q.lon,q.lat); i?c.lineTo(x,y):c.moveTo(x,y); }); c.closePath();
@@ -2380,12 +2469,16 @@ function drawMap(){
     c.fillStyle="#fff"; c.font=`700 ${big?11:9.5}px `+cssVar("--font-body"); c.textAlign="center"; c.fillText(lt,x,y-16*s);
     if(label){ c.font=`${big?600:500} 12px `+cssVar("--font-body"); const tw=c.measureText(label).width+12; c.fillStyle="rgba(255,255,255,.95)"; c.strokeStyle="rgba(0,0,0,.15)"; c.lineWidth=1; c.fillRect(x+12,y-30*s,tw,20); c.strokeRect(x+12,y-30*s,tw,20); c.fillStyle="#16202e"; c.textAlign="left"; c.fillText(label,x+18,y-30*s+14); } };
   MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9","R"+(i+1),false,v.z>4.5?rx.name:""); });
+  drawCellDots(c,W,H);
   MP.txs.forEach((t,i)=>{ if(i!==MP.ti) pin(t,"#e0828f","T"+(i+1),false,v.z>4.5?t.name:""); });
   pin(MP.tx,"#d13b4f","T"+(MP.ti+1),true,MP.tx.name); pin(MP.rx,"#1f5fd1","R"+(MP.ai+1),true,MP.rx.name);
-  // floating delete button beside the selected pin
+  drawMe(c);
+  // floating rename/delete tools beside the selected pin
   { const s=MP.lastSel&&((MP.lastSel.kind==="tx"&&MP.txs[MP.lastSel.i])||(MP.lastSel.kind==="rx"&&MP.rxs[MP.lastSel.i]))?MP.lastSel:{kind:"rx",i:MP.ai};
-    const pt=s.kind==="tx"?MP.txs[s.i]:MP.rxs[s.i], bt=$("pinDel");
-    if(pt){ const [x,y]=proj(pt.lon,pt.lat); const can=(s.kind==="tx"?MP.txs:MP.rxs).length>1; bt.hidden=!can||x<0||y<0||x>W||y>H; bt.style.left=x+"px"; bt.style.top=(y+8)+"px"; bt.textContent=`✕ Delete ${s.kind==="tx"?"T":"R"}${s.i+1}`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?"transmitter":"receiver"} ${pt.name}`); } }
+    const pt=s.kind==="tx"?MP.txs[s.i]:MP.rxs[s.i], box=$("pinTools"), bt=$("pinDel");
+    if(pt){ const [x,y]=proj(pt.lon,pt.lat); box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+8)+"px";
+      const can=(s.kind==="tx"?MP.txs:MP.rxs).length>1; bt.hidden=!can; bt.textContent=`✕ Delete`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?"transmitter":"receiver"} ${pt.name}`);
+      $("pinRen").setAttribute("aria-label",`Rename ${pt.name}`); MP.toolSel=s; } }
   const msg=$("mapMsg");
   if(MP.source==="loading"){ msg.hidden=false; msg.textContent="Loading map data…"; }
   else if(TILE.blockedMsg&&TILE.base==="vector"){ msg.hidden=false; msg.textContent="Map tiles can\'t load here because this page blocks outside images. Open the lab from its public website (or the downloadable copy) for the full OpenStreetMap and terrain. (Click to hide)"; }
@@ -2458,15 +2551,17 @@ function pathModel(){
   selId=m.id; currentPreset=-1; return m;
 }
 function setPoint(which,pt){
+  if(pt.auto){ delete pt.auto; pt.autoName=true; }
   if(which==="tx") MP.tx={id:MP.tx.id,h:MP.tx.h,...pt};
-  else if(which==="addtx"){ MP.txs.push({id:MP.nextTx++,h:+$("txH").value||120,...pt}); MP.ti=MP.txs.length-1; }
+  else if(which==="addtx"){ MP.txs.push({id:MP.nextTx++,h:+$("txH").value||120,techs:["2g","3g","4g"],sector:"omni",az:0,tilt:2,...pt}); MP.ti=MP.txs.length-1; }
   else if(which==="add"){ MP.rxs.push({id:MP.nextRx++,h:+$("rxH").value||10,...pt}); MP.ai=MP.rxs.length-1; }
   else MP.rx={id:MP.rx.id,h:MP.rx.h,...pt};
   MP.path=null; updateMap();
+  const obj=which==="addtx"||which==="tx"?MP.tx:MP.rx; if(obj&&obj.autoName) autoName(obj);
 }
 function updateMap(){
   if(MP.source==="loading"){ drawMap(); return; }
-  computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderActive();
+  computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderActive(); renderMyCoverage();
   $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
   $("rxH").value=MP.rx.h; $("txH").value=MP.txH;
   const ts=$("txCity"); ts.innerHTML=MP.txs.map((t,i)=>`<option value="tx:${i}">T${i+1} · ${esc(t.name)}</option>`).join("")+`<optgroup label="Move selected transmitter to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
@@ -2566,9 +2661,13 @@ function renderTxTable(){
       <td><input type="text" class="tnm" value="${esc(t.name)}" aria-label="Transmitter ${i+1} name"></td>
       <td class="mono">${t.lat.toFixed(3)}, ${t.lon.toFixed(3)}</td>
       <td><input type="number" class="tah" min="1" max="1000" step="1" value="${t.h}" aria-label="Transmitter ${i+1} mast height" style="width:76px"></td>
+      <td><div class="netchips">${TECHS.map(k=>`<button type="button" class="chip tnet" data-k="${k}" aria-pressed="${(t.techs||["2g","3g","4g"]).includes(k)}" aria-label="${TECH_LABEL[k]} on ${esc(t.name)}">${TECH_LABEL[k]}</button>`).join("")}</div></td>
+      <td><select class="tsec" aria-label="Antenna type of ${esc(t.name)}"><option value="omni"${(t.sector||"omni")==="omni"?" selected":""}>Omni</option><option value="3sector"${t.sector==="3sector"?" selected":""}>3-sector</option></select></td>
+      <td><input type="number" class="taz" min="0" max="359" step="5" value="${t.az||0}" aria-label="Azimuth of first sector, degrees" style="width:64px" ${(t.sector||"omni")==="omni"?"disabled":""}></td>
+      <td><input type="number" class="ttilt" min="-5" max="15" step="1" value="${t.tilt??2}" aria-label="Downtilt, degrees" style="width:56px"></td>
       <td>${i===MP.ti?'<span class="pill info">paths shown</span>':'<button class="btn sm tsel" type="button">Show paths</button>'}</td>
       <td><button class="iconbtn tdel" type="button" aria-label="Remove transmitter ${i+1}" title="Remove transmitter" ${MP.txs.length===1?"disabled":""}>✕</button></td></tr>`).join("");
-  $("txTable").innerHTML=`<tr><th></th><th>Transmitter</th><th>Lat, lon</th><th>Mast (m)</th><th></th><th></th></tr>`+rows;
+  $("txTable").innerHTML=`<tr><th></th><th>Transmitter</th><th>Lat, lon</th><th>Mast (m)</th><th>Networks</th><th>Antenna</th><th>Azimuth °</th><th>Tilt °</th><th></th><th></th></tr>`+rows;
 }
 function sitesCSV(){
   const head=["Site","Latitude","Longitude","Ground height (m)","Antenna height (m)","Distance (km)","Terrain loss (dB)","Signal (dBuV/m)","Signal","Reception"];
@@ -2595,8 +2694,8 @@ function bindMap(){
   $("useBuildings").addEventListener("change",e=>{ MP.useBuildings=e.target.checked; updateMap(); });
   $("txElevM").addEventListener("change",e=>{ MP.manual.tx=+e.target.value||0; updateMap(); });
   $("rxElevM").addEventListener("change",e=>{ MP.manual.rx=+e.target.value||0; MP.rx.manualElev=MP.manual.rx; updateMap(); });
-  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; $("modeAddTx").checked=m==="addtx"; $("modeDel").checked=m==="del"; mapC.style.cursor=m==="del"?"not-allowed":""; };
-  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeDel","del"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
+  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; $("modeAddTx").checked=m==="addtx"; $("modeDel").checked=m==="del"; $("modeMe").checked=m==="me"; mapC.style.cursor=m==="del"?"not-allowed":""; };
+  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeDel","del"],["modeMe","me"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
   // pins: TX and RX hit-testing (the pin head sits ~20 px above the point)
   const hitPin=(x,y)=>{ for(let i=MP.txs.length-1;i>=0;i--){ const [px,py]=proj(MP.txs[i].lon,MP.txs[i].lat); if(Math.hypot(px-x,py-18-y)<15) return {kind:"tx",i}; }
     for(let i=MP.rxs.length-1;i>=0;i--){ const [px,py]=proj(MP.rxs[i].lon,MP.rxs[i].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"rx",i}; } return null; };
@@ -2605,7 +2704,18 @@ function bindMap(){
     else { if(MP.rxs.length<2){ msg.hidden=false; msg.textContent="Keep at least one receiver. Use Move RX to place it elsewhere. (Click to hide)"; return; } const id=MP.rxs[h.i].id; MP.rxs.splice(h.i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>h.i?MP.ai-1:MP.ai,MP.rxs.length-1); }
     updateMap(); };
   MP.removePin=removePin;
-  $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
+  const renOpen=()=>{ const s=MP.toolSel||{kind:"rx",i:MP.ai}; const pt=s.kind==="tx"?MP.txs[s.i]:MP.rxs[s.i]; if(!pt) return; const [x,y]=proj(pt.lon,pt.lat);
+    const box=$("renBox"); box.style.left=clamp(x,140,mapC.clientWidth-140)+"px"; box.style.top=Math.min(y+40,mapC.clientHeight-170)+"px"; box.hidden=false; box.dataset.kind=s.kind; box.dataset.i=s.i;
+    $("renInput").value=pt.name; $("renInput").focus(); $("renInput").select();
+    const sug=$("renSug"); sug.hidden=true;
+    const show=nm=>{ if(nm&&nm!==pt.name){ sug.hidden=false; sug.textContent="Use map name: "+nm; sug.onclick=()=>{ $("renInput").value=nm; }; } };
+    if(pt.suggest) show(pt.suggest); else reverseName(pt.lat,pt.lon).then(nm=>{ pt.suggest=nm; if(!$("renBox").hidden) show(nm); }); };
+  const renSave=()=>{ const box=$("renBox"); const arr=box.dataset.kind==="tx"?MP.txs:MP.rxs; const pt=arr[+box.dataset.i]; const v=$("renInput").value.trim(); if(pt&&v){ pt.name=v; pt.autoName=false; } box.hidden=true; updateMap(); };
+  $("pinRen").addEventListener("click",e=>{ e.stopPropagation(); renOpen(); });
+  $("renSave").addEventListener("click",renSave); $("renCancel").addEventListener("click",()=>$("renBox").hidden=true);
+  $("renInput").addEventListener("keydown",e=>{ if(e.key==="Enter") renSave(); if(e.key==="Escape") $("renBox").hidden=true; });
+  mapC.addEventListener("keydown",e=>{ if(e.key==="F2"){ e.preventDefault(); renOpen(); } });
+  $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
   mapC.tabIndex=0;
   mapC.addEventListener("keydown",e=>{ if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removePin(MP.lastSel||{kind:"rx",i:MP.ai}); MP.lastSel={kind:"rx",i:MP.ai}; } });
   $("mapReset").addEventListener("click",()=>{ MP.txs=DEFAULT_TXS(); MP.rxs=DEFAULT_RXS(); MP.ti=0; MP.ai=0; MP.nextTx=2; MP.nextRx=4; MP.res.clear(); setMode("add"); MP.view=null; updateMap(); MP.view=defaultView("sites"); drawMap(); });
@@ -2627,8 +2737,9 @@ function bindMap(){
     // clicking an existing pin selects it (double-click removes it)
     const hp=hitPin(x,y); if(hp) MP.lastSel=hp; if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
     let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
-    const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180};
-    if(MP.mode==="addtx") pt.name=best?best.c[0]:`Transmitter ${MP.nextTx}`;
+    const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(3)}°, ${q.lon.toFixed(3)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180,auto:true};
+    if(MP.mode==="me"){ MP.setMe(pt.lat,pt.lon,best?best.c[0]:null); setMode("add"); return; }
+    if(MP.mode==="addtx"&&!best) pt.name=`Transmitter ${MP.nextTx}`;
     setPoint(MP.mode,pt); if(MP.mode==="tx"||MP.mode==="addtx") setMode("add"); });
   // sites table
   const tb=$("sitesTable");
@@ -2641,10 +2752,15 @@ function bindMap(){
   const tt=$("txTable");
   tt.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-t]"); if(!tr) return; const i=+tr.dataset.t;
     if(e.target.closest(".tdel")){ removePin({kind:"tx",i}); return; }
+    const nb=e.target.closest(".tnet"); if(nb){ const t=MP.txs[i]; const set=new Set(t.techs||["2g","3g","4g"]); set.has(nb.dataset.k)?set.delete(nb.dataset.k):set.add(nb.dataset.k); t.techs=TECHS.filter(k=>set.has(k)); renderTxTable(); drawMap(); renderMyCoverage(); return; }
+    if(e.target.closest("select")) return;
     if(e.target.closest("input")) return; if(MP.ti!==i){ MP.ti=i; updateMap(); } });
   tt.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-t]"); if(!tr) return; const t=MP.txs[+tr.dataset.t];
     if(e.target.classList.contains("tnm")){ t.name=e.target.value.trim()||t.name; updateMap(); }
-    if(e.target.classList.contains("tah")){ t.h=clamp(+e.target.value||1,1,1000); updateMap(); } });
+    if(e.target.classList.contains("tah")){ t.h=clamp(+e.target.value||1,1,1000); updateMap(); }
+    if(e.target.classList.contains("tsec")){ t.sector=e.target.value; renderTxTable(); drawMap(); renderMyCoverage(); }
+    if(e.target.classList.contains("taz")){ t.az=((+e.target.value||0)%360+360)%360; drawMap(); renderMyCoverage(); }
+    if(e.target.classList.contains("ttilt")){ t.tilt=clamp(+e.target.value||0,-5,15); drawMap(); renderMyCoverage(); } });
   $("clearRx").addEventListener("click",()=>{ const keep=MP.rx; MP.rxs=[keep]; MP.ai=0; MP.res=new Map([...MP.res].filter(([k])=>k===keep.id)); updateMap(); });
   $("copyCsv").addEventListener("click",async()=>{ const b=$("copyCsv"); try{ await navigator.clipboard.writeText(sitesCSV()); b.textContent="Copied ✓"; }catch(e){ b.textContent="Copy blocked"; } setTimeout(()=>b.textContent="Copy table (CSV)",1800); });
   let topLevel=false; try{ topLevel=window.top===window.self; }catch(e){}
@@ -2661,18 +2777,18 @@ function bindMap(){
   $("zoomRx").addEventListener("click",()=>{ MP.view={lon:MP.rx.lon,lat:MP.rx.lat,z:16}; drawMap(); });
   $("findTowers").addEventListener("click",async()=>{
     const b=$("findTowers"), msg=$("mapMsg"); b.disabled=true; b.textContent="Searching…";
-    const home=MP.rx; const list=await findTowers(home,8000);
+    const home=(b.dataset.at==="me"&&MP.me)?MP.me:MP.rx; delete b.dataset.at; const list=await findTowers(home,8000);
     b.disabled=false; b.textContent="📶 Find nearest cell towers";
     if(!list){ msg.hidden=false; msg.textContent="The OpenStreetMap tower search is busy. Try again in a minute. (Click to hide)"; return; }
     if(!list.length){ msg.hidden=false; msg.textContent=`No towers are mapped in OpenStreetMap within 8 km of ${home.name}. Many are missing from OSM, so add yours with "+ Transmitter". (Click to hide)`; return; }
     const pick=list.slice(0,5);
-    pick.forEach(t=>MP.txs.push({id:MP.nextTx++,name:`${t.name} (OSM)`,lat:t.lat,lon:t.lon,h:t.h}));
+    pick.forEach(t=>MP.txs.push({id:MP.nextTx++,name:`${t.name} (OSM)`,lat:t.lat,lon:t.lon,h:t.h,op:t.op,techs:["2g","3g","4g"],sector:"omni",az:0,tilt:2}));
     MP.ti=MP.txs.length-pick.length; // nearest first
     // use a 4G model for the station settings, creating one if needed
     let m=models.find(x=>x.p.type==="cell"); if(!m){ m=mk("4G LTE 1800 · home",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,env:"suburban"}); models.push(m); refreshAll(); }
     $("mapModel").value=String(m.id); MP.res.clear(); updateMap();
     MP.view=defaultView("path"); MP.view.z=Math.max(MP.view.z,13); drawMap();
-    msg.hidden=false; msg.textContent=`Added ${pick.length} tower${pick.length>1?"s":""} from OpenStreetMap. The nearest is ${fmtD(pick[0].dist)} km away (${pick[0].h} m). Switch towers in "Selected transmitter". (Click to hide)`;
+    renderMyCoverage(); msg.hidden=false; msg.textContent=`Added ${pick.length} tower${pick.length>1?"s":""} from OpenStreetMap. The nearest is ${fmtD(pick[0].dist)} km away (${pick[0].h} m). Switch towers in "Selected transmitter". (Click to hide)`;
   });
   $("tTx").addEventListener("change",e=>{ MP.ti=+e.target.value; updateMap(); });
   $("tRx").addEventListener("change",e=>{ MP.ai=+e.target.value; updateMap(); });
@@ -2684,6 +2800,184 @@ function bindMap(){
   $("toAnim").addEventListener("click",()=>{ const m=pathModel(); refreshAll(); setAnimModel(m.id); $("animModel").value=String(m.id); go("animation"); });
   $("mapMsg").addEventListener("click",()=>{ $("mapMsg").hidden=true; TILE.blockedMsg=false; });
   requestAnimationFrame(mapTick);
+}
+
+/* ===================== REAL CELL NETWORK, TOWER DESIGN, COVERAGE MAP, MY COVERAGE ===================== */
+const TECHS=["2g","3g","4g","5g"];
+const TECH_LABEL={"2g":"2G","3g":"3G","4g":"4G","5g":"5G"};
+const RADIO2TECH={GSM:"2g",UMTS:"3g",LTE:"4g",NR:"5g"};
+const TECH_COL={"2g":"#7b8ba3","3g":"#8a5cc7","4g":"#2f6fdf","5g":"#d0368a"};
+const TECH_MAXR={"2g":35,"3g":20,"4g":20,"5g":6};           // search radius (km) around a point
+const OPERATORS={"413-1":"Mobitel","413-2":"Dialog","413-3":"Hutch","413-5":"Airtel","413-8":"Hutch"};
+Object.assign(MP,{cells:[],useCells:true,me:null,cov:{tech:"off",env:"urban",indoor:false},covStat:null,covCache:null});
+
+/* ---------- antenna patterns (3GPP TR 36.814 / ITU-R M.2412 sector model) ---------- */
+function antGain(t,brgDeg,elevDeg){
+  const tilt=t.tilt??2, Av=-Math.min(12*Math.pow((elevDeg-tilt)/10,2),20);
+  if((t.sector||"omni")==="omni") return Math.max(Av,-30);
+  let best=-99;
+  for(const off of [0,120,240]){ let phi=Math.abs(((brgDeg-(t.az||0)-off)%360+540)%360-180); const Ah=-Math.min(12*Math.pow(phi/65,2),30); best=Math.max(best,-Math.min(-(Ah+Av),30)); }
+  return best;
+}
+/* tower list for one technology: user/OSM transmitters that carry it + imported real cells */
+function towersFor(tech){
+  const list=[];
+  MP.txs.forEach((t,i)=>{ const techs=t.techs||["2g","3g","4g"]; if(techs.includes(tech)) list.push({src:"pin",i,name:t.name,lat:t.lat,lon:t.lon,h:t.h||30,sector:t.sector||"omni",az:t.az||0,tilt:t.tilt??2,op:t.op||""}); });
+  if(MP.useCells) for(const c of MP.cells){ if(RADIO2TECH[c.radio]===tech) list.push({src:"ocid",c,name:`${c.op||"Cell"} ${TECH_LABEL[tech]} · ${c.cid}`,lat:c.lat,lon:c.lon,h:30,sector:"omni",az:0,tilt:2,op:c.op,range:c.range}); }
+  return list;
+}
+function cellParams(tech,h){ const T=CELL_TECH[tech]; return {type:"cell",tech,f:T.f,P:T.P,htx:h,hrx:1.5,env:MP.cov.env,indoor:MP.cov.indoor,storm:"none",moisture:"normal"}; }
+function rxFrom(tw,tech,pt){
+  const d=Math.max(hav(tw,pt),0.02), p=cellParams(tech,tw.h);
+  const elev=toDeg(Math.atan((tw.h-1.5)/(d*1000)));
+  return {dBm:cellRxdBm(d,p)+antGain(tw,bearing(tw,pt),elev),d};
+}
+const TECH_THR=t=>CELL_TECH[t].thr;
+function verdictDBm(v,tech){ if(v===null) return ["No coverage","bad"]; if(v>=-80) return ["Excellent","good"]; if(v>=-90) return ["Good","good"]; if(v>=TECH_THR(tech)) return ["Fair","warn"]; return ["No coverage","bad"]; }
+
+/* ---------- my coverage (one point, all technologies) ---------- */
+function coverageAt(pt){
+  return TECHS.map(tech=>{
+    let best=null, nReal=0;
+    for(const tw of towersFor(tech)){ const dd=hav(tw,pt); if(dd>TECH_MAXR[tech]) continue; if(tw.src==="ocid"&&dd<2) nReal++;
+      const r=rxFrom(tw,tech,pt); if(!best||r.dBm>best.dBm) best={...r,tw}; }
+    const [v,cls]=verdictDBm(best?best.dBm:null,tech);
+    return {tech,best,verdict:v,cls,nReal};
+  });
+}
+function renderMyCoverage(){
+  const box=$("myCov"); if(!box) return;
+  $("meName").textContent=MP.me?MP.me.name:"not set";
+  $("cellCount").textContent=MP.cells.length?`${MP.cells.length.toLocaleString()} real cells loaded (OpenCelliD)`:"No real cell data loaded yet";
+  if(!MP.me){ box.innerHTML=`<p class="hint">Set your location with <b>📍 Set my location</b> (or the map's "📍 Me" click mode) to see your 2G/3G/4G/5G coverage.</p>`; return; }
+  const res=coverageAt(MP.me);
+  box.innerHTML=res.map(r=>{
+    const b=r.best, tw=b&&b.tw;
+    const meas=tw&&tw.range?` · measured range ≈ ${fmtD(tw.range/1000)} km${b.d*1000>tw.range*1.5?" (you are outside it)":""}`:"";
+    return `<div class="tile ${r.cls}"><span class="k" style="color:${TECH_COL[r.tech]}">${TECH_LABEL[r.tech]} · ${CELL_TECH[r.tech].sys}</span>
+      <span class="val">${b?b.dBm.toFixed(0)+" dBm":"—"}</span>
+      <span class="sub"><span class="pill ${r.cls}">${r.verdict}</span></span>
+      <span class="sub">${tw?`${esc(tw.name)}${tw.op&&tw.src==="pin"?" · "+esc(tw.op):""}<br>${b.d<1?Math.round(b.d*1000)+" m":fmtD(b.d)+" km"} away${meas}`:`No ${TECH_LABEL[r.tech]} tower within ${TECH_MAXR[r.tech]} km in the data`}</span>
+      ${r.nReal?`<span class="sub">${r.nReal} real ${TECH_LABEL[r.tech]} cell${r.nReal>1?"s":""} within 2 km</span>`:""}
+      ${tw?`<button class="btn sm" type="button" data-analyse="${r.tech}">Analyse this path →</button>`:""}</div>`; }).join("");
+  box.querySelectorAll("[data-analyse]").forEach(bt=>bt.onclick=()=>analyseTowerPath(bt.dataset.analyse,res.find(x=>x.tech===bt.dataset.analyse).best.tw));
+}
+function analyseTowerPath(tech,tw){
+  let ti=-1;
+  if(tw.src==="pin") ti=tw.i;
+  else { ti=MP.txs.findIndex(t=>Math.abs(t.lat-tw.lat)<1e-5&&Math.abs(t.lon-tw.lon)<1e-5);
+    if(ti<0){ MP.txs.push({id:MP.nextTx++,name:tw.name,lat:tw.lat,lon:tw.lon,h:30,techs:[tech],op:tw.op||"",sector:"omni",az:0,tilt:2}); ti=MP.txs.length-1; } }
+  MP.ti=ti;
+  let ri=MP.rxs.findIndex(r=>r.me);
+  if(ri<0){ MP.rxs.push({id:MP.nextRx++,name:MP.me.name,lat:MP.me.lat,lon:MP.me.lon,h:1.5,me:true}); ri=MP.rxs.length-1; }
+  else Object.assign(MP.rxs[ri],{lat:MP.me.lat,lon:MP.me.lon,name:MP.me.name});
+  MP.ai=ri;
+  const T=CELL_TECH[tech]; let m=models.find(x=>x.p.type==="cell"&&x.p.tech===tech);
+  if(!m){ m=mk(`${T.name} · coverage`,{type:"cell",tech,f:T.f,P:T.P,htx:30,hrx:1.5,env:MP.cov.env,indoor:MP.cov.indoor}); models.push(m); refreshAll(); }
+  $("mapModel").value=String(m.id); MP.res.clear(); updateMap(); go("terrain");
+}
+
+/* ---------- coverage heat map (best server) ---------- */
+function covFit(tech,h){ const p=cellParams(tech,h); const L1=cellLoss(0.5,p), L2=cellLoss(5,p); const b=(L2-L1); return {a:L1-b*Math.log10(0.5),b,eirp:dBm(p.P)}; }
+function drawCoverage(c,W,H){
+  const tech=MP.cov.tech; MP.covStat=null; if(tech==="off") return;
+  const tl=unproj(0,0), br=unproj(W,H), mid=unproj(W/2,H/2), pad=TECH_MAXR[tech]/111;
+  let tws=towersFor(tech).filter(t=>t.lat<tl.lat+pad&&t.lat>br.lat-pad&&t.lon>tl.lon-pad/Math.cos(toRad(mid.lat))&&t.lon<br.lon+pad/Math.cos(toRad(mid.lat)));
+  if(tws.length>200){ tws.sort((a,b)=>hav(a,mid)-hav(b,mid)); tws=tws.slice(0,200); }
+  const fits=new Map(); const fitFor=h=>{ if(!fits.has(h)) fits.set(h,covFit(tech,h)); return fits.get(h); };
+  const thr=TECH_THR(tech), cell=14; let n=0, ok=0;
+  for(let y=0;y<H;y+=cell){ for(let x=0;x<W;x+=cell){
+    const q=unproj(x+cell/2,y+cell/2); let best=-999;
+    for(const tw of tws){ const dLat=(q.lat-tw.lat)*111.2, dLon=(q.lon-tw.lon)*111.2*Math.cos(toRad(q.lat)); const d=Math.max(Math.hypot(dLat,dLon),0.02); if(d>TECH_MAXR[tech]) continue;
+      const F=fitFor(tw.h); let v=F.eirp-(F.a+F.b*Math.log10(d));
+      if(tw.sector!=="omni"||true){ const brg=(toDeg(Math.atan2(dLon,dLat))+360)%360, el=toDeg(Math.atan((tw.h-1.5)/(d*1000))); v+=antGain(tw,brg,el); }
+      if(v>best) best=v; }
+    n++; if(best>=thr) ok++;
+    const col=best>=-80?"0,140,70,.42":best>=-90?"90,180,70,.38":best>=-100?"235,200,40,.36":best>=thr?"240,130,40,.34":"220,50,40,.16";
+    c.fillStyle=`rgba(${col})`; c.fillRect(x,y,cell,cell); } }
+  MP.covStat={tech,pct:n?Math.round(ok/n*100):0,towers:tws.length};
+}
+function drawCellDots(c,W,H){
+  if(!MP.useCells||!MP.cells.length) return;
+  const tl=unproj(0,0), br=unproj(W,H), r=MP.view.z>=13?4:MP.view.z>=10?3:2; let k=0;
+  for(const cl of MP.cells){ if(cl.lat>tl.lat||cl.lat<br.lat||cl.lon<tl.lon||cl.lon>br.lon) continue; const t=RADIO2TECH[cl.radio]; if(!t) continue;
+    if(MP.cov.tech!=="off"&&t!==MP.cov.tech) continue;
+    const [x,y]=proj(cl.lon,cl.lat); c.fillStyle=TECH_COL[t]; c.strokeStyle="#fff"; c.lineWidth=1; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); if(r>2) c.stroke(); if(++k>6000) break; }
+}
+function drawMe(c){
+  if(!MP.me) return; const [x,y]=proj(MP.me.lon,MP.me.lat);
+  c.fillStyle="#16a34a"; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); c.arc(x,y,8,0,7); c.fill(); c.stroke();
+  c.fillStyle="#fff"; c.beginPath(); c.arc(x,y,3,0,7); c.fill();
+  c.font="600 12px "+cssVar("--font-body"); const tw=c.measureText(MP.me.name).width+12; c.fillStyle="rgba(22,163,74,.95)"; c.fillRect(x+11,y-10,tw,20); c.fillStyle="#fff"; c.textAlign="left"; c.fillText(MP.me.name,x+17,y+4);
+}
+
+/* ---------- OpenCelliD: CSV/CSV.GZ import and API (small box) ---------- */
+function parseOcid(text){
+  const out=[]; let i=0; const lines=text.split(/\r?\n/);
+  for(const ln of lines){ if(!ln) continue; const f=ln.split(","); if(i++===0&&/radio/i.test(f[0])) continue;
+    const radio=(f[0]||"").toUpperCase(); if(!RADIO2TECH[radio]) continue;
+    const lon=+f[6], lat=+f[7]; if(!isFinite(lat)||!isFinite(lon)) continue;
+    const mcc=+f[1], mnc=+f[2]; out.push({radio,mcc,mnc,lac:f[3],cid:f[4],lat,lon,range:+f[8]||0,samples:+f[9]||0,op:OPERATORS[`${mcc}-${mnc}`]||`MNC ${mnc}`});
+    if(out.length>=400000) break; }
+  return out;
+}
+async function importOcidFile(file){
+  const msg=$("ocidMsg"); msg.textContent="Reading "+file.name+"…";
+  try{
+    let text;
+    if(/\.gz$/i.test(file.name)){ if(!("DecompressionStream" in window)) throw new Error("this browser cannot unzip .gz files; unzip it first"); text=await new Response(file.stream().pipeThrough(new DecompressionStream("gzip"))).text(); }
+    else text=await file.text();
+    const cells=parseOcid(text); MP.cells=cells; MP.covCache=null;
+    const by=TECHS.map(t=>`${TECH_LABEL[t]} ${cells.filter(c=>RADIO2TECH[c.radio]===t).length.toLocaleString()}`).join(" · ");
+    msg.textContent=`Loaded ${cells.length.toLocaleString()} real cells (${by}). Data © OpenCelliD (CC BY-SA 4.0).`;
+    updateMap(); renderMyCoverage();
+  }catch(e){ msg.textContent="Couldn't read the file: "+e.message+". Use the OpenCelliD CSV format (radio,mcc,net,area,cell,unit,lon,lat,range,…)."; }
+}
+async function ocidApiAround(pt){
+  const key=$("ocidKey").value.trim(), msg=$("ocidMsg"); if(!key){ msg.textContent="Enter your OpenCelliD API key first (free at opencellid.org)."; return; }
+  try{ if($("ocidRemember").checked) localStorage.setItem("gwlab-ocid-key",key); else localStorage.removeItem("gwlab-ocid-key"); }catch(e){}
+  const dLat=0.009, dLon=0.009/Math.cos(toRad(pt.lat)); // ~2 km × 2 km (the API's area limit)
+  const url=`https://opencellid.org/cell/getInBox?key=${encodeURIComponent(key)}&BBOX=${(pt.lat-dLat).toFixed(5)},${(pt.lon-dLon).toFixed(5)},${(pt.lat+dLat).toFixed(5)},${(pt.lon+dLon).toFixed(5)}&format=json&limit=1000`;
+  msg.textContent="Asking OpenCelliD…";
+  try{ const r=await fetch(url); const j=await r.json(); if(j.error) throw new Error(j.error);
+    const add=(j.cells||[]).map(c=>({radio:String(c.radio||"").toUpperCase(),mcc:c.mcc,mnc:c.mnc,lac:c.lac,cid:c.cellid,lat:+c.lat,lon:+c.lon,range:+c.range||0,samples:+c.samples||0,op:OPERATORS[`${c.mcc}-${c.mnc}`]||`MNC ${c.mnc}`})).filter(c=>RADIO2TECH[c.radio]);
+    const seen=new Set(MP.cells.map(c=>c.radio+c.cid)); add.forEach(c=>{ if(!seen.has(c.radio+c.cid)) MP.cells.push(c); });
+    msg.textContent=`OpenCelliD returned ${add.length} cells around ${pt.name||"this point"}. Data © OpenCelliD (CC BY-SA 4.0).`; updateMap(); renderMyCoverage();
+  }catch(e){ msg.textContent="OpenCelliD API call failed ("+e.message+"). Download the Sri Lanka CSV (MCC 413) from opencellid.org and use Import instead."; }
+}
+
+/* ---------- place names from OpenStreetMap (Nominatim), max 1 request per second ---------- */
+const GEO={cache:new Map(),q:Promise.resolve(),last:0};
+function reverseName(lat,lon){
+  const k=lat.toFixed(4)+","+lon.toFixed(4); if(GEO.cache.has(k)) return Promise.resolve(GEO.cache.get(k));
+  GEO.q=GEO.q.then(async()=>{ const wait=Math.max(0,1100-(Date.now()-GEO.last)); if(wait) await new Promise(r=>setTimeout(r,wait)); GEO.last=Date.now();
+    try{ const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=17&addressdetails=1&accept-language=en&lat=${lat}&lon=${lon}`); if(!r.ok) throw 0; const j=await r.json(); const a=j.address||{};
+      const local=j.name||a.amenity||a.building||a.road||a.neighbourhood||a.suburb||a.village||a.hamlet;
+      const town=a.suburb&&a.suburb!==local?a.suburb:(a.town||a.city||a.village||a.county||"");
+      const nm=[local,town&&town!==local?town:""].filter(Boolean).join(", ")||null; GEO.cache.set(k,nm); return nm; }catch(e){ GEO.cache.set(k,null); return null; } });
+  return GEO.q;
+}
+function autoName(obj){ if(!obj) return; reverseName(obj.lat,obj.lon).then(nm=>{ if(nm&&obj.autoName){ obj.name=nm; obj.suggest=nm; if(currentTab==="map"||currentTab==="terrain") updateMap(); renderMyCoverage(); } else if(nm) obj.suggest=nm; }); }
+
+/* ---------- UI bindings ---------- */
+function bindCells(){
+  $("ocidFile").addEventListener("change",e=>{ const f=e.target.files[0]; if(f) importOcidFile(f); });
+  try{ const k=localStorage.getItem("gwlab-ocid-key"); if(k){ $("ocidKey").value=k; $("ocidRemember").checked=true; } }catch(e){}
+  $("ocidApi").addEventListener("click",()=>ocidApiAround(MP.me||MP.rx));
+  $("useCells").addEventListener("change",e=>{ MP.useCells=e.target.checked; drawMap(); renderMyCoverage(); });
+  document.querySelectorAll('input[name="covTech"]').forEach(r=>r.addEventListener("change",e=>{ MP.cov.tech=e.target.value; drawMap(); }));
+  $("covEnv").addEventListener("change",e=>{ MP.cov.env=e.target.value; drawMap(); renderMyCoverage(); });
+  $("covIndoor").addEventListener("change",e=>{ MP.cov.indoor=e.target.checked; drawMap(); renderMyCoverage(); });
+  const setMe=(lat,lon,name)=>{ MP.me={lat,lon,name:name||"My location",autoName:!name}; autoName(MP.me); renderMyCoverage(); MP.view={lon,lat,z:Math.max(MP.view?MP.view.z:12,13)}; drawMap(); };
+  let topLevel=false; try{ topLevel=window.top===window.self; }catch(e){}
+  $("setMe").addEventListener("click",()=>{
+    const msg=$("mapMsg");
+    if(topLevel&&navigator.geolocation){ $("setMe").textContent="Locating…"; navigator.geolocation.getCurrentPosition(p=>{ $("setMe").textContent="📍 Set my location"; setMe(p.coords.latitude,p.coords.longitude); },
+      ()=>{ $("setMe").textContent="📍 Set my location"; document.getElementById("modeMe").click(); msg.hidden=false; msg.textContent="Location access was refused. Click your home on the map instead. (Click to hide)"; },{enableHighAccuracy:true,timeout:15000}); }
+    else { document.getElementById("modeMe").click(); msg.hidden=false; msg.textContent="Click your home on the map to set your location. (Click to hide)"; }
+  });
+  MP.setMe=setMe;
+  $("meTowers").addEventListener("click",()=>{ if(!MP.me) return $("setMe").click(); const old=MP.rx; const tmp={...MP.rx}; $("findTowers").dataset.at="me"; $("findTowers").click(); });
 }
 
 /* ================= QUIZ ================= */
@@ -2770,7 +3064,7 @@ function bindHelp(){
 
 /* ================= INIT ================= */
 function init(){
-  fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindTabs(); renderQuiz();
+  fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindCells(); bindTabs(); renderQuiz();
   $("quizReset").addEventListener("click",renderQuiz);
   loadPreset(0);
   go(location.hash.slice(1)||"lab",true);
