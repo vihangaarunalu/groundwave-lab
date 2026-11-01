@@ -28,14 +28,14 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0f141c; --panel:#171e29; --ink:#e4e9f0; --muted:#97a3b5; --line:#2a3443;
-    --accent:#f0a93b; --accent-soft:#2e2717; --on-accent:#1a1206; --good:#4cc38a; --warn:#e6b450; --bad:#ef6b62;
+    --bg:#0d1320; --panel:#151d2c; --ink:#e6ebf3; --muted:#9aa6ba; --line:#28344a;
+    --accent:#6ea8ff; --accent-soft:#1a2a47; --on-accent:#08111f; --good:#45c98c; --warn:#f0b54a; --bad:#f2716a;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0f141c; --panel:#171e29; --ink:#e4e9f0; --muted:#97a3b5; --line:#2a3443;
-  --accent:#f0a93b; --accent-soft:#2e2717; --on-accent:#1a1206; --good:#4cc38a; --warn:#e6b450; --bad:#ef6b62;
+  --bg:#0d1320; --panel:#151d2c; --ink:#e6ebf3; --muted:#9aa6ba; --line:#28344a;
+  --accent:#6ea8ff; --accent-soft:#1a2a47; --on-accent:#08111f; --good:#45c98c; --warn:#f0b54a; --bad:#f2716a;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -341,6 +341,14 @@ table.sites tr.selrow{background:var(--accent-soft)}
 .k-fade{background:rgb(240,170,40)}
 .clock{font-size:30px}
 
+/* theme switch */
+.themebtn{align-self:center;margin-bottom:8px;width:auto;padding:0 10px;gap:6px;display:inline-flex;font:inherit;font-size:13px;font-weight:600}
+.appbar-in{align-items:center}
+.appbar-in .tabs{margin-left:auto}
+@media (max-width:760px){.themebtn{order:2}.appbar-in .tabs{order:3;width:100%}}
+
+.route2 .check{justify-content:flex-start !important}
+
 </style>
 </head>
 <body>
@@ -357,6 +365,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
       <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">4</span>Learn</button>
       <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">5</span>Quiz</button>
     </nav>
+    <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
   </div>
 </header>
 
@@ -601,14 +610,14 @@ table.sites tr.selrow{background:var(--accent-soft)}
 <section class="wrap" id="map-tab" role="tabpanel" aria-labelledby="tab-map" hidden>
   <section class="panel card routebar">
     <div class="route">
-      <div class="field"><label for="txCity"><span class="dot tx"></span>Transmitter</label><select id="txCity"></select></div>
+      <div class="field"><label for="txCity"><span class="dot tx"></span>Selected transmitter</label><select id="txCity"></select></div>
       <button class="iconbtn swap" id="swapBtn" type="button" title="Swap transmitter and selected receiver" aria-label="Swap transmitter and selected receiver">⇄</button>
       <div class="field"><label for="rxCity"><span class="dot rx"></span>Selected receiver</label><select id="rxCity"></select></div>
       <div class="field"><label for="when">Date &amp; time</label><div class="row nowrap"><input type="datetime-local" id="when"><button class="btn" id="nowBtn" type="button">Now</button></div></div>
       <div class="field"><label for="mapModel">Station settings</label><select id="mapModel"></select></div>
     </div>
     <div class="route2">
-      <div class="field"><label for="txH">Transmitter mast height (m)</label><input type="number" id="txH" min="1" max="1000" step="1" value="120"></div>
+      <div class="field"><label for="txH">Selected transmitter mast (m)</label><input type="number" id="txH" min="1" max="1000" step="1" value="120"></div>
       <div class="field"><label for="rxH">Selected receiver antenna (m)</label><input type="number" id="rxH" min="0" max="500" step="1" value="10"></div>
       <div class="field"><label for="mapLand">Land along the path is mostly</label><select id="mapLand"></select></div>
       <div class="field" style="align-self:end;gap:6px"><label class="check"><input type="checkbox" id="useTerrain" checked> Include terrain shadowing</label><label class="check"><input type="checkbox" id="useBuildings" checked> Include buildings &amp; peaks (OSM)</label></div>
@@ -630,9 +639,10 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
     <div class="map-tl">
       <div class="seg mapseg" role="radiogroup" aria-label="Clicking the map">
+        <input type="radio" name="clickset" id="modeAddTx" value="addtx"><label for="modeAddTx">+ Transmitter</label>
+        <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd">+ Receiver</label>
         <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move TX</label>
         <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move RX</label>
-        <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd">+ Add receiver</label>
       </div>
       <button class="btn mapbtn" id="gpsBtn" type="button" hidden>◎ Use my location</button>
     </div>
@@ -640,6 +650,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
       <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in">＋</button>
       <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out">－</button>
       <button class="iconbtn mapbtn" id="fitBtn" type="button" aria-label="Fit all sites" title="Fit all sites">⤢</button>
+      <button class="iconbtn mapbtn" id="mapReset" type="button" aria-label="Reset all sites" title="Reset all sites">↺</button>
       <button class="iconbtn mapbtn" id="mapPlay" type="button" aria-label="Pause map animation" title="Pause map animation">❚❚</button>
     </div>
     <div class="map-bl">
@@ -653,6 +664,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <div class="map-br" id="attrib"></div>
     <div class="mapmsg" id="mapMsg" hidden></div>
   </div>
+  <p class="hint">Click the map to add a transmitter or receiver. Click a pin to select it, <b>double-click a pin to remove it</b>, and use ↺ to reset. Drag to pan, scroll to zoom.</p>
 
   <div class="mapresult">
     <section class="panel card verdict" aria-live="polite" id="mapVerdict"></section>
@@ -664,7 +676,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
   <section class="panel card">
     <div class="chart-head"><h2>Receiver sites</h2>
       <div class="row"><button class="btn" id="copyCsv" type="button">Copy table (CSV)</button><button class="btn" id="dlCsv" type="button" hidden>Download CSV</button><button class="btn ghost" id="clearRx" type="button">Remove all but selected</button></div></div>
-    <p class="hint">Choose "+ Add receiver" on the map and click to add sites anywhere in the world. Select a row to see its path below.</p>
+    <p class="hint">Paths are from the selected transmitter. Choose "+ Receiver" or "+ Transmitter" on the map and click anywhere in the world to add sites. Select a row to see its path below.</p>
     <div class="tablewrap"><table class="fs sites" id="sitesTable"></table></div>
   </section>
 
@@ -1427,6 +1439,36 @@ function drawAnim(dt){
   const segs=pathSegs(p,Math.max(dB,1)); arcFill(Math.min(dA,0),0.3,effGround(segs[0].g,p).color);
   { let pos=0; segs.forEach(s=>{ arcFill(pos,pos+s.len+0.3,effGround(s.g,p).color); pos+=s.len; }); }
   if(p.frozen){ c.strokeStyle="rgba(255,255,255,.9)"; c.lineWidth=4; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0.5); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); }
+  // ===== real terrain along a map path (Copernicus DEM + OpenStreetMap) =====
+  const TR=p.path==="geo"&&p.terrain&&p.terrain.d&&p.terrain.d.length>1?p.terrain:null;
+  let tAlt=()=>0, tEx=0, vEx=0;
+  if(TR){
+    const Dmax=TR.d[TR.d.length-1], n=TR.e.length;
+    const maxE=Math.max(30,...TR.e,...(TR.b||[]).map(b=>b[1]));
+    tEx=Math.min(95,gTop*0.24)/maxE;                    // px per metre
+    vEx=tEx*1000/((x1-x0)/span);                        // vertical exaggeration vs distance scale
+    const eAt=d=>{ if(d<=0) return Math.max(0,TR.e[0]); if(d>=Dmax) return Math.max(0,TR.e[n-1]); const x=d/Dmax*(n-1), k=Math.min(n-2,Math.floor(x)), u=x-k; return Math.max(0,TR.e[k]*(1-u)+TR.e[k+1]*u); };
+    tAlt=d=>(d<0||d>Dmax)?0:eAt(d)*tEx/altScale;
+    c.globalAlpha=fa("gw")>0.5?1:0.5;
+    const a0=Math.max(dA,0), b0=Math.min(dB,Dmax);
+    if(b0>a0){
+      const N=240; c.beginPath();
+      for(let i=0;i<=N;i++){ const d=a0+(b0-a0)*i/N; const [x,y]=map(d/RE,tAlt(d)); i?c.lineTo(x,y):c.moveTo(x,y); }
+      for(let i=N;i>=0;i--){ const d=a0+(b0-a0)*i/N; const [x,y]=map(d/RE,0); c.lineTo(x,y); }
+      c.closePath(); const tg=c.createLinearGradient(0,gTop-110,0,gTop+20); tg.addColorStop(0,"#7a5a33"); tg.addColorStop(1,"#a68a5c"); c.fillStyle=tg; c.fill();
+      c.strokeStyle="#4a3519"; c.lineWidth=1.4; c.beginPath(); for(let i=0;i<=N;i++){ const d=a0+(b0-a0)*i/N; const [x,y]=map(d/RE,tAlt(d)); i?c.lineTo(x,y):c.moveTo(x,y); } c.stroke();
+      // buildings (same vertical scale as the terrain)
+      c.strokeStyle="rgba(30,36,48,.9)"; c.lineWidth=2;
+      for(const [bd,bh] of (TR.b||[])){ if(bd<a0||bd>b0) continue; const [x0b,y0b]=map(bd/RE,tAlt(bd)), [x1b,y1b]=map(bd/RE,tAlt(bd)+Math.max(bh*tEx,2)/altScale); c.beginPath(); c.moveTo(x0b,y0b); c.lineTo(x1b,y1b); c.stroke(); }
+      // named peaks
+      if(AN.labels){ const seen=[]; (TR.pk||[]).filter(k=>k[0]>=a0&&k[0]<=b0).sort((u,v)=>(v[2]||0)-(u[2]||0)).slice(0,4).forEach(([pd,name,ele])=>{ const [x,y]=map(pd/RE,tAlt(pd)); if(seen.some(sx=>Math.abs(sx-x)<120)) return; if(TR.ob&&Math.abs(TR.ob.d-pd)<span*0.04) return; seen.push(x);
+        c.fillStyle="#2b1f0e"; c.beginPath(); c.moveTo(x,y-2); c.lineTo(x-5,y-10); c.lineTo(x+5,y-10); c.closePath(); c.fill(); pill(c,`▲ ${name}${ele?" "+ele+" m":""}`,x,y-24,{size:11,bold:false}); }); }
+      // main obstacle
+      if(TR.ob&&TR.ob.d>=a0&&TR.ob.d<=b0){ const [x,y]=map(TR.ob.d/RE,tAlt(TR.ob.d)); c.fillStyle="#e24c42"; c.beginPath(); c.moveTo(x,y-2); c.lineTo(x-7,y-14); c.lineTo(x+7,y-14); c.closePath(); c.fill();
+        if(AN.labels) pill(c,`Main obstacle: ${TR.ob.what} · −${TR.ob.loss} dB`,x,Math.max(70,y-110),{accent:SC.skip,to:[x,y-14]}); }
+    }
+    c.globalAlpha=1;
+  }
   // distance scale
   c.font="11px "+cssVar("--font-mono"); c.fillStyle="rgba(255,255,255,.92)"; c.textAlign="center";
   const st=niceStep(span); for(let d=Math.ceil(Math.max(d0,0)/st)*st; d<=d0+span; d+=st){ if(d<=0) continue; const [x,y]=map(d/RE,0); c.fillRect(x-0.5,y,1,6); c.fillText(`${d>=10?Math.round(d):d.toFixed(1)} km`,x,y+18); }
@@ -1456,7 +1498,7 @@ function drawAnim(dt){
   c.globalAlpha=1;
 
   // tower
-  const [tx,ty]=map(0,0);
+  const [tx,ty]=map(0,tAlt(0));
   c.globalAlpha=fa("tx");
   c.strokeStyle="#eef1f5"; c.lineWidth=2.4; c.beginPath(); c.moveTo(tx,ty); c.lineTo(tx,ty-58); c.stroke();
   c.lineWidth=1; for(let k=1;k<6;k++){ c.beginPath(); c.moveTo(tx-5+k*0.7,ty-k*10); c.lineTo(tx+5-k*0.7,ty-k*10-6); c.stroke(); }
@@ -1470,18 +1512,21 @@ function drawAnim(dt){
     const key=JSON.stringify(m.p)+"|"+Math.round(d0)+"|"+Math.round(span)+"|"+W+"|"+phaseOf(cosC);
     if(AN.gwKey!==key){ AN.gwKey=key; AN.svc=serviceRadius({p}); const N=300, arr=[]; for(let i=0;i<=N;i++){ const d=Math.max(0.3,d0+span*1.12*i/N); const r=evalP(p,d,io); arr.push({d,v:p.type==="combined"?r.g:r.t}); } AN.gw=arr; }
     const nt=norton(100,p.f,g1), tilt=Math.min(Math.atan(1/Math.sqrt(Math.hypot(g1.er,nt.x)))*3,0.8);
-    const amp=v=>v===null?0:clamp((v-thr+30)/70,0,1)*48;
+    const amp0=v=>v===null?0:clamp((v-thr+30)/70,0,1)*48;
+    const shadow=d=>TR&&TR.ob&&d>TR.ob.d?TR.ob.loss:0;
+    const ampQ=q=>amp0(q.v===null?null:q.v-shadow(q.d));
+    const amp=v=>amp0(v);
     c.globalAlpha=fa("gw");
-    c.beginPath(); AN.gw.forEach((q,i)=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,0), A2=amp(q.v); const x=gx+Math.sin(a)*A2, y=gy-Math.cos(a)*A2; i?c.lineTo(x,y):c.moveTo(x,y); });
-    for(let i=AN.gw.length-1;i>=0;i--){ const [gx,gy]=map(AN.gw[i].d/RE,0); c.lineTo(gx,gy); } c.closePath();
+    c.beginPath(); AN.gw.forEach((q,i)=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), A2=ampQ(q); const x=gx+Math.sin(a)*A2, y=gy-Math.cos(a)*A2; i?c.lineTo(x,y):c.moveTo(x,y); });
+    for(let i=AN.gw.length-1;i>=0;i--){ const [gx,gy]=map(AN.gw[i].d/RE,tAlt(AN.gw[i].d)); c.lineTo(gx,gy); } c.closePath();
     c.fillStyle=`rgba(${SC.gw},.30)`; c.fill();
     const lamV=span/16, ph=t/1000*2*Math.PI*0.9;
     c.lineWidth=2.6; c.lineCap="round";
-    for(let i=1;i<AN.gw.length;i++){ const q0=AN.gw[i-1], q1=AN.gw[i]; const A2=amp(q1.v); if(A2<0.5) continue;
-      const pt=q=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,0), o=amp(q.v)*(0.5+0.5*Math.sin(2*Math.PI*q.d/lamV-ph)); return [gx+Math.sin(a)*o, gy-Math.cos(a)*o]; };
+    for(let i=1;i<AN.gw.length;i++){ const q0=AN.gw[i-1], q1=AN.gw[i]; const A2=ampQ(q1); if(A2<0.5) continue;
+      const pt=q=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), o=ampQ(q)*(0.5+0.5*Math.sin(2*Math.PI*q.d/lamV-ph)); return [gx+Math.sin(a)*o, gy-Math.cos(a)*o]; };
       const [ax,ay]=pt(q0),[bx,by]=pt(q1); c.strokeStyle=`rgba(${SC.gw},${clamp(A2/48+0.3,0,1)})`; c.beginPath(); c.moveTo(ax,ay); c.lineTo(bx,by); c.stroke(); }
-    if(p.f<30) for(let k=0;k<22;k++){ const d=d0+(((k*lamV+(ph/(2*Math.PI))*lamV)%(span*1.12))+span*1.12)%(span*1.12); if(d<1) continue; const q=AN.gw[Math.min(AN.gw.length-1,Math.max(0,Math.round((d-d0)/(span*1.12)*300)))]; const A2=amp(q.v); if(A2<1) continue;
-      const a=angAt(d), [gx,gy]=map(d/RE,0), L=A2+10; c.strokeStyle=`rgba(255,250,210,${clamp(A2/48,0.1,0.8)})`; c.lineWidth=1.2; c.beginPath(); c.moveTo(gx,gy); c.lineTo(gx+Math.sin(a+tilt)*L, gy-Math.cos(a+tilt)*L); c.stroke(); }
+    if(p.f<30) for(let k=0;k<22;k++){ const d=d0+(((k*lamV+(ph/(2*Math.PI))*lamV)%(span*1.12))+span*1.12)%(span*1.12); if(d<1) continue; const q=AN.gw[Math.min(AN.gw.length-1,Math.max(0,Math.round((d-d0)/(span*1.12)*300)))]; const A2=ampQ(q); if(A2<1) continue;
+      const a=angAt(d), [gx,gy]=map(d/RE,tAlt(d)), L=A2+10; c.strokeStyle=`rgba(255,250,210,${clamp(A2/48,0.1,0.8)})`; c.lineWidth=1.2; c.beginPath(); c.moveTo(gx,gy); c.lineTo(gx+Math.sin(a+tilt)*L, gy-Math.cos(a+tilt)*L); c.stroke(); }
     c.lineCap="butt";
     // VHF / UHF: line of sight and radio horizon
     if(p.f>=30){ const hz=radioHorizon(p); const [hx,hy]=map(hz/RE,0);
@@ -1490,7 +1535,7 @@ function drawAnim(dt){
     }
     const r=AN.svc; if(r&&r<d0+span*1.05&&r>d0){ const [xr,y]=map(r/RE,0); c.strokeStyle="rgba(255,255,255,.85)"; c.setLineDash([3,3]); c.lineWidth=1.2; c.beginPath(); c.moveTo(xr,y); c.lineTo(xr,y-80); c.stroke(); c.setLineDash([]);
       pill(c,`${p.f>=30?"Coverage":"Ground-wave"} limit ${fmtD(r)} km`,xr,y-92,{accent:SC.gw}); }
-    if(AN.labels){ const dl=clamp((r||span)*0.35,d0+span*0.1,d0+span*0.45); const q=AN.gw[Math.min(300,Math.max(0,Math.round((dl-d0)/(span*1.12)*300)))]; const [gx,gy]=map(dl/RE,0);
+    if(AN.labels&&!TR){ const dl=clamp((r||span)*0.35,d0+span*0.1,d0+span*0.45); const q=AN.gw[Math.min(300,Math.max(0,Math.round((dl-d0)/(span*1.12)*300)))]; const [gx,gy]=map(dl/RE,0);
       pill(c,p.f>=30?"Space wave: direct + reflected, line of sight":"Ground wave: follows the curve, fades with distance",gx+30,gy-amp(q.v)-78,{to:[gx,gy-amp(q.v)*0.6],accent:SC.gw}); }
     c.globalAlpha=1;
   }
@@ -1529,7 +1574,7 @@ function drawAnim(dt){
   // ===== receiver =====
   c.globalAlpha=fa("rx");
   if(AN.rx>=dA&&AN.rx<=dB){
-    const [rx,ry]=map(AN.rx/RE,0), ra=angAt(AN.rx);
+    const [rx,ry]=map(AN.rx/RE,tAlt(AN.rx)), ra=angAt(AN.rx);
     c.save(); c.translate(rx,ry); c.rotate(ra);
     c.fillStyle="#16202e"; c.strokeStyle="#fff"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
     c.beginPath(); c.moveTo(7,-19); c.lineTo(13,-36); c.stroke(); c.fillStyle="#ffd23c"; c.beginPath(); c.arc(-5,-10,4,0,7); c.fill();
@@ -1539,11 +1584,15 @@ function drawAnim(dt){
   c.globalAlpha=1;
   // caption & zoom info
   pill(c,`${m.name} · ${fmtF(p.f)} · ${fmtP(p.P)}`,12,22,{align:"left"});
+  if(TR) pill(c,`Real terrain${TR.manual?" (typed heights)":" · Copernicus DEM"}${(TR.b||[]).length?" + "+TR.b.length+" OSM buildings":""} · heights ×${Math.round(vEx)}`,12,48,{align:"left",size:11,accent:"166,138,92"});
   $("zoomInfo").textContent=`${fmtD(Math.max(d0,0))}–${fmtD(d0+span)} km`;
   updateMeter(p,io,thr,dt);
 }
 function updateMeter(p,io,thr,dt){
   const r=evalP(p,AN.rx,io);
+  // behind the main obstacle of a real map path, the ground wave carries its terrain loss
+  const TRo=p.path==="geo"&&p.terrain&&p.terrain.ob;
+  if(TRo&&AN.rx>TRo.d&&r.g!==null&&p.type!=="sky"){ r.g-=TRo.loss; const eg=mVfromdB(r.g), es=r.s===null?0:mVfromdB(r.s); r.t=p.type==="combined"?dBuV(Math.hypot(eg,es)):r.g; }
   const g=(p.type==="sky")?null:r.g, s=r.s;
   const eg=g===null?0:mVfromdB(g), es=s===null?0:mVfromdB(s);
   const ts=AN.t/1000;
@@ -1601,8 +1650,12 @@ const FALLBACK=[
   [[80.25,9.83],[80.6,9.45],[80.82,9.27],[81.13,8.75],[81.23,8.57],[81.4,8.15],[81.7,7.72],[81.86,7.2],[81.84,6.87],[81.65,6.45],[81.4,6.25],[81.12,6.12],[80.6,5.93],[80.22,6.03],[80.05,6.25],[79.86,6.93],[79.83,7.2],[79.8,7.9],[79.83,8.03],[79.92,8.6],[79.9,8.98],[80.05,9.3],[79.95,9.65],[80.25,9.83]],
   [[68.2,23.7],[70.0,20.8],[72.8,19.0],[73.5,15.8],[74.8,12.8],[76.3,9.5],[77.5,8.1],[78.2,8.9],[79.3,10.3],[79.9,11.2],[80.3,13.4],[80.2,15.5],[82.3,16.6],[84.8,19.2],[87.0,21.5],[88.6,21.6],[90.5,22.5],[92.0,21.5],[94.3,18.2],[94.6,16.0],[97.6,16.5],[98.5,13.0],[98.5,8.0],[100.3,6.5],[103.4,1.4],[104,10],[106,20],[100,25],[90,28],[80,31],[70,33],[62,25],[66,25],[68.2,23.7]]
 ];
-const MP={tx:{name:"Colombo",lat:6.93,lon:79.85},rxs:[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}],ai:0,nextRx:4,
-  view:null,mode:"add",polys:[],source:"loading",date:new Date(),path:null,lastModelId:null,txH:120,useTerrain:true,useBuildings:true,showBulge:false,manual:{tx:0,rx:0},res:new Map(),cover:null,anim:{playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,t:0,last:0}};
+const DEFAULT_TXS=()=>[{id:1,name:"Colombo",lat:6.93,lon:79.85,h:120}];
+const DEFAULT_RXS=()=>[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}];
+const MP={txs:DEFAULT_TXS(),ti:0,nextTx:2,rxs:[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}],ai:0,nextRx:4,
+  view:null,mode:"add",polys:[],source:"loading",date:new Date(),path:null,lastModelId:null,useTerrain:true,useBuildings:true,showBulge:false,manual:{tx:0,rx:0},res:new Map(),cover:null,anim:{playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,t:0,last:0}};
+Object.defineProperty(MP,"tx",{get(){ return MP.txs[MP.ti]; }, set(v){ MP.txs[MP.ti]=v; }});
+Object.defineProperty(MP,"txH",{get(){ return MP.tx.h; }, set(v){ MP.tx.h=v; }});
 Object.defineProperty(MP,"rx",{get(){ return MP.rxs[MP.ai]; }, set(v){ MP.rxs[MP.ai]=v; }});
 const mapC=$("map"), mctx=mapC.getContext("2d"), prof=$("profile"), pctx=prof.getContext("2d"), terr=$("terrain"), tctx=terr.getContext("2d");
 const mapBase=document.createElement("canvas"), bctx=mapBase.getContext("2d");
@@ -1831,7 +1884,7 @@ function unproj(x,y){ const W=mapC.clientWidth,H=mapC.clientHeight,v=MP.view; re
 function defaultView(kind){ const W=mapC.clientWidth||900,H=mapC.clientHeight||560;
   if(kind==="world") return {lon:30,lat:15,z:clamp(Math.log2(W/TS),1,3)};
   if(kind==="asia") return {lon:80,lat:15,z:4.2};
-  if(kind==="sites"){ const pts=[MP.tx,...MP.rxs]; let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity; for(const s of pts){ const x=wx(s.lon,0),y=wy(s.lat,0); a=Math.min(a,x); c=Math.max(c,x); b=Math.min(b,y); d=Math.max(d,y); }
+  if(kind==="sites"){ const pts=[...MP.txs,...MP.rxs]; let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity; for(const s of pts){ const x=wx(s.lon,0),y=wy(s.lat,0); a=Math.min(a,x); c=Math.max(c,x); b=Math.min(b,y); d=Math.max(d,y); }
     const z=clamp(Math.log2(Math.min(W*0.6/Math.max(c-a,1e-6),H*0.6/Math.max(d-b,1e-6))),1.5,12); return {lon:ilon((a+c)/2,0),lat:ilat((b+d)/2,0),z}; }
   if(kind==="lk") return {lon:80.7,lat:7.85,z:clamp(Math.log2(Math.min(W/4.2,H/4.6)*360/TS/1.0)-0.15,6,8.5)};
   const P=MP.path; if(!P) return defaultView("lk");
@@ -1900,7 +1953,8 @@ function drawMap(){
     c.fillStyle="#fff"; c.font=`700 ${big?11:9.5}px `+cssVar("--font-body"); c.textAlign="center"; c.fillText(lt,x,y-16*s);
     if(label){ c.font=`${big?600:500} 12px `+cssVar("--font-body"); const tw=c.measureText(label).width+12; c.fillStyle="rgba(255,255,255,.95)"; c.strokeStyle="rgba(0,0,0,.15)"; c.lineWidth=1; c.fillRect(x+12,y-30*s,tw,20); c.strokeRect(x+12,y-30*s,tw,20); c.fillStyle="#16202e"; c.textAlign="left"; c.fillText(label,x+18,y-30*s+14); } };
   MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9","R"+(i+1),false,v.z>4.5?rx.name:""); });
-  pin(MP.tx,"#d13b4f","TX",true,MP.tx.name); pin(MP.rx,"#1f5fd1","R"+(MP.ai+1),true,MP.rx.name);
+  MP.txs.forEach((t,i)=>{ if(i!==MP.ti) pin(t,"#e0828f","T"+(i+1),false,v.z>4.5?t.name:""); });
+  pin(MP.tx,"#d13b4f","T"+(MP.ti+1),true,MP.tx.name); pin(MP.rx,"#1f5fd1","R"+(MP.ai+1),true,MP.rx.name);
   const msg=$("mapMsg");
   if(MP.source==="loading"){ msg.hidden=false; msg.textContent="Loading map data…"; }
   else if(TILE.blockedMsg&&TILE.base==="vector"){ msg.hidden=false; msg.textContent="Map tiles can\'t load here because this page blocks outside images. Open the lab from its public website (or the downloadable copy) for the full OpenStreetMap and terrain. (Click to hide)"; }
@@ -1957,15 +2011,24 @@ function drawProfile(p){
 }
 
 /* ===== map tab UI ===== */
+function terrainSnapshot(T){
+  if(!T) return null; const n=T.e.length, step=Math.max(1,Math.floor(n/160)), d=[], e=[];
+  for(let i=0;i<n;i+=step){ d.push(+(T.d[i]/1000).toFixed(3)); e.push(Math.round(T.e[i])); }
+  if((n-1)%step){ d.push(+(T.d[n-1]/1000).toFixed(3)); e.push(Math.round(T.e[n-1])); }
+  const ob=T.ob&&T.loss>0.05?{d:T.ob.dm/1000,top:Math.round(T.ob.top),loss:+T.loss.toFixed(1),what:T.ob.kind==="building"?`building ${Math.round(T.ob.b.h)} m tall`:(T.peakName||`ridge ${Math.round(T.ob.top)} m`)}:null;
+  return {d,e,b:(T.buildings||[]).slice(0,500).map(b=>[+(b.dm/1000).toFixed(4),Math.round(b.h)]),pk:(T.osm?T.osm.peaks:[]).filter(p=>p.xt<3000).slice(0,12).map(p=>[+(p.dm/1000).toFixed(2),p.name,isFinite(p.ele)?Math.round(p.ele):null]),ob,manual:T.manual,txH:T.txH,rxH:T.rxH};
+}
 function toLocalInput(d){ const z=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
 function pathModel(){
   const p=mapParams(); const name=`${MP.tx.name} → ${MP.rx.name}`;
   let m=models.find(x=>x.id===MP.lastModelId && x.name===name);
+  const r=MP.res.get(MP.rx.id); p.terrain=terrainSnapshot(r&&r.T);
   if(m){ m.p=p; } else { m=mk(name,p); models.push(m); MP.lastModelId=m.id; }
   selId=m.id; currentPreset=-1; return m;
 }
 function setPoint(which,pt){
-  if(which==="tx") MP.tx=pt;
+  if(which==="tx") MP.tx={id:MP.tx.id,h:MP.tx.h,...pt};
+  else if(which==="addtx"){ MP.txs.push({id:MP.nextTx++,h:+$("txH").value||120,...pt}); MP.ti=MP.txs.length-1; }
   else if(which==="add"){ MP.rxs.push({id:MP.nextRx++,h:+$("rxH").value||10,...pt}); MP.ai=MP.rxs.length-1; }
   else MP.rx={id:MP.rx.id,h:MP.rx.h,...pt};
   MP.path=null; updateMap();
@@ -1974,7 +2037,9 @@ function updateMap(){
   if(MP.source==="loading"){ drawMap(); return; }
   computePath(); refreshSites(); drawMap(); renderSites(); renderActive();
   $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
-  $("rxH").value=MP.rx.h; $("txCity").value=CITIES.some(c=>c[0]===MP.tx.name)?MP.tx.name:"";
+  $("rxH").value=MP.rx.h; $("txH").value=MP.txH;
+  const ts=$("txCity"); ts.innerHTML=MP.txs.map((t,i)=>`<option value="tx:${i}">T${i+1} · ${esc(t.name)}</option>`).join("")+`<optgroup label="Move selected transmitter to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
+  ts.value="tx:"+MP.ti;
   const rs=$("rxCity"); rs.innerHTML=MP.rxs.map((r,i)=>`<option value="${i}">R${i+1} · ${esc(r.name)}</option>`).join("")+`<optgroup label="Move selected receiver to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
   rs.value=String(MP.ai);
 }
@@ -1983,7 +2048,7 @@ function renderActive(){
   const p=paramsFor(P,MP.rx,r.T), pr=r.pred, T=r.T;
   $("strip").innerHTML=P.segs.map((s,i)=>{ const st=i?P.segs[i-1].end:0; return `<span title="${s.g} ${fmtD(st)}–${fmtD(s.end)} km" style="flex:${Math.max(s.end-st,0.001)};background:${s.g==="sea"?"#2a62a8":"#8a7a4c"}"></span>`; }).join("");
   drawProfile(p); drawTerrain(P,T);
-  $("profName").textContent=`${MP.tx.name} → R${MP.ai+1} ${MP.rx.name}`;
+  $("profName").textContent=`T${MP.ti+1} ${MP.tx.name} → R${MP.ai+1} ${MP.rx.name}`;
   const sunEl=toDeg(Math.asin(clamp(P.cosMid,-1,1))), ph=phaseOf(P.cosMid), phTxt={day:"daytime",dusk:"twilight",night:"night"}[ph];
   const via=pr.g!==null&&(pr.s===null||pr.g>=pr.s)?"mostly by ground wave":"mostly by sky wave";
   $("mapVerdict").innerHTML=`<p class="eyebrow" style="margin:0">Prediction at R${MP.ai+1} · ${esc(MP.rx.name)}</p>
@@ -2067,17 +2132,16 @@ function sitesCSV(){
   return `# Transmitter: ${MP.tx.name} (${MP.tx.lat.toFixed(4)}, ${MP.tx.lon.toFixed(4)}), mast ${MP.txH} m, ${toLocalInput(MP.date)}\n`+lines.join("\n");
 }
 function bindMap(){
-  const opts=`<option value="">Custom point</option>`+CITIES.map(c=>`<option value="${esc(c[0])}">${esc(c[0])}</option>`).join("");
-  $("txCity").innerHTML=opts;
+
   $("attrib").innerHTML=PROVIDERS[TILE.base].attr; $("basemap").value=TILE.base;
   if(IS_FILE){ const o=$("basemap").querySelector('option[value="osm"]'); o.textContent="OpenStreetMap (works on the website version)"; }
   const city=n=>{ const c=CITIES.find(x=>x[0]===n); return c?{name:c[0],lat:c[1],lon:c[2]}:null; };
   const fit=()=>{ MP.view=defaultView("sites"); drawMap(); };
-  $("txCity").addEventListener("change",e=>{ const c=city(e.target.value); if(c){ setPoint("tx",c); fit(); } });
+  $("txCity").addEventListener("change",e=>{ const v=e.target.value; if(v.startsWith("city:")){ const c=city(v.slice(5)); if(c){ setPoint("tx",c); fit(); } } else { MP.ti=+v.slice(3); updateMap(); } });
   $("rxCity").addEventListener("change",e=>{ const v=e.target.value; if(v.startsWith("city:")){ const c=city(v.slice(5)); if(c){ setPoint("rx",c); fit(); } } else { MP.ai=+v; updateMap(); } });
   const coord=w=>()=>{ const la=+$(w+"Lat").value, lo=+$(w+"Lon").value; if(isFinite(la)&&isFinite(lo)&&Math.abs(la)<=90&&Math.abs(lo)<=180) setPoint(w,{name:`${la.toFixed(3)}°, ${lo.toFixed(3)}°`,lat:la,lon:lo}); };
   ["txLat","txLon"].forEach(id=>$(id).addEventListener("change",coord("tx"))); ["rxLat","rxLon"].forEach(id=>$(id).addEventListener("change",coord("rx")));
-  $("swapBtn").addEventListener("click",()=>{ const t=MP.tx, r=MP.rx; MP.tx={name:r.name,lat:r.lat,lon:r.lon}; MP.rx={id:r.id,h:r.h,name:t.name,lat:t.lat,lon:t.lon}; updateMap(); });
+  $("swapBtn").addEventListener("click",()=>{ const t=MP.tx, r=MP.rx; MP.tx={id:t.id,h:t.h,name:r.name,lat:r.lat,lon:r.lon}; MP.rx={id:r.id,h:r.h,name:t.name,lat:t.lat,lon:t.lon}; updateMap(); });
   $("txH").addEventListener("change",e=>{ MP.txH=clamp(+e.target.value||1,1,1000); updateMap(); });
   $("rxH").addEventListener("change",e=>{ MP.rx.h=clamp(+e.target.value||0,0,500); updateMap(); });
   $("useTerrain").addEventListener("change",e=>{ MP.useTerrain=e.target.checked; updateMap(); });
@@ -2085,25 +2149,34 @@ function bindMap(){
   $("useBuildings").addEventListener("change",e=>{ MP.useBuildings=e.target.checked; updateMap(); });
   $("txElevM").addEventListener("change",e=>{ MP.manual.tx=+e.target.value||0; updateMap(); });
   $("rxElevM").addEventListener("change",e=>{ MP.manual.rx=+e.target.value||0; MP.rx.manualElev=MP.manual.rx; updateMap(); });
-  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; };
-  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
+  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; $("modeAddTx").checked=m==="addtx"; };
+  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
+  // pins: TX and RX hit-testing (the pin head sits ~20 px above the point)
+  const hitPin=(x,y)=>{ for(let i=MP.txs.length-1;i>=0;i--){ const [px,py]=proj(MP.txs[i].lon,MP.txs[i].lat); if(Math.hypot(px-x,py-18-y)<15) return {kind:"tx",i}; }
+    for(let i=MP.rxs.length-1;i>=0;i--){ const [px,py]=proj(MP.rxs[i].lon,MP.rxs[i].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"rx",i}; } return null; };
+  const removePin=h=>{ const msg=$("mapMsg");
+    if(h.kind==="tx"){ if(MP.txs.length<2){ msg.hidden=false; msg.textContent="Keep at least one transmitter. Use Move TX to place it elsewhere. (Click to hide)"; return; } MP.txs.splice(h.i,1); MP.ti=Math.min(MP.ti>h.i?MP.ti-1:MP.ti,MP.txs.length-1); MP.res.clear(); }
+    else { if(MP.rxs.length<2){ msg.hidden=false; msg.textContent="Keep at least one receiver. Use Move RX to place it elsewhere. (Click to hide)"; return; } const id=MP.rxs[h.i].id; MP.rxs.splice(h.i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>h.i?MP.ai-1:MP.ai,MP.rxs.length-1); }
+    updateMap(); };
+  $("mapReset").addEventListener("click",()=>{ MP.txs=DEFAULT_TXS(); MP.rxs=DEFAULT_RXS(); MP.ti=0; MP.ai=0; MP.nextTx=2; MP.nextRx=4; MP.res.clear(); setMode("add"); MP.view=null; updateMap(); MP.view=defaultView("sites"); drawMap(); });
   const zoom=(dz,x,y)=>{ const W=mapC.clientWidth,H=mapC.clientHeight; x=x??W/2; y=y??H/2; const before=unproj(x,y); MP.view.z=clamp(MP.view.z+dz,1,17); const after=unproj(x,y); MP.view.lon=clamp(MP.view.lon+before.lon-after.lon,-180,180); MP.view.lat=clamp(MP.view.lat+before.lat-after.lat,-80,80); drawMap(); };
   $("zoomIn").onclick=()=>zoom(1); $("zoomOut").onclick=()=>zoom(-1); $("fitBtn").onclick=fit;
   $("mapPlay").addEventListener("click",()=>setMapPlaying(!MP.anim.playing)); setMapPlaying(MP.anim.playing);
   $("basemap").addEventListener("change",e=>{ TILE.blockedMsg=false; setBase(e.target.value); });
   mapC.addEventListener("wheel",e=>{ e.preventDefault(); const r=mapC.getBoundingClientRect(); zoom(e.deltaY<0?0.5:-0.5,e.clientX-r.left,e.clientY-r.top); },{passive:false});
-  mapC.addEventListener("dblclick",e=>{ const r=mapC.getBoundingClientRect(); zoom(1,e.clientX-r.left,e.clientY-r.top); });
+  mapC.addEventListener("dblclick",e=>{ const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; const h=hitPin(x,y); if(h){ removePin(h); return; } zoom(1,x,y); });
   let down=null;
   mapC.addEventListener("pointerdown",e=>{ down={x:e.clientX,y:e.clientY,cx:wx(MP.view.lon,MP.view.z),cy:wy(MP.view.lat,MP.view.z),moved:false}; mapC.setPointerCapture(e.pointerId); });
   mapC.addEventListener("pointermove",e=>{ if(!down) return; const dx=e.clientX-down.x, dy=e.clientY-down.y; if(Math.hypot(dx,dy)>5) down.moved=true;
     if(down.moved){ mapC.style.cursor="grabbing"; MP.view.lon=clamp(ilon(down.cx-dx,MP.view.z),-180,180); MP.view.lat=clamp(ilat(down.cy-dy,MP.view.z),-80,80); scheduleMapDraw(); } });
   mapC.addEventListener("pointerup",e=>{ mapC.style.cursor=""; if(!down) return; const moved=down.moved; down=null; if(moved) return;
     const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, q=unproj(x,y);
-    // clicking an existing receiver pin selects it
-    for(let i=0;i<MP.rxs.length;i++){ const [px,py]=proj(MP.rxs[i].lon,MP.rxs[i].lat); if(Math.hypot(px-x,py+16-y)<14){ MP.ai=i; updateMap(); return; } }
+    // clicking an existing pin selects it (double-click removes it)
+    const hp=hitPin(x,y); if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
     let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
     const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180};
-    setPoint(MP.mode,pt); if(MP.mode==="tx") setMode("add"); });
+    if(MP.mode==="addtx") pt.name=best?best.c[0]:`Transmitter ${MP.nextTx}`;
+    setPoint(MP.mode,pt); if(MP.mode==="tx"||MP.mode==="addtx") setMode("add"); });
   // sites table
   const tb=$("sitesTable");
   tb.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const i=+tr.dataset.i;
@@ -2181,12 +2254,30 @@ function bindTabs(){
   window.addEventListener("hashchange",()=>go(location.hash.slice(1),true));
 }
 
+/* ================= THEME ================= */
+const THEMES=["auto","light","dark"], THEME_LABEL={auto:"◐ Auto",light:"☀ Light",dark:"☾ Dark"};
+function applyTheme(t){
+  if(t==="auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=t;
+  const b=$("themeBtn"); b.textContent=THEME_LABEL[t]; b.setAttribute("aria-label","Colour theme: "+t);
+  try{ localStorage.setItem("gwlab-theme",t); }catch(e){}
+  // canvases read the theme tokens, so redraw the visible ones
+  if(currentTab==="lab") redraw(); if(currentTab==="map"){ drawMap(); renderActive(); }
+}
+function bindTheme(){
+  let t="auto"; try{ t=localStorage.getItem("gwlab-theme")||"auto"; }catch(e){}
+  if(!THEMES.includes(t)) t="auto";
+  applyTheme(t);
+  $("themeBtn").addEventListener("click",()=>{ const cur=document.documentElement.dataset.theme||"auto"; applyTheme(THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]); });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ if(!document.documentElement.dataset.theme){ if(currentTab==="lab") redraw(); if(currentTab==="map"){ drawMap(); renderActive(); } } });
+}
+
 /* ================= INIT ================= */
 function init(){
   fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindTabs(); renderQuiz();
   $("quizReset").addEventListener("click",renderQuiz);
   loadPreset(0);
   go(location.hash.slice(1)||"lab",true);
+  bindTheme();
   new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map") { drawMap(); renderActive(); } }).observe(document.body);
   const mo=new MutationObserver(()=>{ if(currentTab==="lab") redraw(); }); mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
   requestAnimationFrame(animTick);

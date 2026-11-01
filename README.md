@@ -89,7 +89,7 @@ Use this to check that students and trainees can use the lab. Test with 5 people
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--accent` | `#1f5fd1` | `#f0a93b` | buttons, selection, links |
+| `--accent` | `#1f5fd1` | `#6ea8ff` | buttons, selection, links |
 | `--good` / `--warn` / `--bad` | green / amber / red | lighter variants | reception status only |
 | `--font-display` | Archivo | | headings |
 | `--font-body` | IBM Plex Sans | | text |
