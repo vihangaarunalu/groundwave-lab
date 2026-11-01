@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="Interactive trainer for LF, MF and HF ground-wave and sky-wave radio propagation, with OpenStreetMap, terrain profiles and receiver planning.">
+<title>Groundwave Propagation Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: app bar with tabs; each tab is one workspace. Lab = control rail + results; Animation = big stage + live meter; Map = map + path report. */
+:root{
+  --bg:#eef1f5;
+  --panel:#ffffff;
+  --ink:#16202e;
+  --muted:#5a6676;
+  --line:#d5dbe4;
+  --accent:#1f5fd1;
+  --accent-soft:#e3ecfb;
+  --on-accent:#ffffff;
+  --good:#1d8a5a; --warn:#b7791f; --bad:#c2413a;
+  --font-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f141c; --panel:#171e29; --ink:#e4e9f0; --muted:#97a3b5; --line:#2a3443;
+    --accent:#f0a93b; --accent-soft:#2e2717; --on-accent:#1a1206; --good:#4cc38a; --warn:#e6b450; --bad:#ef6b62;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f141c; --panel:#171e29; --ink:#e4e9f0; --muted:#97a3b5; --line:#2a3443;
+  --accent:#f0a93b; --accent-soft:#2e2717; --on-accent:#1a1206; --good:#4cc38a; --warn:#e6b450; --bad:#ef6b62;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:1.25rem;font-weight:800}
+h2{font-size:1.1rem;font-weight:700}
+h3{font-size:.98rem;font-weight:700}
+p{margin:0}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+
+/* App bar + tabs */
+.appbar{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line)}
+.appbar-in{max-width:1360px;margin:0 auto;padding:10px 16px 0;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:6px 18px}
+.brand{display:flex;gap:10px;align-items:center;padding-bottom:10px}
+.brand svg{flex:none}
+.brand small{display:block;color:var(--muted);font-size:12px;font-family:var(--font-body);font-weight:400;letter-spacing:0}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:14px;padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;display:flex;gap:7px;align-items:center}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .n{font-family:var(--font-mono);font-size:11px;border:1px solid currentColor;border-radius:4px;padding:0 4px;line-height:1.4}
+
+.wrap{max-width:1360px;margin:0 auto;padding:18px 16px 48px;display:grid;gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.pad{padding:14px 16px}
+.stack{display:grid;gap:12px}
+.intro{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+.intro p{max-width:80ch;color:var(--muted)}
+
+/* Steps */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+.step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+.step b{font-family:var(--font-display)}
+.step .num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700;font-size:13px;font-family:var(--font-mono)}
+.step p{font-size:13px;color:var(--muted)}
+.step-h{display:flex;gap:9px;align-items:center;margin-bottom:10px}
+.step-h .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700;font-size:12px;font-family:var(--font-mono)}
+
+/* Grids per tab */
+.lab{display:grid;grid-template-columns:370px minmax(0,1fr);gap:16px;align-items:start}
+.animgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+@media (max-width:1020px){.lab,.animgrid,.mapgrid{grid-template-columns:1fr}}
+
+/* Buttons & inputs */
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;padding:6px 11px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:hover{border-color:var(--accent)}
+.btn.sm{font-size:12px;padding:4px 8px}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:14px;line-height:1;display:grid;place-items:center}
+.iconbtn:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select,input[type=number],input[type=text],input[type=datetime-local],textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+textarea{font-family:var(--font-mono);font-size:13px;min-height:58px;resize:vertical}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 11px;font:inherit;font-size:13px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip .ico{font-size:14px;line-height:1}
+
+/* Model list */
+.model-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.model-row{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:9px;align-items:center;padding:7px 8px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.model-row.sel{border-color:var(--accent);background:var(--accent-soft)}
+.model-row .sw{width:14px;height:14px;border-radius:3px}
+.model-row input[type=text]{border:0;background:transparent;padding:0;font-weight:600;min-width:0}
+.model-row .tag{font-size:11px;color:var(--muted);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Form */
+.field{display:grid;gap:5px}
+.field > label,.field > .lbl{font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.field .v{font-family:var(--font-mono);color:var(--accent);font-weight:500}
+.hint{font-size:12px;color:var(--muted)}
+.err{font-size:12px;color:var(--bad);min-height:1em}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:500}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{flex:1;text-align:center;padding:6px 4px;font-size:13px;cursor:pointer;border-right:1px solid var(--line);font-weight:500}
+.seg label:last-of-type{border-right:0}
+.seg input:checked + label{background:var(--accent);color:var(--on-accent)}
+.seg input:focus-visible + label{outline:2px solid var(--accent);outline-offset:-2px}
+details.adv{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+details.adv > summary{cursor:pointer;font-weight:600;font-size:13px}
+details.adv[open] > summary{margin-bottom:10px}
+.subhead{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:4px}
+.dim{opacity:.5}
+.note{font-size:12px;border-left:3px solid var(--warn);padding:3px 0 3px 8px;color:var(--muted)}
+
+/* Info tooltip */
+.qi{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1px solid var(--muted);color:var(--muted);font-size:10px;font-weight:700;cursor:help;position:relative;font-family:var(--font-body);flex:none}
+.qi:hover::after,.qi:focus::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:240px;background:var(--ink);color:var(--panel);padding:7px 9px;border-radius:6px;font-size:12px;font-weight:400;line-height:1.4;text-transform:none;letter-spacing:0;z-index:30;white-space:normal;text-align:left}
+.lbl-l{display:inline-flex;gap:6px;align-items:center}
+
+/* Guide callout */
+.guide{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 14px;border-radius:10px;background:var(--accent-soft);border:1px solid var(--accent)}
+.guide b{font-family:var(--font-display)}
+.guide p{font-size:14px}
+@media (max-width:600px){.guide{grid-template-columns:1fr}}
+
+/* Findings */
+.summary{font-size:15px;max-width:90ch}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-radius:8px;padding:9px 11px 9px 14px;display:grid;gap:2px;position:relative;overflow:hidden;background:var(--panel)}
+.tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--line)}
+.tile.good::before{background:var(--good)}.tile.warn::before{background:var(--warn)}.tile.bad::before{background:var(--bad)}.tile.info::before{background:var(--accent)}
+.tile .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;display:flex;gap:6px;align-items:center}
+.tile .val{font-family:var(--font-mono);font-size:19px;font-weight:500;font-variant-numeric:tabular-nums}
+.tile .sub{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:700;color:#fff}
+.pill.good{background:var(--good)}.pill.warn{background:var(--warn)}.pill.bad{background:var(--bad)}.pill.info{background:var(--accent);color:var(--on-accent)}
+.explain{border-left:3px solid var(--accent);padding:2px 0 2px 12px;display:grid;gap:6px}
+.explain p{max-width:85ch;font-size:14px}
+
+/* Chart */
+.chart-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.chart-opts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.chart-opts select{width:auto;padding:4px 6px;font-size:13px}
+.chart-box{position:relative}
+#chart{display:block;width:100%;height:380px}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-size:12px;box-shadow:0 4px 14px rgba(0,0,0,.14);display:none;min-width:180px;z-index:3}
+.tip .r{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.sw9{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid currentColor}
+table.fs{border-collapse:collapse;font-size:13px;width:100%}
+table.fs th,table.fs td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.fs th:first-child,table.fs td:first-child{text-align:left}
+table.fs th{font-weight:600;color:var(--muted);font-size:12px}
+.tablewrap{overflow-x:auto}
+
+/* Animation */
+.stage{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#0b1430}
+#anim{display:block;width:100%;height:540px;touch-action:none;cursor:default}
+@media (max-width:700px){#anim{height:400px}}
+.stagebar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.meter{display:grid;gap:10px}
+.bar{height:10px;border-radius:5px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.bar > span{display:block;height:100%;border-radius:5px}
+.mrow{display:grid;grid-template-columns:90px 1fr 74px;gap:8px;align-items:center;font-size:13px}
+#scope{display:block;width:100%;height:110px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
+.quality{font-family:var(--font-display);font-size:22px;font-weight:800}
+.clock{font-family:var(--font-mono);font-size:28px;font-weight:500}
+.keyrow{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.keyrow span{display:inline-flex;gap:6px;align-items:center}
+.keyrow i{display:inline-block;width:18px;height:6px;border-radius:3px}
+
+/* Map */
+.mapbox{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+#map{display:block;width:100%;height:520px;touch-action:none;cursor:crosshair;background:#bcd3e8}
+@media (max-width:700px){#map{height:380px}}
+.maptools{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:6px}
+.maptools .btn{background:rgba(255,255,255,.92);color:#16202e;border-color:rgba(0,0,0,.18)}
+.maptools .btn[aria-pressed="true"]{background:#16202e;color:#fff}
+.mapmsg{position:absolute;right:8px;bottom:8px;background:rgba(22,32,46,.82);color:#fff;font-size:12px;padding:4px 8px;border-radius:6px;max-width:70%}
+#profile{display:block;width:100%;height:150px}
+.strip{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+
+/* Learn & quiz */
+.concepts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.concepts details{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel)}
+.concepts summary{cursor:pointer;font-weight:700;font-family:var(--font-display)}
+.concepts p,.concepts li{font-size:14px;max-width:68ch;margin:6px 0}
+.concepts ul{padding-left:18px;margin:6px 0}
+.eq{font-family:var(--font-mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:13px;overflow-x:auto;white-space:nowrap;margin:6px 0}
+table.gloss{border-collapse:collapse;width:100%;font-size:14px}
+table.gloss td{border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:top}
+table.gloss td:first-child{font-weight:600;white-space:nowrap;width:1%}
+.quiz{display:grid;gap:12px}
+.q{border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:8px;background:var(--panel)}
+.q .opts{display:flex;flex-wrap:wrap;gap:6px}
+.q .opts button{text-align:left}
+.q .opts button.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 16%,transparent)}
+.q .opts button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,transparent)}
+.q .fb{font-size:13px;color:var(--muted)}
+footer{color:var(--muted);font-size:12px;max-width:100ch}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+
+/* ===== v3: roomier layout ===== */
+body{font-size:15.5px}
+.wrap{gap:20px;padding:24px 20px 56px;max-width:1320px}
+.appbar-in{max-width:1320px;padding:12px 20px 0}
+.card{padding:20px 22px;display:grid;gap:16px;align-content:start}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.editing{font-size:12px;color:var(--muted);text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.editing b{color:var(--accent)}
+.eyebrow{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px}
+.expbar{padding:18px 22px;display:grid;gap:10px}
+.expbar-top{display:flex;gap:16px;align-items:flex-end;justify-content:space-between}
+.expbar-top > div{min-width:0}
+.scrollrow{flex-wrap:nowrap;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:thin}
+.scrollrow .chip{white-space:nowrap}
+.guide-text{color:var(--muted);max-width:100ch;font-size:14.5px}
+.guide-text b{color:var(--ink)}
+@media (max-width:700px){.expbar-top{flex-direction:column;align-items:stretch}}
+.lab{grid-template-columns:340px minmax(0,1fr);gap:20px}
+.side,.main{display:grid;gap:20px;align-content:start}
+.btn{min-height:36px;padding:7px 13px}
+.btn.ghost{border-color:transparent;background:transparent;text-decoration:none;color:var(--accent)}
+.btn.ghost:hover{border-color:var(--line)}
+a.btn{text-decoration:none}
+.chip{min-height:32px;padding:5px 12px}
+select,input[type=number],input[type=text],input[type=datetime-local]{min-height:38px}
+.iconbtn{width:36px;height:36px;font-size:16px}
+.model-row{padding:9px 10px}
+details.acc{border-top:1px solid var(--line)}
+details.acc > summary{list-style:none;cursor:pointer;padding:13px 0;font-family:var(--font-display);font-weight:700;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+details.acc > summary::-webkit-details-marker{display:none}
+details.acc > summary::after{content:"+";font-family:var(--font-mono);font-size:18px;color:var(--muted);line-height:1}
+details.acc[open] > summary::after{content:"–"}
+details.acc > summary:hover{color:var(--accent)}
+.acc-body{display:grid;gap:16px;padding:2px 0 18px}
+details.acc.plain > summary{font-size:14px;font-family:var(--font-body);font-weight:600}
+.summary{font-size:16px;line-height:1.55}
+.tiles{gap:12px}
+.tile{padding:12px 14px 12px 16px}
+.legend{gap:8px 16px}
+#chart{height:420px}
+.explain h3{margin-bottom:2px}
+.row.nowrap{flex-wrap:nowrap}
+
+/* Map v3 */
+.routebar{gap:10px}
+.route{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr);gap:14px;align-items:end}
+@media (max-width:1100px){.route{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.route > .field:nth-child(4),.route > .field:nth-child(5){grid-column:1 / -1}}
+@media (max-width:560px){.route{grid-template-columns:1fr}.swap{justify-self:center;transform:rotate(90deg)}}
+.route label{justify-content:flex-start !important;gap:7px !important}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.dot.tx{background:#d13b4f}.dot.rx{background:#1f5fd1}
+.coords{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:800px){.coords{grid-template-columns:1fr}}
+.mapbox{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+#map{height:560px;cursor:crosshair;background:#aad3df}
+@media (max-width:700px){#map{height:420px}}
+.map-tl{position:absolute;left:12px;top:12px;display:flex;gap:8px;flex-wrap:wrap;max-width:calc(100% - 70px)}
+.map-tr{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+.map-bl{position:absolute;left:12px;bottom:12px}
+.map-br{position:absolute;right:0;bottom:0;background:rgba(255,255,255,.85);color:#333;font-size:11px;padding:2px 6px;border-top-left-radius:6px}
+.map-br a{color:#0b57d0}
+.mapbtn{background:#fff !important;color:#16202e !important;border:1px solid rgba(0,0,0,.2) !important;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+select.mapbtn{width:auto;border-radius:7px;font-size:13px}
+.mapseg{background:#fff;border-color:rgba(0,0,0,.2);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.mapseg label{color:#16202e;padding:7px 12px;border-right-color:rgba(0,0,0,.15)}
+.mapseg input:checked + label{background:#16202e;color:#fff}
+.mapmsg{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);right:auto;max-width:min(560px,90%);text-align:center;background:rgba(22,32,46,.88);color:#fff;font-size:12.5px;padding:7px 12px;border-radius:8px}
+.mapresult{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px}
+@media (max-width:900px){.mapresult{grid-template-columns:1fr}}
+.verdict .big{font-family:var(--font-display);font-size:24px;font-weight:800;line-height:1.2}
+.verdict .val{font-family:var(--font-mono);font-size:30px}
+#profile{height:200px}
+.mapresult .tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+
+.stage{position:relative}
+.bigplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:inherit;font-weight:700;font-size:17px;padding:14px 24px;border-radius:999px;border:0;background:#fff;color:#16202e;box-shadow:0 6px 24px rgba(0,0,0,.35);cursor:pointer}
+.bigplay:hover{transform:translate(-50%,-50%) scale(1.04)}
+.animerr{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(194,65,58,.92);color:#fff;padding:8px 12px;border-radius:8px;font-size:13px}
+
+.route2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:14px;align-items:end}
+@media (max-width:900px){.route2{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.route2{grid-template-columns:1fr}}
+#terrain{display:block;width:100%;height:250px}
+table.sites td{vertical-align:middle}
+table.sites input{min-height:32px;padding:4px 6px}
+table.sites td:nth-child(2){min-width:150px;text-align:left}
+table.sites tr[data-i]{cursor:pointer}
+table.sites tr.selrow{background:var(--accent-soft)}
+.pin-n{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;background:#1f5fd1;color:#fff;border-radius:4px;padding:1px 5px}
+
+.mapseg label{white-space:nowrap}
+
+.mapmsg{cursor:pointer}
+
+/* ===== Animation v4 ===== */
+.stagebar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px}
+.stagebar .row{align-items:flex-end;gap:14px}
+.stage-tr{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+.zoominfo{position:absolute;right:12px;bottom:10px;font-family:var(--font-mono);font-size:11px;color:#fff;background:rgba(12,20,36,.7);padding:2px 7px;border-radius:5px}
+.tourbox{position:absolute;left:12px;top:44px;width:min(380px,calc(100% - 80px));background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.tourbox p{font-size:14px;line-height:1.5}
+.tourbox h3{font-size:17px}
+#anim{cursor:move}
+.keyrow i{width:18px;height:8px;border-radius:3px}
+.k-gw,.b-gw{background:rgb(255,200,61)}
+.k-sky,.b-sky{background:rgb(255,122,198)}
+.k-esc{background:repeating-linear-gradient(90deg,#9aa6b8 0 4px,transparent 4px 7px)}
+.k-d{background:rgba(222,104,66,.75)}
+.k-e{background:rgba(110,190,255,.75)}
+.k-f{background:rgba(150,130,255,.8)}
+.k-skip{background:rgb(226,76,66)}
+.k-fade{background:rgb(240,170,40)}
+.clock{font-size:30px}
+
+</style>
+</head>
+<body>
+<header class="appbar">
+  <div class="appbar-in">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 28 L15 8" stroke="currentColor" stroke-width="2"/><path d="M11 28 L15 8 L19 28" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 7 a9 9 0 0 1 14 0 M5 4 a13 13 0 0 1 20 0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>
+      <h1>Groundwave Propagation Lab<small>Radio wave propagation trainer · LF · MF · HF · VHF · UHF</small></h1>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-lab" aria-controls="lab" data-tab="lab"><span class="n">1</span>Lab</button>
+      <button class="tab" role="tab" id="tab-animation" aria-controls="animation" data-tab="animation"><span class="n">2</span>Animation</button>
+      <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map"><span class="n">3</span>Map &amp; location</button>
+      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">4</span>Learn</button>
+      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">5</span>Quiz</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ======================= LAB ======================= -->
+<section class="wrap" id="lab" role="tabpanel" aria-labelledby="tab-lab">
+  <section class="expbar panel">
+    <div class="expbar-top">
+      <div>
+        <p class="eyebrow">Experiment</p>
+        <div class="chips scrollrow" id="presets" aria-label="Ready-made experiments"></div>
+      </div>
+      <button class="btn primary" type="button" id="gNext">Next experiment →</button>
+    </div>
+    <p class="guide-text" id="guide"></p>
+  </section>
+
+  <div class="lab">
+    <aside class="side">
+      <section class="panel card">
+        <div class="card-h"><h2>Models</h2><span class="qi" tabindex="0" data-tip="Each model is one set of conditions. Click a model to edit it. To compare, copy a model and change one setting.">?</span></div>
+        <ul class="model-list" id="modelList"></ul>
+        <div class="row">
+          <button class="btn" id="addModel" type="button">+ Copy selected</button>
+          <button class="btn ghost" id="addBlank" type="button">+ New</button>
+        </div>
+      </section>
+
+      <section class="panel card">
+        <div class="card-h"><h2>Settings</h2><span class="editing">editing <b id="selNameCtl"></b></span></div>
+
+        <details class="acc" name="settings" open>
+          <summary>Signal</summary>
+          <div class="acc-body">
+            <div class="field">
+              <label for="type">What to calculate</label>
+              <select id="type">
+                <option value="combined">Ground wave + sky wave (most realistic)</option>
+                <option value="gw">Ground wave only</option>
+                <option value="gwflat">Ground wave only, flat earth (simple)</option>
+                <option value="sky">Sky wave only</option>
+                <option value="inverse">Ideal reference (no ground loss)</option>
+                <option value="custom">My own formula</option>
+              </select>
+            </div>
+            <div class="field" id="exprBox">
+              <label for="expr">Your formula for E (mV/m)</label>
+              <textarea id="expr" spellcheck="false"></textarea>
+              <p class="hint">Variables: d (km), f (MHz), P (kW), sigma, er, A (Norton factor), lam (km). Functions: exp, log, sqrt, pow.</p>
+              <p class="err" id="exprErr"></p>
+            </div>
+            <div class="field">
+              <label for="freq">Frequency <span class="v" id="freqV"></span></label>
+              <div class="chips" id="freqChips"></div>
+              <input type="range" id="freq" min="-1" max="3.477" step="0.001" aria-label="Fine-tune frequency">
+            </div>
+            <div class="two">
+              <div class="field"><label for="htx">TX antenna (m)</label><input type="number" id="htx" min="1" max="2000" step="1"></div>
+              <div class="field"><label for="hrx">RX antenna (m)</label><input type="number" id="hrx" min="1" max="500" step="1"></div>
+            </div>
+            <p class="hint" style="margin-top:-8px">Antenna heights matter most at VHF and UHF (line of sight).</p>
+            <div class="field">
+              <label for="pow">Transmitter power <span class="v" id="powV"></span></label>
+              <input type="range" id="pow" min="-1" max="3" step="0.01">
+            </div>
+          </div>
+        </details>
+
+        <details class="acc" name="settings">
+          <summary>Ground &amp; path</summary>
+          <div class="acc-body">
+            <div class="field" id="groundField">
+              <label for="ground">Ground under the path</label>
+              <select id="ground"></select>
+              <p class="note" id="geoNote" hidden></p>
+            </div>
+            <div class="two" id="customGround">
+              <div class="field"><label for="sigmaC">σ (S/m)</label><input type="number" id="sigmaC" step="0.0001" min="0.00001" max="10"></div>
+              <div class="field"><label for="erC">εr</label><input type="number" id="erC" step="1" min="1" max="90"></div>
+            </div>
+            <div class="field">
+              <label for="path">Path</label>
+              <select id="path">
+                <option value="uniform">Same ground all the way</option>
+                <option value="mixed">Changes at a boundary (e.g. coastline)</option>
+                <option value="geo" disabled>From the map</option>
+              </select>
+            </div>
+            <div id="mixedBox" class="two">
+              <div class="field"><label for="ground2">Then</label><select id="ground2"></select></div>
+              <div class="field"><label for="coast">Boundary <span class="v" id="coastV"></span></label><input type="range" id="coast" min="5" max="600" step="5"></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="acc" name="settings">
+          <summary>Time &amp; weather</summary>
+          <div class="acc-body">
+            <div class="field" id="timeField">
+              <span class="lbl">Time of day</span>
+              <div class="seg" role="radiogroup" aria-label="Time of day">
+                <input type="radio" name="time" id="tDay" value="day"><label for="tDay">Day</label>
+                <input type="radio" name="time" id="tDusk" value="dusk"><label for="tDusk">Dawn/dusk</label>
+                <input type="radio" name="time" id="tNight" value="night"><label for="tNight">Night</label>
+              </div>
+              <p class="note" id="timeNote" hidden></p>
+            </div>
+            <div class="field">
+              <span class="lbl">Weather</span>
+              <div class="chips" id="wxChips"></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="acc" name="settings" id="advBox">
+          <summary>Advanced</summary>
+          <div class="acc-body">
+            <div class="field"><label for="moisture">Soil moisture</label>
+              <select id="moisture"><option value="dry">Drought / dry season</option><option value="normal">Normal</option><option value="wet">After rain</option><option value="saturated">Monsoon / waterlogged</option></select></div>
+            <label class="check"><input type="checkbox" id="frozen"> Frozen ground or snow</label>
+            <div class="field"><label for="storm">Thunderstorm noise</label>
+              <select id="storm"><option value="none">None</option><option value="distant">Distant storms</option><option value="local">Local thunderstorms</option></select></div>
+            <div class="field"><label for="refr">Atmospheric refraction</label>
+              <select id="refr"><option value="sub">Sub-refraction (k = 1)</option><option value="standard">Standard (k = 4/3)</option><option value="super">Super-refraction (k = 2)</option></select></div>
+            <div class="field"><label for="solar">Solar activity</label>
+              <select id="solar"><option value="low">Low (sunspots ≈ 10)</option><option value="medium">Medium (≈ 80)</option><option value="high">High (≈ 160)</option></select></div>
+            <label class="check"><input type="checkbox" id="flare"> Solar flare in progress</label>
+            <label class="check"><input type="checkbox" id="gstorm"> Geomagnetic storm</label>
+            <div class="field"><label for="env">Listener's surroundings</label>
+              <select id="env"><option value="rural">Rural (quiet)</option><option value="suburban">Suburban</option><option value="urban">Urban</option><option value="industrial">Industrial / city centre (noisy)</option></select></div>
+          </div>
+        </details>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section class="panel card">
+        <p class="eyebrow">Result for <span id="selName"></span></p>
+        <p class="summary" id="summary"></p>
+        <div class="tiles" id="tiles"></div>
+      </section>
+
+      <section class="panel card">
+        <div class="chart-head">
+          <h2>Signal strength vs distance</h2>
+          <div class="chart-opts">
+            <select id="yunit" aria-label="Units"><option value="mv">Units: mV/m</option><option value="db">Units: dBµV/m</option></select>
+            <select id="xscale" aria-label="Distance scale"><option value="log">Log distance</option><option value="lin">Linear distance</option></select>
+            <select id="range" aria-label="Distance range"><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="chart" aria-label="Signal strength chart"></canvas>
+          <div class="tip" id="tip"></div>
+        </div>
+        <div class="legend" id="chartLegend"></div>
+        <p class="hint">Below the dashed line a listener no longer gets reliable reception. Hover over the plot to read values.</p>
+      </section>
+
+      <section class="panel card">
+        <div class="explain" id="explain"></div>
+        <details class="acc plain">
+          <summary>Technical details &amp; comparison table</summary>
+          <div class="acc-body">
+            <div class="tiles" id="techTiles"></div>
+            <div class="tablewrap"><table class="fs" id="fsTable"></table></div>
+          </div>
+        </details>
+      </section>
+    </main>
+  </div>
+</section>
+
+<!-- ======================= ANIMATION ======================= -->
+<section class="wrap" id="animation" role="tabpanel" aria-labelledby="tab-animation" hidden>
+  <section class="panel card stagebar">
+    <div class="row">
+      <div class="field" style="min-width:200px"><label for="animModel">Model</label><select id="animModel"></select></div>
+      <div class="field"><label for="animRange">View</label><select id="animRange"><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select></div>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="tourBtn" type="button">▶ Guided tour</button>
+      <label class="check"><input type="checkbox" id="explainT" checked> Show labels</label>
+      <button class="btn" id="playBtn" type="button">❚❚ Pause</button>
+      <div class="field"><label for="speed">Speed</label><input type="range" id="speed" min="0.25" max="3" step="0.25" value="1" style="width:110px"></div>
+    </div>
+  </section>
+
+  <div class="animgrid">
+    <div class="stack">
+      <div class="stage">
+        <canvas id="anim" aria-label="Animated cross-section of ground and sky wave propagation. Scroll or pinch to zoom, drag to pan, drag the radio to move the receiver."></canvas>
+        <div class="stage-tr">
+          <button class="iconbtn mapbtn" id="aZoomIn" type="button" aria-label="Zoom in">＋</button>
+          <button class="iconbtn mapbtn" id="aZoomOut" type="button" aria-label="Zoom out">－</button>
+          <button class="iconbtn mapbtn" id="aReset" type="button" aria-label="Reset view" title="Reset view">⟲</button>
+        </div>
+        <div class="tourbox" id="tourBox" hidden>
+          <p class="eyebrow" id="tourStep" style="margin:0"></p>
+          <h3 id="tourTitle"></h3>
+          <p id="tourText"></p>
+          <div class="row"><button class="btn" id="tourBack" type="button">← Back</button><button class="btn primary" id="tourNext" type="button">Next →</button><button class="btn ghost" id="tourClose" type="button">Close tour</button></div>
+        </div>
+        <button class="bigplay" id="bigPlay" type="button" hidden>▶ Play animation</button>
+        <p class="animerr" id="animErr" hidden></p>
+        <div class="zoominfo" id="zoomInfo"></div>
+      </div>
+      <div class="keyrow">
+        <span><i class="k-gw"></i>Ground wave (height = strength)</span>
+        <span><i class="k-sky"></i>Sky wave that returns</span>
+        <span><i class="k-esc"></i>Sky wave that escapes</span>
+        <span><i class="k-d"></i>D layer (absorbs by day)</span>
+        <span><i class="k-e"></i>E layer</span>
+        <span><i class="k-f"></i>F2 layer</span>
+        <span><i class="k-skip"></i>Skip zone</span>
+        <span><i class="k-fade"></i>Fading zone</span>
+      </div>
+      <p class="hint">Scroll or pinch to zoom, drag to pan. Heights are exaggerated and wave tilt is drawn ×3 so you can see them.</p>
+    </div>
+
+    <aside class="stack">
+      <section class="panel card meter" aria-live="polite">
+        <div class="card-h"><h3>Receiver</h3><span class="mono" id="rxD">–</span></div>
+        <input type="range" id="rxSlider" min="2" max="1000" step="1" value="150" aria-label="Receiver distance">
+        <div class="quality" id="quality">–</div>
+        <div class="mrow"><span>Ground wave</span><div class="bar"><span id="bG" class="b-gw"></span></div><span class="mono" id="vG">–</span></div>
+        <div class="mrow"><span>Sky wave</span><div class="bar"><span id="bS" class="b-sky"></span></div><span class="mono" id="vS">–</span></div>
+        <div class="mrow"><span>Needed</span><div class="bar"><span id="bT" style="background:var(--muted)"></span></div><span class="mono" id="vT">–</span></div>
+        <div class="field"><span class="lbl">Received signal over time</span><canvas id="scope" aria-label="Received signal level over time"></canvas>
+        <p class="hint">When ground and sky waves are similar in strength they interfere, and the level swings up and down. This is fading.</p></div>
+      </section>
+      <section class="panel card">
+        <div class="card-h"><h3>Time of day</h3><span class="pill info" id="phase">Day</span></div>
+        <div class="clock" id="clock">12:00</div>
+        <input type="range" id="hour" min="0" max="24" step="0.05" value="12" aria-label="Local solar time">
+        <label class="check"><input type="checkbox" id="cycle"> Run the day–night cycle</label>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<!-- ======================= MAP ======================= -->
+<section class="wrap" id="map-tab" role="tabpanel" aria-labelledby="tab-map" hidden>
+  <section class="panel card routebar">
+    <div class="route">
+      <div class="field"><label for="txCity"><span class="dot tx"></span>Transmitter</label><select id="txCity"></select></div>
+      <button class="iconbtn swap" id="swapBtn" type="button" title="Swap transmitter and selected receiver" aria-label="Swap transmitter and selected receiver">⇄</button>
+      <div class="field"><label for="rxCity"><span class="dot rx"></span>Selected receiver</label><select id="rxCity"></select></div>
+      <div class="field"><label for="when">Date &amp; time</label><div class="row nowrap"><input type="datetime-local" id="when"><button class="btn" id="nowBtn" type="button">Now</button></div></div>
+      <div class="field"><label for="mapModel">Station settings</label><select id="mapModel"></select></div>
+    </div>
+    <div class="route2">
+      <div class="field"><label for="txH">Transmitter mast height (m)</label><input type="number" id="txH" min="1" max="1000" step="1" value="120"></div>
+      <div class="field"><label for="rxH">Selected receiver antenna (m)</label><input type="number" id="rxH" min="0" max="500" step="1" value="10"></div>
+      <div class="field"><label for="mapLand">Land along the path is mostly</label><select id="mapLand"></select></div>
+      <div class="field" style="align-self:end;gap:6px"><label class="check"><input type="checkbox" id="useTerrain" checked> Include terrain shadowing</label><label class="check"><input type="checkbox" id="useBuildings" checked> Include buildings &amp; peaks (OSM)</label></div>
+    </div>
+    <details class="acc plain">
+      <summary>Coordinates &amp; manual ground height</summary>
+      <div class="acc-body">
+        <div class="coords">
+          <div class="field"><span class="lbl">Transmitter lat / lon</span><div class="two"><input type="number" id="txLat" step="0.0001" aria-label="Transmitter latitude"><input type="number" id="txLon" step="0.0001" aria-label="Transmitter longitude"></div></div>
+          <div class="field"><span class="lbl">Selected receiver lat / lon</span><div class="two"><input type="number" id="rxLat" step="0.0001" aria-label="Receiver latitude"><input type="number" id="rxLon" step="0.0001" aria-label="Receiver longitude"></div></div>
+          <div class="field" id="manualElevBox"><span class="lbl">Ground height above sea level (m), TX / RX</span><div class="two"><input type="number" id="txElevM" step="1" aria-label="Transmitter ground height"><input type="number" id="rxElevM" step="1" aria-label="Receiver ground height"></div>
+            <p class="hint" id="manualElevHint">Used only when terrain data can't be downloaded.</p></div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <div class="mapbox">
+    <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
+    <div class="map-tl">
+      <div class="seg mapseg" role="radiogroup" aria-label="Clicking the map">
+        <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move TX</label>
+        <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move RX</label>
+        <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd">+ Add receiver</label>
+      </div>
+      <button class="btn mapbtn" id="gpsBtn" type="button" hidden>◎ Use my location</button>
+    </div>
+    <div class="map-tr">
+      <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in">＋</button>
+      <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out">－</button>
+      <button class="iconbtn mapbtn" id="fitBtn" type="button" aria-label="Fit all sites" title="Fit all sites">⤢</button>
+      <button class="iconbtn mapbtn" id="mapPlay" type="button" aria-label="Pause map animation" title="Pause map animation">❚❚</button>
+    </div>
+    <div class="map-bl">
+      <select id="basemap" aria-label="Map style" class="mapbtn">
+        <option value="osm">OpenStreetMap</option>
+        <option value="topo">OpenTopoMap (terrain)</option>
+        <option value="light">OpenStreetMap light</option>
+        <option value="vector">Simple outline</option>
+      </select>
+    </div>
+    <div class="map-br" id="attrib"></div>
+    <div class="mapmsg" id="mapMsg" hidden></div>
+  </div>
+
+  <div class="mapresult">
+    <section class="panel card verdict" aria-live="polite" id="mapVerdict"></section>
+    <section class="panel card">
+      <div class="tiles" id="mapTiles"></div>
+    </section>
+  </div>
+
+  <section class="panel card">
+    <div class="chart-head"><h2>Receiver sites</h2>
+      <div class="row"><button class="btn" id="copyCsv" type="button">Copy table (CSV)</button><button class="btn" id="dlCsv" type="button" hidden>Download CSV</button><button class="btn ghost" id="clearRx" type="button">Remove all but selected</button></div></div>
+    <p class="hint">Choose "+ Add receiver" on the map and click to add sites anywhere in the world. Select a row to see its path below.</p>
+    <div class="tablewrap"><table class="fs sites" id="sitesTable"></table></div>
+  </section>
+
+  <section class="panel card">
+    <div class="chart-head"><h2>Terrain profile: <span id="profName" class="muted"></span></h2>
+      <div class="row"><span class="legend"><span><i style="border-top:8px solid rgba(40,50,70,.9);width:6px"></i>Building (OSM)</span><span>▲ Named peak</span><span style="color:#c2413a">▼ Main obstacle</span></span><label class="check"><input type="checkbox" id="showBulge"> Show earth curvature</label></div></div>
+    <canvas id="terrain" aria-label="Terrain height along the path"></canvas>
+    <p class="hint" id="terrainNote"></p>
+    <h3 style="margin-top:6px">Signal along the path</h3>
+    <div class="strip" id="strip" aria-label="Land and sea along the path"></div>
+    <div class="legend"><span><i style="border-top:8px solid #8a7a4c;width:14px"></i>Land</span><span><i style="border-top:8px solid #2a62a8;width:14px"></i>Sea</span><span style="color:var(--accent)"><i style="border-top-width:3px"></i><b style="color:var(--ink);font-weight:500">Total signal (smooth earth)</b></span><span><i style="border-top-style:dashed"></i>Minimum usable</span></div>
+    <canvas id="profile" aria-label="Signal strength along the path"></canvas>
+    <div class="row"><button class="btn primary" id="toLab" type="button">Open selected path in Lab</button><button class="btn" id="toAnim" type="button">Animate it</button><a class="btn ghost" id="osmLink" href="https://www.openstreetmap.org/" target="_blank" rel="noopener">View on openstreetmap.org ↗</a></div>
+  </section>
+</section>
+
+<!-- ======================= LEARN ======================= -->
+<section class="wrap" id="learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
+  <div class="intro"><div class="stack" style="gap:4px"><h2>Concepts behind the lab</h2><p>Short explanations of each effect you can test. Open a card, then try the matching experiment in the Lab.</p></div></div>
+  <div class="concepts">
+      <details open>
+        <summary>1. What a ground wave is</summary>
+        <p>A ground (surface) wave is a vertically polarized wave that is guided along the boundary between air and earth. Currents induced in the ground drag the lower part of the wavefront, so it follows the earth's curvature well beyond the optical horizon. That is why MW (medium-wave) AM broadcasting gives stable daytime coverage over hundreds of kilometres.</p>
+        <p>Horizontal polarization is short-circuited by the conducting ground, so groundwave systems use vertical masts.</p>
+      </details>
+      <details open>
+        <summary>2. Ground constants and the Norton numerical distance</summary>
+        <p>Losses depend on ground conductivity σ and relative permittivity εr. The lab uses the Sommerfeld–Norton flat-earth approximation (Terman's form):</p>
+        <div class="eq">x = 1.8×10⁴·σ / f<sub>MHz</sub> &nbsp; b = atan((εr+1)/x) &nbsp; p = (π d / λ x)·cos b</div>
+        <div class="eq">A ≈ (2 + 0.3p) / (2 + p + 0.6p²) &nbsp;&nbsp; E = 300·√P · A / d &nbsp;[mV/m, kW, km]</div>
+        <p>Small p means little loss (sea water, low frequency). Large p means rapid attenuation (dry ground, high frequency).</p>
+      </details>
+      <details>
+        <summary>3. Why lower frequencies travel further</summary>
+        <p>p grows with frequency through both λ and x. At 200 kHz over sea the attenuation factor stays near 1 for hundreds of kilometres. At 10 MHz over dry land, groundwave is gone within a few tens of kilometres. This is why LF and MF carry broadcasting and navigation, and HF relies on the sky wave.</p>
+      </details>
+      <details>
+        <summary>4. Wave tilt</summary>
+        <p>Ground losses tilt the wavefront forward. The power flow then has a downward component that feeds the losses in the earth. The tilt angle is roughly tan ψ ≈ 1/√|εr − j x|. Wave tilt is larger over poor ground. The scene exaggerates it three times so you can see it.</p>
+      </details>
+      <details>
+        <summary>5. Earth curvature and refraction</summary>
+        <p>The flat-earth formula is good up to about 80/∛f<sub>MHz</sub> km. Beyond that, diffraction around the curved earth adds loss, roughly 0.04·∛f dB per km at standard refraction. Refraction in the lower atmosphere bends waves slightly. It is modelled with an effective earth radius factor k. Larger k (super-refraction in warm, humid inversions) reduces the curvature loss. k = 1 increases it.</p>
+      </details>
+      <details>
+        <summary>6. Sky wave and the ionosphere</summary>
+        <ul>
+          <li><b>D layer</b> (60–90 km): exists in daylight only and absorbs LF/MF/low HF. The absorption scales roughly as 1/(f + f<sub>H</sub>)².</li>
+          <li><b>E layer</b> (~110 km): reflects MF by day; it is weak at night.</li>
+          <li><b>F2 layer</b> (250–350 km): reflects HF. Its critical frequency rises with solar activity.</li>
+        </ul>
+        <p>A wave returns when f ≤ f<sub>o</sub>·sec φ (secant law). Steep rays at high frequency escape, which creates the <b>skip zone</b>.</p>
+      </details>
+      <details>
+        <summary>7. Day, night and the fading zone</summary>
+        <p>By day, the D layer absorbs the MW sky wave, so only the ground wave is heard. At night the D layer vanishes and the sky wave returns strongly hundreds of kilometres away. Where ground and sky waves arrive with similar strength (within about 6 dB), their changing phase causes deep <b>fading and distortion</b>. The lab shades that zone on the plot.</p>
+      </details>
+      <details>
+        <summary>8. How weather enters the picture</summary>
+        <ul>
+          <li><b>Rain and monsoon</b> raise soil conductivity and permittivity, so the ground wave reaches further.</li>
+          <li><b>Drought and frozen ground</b> lower conductivity and shorten coverage.</li>
+          <li><b>Thunderstorms</b> add atmospheric noise (static), so a stronger signal is needed for the same service. Night-time static travels far by sky wave too.</li>
+          <li><b>Rain attenuation in the air</b> is negligible below a few GHz, so the lab ignores it.</li>
+          <li><b>Space weather</b> controls the sky wave. Solar flares cause sudden HF fade-outs, and geomagnetic storms depress the F2 layer.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>9. Mixed paths (Millington's method)</summary>
+        <p>For a land–sea path, the field is the average of forward and reverse calculations, in dB:</p>
+        <div class="eq">E = ½[ (E₁(d₁) − E₂(d₁) + E₂(d)) + (E₂(d₂) − E₁(d₂) + E₁(d)) ]</div>
+        <p>Over sea after a coastline, the field can actually <i>rise</i> for a while. This is the "recovery effect".</p>
+      </details>
+      <details>
+        <summary>10. Limits of this lab</summary>
+        <p>The lab is a teaching model, not a planning tool. Use ITU-R P.368 (groundwave curves), P.527 (ground constants), P.1147 (MF sky wave), P.533 (HF) and P.372 (radio noise) for real work. The sky wave here is a median value. Real signals fade by 5–10 dB within minutes.</p>
+      </details>
+    </div>
+  
+  <section class="panel pad stack">
+    <h2>Glossary</h2>
+    <div class="tablewrap"><table class="gloss">
+      <tr><td>Ground (surface) wave</td><td>Vertically polarized wave guided along the earth's surface. Main MW/LF daytime service.</td></tr>
+      <tr><td>Sky wave</td><td>Wave reflected (refracted) back to earth by the ionosphere.</td></tr>
+      <tr><td>Conductivity σ</td><td>How easily the ground carries current, in S/m. Sea ≈ 5, average land ≈ 0.003, rock ≈ 0.0001.</td></tr>
+      <tr><td>Permittivity εr</td><td>How strongly the ground stores electric field energy. Matters most at higher frequencies.</td></tr>
+      <tr><td>Numerical distance p</td><td>Norton's measure of how "electrically far" a point is over lossy ground. Larger p means more loss.</td></tr>
+      <tr><td>dBµV/m</td><td>Field strength in decibels above 1 µV/m. 60 dBµV/m = 1 mV/m. Every 20 dB is ×10.</td></tr>
+      <tr><td>Critical frequency fo</td><td>Highest frequency a layer reflects at vertical incidence (foE, foF2).</td></tr>
+      <tr><td>Skip zone</td><td>Region with no ground wave and no returning sky wave.</td></tr>
+      <tr><td>Fading zone</td><td>Region where ground and sky waves are similar in strength and interfere.</td></tr>
+      <tr><td>Millington's method</td><td>Standard way to combine different ground types along one path.</td></tr>
+      <tr><td>Great-circle path</td><td>Shortest route between two points on the earth's surface.</td></tr>
+    </table></div>
+  </section>
+</section>
+
+<!-- ======================= QUIZ ======================= -->
+<section class="wrap" id="quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+  <div class="intro"><div class="stack" style="gap:4px"><h2>Check your understanding</h2><p>Several questions ask you to load an experiment in the Lab first. Your score updates as you answer.</p></div>
+    <div class="row"><span class="pill info score" id="score">0 / 0 correct</span><button class="btn sm" id="quizReset" type="button">Start again</button></div></div>
+  <div class="quiz" id="quizBox"></div>
+</section>
+
+<div class="wrap" style="padding-top:0"><footer>Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
+
+<script>
+"use strict";
+/* ================= PHYSICS ================= */
+const RE = 6371;
+const GROUNDS = {
+  sea:     {name:"Sea water",                   sigma:5,      er:70, kind:"sea",   color:"#2a62a8"},
+  seaLow:  {name:"Sea water, low salinity",     sigma:1,      er:80, kind:"sea",   color:"#3a76b8"},
+  fresh:   {name:"Fresh water (lake / river)",  sigma:0.003,  er:80, kind:"fresh", color:"#4b93c8"},
+  wet:     {name:"Wet ground (paddy / marsh)",  sigma:0.01,   er:30, kind:"land",  color:"#4f7a3a"},
+  land:    {name:"Average land",                sigma:0.003,  er:22, kind:"land",  color:"#6f6a3c"},
+  medDry:  {name:"Medium dry ground",           sigma:0.001,  er:15, kind:"land",  color:"#857146"},
+  dry:     {name:"Dry ground",                  sigma:0.0003, er:7,  kind:"land",  color:"#a2865a"},
+  veryDry: {name:"Very dry ground / rock",      sigma:0.0001, er:3,  kind:"land",  color:"#958a7e"},
+  custom:  {name:"Custom σ and εr",             sigma:0.005,  er:15, kind:"land",  color:"#7b7468"}
+};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI;
+const dBuV=mV=>20*Math.log10(Math.max(mV,1e-12)*1000);
+const mVfromdB=dB=>Math.pow(10,dB/20)/1000;
+
+function effGround(key,p){
+  const g = key==="custom" ? {name:"Custom ground",sigma:p.sigmaC,er:p.erC,kind:"land",color:GROUNDS.custom.color} : GROUNDS[key];
+  let s=g.sigma, e=g.er;
+  if(g.kind!=="sea"){
+    if(p.frozen){
+      if(g.kind==="fresh"){ s=1e-4; e=3.2; } else { s*=0.1; e=Math.min(e,5); }
+    } else if(g.kind==="land"){
+      const m={dry:[0.4,0.6],normal:[1,1],wet:[2.5,1.6],saturated:[5,2.2]}[p.moisture];
+      s*=m[0]; e=Math.min(e*m[1],50);
+    }
+  }
+  return {sigma:s, er:e, kind:g.kind, name:g.name, color:g.color};
+}
+function norton(d,f,g){
+  const x=1.8e4*g.sigma/f, b=Math.atan((g.er+1)/x), lam=0.3/f;
+  const p=Math.PI*d/(lam*x)*Math.cos(b);
+  return {A:(2+0.3*p)/(2+p+0.6*p*p), p, x};
+}
+const kFac=p=>({sub:1.0,standard:4/3,super:2.0})[p.refr];
+function critDist(f,p){ return 80/Math.cbrt(f)*Math.pow(kFac(p)/(4/3),2/3); }
+function curvLoss(d,f,p){ const dc=critDist(f,p); return d>dc ? 3.2*(d/dc-1) : 0; }
+function gwSingle(d,p,g,curv){
+  const {A}=norton(d,p.f,g);
+  let v=dBuV(300*Math.sqrt(p.P)*A/d);
+  if(curv) v-=curvLoss(d,p.f,p);
+  return v;
+}
+/* path as list of {g:groundKey, end:km} (cumulative) */
+function pathSegs(p,d){
+  let segs;
+  if(p.path==="mixed") segs=[{g:p.ground,end:p.coast},{g:p.ground2,end:Infinity}];
+  else if(p.path==="geo" && p.segs && p.segs.length) segs=p.segs.map((s,i,a)=>({g:s.g==="sea"?"sea":p.ground,end:i===a.length-1?Infinity:s.end}));
+  else segs=[{g:p.ground,end:Infinity}];
+  const out=[]; let start=0;
+  for(const s of segs){ if(start>=d) break; const e=Math.min(s.end,d); if(e>start) out.push({g:s.g,len:e-start}); start=e; }
+  // merge identical neighbours
+  const m=[]; for(const s of out){ if(m.length&&m[m.length-1].g===s.g) m[m.length-1].len+=s.len; else m.push({...s}); }
+  return m;
+}
+function gwdB(d,p,curv){
+  const segs=pathSegs(p,d);
+  const G=k=>effGround(k,p);
+  if(segs.length<=1) return gwSingle(d,p,G(segs.length?segs[0].g:p.ground),curv);
+  const run=list=>{ let pos=0, E=0;
+    list.forEach((s,i)=>{ const g=G(s.g); const a=pos, b=pos+s.len;
+      E += (i===0) ? gwSingle(b,p,g,curv) : gwSingle(b,p,g,curv)-gwSingle(Math.max(a,0.01),p,g,curv);
+      pos=b; });
+    return E; };
+  return 0.5*(run(segs)+run(segs.slice().reverse()));
+}
+function cosChiOf(p){
+  if(p.cosChi!==undefined && p.cosChi!==null) return p.cosChi;
+  return {day:0.85,dusk:0.1,night:-0.5}[p.time];
+}
+function phaseOf(c){ return c>0.3?"day":c>-0.15?"dusk":"night"; }
+function iono(p){
+  const R={low:10,medium:80,high:160}[p.solar];
+  const c=cosChiOf(p), cp=Math.max(c,0);
+  const Iday=1+0.0037*R;
+  const o={R,cosChi:c};
+  o.I=0.08+(Iday-0.08)*Math.pow(cp,0.75);
+  o.foE=Math.max(0.6,0.9*Math.pow((180+1.44*R)*cp,0.25));
+  const u=clamp((c+0.25)/1.1,0,1);
+  const fN=3+0.015*R, fD=6+0.035*R;
+  o.foF2=fN+(fD-fN)*Math.sqrt(u);
+  o.hF=340-40*u; o.hE=110;
+  if(p.flare && c>0){ o.I*=4; o.foE*=1.15; }
+  if(p.gstorm){ o.foF2*=0.7; o.I+=0.05; }
+  return o;
+}
+function absdB(f,I,sec){ return 677.2*I*sec/(Math.pow(f+1.4,1.98)+10.2); }
+function secAt(del,h){ const s=RE*Math.cos(del)/(RE+h); return 1/Math.sqrt(1-s*s); }
+function elevFor(th,h){ return Math.atan((Math.cos(th)-RE/(RE+h))/Math.sin(th)); }
+function skyField(d,p,io){
+  const f=p.f;
+  const segs=pathSegs(p,d); const gR=effGround(segs.length?segs[segs.length-1].g:p.ground,p);
+  const reflLoss = gR.kind==="sea"?1:(gR.sigma<0.001?6:4);
+  let sumsq=0, best=null;
+  for(let n=1;n<=4;n++){
+    const th=(d/n)/(2*RE);
+    if(th>0.26 || th<=0) continue;
+    let layer=null;
+    const dE=elevFor(th,io.hE);
+    if(dE>toRad(1) && f<=io.foE*secAt(dE,io.hE)) layer={name:"E",h:io.hE,del:dE};
+    if(!layer){
+      const dF=elevFor(th,io.hF);
+      if(dF>toRad(1)){
+        const screened = f<=io.foE*secAt(dF,io.hE);
+        if(!screened && f<=io.foF2*secAt(dF,io.hF)) layer={name:"F2",h:io.hF,del:dF};
+      }
+    }
+    if(!layer) continue;
+    const slant=n*2*Math.sqrt(RE*RE+(RE+layer.h)**2-2*RE*(RE+layer.h)*Math.cos(th));
+    const a1=absdB(f,io.I,secAt(layer.del,100));
+    const loss=n*a1+(n-1)*reflLoss+6;
+    const E=300*Math.sqrt(p.P)*Math.cos(layer.del)/slant*Math.pow(10,-loss/20);
+    sumsq+=E*E;
+    if(!best||E>best.E) best={n,E,layer:layer.name,del:layer.del,abs:a1};
+  }
+  return {E:Math.sqrt(sumsq), best};
+}
+const exprCache={};
+function compileExpr(src){
+  if(exprCache[src]!==undefined) return exprCache[src];
+  let fn=null, err=null;
+  if(/[;{}=`\[\]]|=>|\bnew\b|\bthis\b|\bwindow\b|\bdocument\b|\bfunction\b/.test(src)) err="Use a single maths expression (no ; = { } [ ] or keywords).";
+  else {
+    try{
+      const names=Object.getOwnPropertyNames(Math);
+      fn=new Function("d","f","P","sigma","er","A","lam","M","const {"+names.join(",")+"}=M; return ("+src+");");
+      const t=fn(10,1,1,0.003,22,0.9,0.3,Math);
+      if(typeof t!=="number"||!isFinite(t)) err="The formula did not give a number at d = 10 km.";
+    }catch(e){ err="Formula error: "+e.message; fn=null; }
+  }
+  exprCache[src]=err?{err}:{fn};
+  return exprCache[src];
+}
+function threshold(p){
+  if(p.f>=30){ // FM / TV practice (ITU-R BS.412-style levels); atmospheric static is negligible at VHF/UHF
+    const b={rural:0.25,suburban:1,urban:3,industrial:6}[p.env]; return b*(p.f>=300?2:1);
+  }
+  const base={rural:0.5,suburban:2,urban:5,industrial:10}[p.env];
+  const storm={none:1,distant:2,local:5}[p.storm];
+  const night=cosChiOf(p)<-0.15?1.6:1;
+  const ff=clamp(Math.pow(1/p.f,0.6),0.15,4);
+  return base*storm*night*ff;
+}
+/* {g,s,t} in dBµV/m */
+function evalP(p,d,io){
+  let g=null,s=null,t=null;
+  switch(p.type){
+    case "gwflat": g=groundPath(d,p,false); t=g; break;
+    case "gw": g=groundPath(d,p,true); t=g; break;
+    case "inverse": g=dBuV(300*Math.sqrt(p.P)/d); t=g; break;
+    case "sky": { const sf=skyField(d,p,io); s=sf.E>0?dBuV(sf.E):null; t=s; break; }
+    case "combined": {
+      g=groundPath(d,p,true);
+      const sf=skyField(d,p,io); s=sf.E>0?dBuV(sf.E):null;
+      const eg=mVfromdB(g), es=sf.E;
+      t=dBuV(Math.sqrt(eg*eg+es*es)); break;
+    }
+    case "custom": {
+      const c=compileExpr(p.expr);
+      if(c.fn){
+        const ge=effGround(p.ground,p), nt=norton(d,p.f,ge);
+        let v; try{ v=c.fn(d,p.f,p.P,ge.sigma,ge.er,nt.A,0.3/p.f,Math);}catch(e){v=NaN;}
+        t=(typeof v==="number"&&isFinite(v)&&v>0)?dBuV(v):null; g=t;
+      }
+      break;
+    }
+  }
+  return {g,s,t};
+}
+/* value at the receiver, including the terrain shadowing estimate on the ground-wave part */
+function evalRx(p,io){
+  const r=evalP(p,p.rxDist,io); const L=p.terrainLossDb||0;
+  if(!L||r.g===null||p.type==="sky") return r;
+  const g=r.g-L; let t=g;
+  if(p.type==="combined"){ const eg=mVfromdB(g), es=r.s===null?0:mVfromdB(r.s); t=dBuV(Math.hypot(eg,es)); }
+  return {g,s:r.s,t};
+}
+/* ===== VHF / UHF space wave: direct + ground-reflected (two-ray), with smooth-earth loss beyond the radio horizon ===== */
+function radioHorizon(p){ const k=kFac(p); return 3.57*(Math.sqrt(k*(p.htx||30))+Math.sqrt(k*(p.hrx||10))); }
+function spaceDB(d,p){
+  if(p.f<3) return null;
+  const lam=300/p.f, dm=d*1000, h1=p.htx||30, h2=p.hrx||10;
+  const F=Math.max(2*Math.abs(Math.sin(2*Math.PI*h1*h2/(lam*dm))),1e-3);
+  let v=dBuV(222*Math.sqrt(p.P)/d*F);
+  const hz=radioHorizon(p);
+  if(d>hz) v-=0.04*Math.cbrt(p.f)*Math.pow((4/3)/kFac(p),2/3)*(d-hz)+6*Math.min(1,(d-hz)/20);
+  return v;
+}
+function groundPath(d,p,curv){
+  const g=gwdB(d,p,curv), s=spaceDB(d,p);
+  if(s===null) return g;
+  return dBuV(Math.hypot(mVfromdB(g),mVfromdB(s)));
+}
+
+/* ================= STATE ================= */
+const COLORS=["#2f6fdf","#e0662f","#1f9e74","#b0429c","#c99a10","#6a5bd6","#d13b4f","#2a9bb5"];
+const TYPE_TAG={gwflat:"Ground (flat)",gw:"Ground wave",sky:"Sky wave",combined:"Ground + sky",inverse:"Ideal 1/d",custom:"Own formula"};
+const DEFAULT={type:"combined",f:1.0,P:50,ground:"land",sigmaC:0.005,erC:15,path:"uniform",ground2:"sea",coast:60,
+  moisture:"normal",frozen:false,refr:"standard",storm:"none",time:"day",cosChi:null,solar:"medium",flare:false,gstorm:false,env:"rural",
+  expr:"300*sqrt(P)*A/d",htx:50,hrx:10,segs:null,rxDist:null,pathLabel:null};
+let models=[], selId=null, nextId=1, colorIx=0, currentPreset=0;
+function mk(name,over){ return {id:nextId++,name,visible:true,color:COLORS[(colorIx++)%COLORS.length],p:Object.assign({},DEFAULT,over||{})}; }
+const $=id=>document.getElementById(id);
+const sel=()=>models.find(m=>m.id===selId);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const PRESETS=[
+  {label:"MW day vs night",goal:"See why AM stations reach much further at night.",look:"The night curve (orange) stays strong hundreds of km out because the sky wave returns. The shaded band marks the fading zone.",models:[["MW 1 MHz · day",{time:"day"}],["MW 1 MHz · night",{time:"night"}]]},
+  {label:"Ground types",goal:"Compare how the ground under the path affects the ground wave.",look:"Sea water keeps the signal strong for hundreds of km. Dry rock loses it quickly.",models:[["Sea",{type:"gw",ground:"sea"}],["Wet ground",{type:"gw",ground:"wet"}],["Average land",{type:"gw",ground:"land"}],["Very dry / rock",{type:"gw",ground:"veryDry"}]]},
+  {label:"LF vs MW vs HF",goal:"See why ground-wave broadcasting uses low frequencies.",look:"Each step up in frequency makes the curve fall faster. At 15 MHz the ground wave is gone within a few tens of km.",models:[["LF 200 kHz",{type:"gw",f:0.2}],["MW 1 MHz",{type:"gw",f:1}],["HF 5 MHz",{type:"gw",f:5}],["HF 15 MHz",{type:"gw",f:15}]]},
+  {label:"Monsoon vs drought",goal:"See how weather changes the soil and the noise.",look:"Wet monsoon soil carries the signal further, but thunderstorm noise raises the dashed line. Compare the service radius of each.",models:[["Drought soil",{type:"gw",ground:"medDry",moisture:"dry"}],["Normal soil",{type:"gw",ground:"medDry",moisture:"normal"}],["Monsoon + storms",{type:"gw",ground:"medDry",moisture:"saturated",storm:"local"}]]},
+  {label:"Coastline",goal:"See what happens when a path crosses from land to sea.",look:"After the coast at 60 km, the mixed-path curve recovers toward the sea curve (Millington's recovery effect).",models:[["All land",{type:"gw",ground:"land"}],["Land → sea at 60 km",{type:"gw",ground:"land",path:"mixed",ground2:"sea",coast:60}],["All sea",{type:"gw",ground:"sea"}]]},
+  {label:"HF skip zone",goal:"See the skip zone at HF.",look:"The ground wave dies near the transmitter. There is a gap before the sky wave lands hundreds of km away.",models:[["10 MHz · day",{f:10,P:1,time:"day"}],["10 MHz · night",{f:10,P:1,time:"night"}]],range:"3000"},
+  {label:"Solar flare",goal:"See how a solar flare blacks out HF.",look:"With the flare, D-layer absorption jumps and the sky-wave curve drops sharply.",models:[["7 MHz · quiet sun",{f:7,P:1}],["7 MHz · solar flare",{f:7,P:1,flare:true}]],range:"3000"},
+  {label:"VHF & UHF",goal:"Compare line-of-sight VHF/UHF broadcasting with MW ground wave.",look:"FM (100 MHz) and TV (600 MHz) stay strong until the radio horizon set by the antenna heights, then drop fast. MW keeps going along the ground. The ducting model shows how warm, humid weather can stretch VHF range.",models:[["FM 100 MHz · 300 m mast",{type:"gw",f:100,P:10,htx:300,hrx:10}],["TV 600 MHz · 300 m mast",{type:"gw",f:600,P:50,htx:300,hrx:10}],["FM 100 MHz · ducting",{type:"gw",f:100,P:10,htx:300,hrx:10,refr:"super"}],["MW 1 MHz",{type:"gw",f:1,P:50}]],range:"300"},
+  {label:"Build your own",goal:"Write your own propagation formula and test it against the built-in model.",look:"Edit the formula in Settings. If your curve stays close to the Norton curve, your formula captures the ground losses.",models:[["Norton (built in)",{type:"gw"}],["My formula",{type:"custom",expr:"300*sqrt(P)/d*exp(-0.004*d*pow(f,0.7))"}]]}
+];
+const FREQS=[["LF 200 kHz",0.2],["MW 1 MHz",1],["MW 1.5 MHz",1.5],["HF 7 MHz",7],["HF 15 MHz",15],["VHF 100 MHz",100],["UHF 600 MHz",600]];
+const WEATHER=[
+  {k:"clear",ico:"☀",label:"Clear",set:{moisture:"normal",storm:"none",frozen:false}},
+  {k:"rain",ico:"🌧",label:"After rain",set:{moisture:"wet",storm:"none",frozen:false}},
+  {k:"monsoon",ico:"🌊",label:"Monsoon",set:{moisture:"saturated",storm:"distant",frozen:false}},
+  {k:"storm",ico:"⛈",label:"Thunderstorm",set:{moisture:"wet",storm:"local",frozen:false}},
+  {k:"drought",ico:"🏜",label:"Drought",set:{moisture:"dry",storm:"none",frozen:false}},
+  {k:"snow",ico:"❄",label:"Frozen / snow",set:{moisture:"normal",storm:"none",frozen:true}}
+];
+function weatherKey(p){ for(const w of WEATHER){ if(Object.entries(w.set).every(([k,v])=>p[k]===v)) return w.k; } return null; }
+
+function loadPreset(i){
+  currentPreset=i; colorIx=0; models=[];
+  for(const [n,o] of PRESETS[i].models) models.push(mk(n,o));
+  selId=models[0].id;
+  if(PRESETS[i].range) $("range").value=PRESETS[i].range; else $("range").value="1000";
+  refreshAll();
+}
+function refreshAll(){ renderPresets(); renderList(); syncControls(); renderGuide(); redraw(); syncModelSelects(); }
+
+/* ================= FORMAT ================= */
+function fmtF(f){ if(f>=1000) return `${(f/1000).toFixed(2).replace(/\.?0+$/,"")} GHz`; return f<1?`${Math.round(f*1000)} kHz`:`${f.toFixed(f<10?2:1).replace(/\.?0+$/,"")} MHz`; }
+function band(f){ return f<0.3?"LF":f<3?"MF":f<30?"HF":f<300?"VHF":"UHF"; }
+function fmtP(P){ return P<1?`${(P*1000).toFixed(0)} W`:P<10?`${P.toFixed(1)} kW`:`${Math.round(P)} kW`; }
+function fmtD(d){ return d<10?d.toFixed(1):d<100?d.toFixed(0):String(Math.round(d/5)*5); }
+function fmtField(dB){ if(dB===null||!isFinite(dB)) return "—"; const mV=mVfromdB(dB);
+  if(mV>=1000) return (mV/1000).toFixed(mV>=10000?0:1)+" V/m";
+  if(mV>=1) return mV.toFixed(mV>=100?0:mV>=10?1:2)+" mV/m";
+  if(mV>=0.001) return (mV*1000).toFixed(mV>=0.1?0:mV>=0.01?1:2)+" µV/m";
+  return "< 1 µV/m"; }
+function fmtSig(s){ return s>=0.1?s.toFixed(1):s.toExponential(1).replace("e-","×10⁻").replace(/⁻(\d)/,(m,a)=>"⁻"+"⁰¹²³⁴⁵⁶⁷⁸⁹"[a]); }
+function timeLabel(p){ return {day:"day",dusk:"dawn/dusk",night:"night"}[phaseOf(cosChiOf(p))]; }
+
+/* ================= CONTROLS ================= */
+function fillGroundSelects(){
+  for(const id of ["ground","ground2","mapLand"]){
+    const s=$(id); s.innerHTML="";
+    for(const [k,g] of Object.entries(GROUNDS)){
+      if(id==="mapLand" && (g.kind!=="land")) continue;
+      const o=document.createElement("option"); o.value=k;
+      o.textContent = k==="custom"?g.name:`${g.name}  (σ ${g.sigma} S/m)`;
+      s.appendChild(o);
+    }
+  }
+  $("mapLand").value="land";
+}
+function renderPresets(){
+  const box=$("presets"); box.innerHTML="";
+  PRESETS.forEach((ps,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=ps.label;
+    b.setAttribute("aria-pressed",String(i===currentPreset)); b.addEventListener("click",()=>loadPreset(i)); box.appendChild(b); });
+}
+function renderGuide(){
+  const g=$("guide"), b=$("gNext");
+  if(currentPreset<0){ g.innerHTML=`<b>Your own experiment.</b> Change one setting at a time, so you know which change caused the difference.`; b.textContent="Try a ready-made experiment"; return; }
+  const ps=PRESETS[currentPreset];
+  g.innerHTML=`<b>${currentPreset+1}/${PRESETS.length} · ${esc(ps.goal)}</b> What to look for: ${esc(ps.look)}`; b.textContent="Next experiment →";
+}
+function renderList(){
+  const ul=$("modelList"); ul.innerHTML="";
+  for(const m of models){
+    const li=document.createElement("li");
+    li.className="model-row"+(m.id===selId?" sel":"");
+    li.innerHTML=`<span class="sw" style="background:${m.color}"></span>
+      <span style="display:grid;min-width:0"><input type="text" aria-label="Model name">
+      <span class="tag">${m.p.f>=30&&/^(gw|gwflat|combined)$/.test(m.p.type)?"Line of sight":TYPE_TAG[m.p.type]} · ${fmtF(m.p.f)} · ${timeLabel(m.p)}${m.p.path==="geo"?" · map path":""}</span></span>
+      <span style="display:flex;gap:4px">
+        <button class="iconbtn" type="button" title="${m.visible?"Hide from":"Show on"} plot" aria-label="${m.visible?"Hide":"Show"} ${esc(m.name)}">${m.visible?"👁":"⦸"}</button>
+        <button class="iconbtn" type="button" title="Delete model" aria-label="Delete ${esc(m.name)}" ${models.length===1?"disabled":""}>✕</button>
+      </span>`;
+    const inp=li.querySelector("input"); inp.value=m.name;
+    inp.addEventListener("input",()=>{ m.name=inp.value; $("selNameCtl").textContent=m.name; drawLegend(); syncModelSelects(); });
+    inp.addEventListener("focus",()=>{ if(selId!==m.id){ selId=m.id; [...ul.children].forEach((x,i)=>x.classList.toggle("sel",models[i].id===selId)); syncControls(); redraw(); }});
+    const [eye,del]=li.querySelectorAll("button");
+    eye.addEventListener("click",ev=>{ev.stopPropagation(); m.visible=!m.visible; renderList(); redraw();});
+    del.addEventListener("click",ev=>{ev.stopPropagation(); if(models.length===1) return;
+      models=models.filter(x=>x!==m); if(selId===m.id) selId=models[0].id; currentPreset=-1; refreshAll();});
+    li.addEventListener("click",()=>{ if(selId!==m.id){ selId=m.id; renderList(); syncControls(); redraw(); }});
+    ul.appendChild(li);
+  }
+}
+function syncControls(){
+  const m=sel(); if(!m) return; const p=m.p;
+  $("selNameCtl").textContent=m.name;
+  $("type").value=p.type; $("expr").value=p.expr;
+  $("freq").value=Math.log10(p.f); $("pow").value=Math.log10(p.P); $("htx").value=p.htx||50; $("hrx").value=p.hrx||10;
+  $("ground").value=p.ground; $("sigmaC").value=p.sigmaC; $("erC").value=p.erC;
+  $("path").value=p.path; $("ground2").value=p.ground2; $("coast").value=p.coast;
+  $("moisture").value=p.moisture; $("frozen").checked=p.frozen; $("refr").value=p.refr; $("storm").value=p.storm;
+  document.querySelectorAll("input[name=time]").forEach(r=>r.checked=(p.cosChi===null && r.value===p.time));
+  $("solar").value=p.solar; $("flare").checked=p.flare; $("gstorm").checked=p.gstorm; $("env").value=p.env;
+  updateLabels();
+}
+function updateLabels(){
+  const m=sel(); if(!m) return; const p=m.p;
+  $("freqV").textContent=`${fmtF(p.f)} · ${band(p.f)}`;
+  $("powV").textContent=fmtP(p.P);
+  $("coastV").textContent=`${p.coast} km`;
+  $("exprBox").hidden=p.type!=="custom";
+  $("customGround").hidden=!(p.ground==="custom"||(p.ground2==="custom"&&p.path==="mixed"));
+  $("mixedBox").hidden=p.path!=="mixed";
+  $("path").querySelector("option[value=geo]").disabled=p.path!=="geo";
+  $("geoNote").hidden=p.path!=="geo";
+  if(p.path==="geo") $("geoNote").textContent=`Path from the map: ${p.pathLabel||""}. Sea sections use sea water; land sections use the ground type above.`;
+  const skyUsed=p.type==="sky"||p.type==="combined";
+  $("timeField").classList.toggle("dim",!skyUsed && p.cosChi===null);
+  $("timeNote").hidden=p.cosChi===null;
+  if(p.cosChi!==null) $("timeNote").textContent=`Time comes from the map: sun ${toDeg(Math.asin(clamp(p.cosChi,-1,1))).toFixed(0)}° above the horizon at the path midpoint (${timeLabel(p)}). Pick a time above to override it.`;
+  document.querySelectorAll("#freqChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(Math.abs(+b.dataset.f-p.f)<1e-6)));
+  const wk=weatherKey(p);
+  document.querySelectorAll("#wxChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===wk)));
+  if(p.type==="custom"){ const c=compileExpr(p.expr); $("exprErr").textContent=c.err||""; }
+}
+function bindLab(){
+  const set=(obj)=>{ const m=sel(); if(!m) return; Object.assign(m.p,obj); currentPreset=-1; renderPresets(); renderGuide(); updateLabels(); renderList(); redraw(); syncModelSelects(); };
+  const fc=$("freqChips"); FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f; b.onclick=()=>{ set({f}); $("freq").value=Math.log10(f); }; fc.appendChild(b); });
+  const wc=$("wxChips"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>{ set(Object.assign({},w.set)); syncControls(); }; wc.appendChild(b); });
+  $("type").addEventListener("change",e=>set({type:e.target.value}));
+  $("expr").addEventListener("input",e=>set({expr:e.target.value.trim()||"0"}));
+  $("freq").addEventListener("input",e=>set({f:+Math.pow(10,+e.target.value).toPrecision(3)}));
+  $("pow").addEventListener("input",e=>set({P:+Math.pow(10,+e.target.value).toPrecision(3)}));
+  $("htx").addEventListener("change",e=>set({htx:clamp(+e.target.value||1,1,2000)}));
+  $("hrx").addEventListener("change",e=>set({hrx:clamp(+e.target.value||1,1,500)}));
+  $("ground").addEventListener("change",e=>set({ground:e.target.value}));
+  $("ground2").addEventListener("change",e=>set({ground2:e.target.value}));
+  $("sigmaC").addEventListener("input",e=>{const v=+e.target.value; if(v>0) set({sigmaC:v});});
+  $("erC").addEventListener("input",e=>{const v=+e.target.value; if(v>=1) set({erC:v});});
+  $("path").addEventListener("change",e=>set({path:e.target.value}));
+  $("coast").addEventListener("input",e=>set({coast:+e.target.value}));
+  $("moisture").addEventListener("change",e=>set({moisture:e.target.value}));
+  $("frozen").addEventListener("change",e=>set({frozen:e.target.checked}));
+  $("refr").addEventListener("change",e=>set({refr:e.target.value}));
+  $("storm").addEventListener("change",e=>set({storm:e.target.value}));
+  document.querySelectorAll("input[name=time]").forEach(r=>r.addEventListener("change",e=>set({time:e.target.value,cosChi:null})));
+  $("solar").addEventListener("change",e=>set({solar:e.target.value}));
+  $("flare").addEventListener("change",e=>set({flare:e.target.checked}));
+  $("gstorm").addEventListener("change",e=>set({gstorm:e.target.checked}));
+  $("env").addEventListener("change",e=>set({env:e.target.value}));
+  $("gNext").addEventListener("click",()=>loadPreset(currentPreset<0?0:(currentPreset+1)%PRESETS.length));
+  ["xscale","range","yunit"].forEach(id=>$(id).addEventListener("change",redraw));
+  $("addModel").addEventListener("click",()=>{ const s=sel(); const m=mk((s?s.name:"Model")+" (copy)", s?JSON.parse(JSON.stringify(s.p)):{}); models.push(m); selId=m.id; currentPreset=-1; refreshAll(); });
+  $("addBlank").addEventListener("click",()=>{ const m=mk("Model "+(models.length+1)); models.push(m); selId=m.id; currentPreset=-1; refreshAll(); });
+}
+
+/* ================= CHART ================= */
+const chart=$("chart"), cctx=chart.getContext("2d");
+let chartGeom=null, curveCache=[];
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; }
+function computeCurves(){
+  const dmax=+$("range").value, N=320, lg=$("xscale").value==="log", ds=[];
+  for(let i=0;i<N;i++) ds.push(lg?Math.pow(10,Math.log10(dmax)*i/(N-1)):Math.max(1,dmax*i/(N-1)));
+  curveCache=models.map(m=>{ const io=iono(m.p); return {m,io,thr:dBuV(threshold(m.p)),pts:ds.map(d=>Object.assign({d},evalP(m.p,d,io)))}; });
+  return {dmax,lg};
+}
+const Y_MV={"-20":"0.1 µV/m","0":"1 µV/m","20":"10 µV/m","40":"100 µV/m","60":"1 mV/m","80":"10 mV/m","100":"100 mV/m","120":"1 V/m"};
+function drawChart(hoverX){
+  const W=chart.clientWidth, H=chart.clientHeight; if(!W) return;
+  const dpr=window.devicePixelRatio||1; chart.width=W*dpr; chart.height=H*dpr; cctx.setTransform(dpr,0,0,dpr,0,0);
+  const {dmax,lg}=computeCurves(); const mvMode=$("yunit").value==="mv";
+  const L=mvMode?74:52,R=14,T=12,B=40,w=W-L-R,h=H-T-B, ymin=-20,ymax=130;
+  const xs=d=>lg?L+Math.log10(Math.max(d,1))/Math.log10(dmax)*w:L+d/dmax*w;
+  const ys=v=>T+(ymax-clamp(v,ymin-50,ymax+50))/(ymax-ymin)*h;
+  chartGeom={L,w,T,h,lg,dmax};
+  const muted=cssVar("--muted"), line=cssVar("--line");
+  cctx.clearRect(0,0,W,H); cctx.font="12px "+cssVar("--font-mono");
+  cctx.strokeStyle=line; cctx.lineWidth=1; cctx.fillStyle=muted; cctx.textAlign="right"; cctx.textBaseline="middle";
+  for(let v=ymin;v<=120;v+=20){ const y=ys(v); cctx.beginPath(); cctx.moveTo(L,y); cctx.lineTo(L+w,y); cctx.stroke(); cctx.fillText(mvMode?Y_MV[v]:v,L-6,y); }
+  cctx.textAlign="center"; cctx.textBaseline="top";
+  const xt=lg?[1,2,5,10,20,50,100,200,500,1000,2000,3000].filter(d=>d<=dmax):Array.from({length:7},(_,i)=>Math.round(dmax*i/6));
+  for(const d of xt){ const x=xs(d); cctx.beginPath(); cctx.moveTo(x,T); cctx.lineTo(x,T+h); cctx.stroke(); cctx.fillText(d,x,T+h+5); }
+  cctx.font="12px "+cssVar("--font-body"); cctx.fillText("Distance from transmitter (km)",L+w/2,T+h+22);
+  if(!mvMode){ cctx.save(); cctx.translate(12,T+h/2); cctx.rotate(-Math.PI/2); cctx.fillText("dBµV/m",0,-6); cctx.restore(); }
+  cctx.save(); cctx.beginPath(); cctx.rect(L,T,w,h); cctx.clip();
+  const s=curveCache.find(c=>c.m.id===selId);
+  if(s && s.m.visible && s.m.p.type==="combined"){
+    cctx.fillStyle=hexA(s.m.color,0.13); let inZ=false,x0=0;
+    s.pts.forEach((pt,i)=>{ const z=pt.g!==null&&pt.s!==null&&Math.abs(pt.g-pt.s)<6&&Math.max(pt.g,pt.s)>s.thr-6;
+      if(z&&!inZ){inZ=true;x0=xs(pt.d);} if((!z||i===s.pts.length-1)&&inZ){inZ=false;cctx.fillRect(x0,T,xs(pt.d)-x0,h);} });
+  }
+  if(s){ cctx.setLineDash([4,4]); cctx.strokeStyle=s.m.color; cctx.lineWidth=1.3; cctx.beginPath(); cctx.moveTo(L,ys(s.thr)); cctx.lineTo(L+w,ys(s.thr)); cctx.stroke(); cctx.setLineDash([]);
+    cctx.fillStyle=s.m.color; cctx.textAlign="right"; cctx.textBaseline="bottom"; cctx.font="600 11px "+cssVar("--font-body"); cctx.fillText("minimum usable signal",L+w-4,ys(s.thr)-3); }
+  const plot=(pts,key,col,lw,dash,alpha)=>{ cctx.strokeStyle=hexA(col,alpha); cctx.lineWidth=lw; cctx.setLineDash(dash); cctx.lineJoin="round"; cctx.beginPath(); let pen=false;
+    for(const pt of pts){ const v=pt[key]; if(v===null||!isFinite(v)){pen=false;continue;} const x=xs(pt.d),y=ys(v); if(!pen){cctx.moveTo(x,y);pen=true;} else cctx.lineTo(x,y);} cctx.stroke(); cctx.setLineDash([]); };
+  if(s&&s.m.visible&&s.m.p.type==="combined"){ plot(s.pts,"g",s.m.color,1.3,[6,4],0.85); plot(s.pts,"s",s.m.color,1.3,[1.5,3],0.85); }
+  for(const c of curveCache){ if(c.m.visible) plot(c.pts,"t",c.m.color,c.m.id===selId?3:1.8,[],c.m.id===selId?1:0.75); }
+  if(s&&s.m.visible){ const r=serviceRadius(s.m); if(r&&r<dmax){ const x=xs(r),y=ys(s.thr); cctx.fillStyle=s.m.color; cctx.beginPath(); cctx.arc(x,y,5.5,0,7); cctx.fill(); cctx.strokeStyle=cssVar("--panel"); cctx.lineWidth=2; cctx.stroke(); } }
+  for(const c of curveCache){ const rd=c.m.p.rxDist; if(c.m.visible&&rd&&rd<=dmax){ const v=evalRx(c.m.p,c.io).t; if(v!==null){ const x=xs(rd),y=ys(v); cctx.fillStyle=c.m.color; cctx.font="600 11px "+cssVar("--font-body"); cctx.textAlign="center"; cctx.textBaseline="bottom"; cctx.fillText("📻 receiver",x,y-8); cctx.beginPath(); cctx.moveTo(x-5,y-5); cctx.lineTo(x+5,y-5); cctx.lineTo(x,y); cctx.fill(); } } }
+  if(hoverX!==undefined){ cctx.strokeStyle=muted; cctx.lineWidth=1; cctx.beginPath(); cctx.moveTo(hoverX,T); cctx.lineTo(hoverX,T+h); cctx.stroke(); }
+  cctx.restore();
+  drawLegend();
+}
+function drawLegend(){
+  const s=sel(); let html=models.filter(m=>m.visible).map(m=>`<span style="color:${m.color}"><i style="border-top-width:3px"></i><b style="color:var(--ink);font-weight:500">${esc(m.name)}</b></span>`).join("");
+  if(s&&s.p.type==="combined") html+=`<span style="color:${s.color}"><i style="border-top-style:dashed"></i>ground wave part</span><span style="color:${s.color}"><i style="border-top-style:dotted"></i>sky wave part</span><span><i style="border-top:8px solid ${hexA(s.color,.2)};width:16px"></i>fading zone</span>`;
+  html+=`<span><i style="border-top-style:dashed"></i>minimum usable signal (selected)</span><span>● service limit</span>`;
+  $("chartLegend").innerHTML=html;
+}
+chart.addEventListener("mousemove",e=>{
+  if(!chartGeom) return; const r=chart.getBoundingClientRect(), x=e.clientX-r.left; const {L,w,lg,dmax}=chartGeom;
+  if(x<L||x>L+w){ $("tip").style.display="none"; drawChart(); return; }
+  const fr=(x-L)/w, d=lg?Math.pow(10,fr*Math.log10(dmax)):Math.max(1,fr*dmax);
+  drawChart(x);
+  let html=`<div class="mono" style="margin-bottom:3px"><b>${fmtD(d)} km</b></div>`;
+  for(const m of models){ if(!m.visible) continue; const io=iono(m.p), v=evalP(m.p,d,io).t, ok=v!==null&&v>=dBuV(threshold(m.p));
+    html+=`<div class="r"><span><span class="sw9" style="background:${m.color}"></span>${esc(m.name)}</span><span class="mono" style="color:${ok?"var(--ink)":"var(--muted)"}">${fmtField(v)}</span></div>`; }
+  const tip=$("tip"); tip.innerHTML=html; tip.style.display="block"; const tw=tip.offsetWidth; tip.style.left=(x+14+tw>r.width?x-tw-14:x+14)+"px"; tip.style.top="16px";
+});
+chart.addEventListener("mouseleave",()=>{ $("tip").style.display="none"; drawChart(); });
+
+/* ================= ANALYSIS ================= */
+function scan(p,fn,max=3000,n=500){ const io=iono(p); const out=[]; for(let i=0;i<=n;i++){ const d=Math.pow(10,i/n*Math.log10(max)); out.push([d,evalP(p,d,io)]); } return out; }
+function serviceRadius(m){
+  const p=m.p, thr=dBuV(threshold(p)), io=iono(p);
+  if(p.type==="sky") return null;
+  for(let i=0;i<=500;i++){ const d=Math.pow(10,i/500*Math.log10(3000)); const r=evalP(p,d,io); const v=p.type==="combined"?r.g:r.t;
+    if(v===null||v<thr) return i===0?0:d; }
+  return 3000;
+}
+function analyse(m){
+  const p=m.p, io=iono(p), thr=dBuV(threshold(p)), pts=scan(p);
+  const r=serviceRadius(m);
+  let sky=null, fade=null, skip=null, firstSky=null;
+  if(p.type==="sky"||p.type==="combined"){
+    let a=null,b=null; for(const [d,v] of pts){ if(v.s!==null&&v.s>=thr){ if(a===null)a=d; b=d; } } sky=a?{a,b}:null;
+    for(let d=5; d<=3000; d+=5){ if(skyField(d,p,io).E>0){ firstSky=d; break; } }
+    const gwEnd=p.type==="combined"?(r||0):0;
+    if(firstSky!==null&&firstSky>20&&firstSky>gwEnd+5) skip={a:gwEnd,b:firstSky};
+    if(p.type==="combined"){ let fa=null,fb=null; for(const [d,v] of pts){ if(v.g!==null&&v.s!==null&&Math.abs(v.g-v.s)<6&&Math.max(v.g,v.s)>thr-6){ if(fa===null)fa=d; fb=d; } } fade=fa?{a:fa,b:fb}:null; }
+  }
+  return {io,thr,r,sky,fade,skip,firstSky};
+}
+function readouts(){
+  const m=sel(); if(!m) return; const p=m.p; const A=analyse(m);
+  $("selName").textContent=m.name;
+  const tiles=[]; const sent=[];
+  const thrTxt=fmtField(A.thr);
+  if(p.type!=="sky"){
+    const rv=A.r===null?"—":A.r>=3000?"> 3000 km":`${fmtD(A.r)} km`;
+    tiles.push({k:"Reliable coverage",tip:"Distance out to which the ground wave (or, at VHF/UHF, the line-of-sight wave) stays above the minimum usable signal.",val:rv,sub:p.f>=30?"line-of-sight coverage":"ground-wave service radius",cls:A.r<20?"bad":A.r<80?"warn":"good"});
+    sent.push(A.r>=3000?`The signal stays usable beyond 3000 km.`:`Listeners get reliable ${p.f>=30?"line-of-sight":"ground-wave"} reception out to about <b>${fmtD(A.r)} km</b>.`);
+  }
+  if(p.type==="sky"||p.type==="combined"){
+    tiles.push({k:"Sky-wave reach",tip:"Distances where the reflected sky wave is above the minimum usable signal (median value; it fades).",val:A.sky?`${fmtD(A.sky.a)}–${fmtD(A.sky.b)} km`:"none",sub:A.sky?"usable but fades":"absorbed or not returning",cls:A.sky?"info":"bad"});
+    sent.push(A.sky?`The sky wave adds reception from about <b>${fmtD(A.sky.a)} to ${fmtD(A.sky.b)} km</b>.`:(timeLabel(p)==="day"&&p.f<3?"In daylight the sky wave is absorbed by the D layer, so it adds nothing.":"The sky wave is too weak here or passes through the ionosphere."));
+    tiles.push({k:"Skip zone",tip:"No ground wave and no sky wave lands here.",val:A.skip?`${fmtD(A.skip.a)}–${fmtD(A.skip.b)} km`:"none",sub:A.skip?"no signal":"no gap in coverage",cls:A.skip?"bad":"good"});
+    if(A.skip) sent.push(`Between ${fmtD(A.skip.a)} and ${fmtD(A.skip.b)} km there is a <b>skip zone</b> with no signal.`);
+    if(p.type==="combined"){ tiles.push({k:"Fading zone",tip:"Ground and sky wave arrive within 6 dB of each other and interfere, so the signal swells and fades.",val:A.fade?`${fmtD(A.fade.a)}–${fmtD(A.fade.b)} km`:"none",sub:A.fade?"expect fading & distortion":"one wave always dominates",cls:A.fade?"warn":"good"});
+      if(A.fade) sent.push(`Expect <b>fading</b> between about ${fmtD(A.fade.a)} and ${fmtD(A.fade.b)} km.`); }
+  }
+  tiles.push({k:"Signal needed",tip:"Minimum usable field strength. It rises with man-made noise, thunderstorms, night-time static and lower frequency.",val:thrTxt,sub:`${A.thr.toFixed(0)} dBµV/m · ${p.env}${p.storm!=="none"?" + storms":""}`,cls:"info"});
+  if(p.rxDist){ const v=evalRx(p,A.io).t; const ok=v!==null&&v>=A.thr; tiles.unshift({k:"At your receiver",tip:"Predicted total field at the receiver placed on the map, including the terrain shadowing estimate.",val:fmtField(v),sub:`${fmtD(p.rxDist)} km${p.terrainLossDb?` · terrain −${p.terrainLossDb.toFixed(1)} dB`:""} · ${ok?"usable":"below minimum"}`,cls:ok?"good":"bad"});
+    sent.unshift(`At the receiver (${fmtD(p.rxDist)} km away) the predicted signal is <b>${fmtField(v)}</b>, ${ok?"which is enough for reception":"which is below the minimum usable level"}.`); }
+  $("selName").textContent=`${m.name} · ${fmtF(p.f)} · ${fmtP(p.P)} · ${timeLabel(p)}`;
+  $("summary").innerHTML=sent.join(" ");
+  $("tiles").innerHTML=tiles.map(t=>`<div class="tile ${t.cls}"><span class="k">${t.k}<span class="qi" tabindex="0" data-tip="${esc(t.tip)}">?</span></span><span class="val">${t.val}</span><span class="sub">${t.sub}</span></div>`).join("");
+
+  // technical tiles
+  const g=effGround(p.ground,p), nt=norton(100,p.f,g), tilt=toDeg(Math.atan(1/Math.sqrt(Math.hypot(g.er,nt.x))));
+  const tt=[];
+  if(p.type!=="inverse"&&p.type!=="sky"){
+    tt.push(["Effective ground",`σ ${fmtSig(g.sigma)} S/m`,`εr ${g.er.toFixed(0)} after weather`]);
+    tt.push(["Numerical distance @100 km",nt.p<10?nt.p.toFixed(2):nt.p.toFixed(0),`A = ${nt.A.toFixed(3)} (${(20*Math.log10(nt.A)).toFixed(1)} dB)`]);
+    tt.push(["Wave tilt",`${tilt.toFixed(1)}°`,"forward tilt of wavefront"]);
+    tt.push(["Flat-earth limit",`${fmtD(critDist(p.f,p))} km`,`curvature loss beyond (k = ${kFac(p).toFixed(2)})`]);
+  }
+  if(p.type==="sky"||p.type==="combined"){
+    const s5=skyField(500,p,A.io);
+    tt.push(["Ionosphere",`foF2 ${A.io.foF2.toFixed(1)} MHz`,`foE ${A.io.foE.toFixed(1)} MHz · absorption index ${A.io.I.toFixed(2)}`]);
+    tt.push(["Sky wave @500 km",s5.E>0?`${dBuV(s5.E).toFixed(0)} dBµV/m`:"no return",s5.best?`${s5.best.layer} layer · ${s5.best.n} hop · ${toDeg(s5.best.del).toFixed(0)}° elevation · D absorption ${s5.best.abs.toFixed(1)} dB`:"escapes or absorbed"]);
+  }
+  $("techTiles").innerHTML=tt.map(t=>`<div class="tile info"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
+  const D=[10,25,50,100,200,500,1000];
+  let rows=`<caption style="text-align:left;font-size:12px;color:var(--muted);padding-bottom:4px">Total signal for every model. Grey = below that model's minimum usable signal.</caption><tr><th>Model</th>`+D.map(d=>`<th>${d} km</th>`).join("")+`</tr>`;
+  for(const mm of models){ const io=iono(mm.p), th=dBuV(threshold(mm.p));
+    rows+=`<tr><td><span class="sw9" style="background:${mm.color}"></span>${esc(mm.name)}</td>`+D.map(d=>{ const v=evalP(mm.p,d,io).t; return `<td class="mono" style="color:${v!==null&&v>=th?"var(--ink)":"var(--muted)"}">${fmtField(v)}</td>`; }).join("")+`</tr>`; }
+  $("fsTable").innerHTML=rows;
+
+  // explanation
+  const ex=[];
+  ex.push({LF:"Low frequency (LF): long wavelength, small ground loss, so the ground wave travels very far.",MF:"Medium frequency (MF) is the AM broadcast band: steady ground-wave coverage by day and sky-wave signals at night.",HF:"At HF the ground wave fades within tens of km. Long-distance links rely on the sky wave.",VHF:"At VHF (FM radio, TV, aviation) there is practically no ground wave or sky wave. Coverage comes from the line-of-sight space wave, so antenna height decides the range and the signal drops quickly beyond the radio horizon.",UHF:"At UHF (TV, mobile networks) propagation is line of sight. The range is set by antenna heights and the radio horizon, and hills block the signal far more than at lower frequencies."}[band(p.f)]);
+  if(p.f>=30){ ex.push(`Radio horizon for a ${p.htx||30} m transmitting and ${p.hrx||10} m receiving antenna: about ${fmtD(radioHorizon(p))} km.`); if(p.refr==="super") ex.push("Super-refraction (ducting) in warm, humid layers bends VHF/UHF waves around the earth and can carry them far beyond the normal horizon."); }
+  if(p.type!=="sky"&&p.type!=="inverse"){
+    ex.push(`Over ${g.name.toLowerCase()} the ground wave is ${nt.p<1?"barely":nt.p<20?"moderately":"strongly"} weakened by ground losses, on top of normal spreading.`);
+    if(g.kind==="land"){ if(p.frozen) ex.push("Frozen ground conducts poorly, so losses rise sharply."); else if(p.moisture==="saturated"||p.moisture==="wet") ex.push("Rain-soaked soil conducts better, so the ground wave reaches further."); else if(p.moisture==="dry") ex.push("Dry soil conducts poorly, so coverage shrinks."); }
+    if(p.path==="mixed"||p.path==="geo") ex.push("The path crosses different ground types. Millington's method combines them, and after a land-to-sea boundary the signal can recover.");
+  }
+  if(p.type==="sky"||p.type==="combined"){
+    const ph=phaseOf(cosChiOf(p));
+    if(ph==="day") ex.push(p.f<3?"By day the D layer absorbs MF sky waves, so listeners depend on the ground wave.":"By day the F2 layer is strong, but the D layer still absorbs lower HF frequencies.");
+    if(ph==="night") ex.push("At night the D layer disappears, so sky waves return with little loss. Distant stations come in, and where both waves meet the signal fades.");
+    if(ph==="dusk") ex.push("At dawn and dusk the D layer is forming or decaying, so the sky wave changes quickly.");
+    if(p.flare) ex.push(cosChiOf(p)>0?"The solar flare floods the D layer with ionization and can black out HF on the sunlit side.":"A solar flare does not affect the night side of the earth.");
+    if(p.gstorm) ex.push("The geomagnetic storm weakens the F2 layer, so higher frequencies escape and the skip zone grows.");
+  }
+  if(p.storm!=="none") ex.push("Thunderstorm static raises the noise, so a stronger signal is needed and the service area shrinks.");
+  $("explain").innerHTML=`<h3>Why it behaves this way</h3>`+ex.map(t=>`<p>${t}</p>`).join("");
+}
+function redraw(){ drawChart(); readouts(); }
+
+/* ================= ANIMATION TAB ================= */
+const anim=$("anim"), actx=anim.getContext("2d");
+const scope=$("scope"), sctx2=scope.getContext("2d");
+/* scene tokens — shared with the legend swatches in CSS */
+const SC={gw:"255,200,61",sky:"255,122,198",esc:"255,255,255",D:"222,104,66",E:"110,190,255",F:"150,130,255",skip:"226,76,66",fade:"240,170,40",los:"120,230,190",label:"rgba(12,20,36,.86)"};
+const AN={id:null,hour:12,cycle:false,playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1,rx:150,t:0,last:performance.now(),
+  view:{d0:0,span:1000},gwKey:"",gw:null,svc:null,ana:null,anaKey:"",scope:[],geom:null,meterT:0,drag:null,ptrs:new Map(),labels:true,tour:null,errShown:false};
+const cosFromHour=h=>Math.cos(2*Math.PI*(h-12)/24);
+const hourFromCos=c=>12-Math.acos(clamp(c,-1,1))*12/Math.PI;
+function animModel(){ return models.find(m=>m.id===AN.id)||sel(); }
+function animParams(){ const m=animModel(); return Object.assign({},m.p,{cosChi:cosFromHour(AN.hour)}); }
+function resetView(){ const span=+$("animRange").value; AN.view={d0:-span*0.03,span}; syncRx(); }
+function setAnimModel(id){ AN.id=id; const m=animModel(); AN.hour=hourFromCos(cosChiOf(m.p)); $("hour").value=AN.hour;
+  let span=+$("animRange").value;
+  if(m.p.rxDist){ AN.rx=m.p.rxDist; span=m.p.rxDist>900?3000:m.p.rxDist>280?1000:300; }
+  else if(m.p.f>=30) span=300; else if(m.p.f>3) span=3000;
+  $("animRange").value=String(span); resetView(); AN.scope=[]; AN.gwKey=""; AN.anaKey=""; }
+function syncRx(){ const max=Math.max(+$("animRange").value, AN.view.d0+AN.view.span); $("rxSlider").max=Math.round(max); AN.rx=clamp(AN.rx,1,max); $("rxSlider").value=AN.rx; }
+function syncModelSelects(){
+  for(const id of ["animModel","mapModel"]){ const s=$(id); const v=s.value; s.innerHTML=models.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join("");
+    if(models.some(m=>String(m.id)===v)) s.value=v; else s.value=String(selId); }
+  if(!models.some(m=>m.id===AN.id)) setAnimModel(selId); else $("animModel").value=String(AN.id);
+}
+function setPlaying(on){ AN.playing=on; $("playBtn").textContent=on?"❚❚ Pause":"▶ Play"; $("bigPlay").hidden=on; AN.last=performance.now(); }
+
+/* ---- guided tour ---- */
+const TOUR=[
+  {t:"The transmitter",f:["tx"],x:"The mast radiates radio energy in all directions. At LF, MF and HF the wave is vertically polarized, so part of it can travel along the ground."},
+  {t:"The ground wave",f:["gw"],x:"The yellow band hugs the ground and follows the earth's curve. Its height shows the signal strength, which shrinks as ground losses add up. Sea water and wet soil keep it strong. Dry rock and higher frequencies weaken it quickly."},
+  {t:"The ionosphere",f:["iono"],x:"Between about 60 and 400 km up, sunlight ionizes the air into layers. The D layer (red) absorbs radio waves by day. The E and F2 layers can bend waves back down to earth."},
+  {t:"The sky wave",f:["sky","iono","zones"],x:"Waves sent upward come back only if the frequency is low enough for that angle (the secant law). Steep rays at high frequency escape into space, leaving a skip zone where nothing arrives."},
+  {t:"Day and night",f:["iono","sky","gw","zones"],cycle:true,x:"Watch the clock. After sunset the D layer disappears, so the sky wave returns strongly and reaches far beyond the ground wave. That is why AM stations travel further at night."},
+  {t:"At the receiver",f:["rx","zones"],x:"Drag the radio along the ground. The meter compares the two waves with the level needed. Where they are similar in strength they interfere, and the trace swings up and down. This is fading."}
+];
+function showTour(i){
+  if(i===null||i<0||i>=TOUR.length){ AN.tour=null; $("tourBox").hidden=true; AN.cycle=false; $("cycle").checked=false; return; }
+  AN.tour=i; const s=TOUR[i]; $("tourBox").hidden=false;
+  $("tourStep").textContent=`Guided tour · step ${i+1} of ${TOUR.length}`; $("tourTitle").textContent=s.t; $("tourText").textContent=s.x;
+  $("tourBack").disabled=i===0; $("tourNext").textContent=i===TOUR.length-1?"Finish":"Next →";
+  AN.cycle=!!s.cycle; $("cycle").checked=AN.cycle; if(!AN.playing) setPlaying(true);
+}
+const fa=k=>AN.tour===null?1:(TOUR[AN.tour].f.includes(k)?1:0.14);
+
+function bindAnim(){
+  $("animModel").addEventListener("change",e=>setAnimModel(+e.target.value));
+  $("animRange").addEventListener("change",()=>{ resetView(); AN.gwKey=""; });
+  $("playBtn").addEventListener("click",()=>setPlaying(!AN.playing));
+  $("bigPlay").addEventListener("click",()=>setPlaying(true));
+  setPlaying(AN.playing);
+  $("speed").addEventListener("input",e=>AN.speed=+e.target.value);
+  $("hour").addEventListener("input",e=>{ AN.hour=+e.target.value; AN.cycle=false; $("cycle").checked=false; });
+  $("cycle").addEventListener("change",e=>{ AN.cycle=e.target.checked; if(AN.cycle&&!AN.playing) setPlaying(true); });
+  $("rxSlider").addEventListener("input",e=>{ AN.rx=+e.target.value; AN.scope=[]; });
+  $("explainT").addEventListener("change",e=>AN.labels=e.target.checked);
+  $("tourBtn").addEventListener("click",()=>showTour(0));
+  $("tourNext").addEventListener("click",()=>showTour(AN.tour+1>=TOUR.length?null:AN.tour+1));
+  $("tourBack").addEventListener("click",()=>showTour(Math.max(0,AN.tour-1)));
+  $("tourClose").addEventListener("click",()=>showTour(null));
+  const zoomAt=(f,x)=>{ const g=AN.geom; if(!g) return; const W=anim.clientWidth; x=x??W/2;
+    const frac=clamp((x-g.x0)/(g.x1-g.x0),0,1), dAt=AN.view.d0+frac*AN.view.span;
+    const ns=clamp(AN.view.span*f,10,4000); AN.view.span=ns; AN.view.d0=clamp(dAt-frac*ns,-ns*0.1,4000-ns*0.3); syncRx(); };
+  $("aZoomIn").onclick=()=>zoomAt(0.6); $("aZoomOut").onclick=()=>zoomAt(1/0.6); $("aReset").onclick=resetView;
+  anim.addEventListener("wheel",e=>{ e.preventDefault(); const r=anim.getBoundingClientRect(); zoomAt(e.deltaY<0?0.8:1.25,e.clientX-r.left); },{passive:false});
+  const pos=e=>{ const r=anim.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
+  const dAtX=(x,y)=>{ const g=AN.geom; const a=Math.atan2(x-g.cx,g.cy-y); return AN.view.d0+(a+g.Tv/2)/g.Tv*AN.view.span; };
+  anim.addEventListener("pointerdown",e=>{ anim.setPointerCapture(e.pointerId); const q=pos(e); AN.ptrs.set(e.pointerId,q);
+    if(AN.ptrs.size===2){ const [a,b]=[...AN.ptrs.values()]; AN.drag={mode:"pinch",dist:Math.hypot(a.x-b.x,a.y-b.y),span:AN.view.span}; return; }
+    const g=AN.geom; if(!g) return; const [rx,ry]=g.map(AN.rx/RE,0);
+    if(Math.hypot(q.x-rx,q.y-ry+14)<34) AN.drag={mode:"rx"}; else AN.drag={mode:"pan",x:q.x,d0:AN.view.d0}; });
+  anim.addEventListener("pointermove",e=>{ const q=pos(e); if(AN.ptrs.has(e.pointerId)) AN.ptrs.set(e.pointerId,q);
+    const g=AN.geom; if(!g) return;
+    if(!AN.drag){ const [rx,ry]=g.map(AN.rx/RE,0); anim.style.cursor=Math.hypot(q.x-rx,q.y-ry+14)<34?"grab":"move"; return; }
+    if(AN.drag.mode==="rx"){ AN.rx=clamp(dAtX(q.x,q.y),1,4000); $("rxSlider").value=AN.rx; AN.scope=[]; }
+    else if(AN.drag.mode==="pan"){ const kmPerPx=AN.view.span/(g.x1-g.x0); AN.view.d0=clamp(AN.drag.d0-(q.x-AN.drag.x)*kmPerPx,-AN.view.span*0.1,4000-AN.view.span*0.3); }
+    else if(AN.drag.mode==="pinch"&&AN.ptrs.size===2){ const [a,b]=[...AN.ptrs.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); const target=clamp(AN.drag.span*AN.drag.dist/Math.max(d,1),10,4000); zoomAt(target/AN.view.span,(a.x+b.x)/2); } });
+  const up=e=>{ AN.ptrs.delete(e.pointerId); if(AN.ptrs.size===0){ AN.drag=null; syncRx(); } };
+  anim.addEventListener("pointerup",up); anim.addEventListener("pointercancel",up);
+}
+function mixCol(a,b,u){ const pa=a.match(/\w\w/g).map(h=>parseInt(h,16)), pb=b.match(/\w\w/g).map(h=>parseInt(h,16)); return "rgb("+pa.map((v,i)=>Math.round(v+(pb[i]-v)*u)).join(",")+")"; }
+function skyCols(c){
+  const day=["4f86cf","cfe3f6"], dusk=["3b3f78","f2b27a"], night=["050a1a","1b2647"];
+  if(c>=0.3) return day.map(x=>"#"+x);
+  if(c>=-0.15){ const u=(c+0.15)/0.45; return [mixCol(dusk[0],day[0],u),mixCol(dusk[1],day[1],u)]; }
+  const u=clamp((c+0.15)/-0.35,0,1); return [mixCol(dusk[0],night[0],u),mixCol(dusk[1],night[1],u)];
+}
+function niceStep(span){ const raw=span/6, p=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; }
+/* label pill with optional leader line to (tx,ty) */
+function pill(c,text,x,y,o={}){
+  c.font=`${o.bold===false?500:600} ${o.size||12}px `+cssVar("--font-body");
+  const w=c.measureText(text).width+14, h=(o.size||12)+10; let bx=o.align==="right"?x-w:o.align==="left"?x:x-w/2;
+  bx=clamp(bx,6,c.canvas.clientWidth-w-6); const by=y-h/2;
+  if(o.to){ c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=1.2; c.beginPath(); c.moveTo(clamp(o.to[0],bx,bx+w),by+(o.to[1]>y?h:0)); c.lineTo(o.to[0],o.to[1]); c.stroke(); c.fillStyle="#fff"; c.beginPath(); c.arc(o.to[0],o.to[1],2.5,0,7); c.fill(); }
+  c.fillStyle=o.bg||SC.label; c.beginPath(); c.roundRect?c.roundRect(bx,by,w,h,6):c.rect(bx,by,w,h); c.fill();
+  if(o.accent){ c.fillStyle=`rgb(${o.accent})`; c.fillRect(bx,by+4,3,h-8); }
+  c.fillStyle=o.fg||"#fff"; c.textAlign="left"; c.textBaseline="middle"; c.fillText(text,bx+7+(o.accent?2:0),y+0.5); c.textBaseline="alphabetic";
+}
+
+function drawAnim(dt){
+  const W=anim.clientWidth, H=anim.clientHeight; if(!W||!H) return;
+  const dpr=window.devicePixelRatio||1; if(anim.width!==Math.round(W*dpr)||anim.height!==Math.round(H*dpr)){ anim.width=W*dpr; anim.height=H*dpr; }
+  const c=actx; c.setTransform(dpr,0,0,dpr,0,0);
+  const m=animModel(); if(!m) return;
+  const p=animParams(), io=iono(p), cosC=p.cosChi, thr=dBuV(threshold(p));
+  const {d0,span}=AN.view, th0=d0/RE, thS=span/RE, Tv=0.62, x0=40, x1=W-30;
+  const Rpx=(x1-x0)/(2*Math.sin(Tv/2)), drop=Rpx*(1-Math.cos(Tv/2)), gTop=H-34-drop, cx=(x0+x1)/2, cy=gTop+Rpx;
+  const altScale=(gTop-56)/400;
+  const map=(th,alt)=>{ const a=(th-th0)/thS*Tv-Tv/2, r=Rpx+alt*altScale; return [cx+r*Math.sin(a), cy-r*Math.cos(a)]; };
+  const angAt=d=>(d/RE-th0)/thS*Tv-Tv/2;
+  AN.geom={cx,cy,Tv,map,x0,x1};
+  const t=AN.t, dA=d0-span*0.15, dB=d0+span*1.15;
+  // sky background
+  const [top,bot]=skyCols(cosC); const gr=c.createLinearGradient(0,0,0,H); gr.addColorStop(0,top); gr.addColorStop(1,bot); c.fillStyle=gr; c.fillRect(0,0,W,H);
+  const starA=clamp((-cosC-0.1)/0.4,0,1);
+  if(starA>0){ for(let i=0;i<90;i++){ c.fillStyle=`rgba(255,255,255,${starA*(0.4+0.6*Math.abs(Math.sin(i+t/900)))})`; c.fillRect((i*97.3)%W,(i*53.7)%(gTop*0.85),1.4,1.4);} }
+  const sunU=(AN.hour-6)/12; const body=(u,col,r)=>{ const x=W*0.1+u*W*0.8, y=26+(1-Math.sin(clamp(u,0,1)*Math.PI))*80; c.fillStyle=col; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); return [x,y]; };
+  if(sunU>-0.05&&sunU<1.05){ const [sx,sy]=body(sunU,"#ffd34d",14); if(p.flare){ c.strokeStyle="#ff7a2f"; c.lineWidth=2; for(let i=0;i<12;i++){ const a=i/12*Math.PI*2+t/900, L=24+5*Math.sin(t/120+i); c.beginPath(); c.moveTo(sx+Math.cos(a)*17,sy+Math.sin(a)*17); c.lineTo(sx+Math.cos(a)*L,sy+Math.sin(a)*L); c.stroke(); } } }
+  else { const mu=((AN.hour+6)%24)/12; const [mx,my]=body(mu,"#f3f0d8",11); c.fillStyle=top; c.beginPath(); c.arc(mx+5,my-4,10,0,7); c.fill(); }
+
+  // ionosphere layers
+  const band=(h1,h2,col)=>{ c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1); c.lineTo(x,y);} c.closePath(); c.fillStyle=col; c.fill(); };
+  const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); pill(c,txt,W-14,y,{align:"right",accent:rgb,size:11.5}); };
+  c.globalAlpha=fa("iono");
+  const dDens=clamp((io.I-0.08)/1.2,0,1)*(p.flare&&cosC>0?1.4:1);
+  if(dDens>0.02) band(60,90,`rgba(${SC.D},${clamp(dDens*0.6,0.06,0.78)})`);
+  band(100,120,`rgba(${SC.E},${clamp(io.foE/4,0.08,0.45)})`);
+  band(io.hF-45,io.hF+45,`rgba(${SC.F},${clamp(io.foF2/14,0.15,0.5)})`);
+  if(p.gstorm){ c.strokeStyle="rgba(90,255,170,.5)"; c.lineWidth=3; for(let k=0;k<3;k++){ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((d0+span*(0.5+i/80))/RE,430+k*14+8*Math.sin(i/4+t/500+k)); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); } }
+  layerTag(`F2 layer · foF2 ${io.foF2.toFixed(1)} MHz`,io.hF,SC.F); layerTag(`E layer · foE ${io.foE.toFixed(1)} MHz`,110,SC.E);
+  if(dDens>0.02) layerTag(`D layer${p.flare&&cosC>0?" · solar flare!":""}`,75,SC.D);
+  c.globalAlpha=1;
+
+  // earth
+  const arcFill=(a,b,col)=>{ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((a+(b-a)*i/40)/RE,0); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=40;i>=0;i--){ const [x,y]=map((a+(b-a)*i/40)/RE,-260); c.lineTo(x,y);} c.closePath(); c.fillStyle=col; c.fill(); };
+  const segs=pathSegs(p,Math.max(dB,1)); arcFill(Math.min(dA,0),0.3,effGround(segs[0].g,p).color);
+  { let pos=0; segs.forEach(s=>{ arcFill(pos,pos+s.len+0.3,effGround(s.g,p).color); pos+=s.len; }); }
+  if(p.frozen){ c.strokeStyle="rgba(255,255,255,.9)"; c.lineWidth=4; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0.5); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); }
+  // distance scale
+  c.font="11px "+cssVar("--font-mono"); c.fillStyle="rgba(255,255,255,.92)"; c.textAlign="center";
+  const st=niceStep(span); for(let d=Math.ceil(Math.max(d0,0)/st)*st; d<=d0+span; d+=st){ if(d<=0) continue; const [x,y]=map(d/RE,0); c.fillRect(x-0.5,y,1,6); c.fillText(`${d>=10?Math.round(d):d.toFixed(1)} km`,x,y+18); }
+
+  // weather
+  const g1=effGround(p.ground,p), wet=g1.kind==="land"&&!p.frozen?p.moisture:"normal";
+  if((wet==="wet"||wet==="saturated"||p.storm!=="none")&&p.f<30){
+    const n=p.storm==="local"||wet==="saturated"?7:4;
+    for(let i=0;i<n;i++){ const [x,y]=map((d0+span*(0.12+i*0.8/n))/RE,0); const yy=y-112;
+      c.fillStyle=p.storm==="local"?"rgba(95,105,125,.93)":cosC<0?"rgba(150,160,185,.85)":"rgba(240,244,250,.93)";
+      for(const [dx,dy,r] of [[-15,4,11],[0,-3,14],[16,4,11],[6,7,11]]){ c.beginPath(); c.arc(x+dx,yy+dy,r,0,7); c.fill(); }
+      if(wet!=="normal"||p.storm==="local"){ c.strokeStyle="rgba(170,205,255,.85)"; c.lineWidth=1.2; for(let k=0;k<6;k++){ const ry=((t/6+k*13+i*7)%70); c.beginPath(); c.moveTo(x-13+k*5,yy+14+ry); c.lineTo(x-15+k*5,yy+21+ry); c.stroke(); } }
+      if(p.storm!=="none"&&i%2===0&&Math.floor(t/160+i)%6===0){ c.strokeStyle="#fff6a8"; c.lineWidth=2.4; c.beginPath(); c.moveTo(x,yy+12); c.lineTo(x-7,yy+34); c.lineTo(x+3,yy+34); c.lineTo(x-5,yy+60); c.stroke(); } }
+  }
+  if(p.frozen){ c.fillStyle="rgba(255,255,255,.9)"; for(let i=0;i<50;i++){ c.fillRect((i*71.3+t/30)%W,(i*37.1+t/14)%gTop,2,2);} }
+
+  // analysis (zones), cached
+  const aKey=JSON.stringify(m.p)+"|"+Math.round(AN.hour*4);
+  if(AN.anaKey!==aKey){ AN.anaKey=aKey; try{ AN.ana=analyse({p}); }catch(e){ AN.ana=null; } }
+  const A=AN.ana;
+  const zone=(a,b,rgb,txt)=>{ if(b<d0||a>d0+span) return; const aa=Math.max(a,dA), bb=Math.min(b,dB);
+    c.strokeStyle=`rgba(${rgb},.95)`; c.lineWidth=6; c.lineCap="butt"; c.beginPath(); for(let i=0;i<=30;i++){ const [x,y]=map((aa+(bb-aa)*i/30)/RE,0); i?c.lineTo(x,y+30):c.moveTo(x,y+30);} c.stroke();
+    if(AN.labels){ const mid=clamp((Math.max(a,d0)+Math.min(b,d0+span))/2,d0,d0+span); const [x,y]=map(mid/RE,0); pill(c,txt,x,y-18,{accent:rgb,size:11.5}); } };
+  c.globalAlpha=fa("zones");
+  if(A&&A.skip) zone(A.skip.a,A.skip.b,SC.skip,`Skip zone: no signal (${fmtD(A.skip.a)}–${fmtD(A.skip.b)} km)`);
+  if(A&&A.fade) zone(A.fade.a,A.fade.b,SC.fade,`Fading zone (${fmtD(A.fade.a)}–${fmtD(A.fade.b)} km)`);
+  c.globalAlpha=1;
+
+  // tower
+  const [tx,ty]=map(0,0);
+  c.globalAlpha=fa("tx");
+  c.strokeStyle="#eef1f5"; c.lineWidth=2.4; c.beginPath(); c.moveTo(tx,ty); c.lineTo(tx,ty-58); c.stroke();
+  c.lineWidth=1; for(let k=1;k<6;k++){ c.beginPath(); c.moveTo(tx-5+k*0.7,ty-k*10); c.lineTo(tx+5-k*0.7,ty-k*10-6); c.stroke(); }
+  c.fillStyle=Math.floor(t/500)%2?"#ff4d4d":"#7a1d1d"; c.beginPath(); c.arc(tx,ty-60,3,0,7); c.fill();
+  for(let k=0;k<3;k++){ const r=((t/12+k*20)%60); c.strokeStyle=`rgba(255,230,140,${0.6*(1-r/60)})`; c.lineWidth=1.5; c.beginPath(); c.arc(tx,ty-58,r,-Math.PI*0.95,-Math.PI*0.05); c.stroke(); }
+  if(AN.labels&&AN.tour!==null&&TOUR[AN.tour].f.includes("tx")) pill(c,`Transmitter · ${fmtF(p.f)} · ${fmtP(p.P)}`,tx+60,ty-90,{to:[tx,ty-58]});
+  c.globalAlpha=1;
+
+  // ===== ground / space wave =====
+  if(p.type!=="sky"){
+    const key=JSON.stringify(m.p)+"|"+Math.round(d0)+"|"+Math.round(span)+"|"+W+"|"+phaseOf(cosC);
+    if(AN.gwKey!==key){ AN.gwKey=key; AN.svc=serviceRadius({p}); const N=300, arr=[]; for(let i=0;i<=N;i++){ const d=Math.max(0.3,d0+span*1.12*i/N); const r=evalP(p,d,io); arr.push({d,v:p.type==="combined"?r.g:r.t}); } AN.gw=arr; }
+    const nt=norton(100,p.f,g1), tilt=Math.min(Math.atan(1/Math.sqrt(Math.hypot(g1.er,nt.x)))*3,0.8);
+    const amp=v=>v===null?0:clamp((v-thr+30)/70,0,1)*48;
+    c.globalAlpha=fa("gw");
+    c.beginPath(); AN.gw.forEach((q,i)=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,0), A2=amp(q.v); const x=gx+Math.sin(a)*A2, y=gy-Math.cos(a)*A2; i?c.lineTo(x,y):c.moveTo(x,y); });
+    for(let i=AN.gw.length-1;i>=0;i--){ const [gx,gy]=map(AN.gw[i].d/RE,0); c.lineTo(gx,gy); } c.closePath();
+    c.fillStyle=`rgba(${SC.gw},.30)`; c.fill();
+    const lamV=span/16, ph=t/1000*2*Math.PI*0.9;
+    c.lineWidth=2.6; c.lineCap="round";
+    for(let i=1;i<AN.gw.length;i++){ const q0=AN.gw[i-1], q1=AN.gw[i]; const A2=amp(q1.v); if(A2<0.5) continue;
+      const pt=q=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,0), o=amp(q.v)*(0.5+0.5*Math.sin(2*Math.PI*q.d/lamV-ph)); return [gx+Math.sin(a)*o, gy-Math.cos(a)*o]; };
+      const [ax,ay]=pt(q0),[bx,by]=pt(q1); c.strokeStyle=`rgba(${SC.gw},${clamp(A2/48+0.3,0,1)})`; c.beginPath(); c.moveTo(ax,ay); c.lineTo(bx,by); c.stroke(); }
+    if(p.f<30) for(let k=0;k<22;k++){ const d=d0+(((k*lamV+(ph/(2*Math.PI))*lamV)%(span*1.12))+span*1.12)%(span*1.12); if(d<1) continue; const q=AN.gw[Math.min(AN.gw.length-1,Math.max(0,Math.round((d-d0)/(span*1.12)*300)))]; const A2=amp(q.v); if(A2<1) continue;
+      const a=angAt(d), [gx,gy]=map(d/RE,0), L=A2+10; c.strokeStyle=`rgba(255,250,210,${clamp(A2/48,0.1,0.8)})`; c.lineWidth=1.2; c.beginPath(); c.moveTo(gx,gy); c.lineTo(gx+Math.sin(a+tilt)*L, gy-Math.cos(a+tilt)*L); c.stroke(); }
+    c.lineCap="butt";
+    // VHF / UHF: line of sight and radio horizon
+    if(p.f>=30){ const hz=radioHorizon(p); const [hx,hy]=map(hz/RE,0);
+      c.strokeStyle=`rgba(${SC.los},.9)`; c.setLineDash([6,5]); c.lineWidth=1.6; c.beginPath(); c.moveTo(tx,ty-58); c.lineTo(hx,hy); c.stroke(); c.setLineDash([]);
+      if(AN.labels){ pill(c,`Radio horizon ≈ ${fmtD(hz)} km`,hx,hy-40,{accent:SC.los,to:[hx,hy]}); }
+    }
+    const r=AN.svc; if(r&&r<d0+span*1.05&&r>d0){ const [xr,y]=map(r/RE,0); c.strokeStyle="rgba(255,255,255,.85)"; c.setLineDash([3,3]); c.lineWidth=1.2; c.beginPath(); c.moveTo(xr,y); c.lineTo(xr,y-80); c.stroke(); c.setLineDash([]);
+      pill(c,`${p.f>=30?"Coverage":"Ground-wave"} limit ${fmtD(r)} km`,xr,y-92,{accent:SC.gw}); }
+    if(AN.labels){ const dl=clamp((r||span)*0.35,d0+span*0.1,d0+span*0.45); const q=AN.gw[Math.min(300,Math.max(0,Math.round((dl-d0)/(span*1.12)*300)))]; const [gx,gy]=map(dl/RE,0);
+      pill(c,p.f>=30?"Space wave: direct + reflected, line of sight":"Ground wave: follows the curve, fades with distance",gx+30,gy-amp(q.v)-78,{to:[gx,gy-amp(q.v)*0.6],accent:SC.gw}); }
+    c.globalAlpha=1;
+  }
+
+  // ===== sky waves =====
+  if(p.type==="sky"||p.type==="combined"){
+    c.globalAlpha=fa("sky");
+    const elevs=[3,7,12,18,26,36,50,68]; let apexLabel=null, escLabel=null;
+    elevs.forEach((ed,ix)=>{
+      const del=toRad(ed); let h=null, lname="";
+      if(p.f<=io.foE*secAt(del,io.hE)){ h=io.hE; lname="E"; } else if(p.f<=io.foF2*secAt(del,io.hF)){ h=io.hF; lname="F2"; }
+      const ab=absdB(p.f,io.I,secAt(del,100)), base=0.35+0.65*Math.cos(del);
+      const pts=[];
+      const seg=(thA,hA,thB,hB)=>{ const ax=(RE+hA)*Math.sin(thA),ay=(RE+hA)*Math.cos(thA),bx=(RE+hB)*Math.sin(thB),by=(RE+hB)*Math.cos(thB); for(let i=0;i<=30;i++){ const u=i/30,x=ax+(bx-ax)*u,y=ay+(by-ay)*u; pts.push([Math.atan2(x,y),Math.hypot(x,y)-RE]); } };
+      let hops=0, apex=null;
+      if(h){ const phi=Math.asin(RE*Math.cos(del)/(RE+h)), thh=Math.PI/2-del-phi;
+        for(let k=0;k<4;k++){ const b=k*2*thh; if(b*RE>d0+span*1.1) break; seg(b,0,b+thh,h); seg(b+thh,h,b+2*thh,0); hops++; if(k===0) apex=[thh,h]; } }
+      else { const phi=Math.asin(RE*Math.cos(del)/(RE+460)), thh=Math.PI/2-del-phi; seg(0,0,thh,460); }
+      const alph=[]; let cross=0; pts.forEach((q,i)=>{ if(i>0){ const a0=pts[i-1][1],a1=q[1]; if((a0<75&&a1>=75)||(a0>=75&&a1<75)) cross++; } alph.push(base*Math.pow(10,-(cross*ab/2)/20)); });
+      c.lineWidth=1.4; c.setLineDash(h?[]:[4,5]);
+      for(let i=1;i<pts.length;i++){ const [xa,ya]=map(pts[i-1][0],pts[i-1][1]),[xb,yb]=map(pts[i][0],pts[i][1]); c.strokeStyle=h?`rgba(${SC.sky},${clamp(alph[i]*0.8,0.06,0.8)})`:`rgba(${SC.esc},${clamp(alph[i]*0.35,0.05,0.35)})`; c.beginPath(); c.moveTo(xa,ya); c.lineTo(xb,yb); c.stroke(); }
+      c.setLineDash([]);
+      const n=pts.length, sp=n/(h?3600*hops/1.2:2400);
+      for(let k=0;k<2;k++){ const u=((t*sp)+ix*17+k*n/2)%n; const i=Math.floor(u); const a=alph[i];
+        for(let q=0;q<7;q++){ const j=i-q; if(j<0) break; const [x,y]=map(pts[j][0],pts[j][1]); c.fillStyle=h?`rgba(${SC.sky},${clamp(a*(1-q/7),0,1)})`:`rgba(${SC.esc},${clamp(a*0.7*(1-q/7),0,1)})`; c.beginPath(); c.arc(x,y,q===0?3.4:2.2,0,7); c.fill(); } }
+      if(h&&apex&&!apexLabel&&ed>=12) apexLabel={pt:map(apex[0],apex[1]),txt:`Sky wave bends back at the ${lname} layer`,ab};
+      if(!h&&!escLabel&&ed>=36){ const q=pts[pts.length-1]; escLabel={pt:map(q[0],q[1])}; }
+    });
+    if(AN.labels){
+      if(apexLabel) pill(c,apexLabel.txt+(apexLabel.ab>20?" (weak: D layer absorbs)":""),apexLabel.pt[0]+40,apexLabel.pt[1]-36,{to:apexLabel.pt,accent:SC.sky});
+      if(escLabel) pill(c,"Too steep / frequency too high: escapes to space",escLabel.pt[0]+30,Math.max(escLabel.pt[1],60),{accent:SC.esc});
+    }
+    c.globalAlpha=1;
+  }
+
+  // ===== receiver =====
+  c.globalAlpha=fa("rx");
+  if(AN.rx>=dA&&AN.rx<=dB){
+    const [rx,ry]=map(AN.rx/RE,0), ra=angAt(AN.rx);
+    c.save(); c.translate(rx,ry); c.rotate(ra);
+    c.fillStyle="#16202e"; c.strokeStyle="#fff"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
+    c.beginPath(); c.moveTo(7,-19); c.lineTo(13,-36); c.stroke(); c.fillStyle="#ffd23c"; c.beginPath(); c.arc(-5,-10,4,0,7); c.fill();
+    c.restore();
+    pill(c,`📻 ${fmtD(AN.rx)} km · drag me`,rx,ry-58,{size:11.5});
+  }
+  c.globalAlpha=1;
+  // caption & zoom info
+  pill(c,`${m.name} · ${fmtF(p.f)} · ${fmtP(p.P)}`,12,22,{align:"left"});
+  $("zoomInfo").textContent=`${fmtD(Math.max(d0,0))}–${fmtD(d0+span)} km`;
+  updateMeter(p,io,thr,dt);
+}
+function updateMeter(p,io,thr,dt){
+  const r=evalP(p,AN.rx,io);
+  const g=(p.type==="sky")?null:r.g, s=r.s;
+  const eg=g===null?0:mVfromdB(g), es=s===null?0:mVfromdB(s);
+  const ts=AN.t/1000;
+  const phi=2.3*Math.sin(0.7*ts)+1.7*Math.sin(1.9*ts+1)+0.9*Math.sin(3.7*ts);
+  const esF=es*Math.pow(10,(3*Math.sin(0.5*ts)+2*Math.sin(1.3*ts+2))/20);
+  const inst=Math.hypot(eg+esF*Math.cos(phi),esF*Math.sin(phi));
+  if(AN.playing){ AN.scope.push(inst>0?dBuV(inst):null); if(AN.scope.length>260) AN.scope.shift(); }
+  AN.meterT+=dt; if(AN.meterT<120) return; AN.meterT=0;
+  const sc=v=>v===null?0:clamp((v-(thr-40))/100*100,0,100);
+  $("rxD").textContent=`${fmtD(AN.rx)} km`;
+  $("bG").style.width=sc(g)+"%"; $("vG").textContent=g===null?"—":fmtField(g);
+  $("bS").style.width=sc(s)+"%"; $("vS").textContent=s===null?"none":fmtField(s);
+  $("bT").style.width=sc(thr)+"%"; $("vT").textContent=fmtField(thr);
+  const tot=r.t; const fading=g!==null&&s!==null&&Math.abs(g-s)<6&&Math.max(g,s)>thr-6;
+  let q,cls;
+  if(tot===null||tot<thr){ q="No reliable signal"; cls="var(--bad)"; }
+  else if(fading){ q="Fading and distortion"; cls="var(--warn)"; }
+  else if(tot>=thr+20){ q="Excellent reception"; cls="var(--good)"; }
+  else if(tot>=thr+6){ q="Good reception"; cls="var(--good)"; }
+  else { q="Weak but usable"; cls="var(--warn)"; }
+  const qe=$("quality"); qe.textContent=q; qe.style.color=cls;
+  const hh=Math.floor(AN.hour)%24, mm=Math.floor((AN.hour%1)*60);
+  $("clock").textContent=`${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
+  const ph=phaseOf(cosFromHour(AN.hour)); const pe=$("phase"); pe.textContent={day:"Day",dusk:"Dawn / dusk",night:"Night"}[ph]; pe.className="pill "+(ph==="day"?"info":ph==="dusk"?"warn":"bad");
+  drawScope(thr);
+}
+function drawScope(thr){
+  const W=scope.clientWidth,H=scope.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; scope.width=W*dpr; scope.height=H*dpr; const c=sctx2; c.setTransform(dpr,0,0,dpr,0,0);
+  c.clearRect(0,0,W,H); const lo=thr-30, hi=thr+50; const y=v=>H-6-(clamp(v,lo,hi)-lo)/(hi-lo)*(H-12);
+  c.strokeStyle=cssVar("--muted"); c.setLineDash([3,3]); c.beginPath(); c.moveTo(0,y(thr)); c.lineTo(W,y(thr)); c.stroke(); c.setLineDash([]);
+  c.fillStyle=cssVar("--muted"); c.font="10px "+cssVar("--font-body"); c.fillText("minimum usable",4,y(thr)-3);
+  c.strokeStyle=cssVar("--accent"); c.lineWidth=1.8; c.beginPath(); let pen=false;
+  AN.scope.forEach((v,i)=>{ if(v===null){pen=false;return;} const x=i/259*W; pen?c.lineTo(x,y(v)):c.moveTo(x,y(v)); pen=true; }); c.stroke();
+}
+function animTick(now){
+  requestAnimationFrame(animTick);
+  const dt=clamp(now-AN.last,0,100); AN.last=now;
+  if(currentTab!=="animation") return;
+  if(AN.playing){ AN.t+=dt*AN.speed; if(AN.cycle){ AN.hour=(AN.hour+dt*AN.speed/1000*0.8)%24; $("hour").value=AN.hour; } }
+  try{ drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
+  catch(e){ if(!AN.errShown){ AN.errShown=true; const el=$("animErr"); el.hidden=false; el.textContent="This model can't be animated: "+e.message+". Pick another model or change its settings."; console.error(e); } }
+}
+
+/* ================= MAP & LOCATION TAB ================= */
+const CITIES=[
+  ["Colombo",6.93,79.85],["Kandy",7.29,80.63],["Jaffna",9.66,80.02],["Trincomalee",8.57,81.23],["Batticaloa",7.72,81.70],["Galle",6.03,80.22],
+  ["Hambantota",6.12,81.12],["Anuradhapura",8.31,80.40],["Badulla",6.99,81.06],["Mannar",8.98,79.90],["Nuwara Eliya",6.95,80.78],["Kurunegala",7.49,80.36],
+  ["Chennai",13.08,80.27],["Madurai",9.93,78.12],["Thiruvananthapuram",8.52,76.94],["Bengaluru",12.97,77.59],["Mumbai",19.08,72.88],["Kolkata",22.57,88.36],
+  ["New Delhi",28.61,77.21],["Malé",4.18,73.51],["Karachi",24.86,67.01],["Dhaka",23.81,90.41],["Kathmandu",27.72,85.32],["Singapore",1.35,103.82],
+  ["Kuala Lumpur",3.14,101.69],["Bangkok",13.76,100.50],["Dubai",25.20,55.27],["Muscat",23.59,58.41],["Perth",-31.95,115.86],["Nairobi",-1.29,36.82],
+  ["London",51.51,-0.13],["Tokyo",35.68,139.69],["Sydney",-33.87,151.21],["New York",40.71,-74.01]
+];
+/* Simplified fallback outlines (lon,lat) used only if the world map cannot load */
+const FALLBACK=[
+  [[80.25,9.83],[80.6,9.45],[80.82,9.27],[81.13,8.75],[81.23,8.57],[81.4,8.15],[81.7,7.72],[81.86,7.2],[81.84,6.87],[81.65,6.45],[81.4,6.25],[81.12,6.12],[80.6,5.93],[80.22,6.03],[80.05,6.25],[79.86,6.93],[79.83,7.2],[79.8,7.9],[79.83,8.03],[79.92,8.6],[79.9,8.98],[80.05,9.3],[79.95,9.65],[80.25,9.83]],
+  [[68.2,23.7],[70.0,20.8],[72.8,19.0],[73.5,15.8],[74.8,12.8],[76.3,9.5],[77.5,8.1],[78.2,8.9],[79.3,10.3],[79.9,11.2],[80.3,13.4],[80.2,15.5],[82.3,16.6],[84.8,19.2],[87.0,21.5],[88.6,21.6],[90.5,22.5],[92.0,21.5],[94.3,18.2],[94.6,16.0],[97.6,16.5],[98.5,13.0],[98.5,8.0],[100.3,6.5],[103.4,1.4],[104,10],[106,20],[100,25],[90,28],[80,31],[70,33],[62,25],[66,25],[68.2,23.7]]
+];
+const MP={tx:{name:"Colombo",lat:6.93,lon:79.85},rxs:[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}],ai:0,nextRx:4,
+  view:null,mode:"add",polys:[],source:"loading",date:new Date(),path:null,lastModelId:null,txH:120,useTerrain:true,useBuildings:true,showBulge:false,manual:{tx:0,rx:0},res:new Map(),cover:null,anim:{playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,t:0,last:0}};
+Object.defineProperty(MP,"rx",{get(){ return MP.rxs[MP.ai]; }, set(v){ MP.rxs[MP.ai]=v; }});
+const mapC=$("map"), mctx=mapC.getContext("2d"), prof=$("profile"), pctx=prof.getContext("2d"), terr=$("terrain"), tctx=terr.getContext("2d");
+const mapBase=document.createElement("canvas"), bctx=mapBase.getContext("2d");
+
+function decodeTopo(topo){
+  const tf=topo.transform;
+  const arcs=topo.arcs.map(a=>{ let x=0,y=0; return a.map(pt=>{ if(tf){ x+=pt[0]; y+=pt[1]; return [x*tf.scale[0]+tf.translate[0], y*tf.scale[1]+tf.translate[1]]; } return [pt[0],pt[1]]; }); });
+  const arcPts=i=>i<0?arcs[~i].slice().reverse():arcs[i];
+  const ring=ids=>{ let r=[]; ids.forEach((i,k)=>{ const a=arcPts(i); r=r.concat(k?a.slice(1):a); }); return r; };
+  const polys=[];
+  const obj=topo.objects[Object.keys(topo.objects)[0]];
+  const geoms=obj.type==="GeometryCollection"?obj.geometries:[obj];
+  for(const g of geoms){
+    if(g.type==="Polygon") polys.push(g.arcs.map(ring));
+    else if(g.type==="MultiPolygon") g.arcs.forEach(pg=>polys.push(pg.map(ring)));
+  }
+  return polys;
+}
+function prepPolys(list){
+  return list.map(rings=>{ let a=180,b=90,c=-180,d=-90; for(const [x,y] of rings[0]){ if(x<a)a=x; if(y<b)b=y; if(x>c)c=x; if(y>d)d=y; } return {rings,bb:[a,b,c,d]}; });
+}
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.async=true; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function loadLand(){
+  const urls=["https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.world.min.js","https://cdn.jsdelivr.net/npm/datamaps@0.5.9/dist/datamaps.world.min.js"];
+  for(const u of urls){
+    try{ await loadScript(u); const D=window.Datamap||window.Datamaps; const topo=D&&D.prototype&&D.prototype.worldTopo;
+      if(topo&&topo.arcs){ MP.polys=prepPolys(decodeTopo(topo)); MP.source="world"; break; } }catch(e){}
+  }
+  if(MP.source!=="world"){ MP.polys=prepPolys(FALLBACK.map(r=>[r])); MP.source="fallback"; }
+  MP.path=null; updateMap();
+}
+function inRing(x,y,r){ let ins=false; for(let i=0,j=r.length-1;i<r.length;j=i++){ const [xi,yi]=r[i],[xj,yj]=r[j]; if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi)) ins=!ins; } return ins; }
+function isLand(lon,lat){ for(const p of MP.polys){ const b=p.bb; if(lon<b[0]||lon>b[2]||lat<b[1]||lat>b[3]) continue; if(inRing(lon,lat,p.rings[0])){ let hole=false; for(let k=1;k<p.rings.length;k++) if(inRing(lon,lat,p.rings[k])){hole=true;break;} if(!hole) return true; } } return false; }
+
+/* geodesy */
+function hav(a,b){ const p1=toRad(a.lat),p2=toRad(b.lat),dp=p2-p1,dl=toRad(b.lon-a.lon); const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2; return 2*RE*Math.asin(Math.min(1,Math.sqrt(h))); }
+function bearing(a,b){ const p1=toRad(a.lat),p2=toRad(b.lat),dl=toRad(b.lon-a.lon); return (toDeg(Math.atan2(Math.sin(dl)*Math.cos(p2),Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl)))+360)%360; }
+function gcPoint(a,b,f){ const p1=toRad(a.lat),l1=toRad(a.lon),p2=toRad(b.lat),l2=toRad(b.lon); const d=hav(a,b)/RE; if(d<1e-9) return {lat:a.lat,lon:a.lon};
+  const A=Math.sin((1-f)*d)/Math.sin(d), B=Math.sin(f*d)/Math.sin(d);
+  const x=A*Math.cos(p1)*Math.cos(l1)+B*Math.cos(p2)*Math.cos(l2), y=A*Math.cos(p1)*Math.sin(l1)+B*Math.cos(p2)*Math.sin(l2), z=A*Math.sin(p1)+B*Math.sin(p2);
+  return {lat:toDeg(Math.atan2(z,Math.hypot(x,y))), lon:toDeg(Math.atan2(y,x))}; }
+function sunPos(date){ const n=date.getTime()/86400000+2440587.5-2451545.0;
+  const L=(280.460+0.9856474*n)%360, g=toRad((357.528+0.9856003*n)%360);
+  const lam=toRad(L+1.915*Math.sin(g)+0.020*Math.sin(2*g)), eps=toRad(23.439-0.0000004*n);
+  const dec=Math.asin(Math.sin(eps)*Math.sin(lam)), ra=Math.atan2(Math.cos(eps)*Math.sin(lam),Math.cos(lam));
+  const gmst=((18.697374558+24.06570982441908*n)%24+24)%24;
+  let sl=toDeg(ra)-gmst*15; sl=((sl+540)%360)-180; return {dec,subLon:sl}; }
+function cosZen(lat,lon,sp){ return Math.sin(toRad(lat))*Math.sin(sp.dec)+Math.cos(toRad(lat))*Math.cos(sp.dec)*Math.cos(toRad(lon-sp.subLon)); }
+
+/* ===== paths, elevation & terrain ===== */
+function computePathFor(a,b){
+  const dist=Math.max(hav(a,b),0.01);
+  const N=clamp(Math.round(dist/3),30,600), samples=[];
+  for(let i=0;i<=N;i++){ const q=gcPoint(a,b,i/N); samples.push({...q,d:dist*i/N,land:isLand(q.lon,q.lat)}); }
+  let runs=[]; for(const s of samples){ const k=s.land?"land":"sea"; if(runs.length&&runs[runs.length-1].g===k) runs[runs.length-1].end=s.d; else runs.push({g:k,start:runs.length?runs[runs.length-1].end:0,end:s.d}); }
+  runs=runs.filter((r,i)=>r.end-r.start>=4||runs.length===1||i===runs.length-1||i===0);
+  const segs=[]; for(const r of runs){ if(segs.length&&segs[segs.length-1].g===r.g) segs[segs.length-1].end=r.end; else segs.push({g:r.g,end:r.end}); }
+  if(segs.length) segs[segs.length-1].end=dist;
+  const landKm=samples.filter(s=>s.land).length/samples.length*dist;
+  const sp=sunPos(MP.date), mid=gcPoint(a,b,0.5);
+  return {dist,samples,segs,landPct:Math.round(landKm/dist*100),brg:bearing(a,b),sp,mid,cosMid:cosZen(mid.lat,mid.lon,sp),cosTx:cosZen(a.lat,a.lon,sp),cosRx:cosZen(b.lat,b.lon,sp)};
+}
+function computePath(){ MP.path=computePathFor(MP.tx,MP.rx); }
+function baseModel(){ return models.find(m=>String(m.id)===$("mapModel").value)||sel(); }
+function paramsFor(P,rx,T){
+  const p=JSON.parse(JSON.stringify(baseModel().p));
+  return Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,rxDist:Math.max(P.dist,0.5),
+    htx:MP.txH,hrx:rx.h,terrainLossDb:(MP.useTerrain&&T)?T.loss:0,pathLabel:`${MP.tx.name} → ${rx.name}, ${P.landPct}% land`});
+}
+function mapParams(){ const r=MP.res.get(MP.rx.id); return paramsFor(MP.path||computePathFor(MP.tx,MP.rx),MP.rx,r&&r.T); }
+
+/* Elevation: Copernicus DEM GLO-90 via Open-Meteo (needs outside network access) */
+const ELEV={cache:new Map(),ok:null};
+const ekey=(lat,lon)=>lat.toFixed(3)+","+lon.toFixed(3);
+async function fetchElev(pts){
+  const out=new Array(pts.length).fill(null), need=[];
+  pts.forEach((p,i)=>{ const k=ekey(p.lat,p.lon); if(ELEV.cache.has(k)) out[i]=ELEV.cache.get(k); else need.push(i); });
+  if(!need.length) return out;
+  if(ELEV.ok===false) return null;
+  for(let s=0;s<need.length;s+=100){
+    const ch=need.slice(s,s+100);
+    const url=`https://api.open-meteo.com/v1/elevation?latitude=${ch.map(i=>pts[i].lat.toFixed(4)).join(",")}&longitude=${ch.map(i=>pts[i].lon.toFixed(4)).join(",")}`;
+    try{
+      const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),9000);
+      const r=await fetch(url,{signal:ctl.signal}); clearTimeout(to);
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const j=await r.json();
+      ch.forEach((i,k)=>{ let e=j.elevation[k]; if(!isFinite(e)) e=0; ELEV.cache.set(ekey(pts[i].lat,pts[i].lon),e); out[i]=e; });
+      ELEV.ok=true;
+    }catch(e){ ELEV.ok=false; return null; }
+  }
+  return out;
+}
+function J(nu){ return nu<=-0.78?0:6.9+20*Math.log10(Math.sqrt((nu-0.1)**2+1)+nu-0.1); }
+/* knife-edge estimate of terrain shadowing on top of the smooth-earth ground wave */
+function terrainAnalyse(P,elev,txH,rxH,f,manual,extras){
+  const n=elev.length, D=P.dist*1000, lam=300/f;
+  const d=elev.map((_,i)=>D*i/(n-1)), e=elev.map(v=>isFinite(v)?v:0);
+  const tA=e[0]+txH, tB=e[n-1]+rxH, Re=(4/3)*RE*1000;
+  const gA=e[0], gB=e[n-1], edge=Math.max(2,Math.round(n*0.02));
+  // candidate obstacles: terrain samples + OpenStreetMap buildings (top = ground + building height)
+  const obs=[];
+  for(let i=1;i<n-1;i++) obs.push({dm:d[i],top:e[i],i,kind:"terrain",skip:i<edge||i>n-1-edge});
+  for(const b of (extras||[])){ if(b.dm<20||b.dm>D-20) continue; obs.push({dm:b.dm,top:groundAt(b.dm)+b.h,kind:"building",b}); }
+  function groundAt(dm){ const x=dm/D*(n-1), k=Math.min(n-2,Math.floor(x)), u=x-k; return e[k]*(1-u)+e[k+1]*u; }
+  // LF–HF: hills above the straight line joining the two sites' ground levels (smooth-earth model already covers flat ground, so J(0) is removed)
+  // VHF/UHF: true knife edge against the line between the antenna tips
+  let best={nu:-Infinity,o:null}, los=true;
+  for(const o of obs){
+    const tip=tA+(tB-tA)*o.dm/D, bul=o.dm*(D-o.dm)/(2*Re);
+    if(o.top+bul>tip) los=false;
+    if(o.skip) continue;
+    const c=f>=30? o.top+bul-tip : o.top-(gA+(gB-gA)*o.dm/D);
+    const nu=c*Math.sqrt(2*D/(lam*o.dm*(D-o.dm)));
+    if(nu>best.nu) best={nu,o};
+  }
+  const inner=e.slice(1,-1).sort((a,b)=>a-b);
+  const pct=q=>inner.length?inner[Math.floor(q*(inner.length-1))]:0;
+  const loss=best.o?(f>=30?J(best.nu):(best.nu>0?Math.max(0,J(best.nu)-J(0)):0)):0;
+  return {d,e,txE:e[0],rxE:e[n-1],nu:best.nu,ob:best.o,obst:best.o&&best.o.kind==="terrain"?best.o.i:-1,loss,los,dh:pct(0.9)-pct(0.1),maxE:Math.max(...e),manual:!!manual,txH,rxH,buildings:extras||[]};
+}
+/* ===== OpenStreetMap features near the path: buildings (with heights) and named peaks, via the Overpass API ===== */
+const OSMF={cache:new Map(),ok:null};
+function alongTrack(A,B,X){ const d13=hav(A,X)/RE, t13=toRad(bearing(A,X)), t12=toRad(bearing(A,B)); const xt=Math.asin(Math.sin(d13)*Math.sin(t13-t12)); const at=Math.acos(clamp(Math.cos(d13)/Math.cos(xt),-1,1))*RE; return {at,xt:Math.abs(xt*RE)}; }
+function buildingHeight(t){ const h=parseFloat(t.height); if(isFinite(h)&&h>0) return {h,est:false}; const lv=parseFloat(t["building:levels"]); if(isFinite(lv)&&lv>0) return {h:lv*3.2+1.5,est:true}; return {h:7,est:true}; }
+async function fetchOSMFeatures(P,rx){
+  const key=[MP.tx.lat,MP.tx.lon,rx.lat,rx.lon].map(v=>v.toFixed(4)).join(",");
+  if(OSMF.cache.has(key)) return OSMF.cache.get(key);
+  if(OSMF.ok===false) return null;
+  const poly=(f0,f1,k)=>{ const a=[]; for(let i=0;i<=k;i++){ const q=gcPoint(MP.tx,rx,f0+(f1-f0)*i/k); a.push(q.lat.toFixed(5),q.lon.toFixed(5)); } return a.join(","); };
+  const D=P.dist, nearKm=Math.min(D,8);
+  const bParts = D<=60 ? [`way["building"](around:25,${poly(0,1,Math.max(8,Math.round(D/2)))});`]
+    : [`way["building"](around:25,${poly(0,nearKm/D,8)});`,`way["building"](around:25,${poly(1-nearKm/D,1,8)});`];
+  const q=`[out:json][timeout:25];(${bParts.join("")}node["natural"="peak"](around:4000,${poly(0,1,40)}););out tags center 4000;`;
+  try{
+    const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),30000);
+    const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ctl.signal});
+    clearTimeout(to); if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json(); const res={buildings:[],peaks:[],partial:D>60};
+    for(const el of j.elements||[]){
+      const lat=el.lat??(el.center&&el.center.lat), lon=el.lon??(el.center&&el.center.lon); if(lat==null) continue;
+      const {at,xt}=alongTrack(MP.tx,rx,{lat,lon}); if(at<0||at>D) continue;
+      const t=el.tags||{};
+      if(t.natural==="peak"){ res.peaks.push({dm:at*1000,xt,name:t.name||t["name:en"]||"Peak",ele:parseFloat(t.ele)}); }
+      else if(t.building){ const bh=buildingHeight(t); res.buildings.push({dm:at*1000,h:bh.h,est:bh.est,name:t.name||""}); }
+    }
+    OSMF.ok=true; OSMF.cache.set(key,res); return res;
+  }catch(e){ if(String(e).includes("HTTP 429")||String(e).includes("abort")) return null; OSMF.ok=false; return null; }
+}
+async function terrainFor(P,rx){
+  const n=clamp(Math.round(P.dist/0.5)+1,101,301), pts=[]; for(let i=0;i<n;i++) pts.push(gcPoint(MP.tx,rx,i/(n-1)));
+  let elev=await fetchElev(pts), manual=false;
+  if(!elev){ manual=true; const a=+MP.manual.tx||0, b=(rx.id===MP.rx.id?+MP.manual.rx:rx.manualElev)||0; elev=pts.map((_,i)=>a+(b-a)*i/(n-1)); }
+  let osm=null; if(MP.useBuildings&&!manual) osm=await fetchOSMFeatures(P,rx);
+  const T=terrainAnalyse(P,elev,MP.txH,rx.h,baseModel().p.f,manual,osm?osm.buildings:[]);
+  T.osm=osm; T.osmTried=MP.useBuildings&&!manual;
+  if(osm&&T.ob&&T.ob.kind==="terrain"){ let bp=null; for(const pk of osm.peaks){ const dd=Math.abs(pk.dm-T.ob.dm); if(dd<5000&&(!bp||dd<bp.dd)) bp={dd,pk}; } if(bp) T.peakName=bp.pk.name; }
+  return T;
+}
+function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(threshold(p));
+  const ok=r.t!==null&&r.t>=thr, fading=r.g!==null&&r.s!==null&&Math.abs(r.g-r.s)<6&&Math.max(r.g,r.s)>thr-6;
+  let v,cls; if(!ok){v="No reliable reception";cls="bad";} else if(fading){v="Receivable, with fading";cls="warn";} else if(r.t>=thr+20){v="Excellent";cls="good";} else {v="Good";cls="good";}
+  return {...r,thr,ok,fading,verdict:v,cls}; }
+function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
+let siteQueue=Promise.resolve();
+function refreshSites(){
+  for(const rx of MP.rxs){
+    const sig=siteSig(rx), cur=MP.res.get(rx.id);
+    if(cur&&cur.sig===sig) continue;
+    const P=computePathFor(MP.tx,rx);
+    const entry={sig,P,T:null,pred:predict(paramsFor(P,rx,null)),loading:true};
+    MP.res.set(rx.id,entry);
+    siteQueue=siteQueue.then(async()=>{
+      if(MP.res.get(rx.id)!==entry) return;
+      try{ entry.T=await terrainFor(P,rx); }catch(e){ entry.T=null; }
+      entry.loading=false; entry.pred=predict(paramsFor(P,rx,entry.T));
+      if(MP.res.get(rx.id)===entry){ renderSites(); if(rx.id===MP.rx.id) renderActive(); drawMap(); }
+    });
+  }
+}
+function destPoint(a,brgDeg,km){ const d=km/RE, b=toRad(brgDeg), p1=toRad(a.lat), l1=toRad(a.lon);
+  const p2=Math.asin(Math.sin(p1)*Math.cos(d)+Math.cos(p1)*Math.sin(d)*Math.cos(b));
+  const l2=l1+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(p1),Math.cos(d)-Math.sin(p1)*Math.sin(p2));
+  return {lat:toDeg(p2),lon:((toDeg(l2)+540)%360)-180}; }
+function coverage(){
+  const b=baseModel(); const sp=sunPos(MP.date);
+  const p=Object.assign(JSON.parse(JSON.stringify(b.p)),{path:"uniform",ground:$("mapLand").value,cosChi:cosZen(MP.tx.lat,MP.tx.lon,sp),rxDist:null});
+  const sig=JSON.stringify([p,MP.tx]); if(MP.cover&&MP.cover.sig===sig) return MP.cover;
+  const r=p.type==="sky"?null:serviceRadius({p});
+  MP.cover={sig,r,ring:r?Array.from({length:73},(_,i)=>destPoint(MP.tx,i*5,Math.min(r,3000))):null};
+  return MP.cover;
+}
+
+/* drawing: Web Mercator view with OpenStreetMap tiles (falls back to vector outlines) */
+const TS=256;
+const PROVIDERS={
+  osm:{url:(z,x,y)=>`https://tile.openstreetmap.org/${z}/${x}/${y}.png`, attr:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors', max:19},
+  light:{url:(z,x,y)=>`https://${"abcd"[(x+y)%4]}.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png`, attr:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>', max:19},
+  topo:{url:(z,x,y)=>`https://${"abc"[(x+y)%3]}.tile.opentopomap.org/${z}/${x}/${y}.png`, attr:'Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, SRTM · Style © <a href="https://opentopomap.org" target="_blank" rel="noopener">OpenTopoMap</a> (CC-BY-SA)', max:17},
+  vector:{attr:'Outlines: Natural Earth (public domain)'}
+};
+// OpenStreetMap's own tile servers refuse pages opened from disk (no Referer), so local files start on the CARTO style
+const IS_FILE=location.protocol==="file:";
+const TILE={cache:new Map(),ok:0,err:0,base:IS_FILE?"light":"osm",blockedMsg:false,pending:false};
+const wx=(lon,z)=>(lon+180)/360*TS*Math.pow(2,z);
+const wy=(lat,z)=>{ const s=Math.sin(toRad(clamp(lat,-85.05,85.05))); return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*TS*Math.pow(2,z); };
+const ilon=(x,z)=>x/(TS*Math.pow(2,z))*360-180;
+const ilat=(y,z)=>toDeg(Math.atan(Math.sinh(Math.PI*(1-2*y/(TS*Math.pow(2,z))))));
+function proj(lon,lat){ const W=mapC.clientWidth,H=mapC.clientHeight,v=MP.view; return [W/2+wx(lon,v.z)-wx(v.lon,v.z), H/2+wy(lat,v.z)-wy(v.lat,v.z)]; }
+function unproj(x,y){ const W=mapC.clientWidth,H=mapC.clientHeight,v=MP.view; return {lon:ilon(wx(v.lon,v.z)+x-W/2,v.z), lat:ilat(wy(v.lat,v.z)+y-H/2,v.z)}; }
+function defaultView(kind){ const W=mapC.clientWidth||900,H=mapC.clientHeight||560;
+  if(kind==="world") return {lon:30,lat:15,z:clamp(Math.log2(W/TS),1,3)};
+  if(kind==="asia") return {lon:80,lat:15,z:4.2};
+  if(kind==="sites"){ const pts=[MP.tx,...MP.rxs]; let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity; for(const s of pts){ const x=wx(s.lon,0),y=wy(s.lat,0); a=Math.min(a,x); c=Math.max(c,x); b=Math.min(b,y); d=Math.max(d,y); }
+    const z=clamp(Math.log2(Math.min(W*0.6/Math.max(c-a,1e-6),H*0.6/Math.max(d-b,1e-6))),1.5,12); return {lon:ilon((a+c)/2,0),lat:ilat((b+d)/2,0),z}; }
+  if(kind==="lk") return {lon:80.7,lat:7.85,z:clamp(Math.log2(Math.min(W/4.2,H/4.6)*360/TS/1.0)-0.15,6,8.5)};
+  const P=MP.path; if(!P) return defaultView("lk");
+  let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity; for(const s of P.samples){ const x=wx(s.lon,0),y=wy(s.lat,0); a=Math.min(a,x); c=Math.max(c,x); b=Math.min(b,y); d=Math.max(d,y); }
+  const z=clamp(Math.log2(Math.min(W*0.62/Math.max(c-a,1e-6),H*0.62/Math.max(d-b,1e-6))),1.5,12);
+  return {lon:ilon((a+c)/2,0),lat:ilat((b+d)/2,0),z};
+}
+function scheduleMapDraw(){ if(TILE.pending) return; TILE.pending=true; requestAnimationFrame(()=>{ TILE.pending=false; if(currentTab==="map") drawMap(); }); }
+function tileFail(){
+  if(TILE.ok>0||TILE.err<4) return;
+  if(TILE.base==="osm"||TILE.base==="topo"){ setBase("light"); }
+  else { TILE.blockedMsg=true; setBase("vector"); }
+}
+function setBase(b){ TILE.base=b; TILE.ok=0; TILE.err=0; $("basemap").value=b; $("attrib").innerHTML=PROVIDERS[b].attr; scheduleMapDraw(); }
+function getTile(z,x,y){
+  const key=TILE.base+"/"+z+"/"+x+"/"+y; let im=TILE.cache.get(key);
+  if(!im){ im=new Image(); const base=TILE.base; im.onload=()=>{ if(TILE.base===base){ TILE.ok++; } scheduleMapDraw(); }; im.onerror=()=>{ if(TILE.base===base){ TILE.err++; tileFail(); } }; im.src=PROVIDERS[TILE.base].url(z,x,y); TILE.cache.set(key,im); }
+  return im.complete&&im.naturalWidth?im:null;
+}
+
+function drawMap(){
+  const W=mapC.clientWidth,H=mapC.clientHeight; if(!W) return; if(!MP.view) MP.view=defaultView("sites");
+  const dpr=window.devicePixelRatio||1;
+  for(const cv of [mapC,mapBase]) if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){ cv.width=W*dpr; cv.height=H*dpr; }
+  const c=bctx; c.setTransform(dpr,0,0,dpr,0,0); const v=MP.view, vec=TILE.base==="vector";
+  c.fillStyle=vec?"#b9d2ea":"#aad3df"; c.fillRect(0,0,W,H);
+  if(!vec){
+    const tz=clamp(Math.round(v.z),0,PROVIDERS[TILE.base].max), sc=Math.pow(2,v.z-tz), n=Math.pow(2,tz), ts=TS*sc;
+    const cX=wx(v.lon,tz), cY=wy(v.lat,tz);
+    const x0=Math.floor((cX-W/2/sc)/TS), x1=Math.floor((cX+W/2/sc)/TS), y0=Math.max(0,Math.floor((cY-H/2/sc)/TS)), y1=Math.min(n-1,Math.floor((cY+H/2/sc)/TS));
+    for(let ty=y0;ty<=y1;ty++) for(let tx=x0;tx<=x1;tx++){
+      const xx=((tx%n)+n)%n; const im=getTile(tz,xx,ty); const sx=W/2+(tx*TS-cX)*sc, sy=H/2+(ty*TS-cY)*sc;
+      if(im) c.drawImage(im,Math.floor(sx),Math.floor(sy),Math.ceil(ts)+1,Math.ceil(ts)+1);
+      else { const pi=TILE.cache.get(TILE.base+"/"+(tz-1)+"/"+(xx>>1)+"/"+(ty>>1)); if(tz>0&&pi&&pi.complete&&pi.naturalWidth) c.drawImage(pi,(xx&1)*128,(ty&1)*128,128,128,Math.floor(sx),Math.floor(sy),Math.ceil(ts)+1,Math.ceil(ts)+1); }
+    }
+  } else {
+    const tl=unproj(0,0), br=unproj(W,H);
+    c.fillStyle="#efe9d6"; c.strokeStyle="#9c8f6a"; c.lineWidth=0.8;
+    for(const p of MP.polys){ const b=p.bb; if(b[2]<tl.lon||b[0]>br.lon||b[3]<br.lat||b[1]>tl.lat) continue;
+      c.beginPath(); for(const r of p.rings){ r.forEach(([x,y],i)=>{ const [px,py]=proj(x,y); i?c.lineTo(px,py):c.moveTo(px,py); }); c.closePath(); } c.fill("evenodd"); c.stroke(); }
+    const step=v.z>7?1:v.z>4.5?5:v.z>2.5?10:30; c.strokeStyle="rgba(255,255,255,.6)"; c.fillStyle="rgba(30,50,80,.65)"; c.font="10px "+cssVar("--font-mono");
+    for(let lon=Math.ceil(tl.lon/step)*step; lon<=br.lon; lon+=step){ const [x]=proj(lon,0); c.beginPath(); c.moveTo(x,0); c.lineTo(x,H); c.stroke(); c.fillText(`${Math.abs(lon)}°${lon<0?"W":"E"}`,x+3,14); }
+    for(let lat=Math.ceil(br.lat/step)*step; lat<=tl.lat; lat+=step){ const [,y]=proj(0,lat); c.beginPath(); c.moveTo(0,y); c.lineTo(W,y); c.stroke(); c.fillText(`${Math.abs(lat)}°${lat<0?"S":"N"}`,4,y-3); }
+    c.font="11px "+cssVar("--font-body");
+    for(const [nm,la,lo] of CITIES){ const [x,y]=proj(lo,la); if(x<-10||x>W+10||y<-10||y>H+10) continue; c.fillStyle="#3b4656"; c.beginPath(); c.arc(x,y,2.4,0,7); c.fill(); if(v.z>5.5){ c.fillStyle="rgba(30,40,55,.85)"; c.fillText(nm,x+5,y-4); } }
+  }
+  // night
+  const sp=sunPos(MP.date), cell=10, nightA=vec?0.34:0.24;
+  for(let y=0;y<H;y+=cell){ for(let x=0;x<W;x+=cell){ const q=unproj(x+cell/2,y+cell/2); const cz=cosZen(q.lat,q.lon,sp); const a=cz< -0.1?nightA:cz<0.1?nightA*(0.1-cz)/0.2:0; if(a>0){ c.fillStyle=`rgba(10,18,52,${a})`; c.fillRect(x,y,cell,cell);} } }
+  // coverage circle
+  const cov=coverage();
+  if(cov.ring){ c.beginPath(); cov.ring.forEach((q,i)=>{ const [x,y]=proj(q.lon,q.lat); i?c.lineTo(x,y):c.moveTo(x,y); }); c.closePath();
+    c.fillStyle="rgba(255,196,0,.10)"; c.fill(); c.setLineDash([7,5]); c.strokeStyle="rgba(176,120,0,.9)"; c.lineWidth=1.6; c.stroke(); c.setLineDash([]);
+    const top=cov.ring[0]; const [lx,ly]=proj(top.lon,top.lat); c.font="600 11.5px "+cssVar("--font-body"); const s=`ground-wave service ≈ ${fmtD(cov.r)} km`; const tw=c.measureText(s).width+10; c.fillStyle="rgba(255,248,225,.95)"; c.fillRect(lx-tw/2,ly-9,tw,18); c.fillStyle="#6b4a00"; c.textAlign="center"; c.fillText(s,lx,ly+4); c.textAlign="left"; }
+  // paths to all receivers
+  MP.rxs.forEach((rx,i)=>{ if(i===MP.ai) return; const r=MP.res.get(rx.id); if(!r) return; const col=r.pred.cls==="good"?"#1d8a5a":r.pred.cls==="warn"?"#b7791f":"#c2413a";
+    c.strokeStyle="rgba(255,255,255,.8)"; c.lineWidth=4; c.beginPath(); r.P.samples.forEach((s,k)=>{ const [x,y]=proj(s.lon,s.lat); k?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke();
+    c.strokeStyle=col; c.lineWidth=2; c.stroke(); });
+  const P=MP.path;
+  if(P){ c.lineCap="round"; c.strokeStyle="rgba(255,255,255,.95)"; c.lineWidth=8; c.beginPath(); P.samples.forEach((s,i)=>{ const [x,y]=proj(s.lon,s.lat); i?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke();
+    c.lineWidth=4.5; for(let i=1;i<P.samples.length;i++){ const a=P.samples[i-1],b=P.samples[i]; const [x1,y1]=proj(a.lon,a.lat),[x2,y2]=proj(b.lon,b.lat); if(Math.abs(x2-x1)>W/2) continue; c.strokeStyle=b.land?"#9a6b12":"#1f57b8"; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); }
+    c.lineCap="butt"; const [mx,my]=proj(P.mid.lon,P.mid.lat); const lbl=`${fmtD(P.dist)} km`; c.font="700 13px "+cssVar("--font-body"); const tw=c.measureText(lbl).width+16;
+    c.fillStyle="rgba(22,32,46,.9)"; c.beginPath(); c.roundRect?c.roundRect(mx-tw/2,my-30,tw,22,11):c.rect(mx-tw/2,my-30,tw,22); c.fill(); c.fillStyle="#fff"; c.textAlign="center"; c.fillText(lbl,mx,my-15); c.textAlign="left"; }
+  const pin=(pt,col,lt,big,label)=>{ const [x,y]=proj(pt.lon,pt.lat), s=big?1:0.8;
+    c.fillStyle=col; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); c.moveTo(x,y); c.arc(x,y-20*s,11*s,Math.PI*0.72,Math.PI*0.28); c.closePath(); c.fill(); c.stroke();
+    c.fillStyle="#fff"; c.font=`700 ${big?11:9.5}px `+cssVar("--font-body"); c.textAlign="center"; c.fillText(lt,x,y-16*s);
+    if(label){ c.font=`${big?600:500} 12px `+cssVar("--font-body"); const tw=c.measureText(label).width+12; c.fillStyle="rgba(255,255,255,.95)"; c.strokeStyle="rgba(0,0,0,.15)"; c.lineWidth=1; c.fillRect(x+12,y-30*s,tw,20); c.strokeRect(x+12,y-30*s,tw,20); c.fillStyle="#16202e"; c.textAlign="left"; c.fillText(label,x+18,y-30*s+14); } };
+  MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9","R"+(i+1),false,v.z>4.5?rx.name:""); });
+  pin(MP.tx,"#d13b4f","TX",true,MP.tx.name); pin(MP.rx,"#1f5fd1","R"+(MP.ai+1),true,MP.rx.name);
+  const msg=$("mapMsg");
+  if(MP.source==="loading"){ msg.hidden=false; msg.textContent="Loading map data…"; }
+  else if(TILE.blockedMsg&&TILE.base==="vector"){ msg.hidden=false; msg.textContent="Map tiles can\'t load here because this page blocks outside images. Open the lab from its public website (or the downloadable copy) for the full OpenStreetMap and terrain. (Click to hide)"; }
+  else msg.hidden=true;
+  composite();
+}
+/* animated overlay: radio rings from the transmitter, pulses to each receiver, glowing receivers */
+function composite(){
+  const W=mapC.clientWidth,H=mapC.clientHeight; if(!W||!mapBase.width) return; const dpr=window.devicePixelRatio||1;
+  const c=mctx; c.setTransform(1,0,0,1,0,0); c.drawImage(mapBase,0,0); c.setTransform(dpr,0,0,dpr,0,0);
+  const t=MP.anim.t/1000;
+  const [tx,ty]=proj(MP.tx.lon,MP.tx.lat);
+  for(let k=0;k<3;k++){ const ph=((t*0.6+k/3)%1); const r=8+ph*90; c.strokeStyle=`rgba(209,59,79,${0.75*(1-ph)})`; c.lineWidth=2.2*(1-ph)+0.5; c.beginPath(); c.arc(tx,ty,r,0,7); c.stroke(); }
+  MP.rxs.forEach((rx,i)=>{
+    const r=MP.res.get(rx.id); if(!r) return; const smp=r.P.samples, n=smp.length;
+    const col=r.pred.cls==="good"?[29,138,90]:r.pred.cls==="warn"?[214,140,30]:[194,65,58];
+    const pts=[]; const step=Math.max(1,Math.floor(n/80)); for(let k=0;k<n;k+=step) pts.push(proj(smp[k].lon,smp[k].lat)); pts.push(proj(smp[n-1].lon,smp[n-1].lat));
+    let L=0; const cum=[0]; for(let k=1;k<pts.length;k++){ L+=Math.hypot(pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]); cum.push(L); }
+    if(L<2) return;
+    const at=s=>{ let k=1; while(k<cum.length-1&&cum[k]<s) k++; const u=(s-cum[k-1])/Math.max(cum[k]-cum[k-1],1e-6); return [pts[k-1][0]+(pts[k][0]-pts[k-1][0])*u, pts[k-1][1]+(pts[k][1]-pts[k-1][1])*u]; };
+    const speed=140, gap=Math.max(L/3,60);
+    for(let s0=(t*speed)%gap; s0<L; s0+=gap){
+      // pulse fades along the path when the signal ends up weak
+      const fr=s0/L, fade=r.pred.ok?1:Math.max(0.15,1-fr*0.85);
+      for(let q=0;q<6;q++){ const s=s0-q*5; if(s<0) break; const [x,y]=at(s); c.fillStyle=`rgba(${col},${fade*(1-q/6)*(i===MP.ai?1:0.75)})`; c.beginPath(); c.arc(x,y,(i===MP.ai?4.2:3.2)-q*0.45,0,7); c.fill(); }
+    }
+    const [rx0,ry0]=proj(rx.lon,rx.lat);
+    if(r.pred.ok){ const ph=(t*0.9+i*0.17)%1; c.strokeStyle=`rgba(${col},${0.8*(1-ph)})`; c.lineWidth=2; c.beginPath(); c.arc(rx0,ry0,5+ph*22,0,7); c.stroke(); }
+    else { c.strokeStyle="rgba(194,65,58,.85)"; c.lineWidth=2; c.beginPath(); c.moveTo(rx0-5,ry0-5); c.lineTo(rx0+5,ry0+5); c.moveTo(rx0+5,ry0-5); c.lineTo(rx0-5,ry0+5); c.stroke(); }
+  });
+}
+function mapTick(now){
+  requestAnimationFrame(mapTick);
+  const dt=clamp(now-(MP.anim.last||now),0,100); MP.anim.last=now;
+  if(currentTab!=="map"||!MP.anim.playing) return;
+  MP.anim.t+=dt; try{ composite(); }catch(e){ console.error(e); }
+}
+function setMapPlaying(on){ MP.anim.playing=on; const b=$("mapPlay"); b.textContent=on?"❚❚":"▶"; b.title=on?"Pause map animation":"Play map animation"; b.setAttribute("aria-label",b.title); composite(); }
+
+function drawProfile(p){
+  const W=prof.clientWidth,H=prof.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; prof.width=W*dpr; prof.height=H*dpr; const c=pctx; c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const P=MP.path, dist=Math.max(P.dist,1), io=iono(p), thr=dBuV(threshold(p));
+  const pts=[]; for(let i=1;i<=120;i++){ const d=dist*i/120; pts.push([d,evalP(p,d,io)]); }
+  const vals=pts.flatMap(([,v])=>[v.t,v.g,v.s]).filter(v=>v!==null&&isFinite(v)); vals.push(thr);
+  let lo=Math.floor((Math.min(...vals)-5)/20)*20, hi=Math.ceil((Math.max(...vals)+5)/20)*20; lo=Math.max(lo,hi-140);
+  const L=70,R=10,T=8,B=24,w=W-L-R,h=H-T-B, xs=d=>L+d/dist*w, ys=v=>T+(hi-clamp(v,lo,hi))/(hi-lo)*h;
+  c.font="11px "+cssVar("--font-mono"); c.fillStyle=cssVar("--muted"); c.strokeStyle=cssVar("--line"); c.textAlign="right"; c.textBaseline="middle";
+  for(let v=lo;v<=hi;v+=20){ c.beginPath(); c.moveTo(L,ys(v)); c.lineTo(L+w,ys(v)); c.stroke(); c.fillText(fmtField(v),L-5,ys(v)); }
+  c.textAlign="center"; c.textBaseline="top"; for(let i=0;i<=4;i++){ c.fillText(fmtD(dist*i/4)+" km",xs(dist*i/4),T+h+6); }
+  c.setLineDash([4,4]); c.strokeStyle=cssVar("--muted"); c.beginPath(); c.moveTo(L,ys(thr)); c.lineTo(L+w,ys(thr)); c.stroke(); c.setLineDash([]);
+  const line=(k,col,lw,dash)=>{ c.strokeStyle=col; c.lineWidth=lw; c.setLineDash(dash); c.beginPath(); let pen=false; for(const [d,v] of pts){ const y=v[k]; if(y===null||!isFinite(y)){pen=false;continue;} pen?c.lineTo(xs(d),ys(y)):c.moveTo(xs(d),ys(y)); pen=true; } c.stroke(); c.setLineDash([]); };
+  if(p.type==="combined"){ line("g","#c99a10",1.3,[6,4]); line("s","#c0559f",1.3,[2,3]); }
+  line("t",cssVar("--accent"),2.4,[]);
+}
+
+/* ===== map tab UI ===== */
+function toLocalInput(d){ const z=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
+function pathModel(){
+  const p=mapParams(); const name=`${MP.tx.name} → ${MP.rx.name}`;
+  let m=models.find(x=>x.id===MP.lastModelId && x.name===name);
+  if(m){ m.p=p; } else { m=mk(name,p); models.push(m); MP.lastModelId=m.id; }
+  selId=m.id; currentPreset=-1; return m;
+}
+function setPoint(which,pt){
+  if(which==="tx") MP.tx=pt;
+  else if(which==="add"){ MP.rxs.push({id:MP.nextRx++,h:+$("rxH").value||10,...pt}); MP.ai=MP.rxs.length-1; }
+  else MP.rx={id:MP.rx.id,h:MP.rx.h,...pt};
+  MP.path=null; updateMap();
+}
+function updateMap(){
+  if(MP.source==="loading"){ drawMap(); return; }
+  computePath(); refreshSites(); drawMap(); renderSites(); renderActive();
+  $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
+  $("rxH").value=MP.rx.h; $("txCity").value=CITIES.some(c=>c[0]===MP.tx.name)?MP.tx.name:"";
+  const rs=$("rxCity"); rs.innerHTML=MP.rxs.map((r,i)=>`<option value="${i}">R${i+1} · ${esc(r.name)}</option>`).join("")+`<optgroup label="Move selected receiver to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
+  rs.value=String(MP.ai);
+}
+function renderActive(){
+  const P=MP.path, r=MP.res.get(MP.rx.id); if(!P||!r) return;
+  const p=paramsFor(P,MP.rx,r.T), pr=r.pred, T=r.T;
+  $("strip").innerHTML=P.segs.map((s,i)=>{ const st=i?P.segs[i-1].end:0; return `<span title="${s.g} ${fmtD(st)}–${fmtD(s.end)} km" style="flex:${Math.max(s.end-st,0.001)};background:${s.g==="sea"?"#2a62a8":"#8a7a4c"}"></span>`; }).join("");
+  drawProfile(p); drawTerrain(P,T);
+  $("profName").textContent=`${MP.tx.name} → R${MP.ai+1} ${MP.rx.name}`;
+  const sunEl=toDeg(Math.asin(clamp(P.cosMid,-1,1))), ph=phaseOf(P.cosMid), phTxt={day:"daytime",dusk:"twilight",night:"night"}[ph];
+  const via=pr.g!==null&&(pr.s===null||pr.g>=pr.s)?"mostly by ground wave":"mostly by sky wave";
+  $("mapVerdict").innerHTML=`<p class="eyebrow" style="margin:0">Prediction at R${MP.ai+1} · ${esc(MP.rx.name)}</p>
+    <div class="big" style="color:var(--${pr.cls})">${pr.verdict}${r.loading?' <span class="muted" style="font-size:13px;font-weight:500">(terrain loading…)</span>':""}</div>
+    <div class="val">${fmtField(pr.t)}</div>
+    <p class="muted" style="font-size:14px">${pr.ok?`Arrives ${via}.`:`Below the ${fmtField(pr.thr)} needed.`} ${fmtF(p.f)}, ${fmtP(p.P)}, ${phTxt} at the path midpoint.${T&&MP.useTerrain&&T.loss>0.5?` Terrain costs about ${T.loss.toFixed(1)} dB.`:""}</p>`;
+  const tiles=[
+    ["Distance",`${fmtD(P.dist)} km`,`bearing ${P.brg.toFixed(0)}° · ${P.landPct}% land`,"info"],
+    ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
+    ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?(T.ob&&T.loss>0.05?(T.ob.kind==="building"?"caused by a building":(T.peakName?`at ${T.peakName}`:`ridge at ${fmtD(T.ob.dm/1000)} km`)):`highest ${Math.round(T.maxE)} m`)+` · Δh ${Math.round(T.dh)} m`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"],
+    ["Line of sight",T?(T.los?"Yes":"No"):"…",T?`masts ${T.txH} m / ${T.rxH} m`:"","info"],
+    ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmTried?"unavailable":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":"OpenStreetMap"),"info"],
+    ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
+    ["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],
+    ["Needed",fmtField(pr.thr),"minimum usable","info"]];
+  $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
+  $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
+  const note=$("terrainNote");
+  if(ELEV.ok===false){ note.innerHTML="Terrain data couldn't be downloaded here (this page blocks outside data, or you are offline). Type ground heights under <b>Coordinates &amp; manual ground height</b>, or open the lab from its public website for automatic worldwide terrain."; }
+  else note.innerHTML="Terrain: Copernicus DEM GLO-90 via Open-Meteo. Buildings and peak names: © OpenStreetMap contributors (Overpass API); buildings without a height tag are estimated from floors, or 7 m. Shadowing counts hills that rise above the line joining the two sites&#39; ground levels (single knife-edge, ITU-R P.526), added to the smooth-earth ground wave. It is an estimate, not a planning-grade result.";
+  $("manualElevHint").textContent=ELEV.ok===false?"Terrain download unavailable, so these values are used.":"Only used when terrain data can't be downloaded.";
+}
+function drawTerrain(P,T){
+  const W=terr.clientWidth,H=terr.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; terr.width=W*dpr; terr.height=H*dpr; const c=tctx; c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const muted=cssVar("--muted"), line=cssVar("--line");
+  if(!T){ c.fillStyle=muted; c.font="13px "+cssVar("--font-body"); c.fillText("Loading terrain…",16,28); return; }
+  const n=T.e.length, D=P.dist, Re=(4/3)*RE*1000;
+  const bul=i=>MP.showBulge?T.d[i]*(T.d[T.d.length-1]-T.d[i])/(2*Re):0;
+  const hs=T.e.map((e,i)=>e+bul(i));
+  const tA=T.e[0]+T.txH, tB=T.e[n-1]+T.rxH;
+  let lo=Math.min(0,...hs), hi=Math.max(...hs,tA,tB); const pad=(hi-lo)*0.12+20; hi+=pad; lo-=pad*0.3;
+  const L=58,R=16,Tp=10,B=26,w=W-L-R,h=H-Tp-B, xs=i=>L+i/(n-1)*w, ys=v=>Tp+(hi-v)/(hi-lo)*h;
+  c.font="11px "+cssVar("--font-mono"); c.fillStyle=muted; c.strokeStyle=line; c.textAlign="right"; c.textBaseline="middle";
+  const step=Math.pow(10,Math.floor(Math.log10(Math.max(hi-lo,1))))/(((hi-lo)/Math.pow(10,Math.floor(Math.log10(Math.max(hi-lo,1)))))<3?2:1);
+  for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step){ c.beginPath(); c.moveTo(L,ys(v)); c.lineTo(L+w,ys(v)); c.stroke(); c.fillText(`${Math.round(v)} m`,L-5,ys(v)); }
+  c.textAlign="center"; c.textBaseline="top"; for(let k=0;k<=4;k++) c.fillText(`${fmtD(D*k/4)} km`,L+w*k/4,Tp+h+6);
+  // sea level
+  c.strokeStyle="rgba(42,98,168,.6)"; c.setLineDash([2,3]); c.beginPath(); c.moveTo(L,ys(0)); c.lineTo(L+w,ys(0)); c.stroke(); c.setLineDash([]);
+  // terrain fill
+  const g=c.createLinearGradient(0,ys(hi),0,ys(lo)); g.addColorStop(0,"#9c7b4c"); g.addColorStop(1,"#cdb98c");
+  c.beginPath(); c.moveTo(xs(0),ys(lo)); hs.forEach((v,i)=>c.lineTo(xs(i),ys(v))); c.lineTo(xs(n-1),ys(lo)); c.closePath(); c.fillStyle=g; c.fill();
+  c.strokeStyle="#6b5330"; c.lineWidth=1.4; c.beginPath(); hs.forEach((v,i)=>i?c.lineTo(xs(i),ys(v)):c.moveTo(xs(i),ys(v))); c.stroke();
+  // water where height ≈ 0
+  c.fillStyle="rgba(42,98,168,.55)"; T.e.forEach((e,i)=>{ if(e<=0.5&&i<n-1&&T.e[i+1]<=0.5) c.fillRect(xs(i),ys(bul(i))-2,xs(i+1)-xs(i)+0.5,4); });
+  // masts and the direct line
+  const mast=(i,top,col,lab)=>{ c.strokeStyle=col; c.lineWidth=3; c.beginPath(); c.moveTo(xs(i),ys(hs[i])); c.lineTo(xs(i),ys(top+bul(i))); c.stroke(); c.fillStyle=col; c.beginPath(); c.arc(xs(i),ys(top+bul(i)),4,0,7); c.fill(); c.font="600 11px "+cssVar("--font-body"); c.textAlign=i?"right":"left"; c.textBaseline="bottom"; c.fillText(lab,xs(i)+(i?-6:6),ys(top+bul(i))-4); };
+  c.strokeStyle=T.los?"rgba(29,138,90,.9)":"rgba(194,65,58,.9)"; c.setLineDash([6,4]); c.lineWidth=1.5; c.beginPath(); c.moveTo(xs(0),ys(tA)); c.lineTo(xs(n-1),ys(tB)); c.stroke(); c.setLineDash([]);
+  mast(0,tA,"#d13b4f",`TX ${T.txH} m`); mast(n-1,tB,"#1f5fd1",`RX ${T.rxH} m`);
+  const Dm=T.d[n-1]||1, xd=dm=>L+dm/Dm*w, bulD=dm=>MP.showBulge?dm*(Dm-dm)/(2*Re):0;
+  // OpenStreetMap buildings (height exaggerated ×1 — real metres on the same scale)
+  if(T.buildings&&T.buildings.length){ for(const b of T.buildings){ const x=xd(b.dm); const gi=Math.min(n-1,Math.round(b.dm/Dm*(n-1))); const base=T.e[gi]+bulD(b.dm); const y0=ys(base), y1=ys(base+b.h); c.fillStyle=b.est?"rgba(90,100,120,.75)":"rgba(40,50,70,.9)"; c.fillRect(x-1.5,y1,3,Math.max(1.5,y0-y1)); } }
+  // named peaks
+  if(T.osm&&T.osm.peaks){ c.font="10.5px "+cssVar("--font-body"); c.textAlign="center"; c.textBaseline="bottom";
+    const seen=[]; T.osm.peaks.filter(pk=>pk.xt<2500).sort((a,b)=>(b.ele||0)-(a.ele||0)).slice(0,8).forEach(pk=>{ const x=xd(pk.dm); if(seen.some(s=>Math.abs(s-x)<70)) return; if(T.ob&&T.loss>0.05&&Math.abs(xd(T.ob.dm)-x)<110) return; seen.push(x); const gi=Math.min(n-1,Math.round(pk.dm/Dm*(n-1))); const y=ys(Math.max(T.e[gi],0)+bulD(pk.dm));
+      c.fillStyle="#3d2f1a"; c.beginPath(); c.moveTo(x,y-3); c.lineTo(x-4,y-10); c.lineTo(x+4,y-10); c.closePath(); c.fill(); c.fillStyle=cssVar("--ink"); c.fillText(`${pk.name}${isFinite(pk.ele)?" "+Math.round(pk.ele)+" m":""}`,x,y-12); }); }
+  if(T.ob&&T.loss>0.05){ const x=xd(T.ob.dm), y=ys(T.ob.top+bulD(T.ob.dm)); c.fillStyle="#c2413a"; c.beginPath(); c.moveTo(x,y-2); c.lineTo(x-6,y-13); c.lineTo(x+6,y-13); c.closePath(); c.fill();
+    const what=T.ob.kind==="building"?`building${T.ob.b.name?" "+T.ob.b.name:""} ${Math.round(T.ob.b.h)} m tall`:(T.peakName?`${T.peakName}, ${Math.round(T.ob.top)} m`:`ridge ${Math.round(T.ob.top)} m`);
+    c.font="600 11px "+cssVar("--font-body"); c.textAlign=x>W*0.7?"right":"left"; c.textBaseline="bottom"; c.fillStyle=cssVar("--ink"); c.fillText(`main obstacle: ${what} · −${T.loss.toFixed(1)} dB`,x+(x>W*0.7?-8:8),y-14); }
+  c.textAlign="left"; c.textBaseline="top"; c.font="11px "+cssVar("--font-body"); c.fillStyle=muted; c.fillText(T.los?"Line of sight: clear":"Line of sight: blocked (ground wave still bends around terrain)",L+6,Tp+4);
+}
+function renderSites(){
+  const rows=MP.rxs.map((rx,i)=>{ const r=MP.res.get(rx.id), T=r&&r.T, pr=r&&r.pred;
+    return `<tr data-i="${i}" class="${i===MP.ai?"selrow":""}">
+      <td><span class="pin-n">R${i+1}</span></td>
+      <td><input type="text" class="nm" value="${esc(rx.name)}" aria-label="Receiver ${i+1} name"></td>
+      <td class="mono">${rx.lat.toFixed(3)}, ${rx.lon.toFixed(3)}</td>
+      <td class="mono">${T?Math.round(T.rxE)+" m":"…"}</td>
+      <td><input type="number" class="ah" min="0" max="500" step="1" value="${rx.h}" aria-label="Receiver ${i+1} antenna height" style="width:76px"></td>
+      <td class="mono">${r?fmtD(r.P.dist)+" km":"…"}</td>
+      <td class="mono">${T?(T.loss>0.05?"−"+T.loss.toFixed(1)+" dB":"0 dB"):"…"}</td>
+      <td class="mono">${pr?fmtField(pr.t):"…"}</td>
+      <td>${pr?`<span class="pill ${pr.cls}">${pr.verdict}</span>`:"…"}</td>
+      <td><button class="iconbtn del" type="button" aria-label="Remove receiver ${i+1}" ${MP.rxs.length===1?"disabled":""}>✕</button></td></tr>`; }).join("");
+  $("sitesTable").innerHTML=`<tr><th></th><th>Site</th><th>Lat, lon</th><th>Ground</th><th>Antenna (m)</th><th>Distance</th><th>Terrain</th><th>Signal</th><th>Reception</th><th></th></tr>`+rows;
+}
+function sitesCSV(){
+  const head=["Site","Latitude","Longitude","Ground height (m)","Antenna height (m)","Distance (km)","Terrain loss (dB)","Signal (dBuV/m)","Signal","Reception"];
+  const lines=[head.join(",")];
+  MP.rxs.forEach(rx=>{ const r=MP.res.get(rx.id), T=r&&r.T, pr=r&&r.pred;
+    lines.push([`"${rx.name.replace(/"/g,'""')}"`,rx.lat.toFixed(5),rx.lon.toFixed(5),T?Math.round(T.rxE):"",rx.h,r?r.P.dist.toFixed(1):"",T?T.loss.toFixed(1):"",pr&&pr.t!==null?pr.t.toFixed(1):"",pr?`"${fmtField(pr.t)}"`:"",pr?pr.verdict:""].join(",")); });
+  return `# Transmitter: ${MP.tx.name} (${MP.tx.lat.toFixed(4)}, ${MP.tx.lon.toFixed(4)}), mast ${MP.txH} m, ${toLocalInput(MP.date)}\n`+lines.join("\n");
+}
+function bindMap(){
+  const opts=`<option value="">Custom point</option>`+CITIES.map(c=>`<option value="${esc(c[0])}">${esc(c[0])}</option>`).join("");
+  $("txCity").innerHTML=opts;
+  $("attrib").innerHTML=PROVIDERS[TILE.base].attr; $("basemap").value=TILE.base;
+  if(IS_FILE){ const o=$("basemap").querySelector('option[value="osm"]'); o.textContent="OpenStreetMap (works on the website version)"; }
+  const city=n=>{ const c=CITIES.find(x=>x[0]===n); return c?{name:c[0],lat:c[1],lon:c[2]}:null; };
+  const fit=()=>{ MP.view=defaultView("sites"); drawMap(); };
+  $("txCity").addEventListener("change",e=>{ const c=city(e.target.value); if(c){ setPoint("tx",c); fit(); } });
+  $("rxCity").addEventListener("change",e=>{ const v=e.target.value; if(v.startsWith("city:")){ const c=city(v.slice(5)); if(c){ setPoint("rx",c); fit(); } } else { MP.ai=+v; updateMap(); } });
+  const coord=w=>()=>{ const la=+$(w+"Lat").value, lo=+$(w+"Lon").value; if(isFinite(la)&&isFinite(lo)&&Math.abs(la)<=90&&Math.abs(lo)<=180) setPoint(w,{name:`${la.toFixed(3)}°, ${lo.toFixed(3)}°`,lat:la,lon:lo}); };
+  ["txLat","txLon"].forEach(id=>$(id).addEventListener("change",coord("tx"))); ["rxLat","rxLon"].forEach(id=>$(id).addEventListener("change",coord("rx")));
+  $("swapBtn").addEventListener("click",()=>{ const t=MP.tx, r=MP.rx; MP.tx={name:r.name,lat:r.lat,lon:r.lon}; MP.rx={id:r.id,h:r.h,name:t.name,lat:t.lat,lon:t.lon}; updateMap(); });
+  $("txH").addEventListener("change",e=>{ MP.txH=clamp(+e.target.value||1,1,1000); updateMap(); });
+  $("rxH").addEventListener("change",e=>{ MP.rx.h=clamp(+e.target.value||0,0,500); updateMap(); });
+  $("useTerrain").addEventListener("change",e=>{ MP.useTerrain=e.target.checked; updateMap(); });
+  $("showBulge").addEventListener("change",e=>{ MP.showBulge=e.target.checked; renderActive(); });
+  $("useBuildings").addEventListener("change",e=>{ MP.useBuildings=e.target.checked; updateMap(); });
+  $("txElevM").addEventListener("change",e=>{ MP.manual.tx=+e.target.value||0; updateMap(); });
+  $("rxElevM").addEventListener("change",e=>{ MP.manual.rx=+e.target.value||0; MP.rx.manualElev=MP.manual.rx; updateMap(); });
+  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; };
+  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
+  const zoom=(dz,x,y)=>{ const W=mapC.clientWidth,H=mapC.clientHeight; x=x??W/2; y=y??H/2; const before=unproj(x,y); MP.view.z=clamp(MP.view.z+dz,1,17); const after=unproj(x,y); MP.view.lon=clamp(MP.view.lon+before.lon-after.lon,-180,180); MP.view.lat=clamp(MP.view.lat+before.lat-after.lat,-80,80); drawMap(); };
+  $("zoomIn").onclick=()=>zoom(1); $("zoomOut").onclick=()=>zoom(-1); $("fitBtn").onclick=fit;
+  $("mapPlay").addEventListener("click",()=>setMapPlaying(!MP.anim.playing)); setMapPlaying(MP.anim.playing);
+  $("basemap").addEventListener("change",e=>{ TILE.blockedMsg=false; setBase(e.target.value); });
+  mapC.addEventListener("wheel",e=>{ e.preventDefault(); const r=mapC.getBoundingClientRect(); zoom(e.deltaY<0?0.5:-0.5,e.clientX-r.left,e.clientY-r.top); },{passive:false});
+  mapC.addEventListener("dblclick",e=>{ const r=mapC.getBoundingClientRect(); zoom(1,e.clientX-r.left,e.clientY-r.top); });
+  let down=null;
+  mapC.addEventListener("pointerdown",e=>{ down={x:e.clientX,y:e.clientY,cx:wx(MP.view.lon,MP.view.z),cy:wy(MP.view.lat,MP.view.z),moved:false}; mapC.setPointerCapture(e.pointerId); });
+  mapC.addEventListener("pointermove",e=>{ if(!down) return; const dx=e.clientX-down.x, dy=e.clientY-down.y; if(Math.hypot(dx,dy)>5) down.moved=true;
+    if(down.moved){ mapC.style.cursor="grabbing"; MP.view.lon=clamp(ilon(down.cx-dx,MP.view.z),-180,180); MP.view.lat=clamp(ilat(down.cy-dy,MP.view.z),-80,80); scheduleMapDraw(); } });
+  mapC.addEventListener("pointerup",e=>{ mapC.style.cursor=""; if(!down) return; const moved=down.moved; down=null; if(moved) return;
+    const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, q=unproj(x,y);
+    // clicking an existing receiver pin selects it
+    for(let i=0;i<MP.rxs.length;i++){ const [px,py]=proj(MP.rxs[i].lon,MP.rxs[i].lat); if(Math.hypot(px-x,py+16-y)<14){ MP.ai=i; updateMap(); return; } }
+    let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
+    const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180};
+    setPoint(MP.mode,pt); if(MP.mode==="tx") setMode("add"); });
+  // sites table
+  const tb=$("sitesTable");
+  tb.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const i=+tr.dataset.i;
+    if(e.target.closest(".del")){ if(MP.rxs.length<2) return; const id=MP.rxs[i].id; MP.rxs.splice(i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>i?MP.ai-1:MP.ai,MP.rxs.length-1); updateMap(); return; }
+    if(e.target.closest("input")) return; if(MP.ai!==i){ MP.ai=i; updateMap(); } });
+  tb.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const rx=MP.rxs[+tr.dataset.i];
+    if(e.target.classList.contains("nm")){ rx.name=e.target.value.trim()||rx.name; updateMap(); }
+    if(e.target.classList.contains("ah")){ rx.h=clamp(+e.target.value||0,0,500); updateMap(); } });
+  $("clearRx").addEventListener("click",()=>{ const keep=MP.rx; MP.rxs=[keep]; MP.ai=0; MP.res=new Map([...MP.res].filter(([k])=>k===keep.id)); updateMap(); });
+  $("copyCsv").addEventListener("click",async()=>{ const b=$("copyCsv"); try{ await navigator.clipboard.writeText(sitesCSV()); b.textContent="Copied ✓"; }catch(e){ b.textContent="Copy blocked"; } setTimeout(()=>b.textContent="Copy table (CSV)",1800); });
+  let topLevel=false; try{ topLevel=window.top===window.self; }catch(e){}
+  if(topLevel){
+    $("dlCsv").hidden=false; $("dlCsv").addEventListener("click",()=>{ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([sitesCSV()],{type:"text/csv"})); a.download="receiver-sites.csv"; document.body.appendChild(a); a.click(); a.remove(); });
+    if(navigator.geolocation){ const b=$("gpsBtn"); b.hidden=false;
+      b.addEventListener("click",()=>{ b.textContent="◎ Locating…"; navigator.geolocation.getCurrentPosition(pos=>{ b.textContent="◎ Use my location"; setPoint(MP.mode,{name:"My location",lat:pos.coords.latitude,lon:pos.coords.longitude}); fit(); },
+        err=>{ b.textContent="◎ Use my location"; const m=$("mapMsg"); m.hidden=false; m.textContent="Location not available ("+err.message+"). Type coordinates instead."; },{enableHighAccuracy:true,timeout:15000}); }); }
+  }
+  $("when").value=toLocalInput(MP.date);
+  $("when").addEventListener("change",e=>{ const d=new Date(e.target.value); if(!isNaN(d)){ MP.date=d; updateMap(); } });
+  $("nowBtn").addEventListener("click",()=>{ MP.date=new Date(); $("when").value=toLocalInput(MP.date); updateMap(); });
+  $("mapModel").addEventListener("change",updateMap); $("mapLand").addEventListener("change",updateMap);
+  $("toLab").addEventListener("click",()=>{ pathModel(); const d=MP.path.dist; $("range").value=d>900?"3000":d>280?"1000":"300"; refreshAll(); go("lab"); });
+  $("toAnim").addEventListener("click",()=>{ const m=pathModel(); refreshAll(); setAnimModel(m.id); $("animModel").value=String(m.id); go("animation"); });
+  $("mapMsg").addEventListener("click",()=>{ $("mapMsg").hidden=true; TILE.blockedMsg=false; });
+  requestAnimationFrame(mapTick);
+}
+
+/* ================= QUIZ ================= */
+const QUIZ=[
+  {q:"Why do groundwave broadcast stations use vertical masts?",o:["Vertical polarization is not short-circuited by the conducting ground","Vertical antennas are cheaper","Horizontal waves reflect from the ionosphere too much","The D layer absorbs horizontal polarization"],a:0,e:"A horizontally polarized field parallel to a conducting surface is shorted out; vertical polarization can travel along the surface."},
+  {q:"In the Lab, open the 'Ground types' experiment. Which path keeps the ground wave strongest at 300 km?",o:["Very dry ground","Average land","Sea water","Wet ground"],a:2,e:"Sea water has σ ≈ 5 S/m, so its numerical distance stays small and losses are minimal."},
+  {q:"In the Lab, open 'MW day vs night'. Why does the night model show a strong signal far beyond the ground-wave limit?",o:["Ground conductivity rises at night","The D layer disappears, so the sky wave returns with little absorption","The transmitter power is doubled","Tropospheric ducting"],a:1,e:"Without the daytime D layer, MF sky waves reflect from the E/F regions and come back hundreds of km away."},
+  {q:"What happens in the fading zone?",o:["Only the sky wave is present","Ground and sky waves arrive with similar strength and interfere","The signal is below the noise floor","The wave tilts backwards"],a:1,e:"When the two modes are within a few dB their varying phase difference causes deep fading and distortion."},
+  {q:"In the Lab, open 'HF skip zone'. What creates the gap with no signal?",o:["Rain attenuation","Steep rays above the critical frequency pass through the ionosphere, and the ground wave has already died","Earth curvature blocks the sky wave","Man-made noise"],a:1,e:"By the secant law only rays oblique enough reflect, so the first return lands far away. The HF ground wave fades within tens of km."},
+  {q:"How does a monsoon (waterlogged soil) affect MW ground-wave coverage?",o:["Coverage shrinks because rain absorbs the wave","No effect at all","Coverage grows because wet soil has higher conductivity","Only the sky wave is affected"],a:2,e:"Higher σ and εr reduce ground losses. Thunderstorms in the same season do raise the noise floor, though."},
+  {q:"A solar flare erupts at midday. Which signal suffers most?",o:["Daytime LF ground wave","HF sky wave on the sunlit side","Night-time MW sky wave on the dark side","Microwave line of sight"],a:1,e:"Flare X-rays boost D-layer ionization (sudden ionospheric disturbance) and absorb HF sky waves on the day side."}
+];
+QUIZ.push({q:"On the Animation tab, a listener sits where ground and sky waves are almost equally strong. What does the 'Received signal' trace show?",o:["A steady flat line","Deep, irregular swings up and down (fading)","No signal at all","A slowly rising line"],a:1,e:"The two waves arrive with a changing phase difference, so they alternately add and cancel."});
+QUIZ.push({q:"On the Map tab, a path from Colombo runs mostly over the sea. Compared with an all-land path of the same length, the ground wave is…",o:["Weaker","About the same","Stronger","Only present at night"],a:2,e:"Sea water conducts very well (σ ≈ 5 S/m), so ground-wave losses are much lower."});
+
+let qAnswered=0,qRight=0;
+function renderQuiz(){
+  qAnswered=0; qRight=0; $("score").textContent="0 / 0 correct";
+  const box=$("quizBox"); box.innerHTML="";
+  QUIZ.forEach((it,i)=>{
+    const d=document.createElement("div"); d.className="q";
+    d.innerHTML=`<b>${i+1}. ${esc(it.q)}</b><div class="opts"></div><p class="fb" aria-live="polite"></p>`;
+    const opts=d.querySelector(".opts"); let done=false;
+    it.o.forEach((o,j)=>{ const b=document.createElement("button"); b.type="button"; b.className="btn"; b.textContent=o;
+      b.addEventListener("click",()=>{ if(done) return; done=true; qAnswered++;
+        if(j===it.a){ qRight++; b.classList.add("right"); d.querySelector(".fb").textContent="Correct. "+it.e; }
+        else { b.classList.add("wrong"); opts.children[it.a].classList.add("right"); d.querySelector(".fb").textContent="Not quite. "+it.e; }
+        $("score").textContent=`${qRight} / ${qAnswered} correct`; });
+      opts.appendChild(b); });
+    box.appendChild(d);
+  });
+}
+
+/* ================= TABS ================= */
+const TABS=["lab","animation","map","learn","quiz"];
+let currentTab="lab";
+function go(t,noHash){
+  if(!TABS.includes(t)) t="lab"; currentTab=t;
+  document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
+  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("learn").hidden=t!=="learn"; $("quiz").hidden=t!=="quiz";
+  if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
+  if(t==="lab") redraw();
+  if(t==="map") updateMap();
+  if(t==="animation"){ syncRx(); }
+  window.scrollTo({top:0});
+}
+function bindTabs(){
+  document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+  document.querySelector(".tabs").addEventListener("keydown",e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return; const i=TABS.indexOf(currentTab); const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length]; go(n); document.querySelector(`.tab[data-tab="${n}"]`).focus(); });
+  window.addEventListener("hashchange",()=>go(location.hash.slice(1),true));
+}
+
+/* ================= INIT ================= */
+function init(){
+  fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindTabs(); renderQuiz();
+  $("quizReset").addEventListener("click",renderQuiz);
+  loadPreset(0);
+  go(location.hash.slice(1)||"lab",true);
+  new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map") { drawMap(); renderActive(); } }).observe(document.body);
+  const mo=new MutationObserver(()=>{ if(currentTab==="lab") redraw(); }); mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+  requestAnimationFrame(animTick);
+  loadLand();
+}
+init();
+
+</script>
+</body>
+</html>
