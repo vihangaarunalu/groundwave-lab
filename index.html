@@ -1675,7 +1675,10 @@ function paramsFor(P,rx,T){
 function mapParams(){ const r=MP.res.get(MP.rx.id); return paramsFor(MP.path||computePathFor(MP.tx,MP.rx),MP.rx,r&&r.T); }
 
 /* Elevation: Copernicus DEM GLO-90 via Open-Meteo (needs outside network access) */
-const ELEV={cache:new Map(),ok:null};
+const ELEV={cache:new Map(),ok:null,retryTimer:null};
+try{ const saved=JSON.parse(localStorage.getItem("gwlab-elev")||"[]"); saved.forEach(([k,v])=>ELEV.cache.set(k,v)); }catch(e){}
+function saveElev(){ try{ localStorage.setItem("gwlab-elev",JSON.stringify([...ELEV.cache].slice(-6000))); }catch(e){} }
+function scheduleElevRetry(){ if(ELEV.retryTimer) return; ELEV.retryTimer=setTimeout(()=>{ ELEV.retryTimer=null; ELEV.ok=null; MP.res.clear(); if(currentTab==="map") updateMap(); },61000); }
 const ekey=(lat,lon)=>lat.toFixed(3)+","+lon.toFixed(3);
 async function fetchElev(pts){
   const out=new Array(pts.length).fill(null), need=[];
@@ -1691,8 +1694,8 @@ async function fetchElev(pts){
       if(!r.ok) throw new Error("HTTP "+r.status);
       const j=await r.json();
       ch.forEach((i,k)=>{ let e=j.elevation[k]; if(!isFinite(e)) e=0; ELEV.cache.set(ekey(pts[i].lat,pts[i].lon),e); out[i]=e; });
-      ELEV.ok=true;
-    }catch(e){ ELEV.ok=false; ELEV.failedAt=Date.now(); return null; }
+      ELEV.ok=true; saveElev();
+    }catch(e){ ELEV.ok=false; ELEV.failedAt=Date.now(); scheduleElevRetry(); return null; }
   }
   return out;
 }
@@ -1762,7 +1765,7 @@ async function fetchOSMFeatures(P,rx){
   }catch(e){ return null; }
 }
 async function terrainFor(P,rx,onTerrain){
-  const n=clamp(Math.round(P.dist/0.5)+1,101,301), pts=[]; for(let i=0;i<n;i++) pts.push(gcPoint(MP.tx,rx,i/(n-1)));
+  const n=clamp(Math.round(P.dist/1)+1,101,201), pts=[]; for(let i=0;i<n;i++) pts.push(gcPoint(MP.tx,rx,i/(n-1)));
   let elev=await fetchElev(pts), manual=false;
   if(!elev){ manual=true; const a=+MP.manual.tx||0, b=(rx.id===MP.rx.id?+MP.manual.rx:rx.manualElev)||0; elev=pts.map((_,i)=>a+(b-a)*i/(n-1)); }
   // show terrain straight away; buildings/peaks are added when the (sometimes slow) OSM servers answer
@@ -1999,7 +2002,7 @@ function renderActive(){
   $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
   $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
   const note=$("terrainNote");
-  if(ELEV.ok===false){ note.innerHTML="Terrain data couldn't be downloaded here (this page blocks outside data, or you are offline). Type ground heights under <b>Coordinates &amp; manual ground height</b>, or open the lab from its public website for automatic worldwide terrain."; }
+  if(ELEV.ok===false){ note.innerHTML="Terrain data couldn't be downloaded right now (the free terrain service is busy, this page blocks outside data, or you are offline). The lab retries automatically in a minute. Type ground heights under <b>Coordinates &amp; manual ground height</b>, or open the lab from its public website for automatic worldwide terrain."; }
   else note.innerHTML="Terrain: Copernicus DEM GLO-90 via Open-Meteo. Buildings and peak names: © OpenStreetMap contributors (Overpass API); buildings without a height tag are estimated from floors, or 7 m. Shadowing counts hills that rise above the line joining the two sites&#39; ground levels (single knife-edge, ITU-R P.526), added to the smooth-earth ground wave. It is an estimate, not a planning-grade result.";
   $("manualElevHint").textContent=ELEV.ok===false?"Terrain download unavailable, so these values are used.":"Only used when terrain data can't be downloaded.";
 }
