@@ -659,8 +659,8 @@ table.sites tr.selrow{background:var(--accent-soft)}
     </div>
     <div class="map-bl">
       <select id="basemap" aria-label="Map style" class="mapbtn">
-        <option value="osm">OpenStreetMap</option>
         <option value="topo">OpenTopoMap (terrain)</option>
+        <option value="osm">OpenStreetMap</option>
         <option value="light">OpenStreetMap light</option>
         <option value="vector">Simple outline</option>
       </select>
@@ -668,6 +668,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <div class="map-br" id="attrib"></div>
     <div class="mapmsg" id="mapMsg" hidden></div>
   </div>
+  <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span>■ Buildings (zoom in)</span></div>
   <p class="hint">Choose <b>+ Transmitter</b> or <b>+ Receiver</b> and click the map to add a site. To remove a pin, choose <b>✕ Remove</b> and click it, or right-click or double-click it. Use ↺ to reset. Drag to pan, scroll to zoom.</p>
 
   <div class="mapresult">
@@ -1817,8 +1818,8 @@ async function fetchOSMFeatures(P,rx){
       const lat=el.lat??(el.center&&el.center.lat), lon=el.lon??(el.center&&el.center.lon); if(lat==null) continue;
       const {at,xt}=alongTrack(MP.tx,rx,{lat,lon}); if(at<0||at>D) continue;
       const t=el.tags||{};
-      if(t.natural==="peak"){ res.peaks.push({dm:at*1000,xt,name:t.name||t["name:en"]||"Peak",ele:parseFloat(t.ele)}); }
-      else if(t.building){ const bh=buildingHeight(t); res.buildings.push({dm:at*1000,h:bh.h,est:bh.est,name:t.name||""}); }
+      if(t.natural==="peak"){ res.peaks.push({dm:at*1000,xt,lat,lon,name:t.name||t["name:en"]||"Peak",ele:parseFloat(t.ele)}); }
+      else if(t.building){ const bh=buildingHeight(t); res.buildings.push({dm:at*1000,lat,lon,h:bh.h,est:bh.est,name:t.name||""}); }
     }
     OSMF.ok=true; OSMF.cache.set(key,res); return res;
   }catch(e){ return null; }
@@ -1880,7 +1881,7 @@ const PROVIDERS={
 };
 // OpenStreetMap's own tile servers refuse pages opened from disk (no Referer), so local files start on the CARTO style
 const IS_FILE=location.protocol==="file:";
-const TILE={cache:new Map(),ok:0,err:0,base:IS_FILE?"light":"osm",blockedMsg:false,pending:false};
+const TILE={cache:new Map(),ok:0,err:0,base:IS_FILE?"light":"topo",blockedMsg:false,pending:false};
 const wx=(lon,z)=>(lon+180)/360*TS*Math.pow(2,z);
 const wy=(lat,z)=>{ const s=Math.sin(toRad(clamp(lat,-85.05,85.05))); return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*TS*Math.pow(2,z); };
 const ilon=(x,z)=>x/(TS*Math.pow(2,z))*360-180;
@@ -1954,6 +1955,35 @@ function drawMap(){
     c.lineWidth=4.5; for(let i=1;i<P.samples.length;i++){ const a=P.samples[i-1],b=P.samples[i]; const [x1,y1]=proj(a.lon,a.lat),[x2,y2]=proj(b.lon,b.lat); if(Math.abs(x2-x1)>W/2) continue; c.strokeStyle=b.land?"#9a6b12":"#1f57b8"; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); }
     c.lineCap="butt"; const [mx,my]=proj(P.mid.lon,P.mid.lat); const lbl=`${fmtD(P.dist)} km`; c.font="700 13px "+cssVar("--font-body"); const tw=c.measureText(lbl).width+16;
     c.fillStyle="rgba(22,32,46,.9)"; c.beginPath(); c.roundRect?c.roundRect(mx-tw/2,my-30,tw,22,11):c.rect(mx-tw/2,my-30,tw,22); c.fill(); c.fillStyle="#fff"; c.textAlign="center"; c.fillText(lbl,mx,my-15); c.textAlign="left"; }
+  // ===== obstructions along the selected path: blocked line of sight, named peaks, buildings, main obstacle =====
+  const ra=MP.res.get(MP.rx.id), T=ra&&ra.T;
+  if(P&&T&&T.e&&T.e.length>2){
+    const n=T.e.length, D=T.d[n-1]||1, Re=(4/3)*RE*1000, tA=T.e[0]+T.txH, tB=T.e[n-1]+T.rxH;
+    const at=i=>gcPoint(MP.tx,MP.rx,i/(n-1));
+    // red dashes where terrain rises above the straight line between the antenna tips
+    c.lineCap="round"; c.strokeStyle="rgba(214,48,40,.95)"; c.lineWidth=5; c.setLineDash([2,7]);
+    let open=false; c.beginPath();
+    for(let i=1;i<n-1;i++){ const blocked=T.e[i]+T.d[i]*(D-T.d[i])/(2*Re)>tA+(tB-tA)*T.d[i]/D; const q=at(i); const [x,y]=proj(q.lon,q.lat);
+      if(blocked){ if(!open){ c.moveTo(x,y); open=true; } else c.lineTo(x,y); } else open=false; }
+    c.stroke(); c.setLineDash([]); c.lineCap="butt";
+    // highest point on the path
+    let hi=1; for(let i=1;i<n-1;i++) if(T.e[i]>T.e[hi]) hi=i;
+    const tag=(x,y,txt,bg,fg)=>{ c.font="600 11.5px "+cssVar("--font-body"); const tw=c.measureText(txt).width+12; c.fillStyle=bg; c.strokeStyle="rgba(0,0,0,.2)"; c.lineWidth=1; c.fillRect(x-tw/2,y-26,tw,19); c.strokeRect(x-tw/2,y-26,tw,19); c.fillStyle=fg; c.textAlign="center"; c.fillText(txt,x,y-12); c.textAlign="left"; };
+    const tri=(x,y,col,s)=>{ c.fillStyle=col; c.strokeStyle="#fff"; c.lineWidth=1.5; c.beginPath(); c.moveTo(x,y-s); c.lineTo(x-s*0.9,y+s*0.6); c.lineTo(x+s*0.9,y+s*0.6); c.closePath(); c.fill(); c.stroke(); };
+    // named peaks near the path (skip the one already labelled as the main obstacle)
+    const obXY=T.ob&&T.loss>0.05?(q=>proj(q.lon,q.lat))(gcPoint(MP.tx,MP.rx,clamp(T.ob.dm/D,0,1))):null;
+    if(T.osm&&T.osm.peaks){ const shown=obXY?[obXY]:[]; T.osm.peaks.filter(k=>k.xt<4000&&k.lat!=null).sort((a,b)=>(b.ele||0)-(a.ele||0)).slice(0,10).forEach(k=>{ const [x,y]=proj(k.lon,k.lat); if(x<0||y<0||x>W||y>H||shown.some(([sx,sy])=>Math.hypot(sx-x,sy-y)<70)) return; shown.push([x,y]); tri(x,y,"#5a3d1c",7); if(v.z>6.5) tag(x,y-6,`${k.name}${isFinite(k.ele)?" "+Math.round(k.ele)+" m":""}`,"rgba(255,250,240,.95)","#3d2a10"); }); }
+    // buildings (only when zoomed in enough to tell them apart)
+    if(T.osm&&T.osm.buildings&&v.z>=12){ for(const b of T.osm.buildings){ if(b.lat==null) continue; const [x,y]=proj(b.lon,b.lat); c.fillStyle=b.est?"rgba(60,66,82,.75)":"rgba(25,30,42,.95)"; c.fillRect(x-3,y-3,6,6); } }
+    // highest point marker (when it isn't the main obstacle)
+    if(!T.ob||Math.abs((T.ob.dm||0)-T.d[hi])>D*0.03){ const q=at(hi); const [x,y]=proj(q.lon,q.lat); tri(x,y,"#7a5a33",6); if(v.z>5.5) tag(x,y-4,`highest ${Math.round(T.e[hi])} m`,"rgba(255,250,240,.92)","#3d2a10"); }
+    // main obstacle
+    if(T.ob&&T.loss>0.05){ const q=gcPoint(MP.tx,MP.rx,clamp(T.ob.dm/D,0,1)); const [x,y]=proj(q.lon,q.lat);
+      c.strokeStyle="#fff"; c.lineWidth=4; c.beginPath(); c.moveTo(x-7,y-7); c.lineTo(x+7,y+7); c.moveTo(x+7,y-7); c.lineTo(x-7,y+7); c.stroke();
+      c.strokeStyle="#d6302a"; c.lineWidth=2.5; c.beginPath(); c.moveTo(x-7,y-7); c.lineTo(x+7,y+7); c.moveTo(x+7,y-7); c.lineTo(x-7,y+7); c.stroke();
+      const what=T.ob.kind==="building"?`building ${Math.round(T.ob.b.h)} m`:(T.peakName?`${T.peakName} ${Math.round(T.ob.top)} m`:`ridge ${Math.round(T.ob.top)} m`);
+      tag(x,y-8,`Main obstacle: ${what} · −${T.loss.toFixed(1)} dB`,"rgba(214,48,40,.95)","#fff"); }
+  }
   const pin=(pt,col,lt,big,label)=>{ const [x,y]=proj(pt.lon,pt.lat), s=big?1:0.8;
     c.fillStyle=col; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); c.moveTo(x,y); c.arc(x,y-20*s,11*s,Math.PI*0.72,Math.PI*0.28); c.closePath(); c.fill(); c.stroke();
     c.fillStyle="#fff"; c.font=`700 ${big?11:9.5}px `+cssVar("--font-body"); c.textAlign="center"; c.fillText(lt,x,y-16*s);
@@ -2154,7 +2184,7 @@ function bindMap(){
   const city=n=>{ const c=CITIES.find(x=>x[0]===n); return c?{name:c[0],lat:c[1],lon:c[2]}:null; };
   const fit=()=>{ MP.view=defaultView("sites"); drawMap(); };
   $("txCity").addEventListener("change",e=>{ const v=e.target.value; if(v.startsWith("city:")){ const c=city(v.slice(5)); if(c){ setPoint("tx",c); fit(); } } else { MP.ti=+v.slice(3); updateMap(); } });
-  $("rxCity").addEventListener("change",e=>{ const v=e.target.value; if(v.startsWith("city:")){ const c=city(v.slice(5)); if(c){ setPoint("rx",c); fit(); } } else { MP.ai=+v; updateMap(); } });
+  $("rxCity").addEventListener("change",e=>{ const v=e.target.value; if(v.startsWith("city:")){ const c=city(v.slice(5)); if(c){ setPoint("rx",c); fit(); } } else { MP.ai=+v; updateMap(); MP.view=defaultView("path"); drawMap(); } });
   const coord=w=>()=>{ const la=+$(w+"Lat").value, lo=+$(w+"Lon").value; if(isFinite(la)&&isFinite(lo)&&Math.abs(la)<=90&&Math.abs(lo)<=180) setPoint(w,{name:`${la.toFixed(3)}°, ${lo.toFixed(3)}°`,lat:la,lon:lo}); };
   ["txLat","txLon"].forEach(id=>$(id).addEventListener("change",coord("tx"))); ["rxLat","rxLon"].forEach(id=>$(id).addEventListener("change",coord("rx")));
   $("swapBtn").addEventListener("click",()=>{ const t=MP.tx, r=MP.rx; MP.tx={id:t.id,h:t.h,name:r.name,lat:r.lat,lon:r.lon}; MP.rx={id:r.id,h:r.h,name:t.name,lat:t.lat,lon:t.lon}; updateMap(); });
@@ -2200,7 +2230,7 @@ function bindMap(){
   const tb=$("sitesTable");
   tb.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const i=+tr.dataset.i;
     if(e.target.closest(".del")){ if(MP.rxs.length<2) return; const id=MP.rxs[i].id; MP.rxs.splice(i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>i?MP.ai-1:MP.ai,MP.rxs.length-1); updateMap(); return; }
-    if(e.target.closest("input")) return; if(MP.ai!==i){ MP.ai=i; updateMap(); } });
+    if(e.target.closest("input")) return; if(MP.ai!==i){ MP.ai=i; updateMap(); MP.view=defaultView("path"); drawMap(); $("map").scrollIntoView({behavior:"smooth",block:"center"}); } });
   tb.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const rx=MP.rxs[+tr.dataset.i];
     if(e.target.classList.contains("nm")){ rx.name=e.target.value.trim()||rx.name; updateMap(); }
     if(e.target.classList.contains("ah")){ rx.h=clamp(+e.target.value||0,0,500); updateMap(); } });
