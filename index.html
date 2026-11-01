@@ -1681,7 +1681,7 @@ async function fetchElev(pts){
   const out=new Array(pts.length).fill(null), need=[];
   pts.forEach((p,i)=>{ const k=ekey(p.lat,p.lon); if(ELEV.cache.has(k)) out[i]=ELEV.cache.get(k); else need.push(i); });
   if(!need.length) return out;
-  if(ELEV.ok===false) return null;
+  if(ELEV.ok===false&&Date.now()-(ELEV.failedAt||0)<60000) return null; // retry a minute after a failure
   for(let s=0;s<need.length;s+=100){
     const ch=need.slice(s,s+100);
     const url=`https://api.open-meteo.com/v1/elevation?latitude=${ch.map(i=>pts[i].lat.toFixed(4)).join(",")}&longitude=${ch.map(i=>pts[i].lon.toFixed(4)).join(",")}`;
@@ -1692,7 +1692,7 @@ async function fetchElev(pts){
       const j=await r.json();
       ch.forEach((i,k)=>{ let e=j.elevation[k]; if(!isFinite(e)) e=0; ELEV.cache.set(ekey(pts[i].lat,pts[i].lon),e); out[i]=e; });
       ELEV.ok=true;
-    }catch(e){ ELEV.ok=false; return null; }
+    }catch(e){ ELEV.ok=false; ELEV.failedAt=Date.now(); return null; }
   }
   return out;
 }
