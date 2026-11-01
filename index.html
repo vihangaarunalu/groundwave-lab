@@ -365,14 +365,55 @@ table.sites tr.selrow{background:var(--accent-soft)}
 
 .route3 label{justify-content:flex-start !important;gap:7px !important}
 
+/* ===== v5: help dialog, full screen, a11y ===== */
+.skip{position:absolute;left:-999px;top:8px;z-index:100;background:var(--accent);color:var(--on-accent);padding:8px 12px;border-radius:6px}
+.skip:focus{left:8px}
+.iconbtn{width:40px;height:40px}
+.themebtn{width:auto;height:36px}
+dialog#helpDlg{border:0;padding:0;border-radius:14px;max-width:min(720px,calc(100vw - 24px));width:100%;background:var(--panel);color:var(--ink);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
+.dlg{display:grid;gap:14px;padding:22px 24px}
+.dlg-h{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dlg-h h2{font-size:1.25rem}
+.dlg-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.dlg-b{display:grid;gap:10px;font-size:15px;line-height:1.6;max-height:min(60vh,520px);overflow:auto}
+.dlg-b ul{margin:0;padding-left:20px}
+.steps-list{margin:0;padding-left:22px;display:grid;gap:8px}
+.dlg-f{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+.stage:fullscreen{border-radius:0;border:0;background:#050a1a}
+.stage:fullscreen #anim{height:100vh}
+.stage.is-expanded{position:fixed;inset:0;z-index:200;border-radius:0;border:0}
+.stage.is-expanded #anim{height:100vh}
+.stage:fullscreen .tourbox,.stage.is-expanded .tourbox{top:60px}
+.learn-build ol{padding-left:22px;display:grid;gap:8px}
+
+.fsbar{display:none;position:absolute;left:50%;bottom:16px;transform:translateX(-50%);gap:10px;align-items:center;background:rgba(12,20,36,.88);color:#fff;padding:8px 12px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);flex-wrap:wrap;max-width:calc(100% - 24px)}
+.stage:fullscreen .fsbar,.stage.is-expanded .fsbar{display:flex}
+.fsbar select{width:auto;min-height:34px;background:#1d2738;color:#fff;border-color:#3a4760}
+.fsbar .btn{min-height:34px;background:#1d2738;color:#fff;border-color:#3a4760}
+.fsbar input[type=range]{width:160px}
+.fsbar .check{color:#fff}
+.fsclock{font-size:15px;min-width:46px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.dlg-b .eq{overflow:visible;white-space:normal;line-height:1.6;padding:8px 10px}
+
+@media (min-width:900px){.fsbar{flex-wrap:nowrap;white-space:nowrap}}
+
+.method{font-size:12.5px;color:var(--muted);margin:-4px 0 4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent);border-radius:4px;padding:1px 6px}
+
+.pindel{position:absolute;z-index:5;transform:translate(-50%,0);background:#c2413a;color:#fff;border:2px solid #fff;border-radius:999px;font:inherit;font-size:12px;font-weight:700;padding:3px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap}
+.pindel:hover{background:#a5322c}
+
 </style>
 </head>
 <body>
+<a class="skip" href="#main-content">Skip to content</a>
 <header class="appbar">
   <div class="appbar-in">
     <div class="brand">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 28 L15 8" stroke="currentColor" stroke-width="2"/><path d="M11 28 L15 8 L19 28" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 7 a9 9 0 0 1 14 0 M5 4 a13 13 0 0 1 20 0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>
-      <h1>Groundwave Propagation Lab<small>Radio wave propagation trainer · LF · MF · HF · VHF · UHF</small></h1>
+      <h1>Groundwave Propagation Lab<small>Radio propagation simulator · LF to UHF</small></h1>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button class="tab" role="tab" id="tab-lab" aria-controls="lab" data-tab="lab"><span class="n">1</span>Lab</button>
@@ -382,11 +423,13 @@ table.sites tr.selrow{background:var(--accent-soft)}
       <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">5</span>Learn</button>
       <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">6</span>Quiz</button>
     </nav>
+    <button class="iconbtn themebtn" id="helpBtn" type="button" aria-haspopup="dialog" title="Help and quick start">? Help</button>
     <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
   </div>
 </header>
 
 <!-- ======================= LAB ======================= -->
+<span id="main-content" tabindex="-1"></span>
 <section class="wrap" id="lab" role="tabpanel" aria-labelledby="tab-lab">
   <section class="expbar panel">
     <div class="expbar-top">
@@ -394,7 +437,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
         <p class="eyebrow">Experiment</p>
         <div class="chips scrollrow" id="presets" aria-label="Ready-made experiments"></div>
       </div>
-      <button class="btn primary" type="button" id="gNext">Next experiment →</button>
+      <div class="row"><button class="btn ghost" type="button" data-open-help="build">How to build your own model</button><button class="btn primary" type="button" id="gNext">Next experiment →</button></div>
     </div>
     <p class="guide-text" id="guide"></p>
   </section>
@@ -425,7 +468,14 @@ table.sites tr.selrow{background:var(--accent-soft)}
                 <option value="sky">Sky wave only</option>
                 <option value="inverse">Ideal reference (no ground loss)</option>
                 <option value="custom">My own formula</option>
+                <option value="cell">Mobile network: 2G/3G/4G/5G (ITU-R P.529 / M.2412)</option>
               </select>
+            </div>
+            <div class="field" id="cellBox">
+              <span class="lbl">Mobile network</span>
+              <div class="chips" id="cellChips"></div>
+              <label class="check"><input type="checkbox" id="indoor"> Phone is indoors (ITU-R P.2109 building entry loss)</label>
+              <p class="hint">Tower height and phone height: set them under TX/RX antenna below (typical 30 m and 1.5 m). Power is the EIRP: 1 kW = 60 dBm.</p>
             </div>
             <div class="field" id="exprBox">
               <label for="expr">Your formula for E (mV/m)</label>
@@ -436,7 +486,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
             <div class="field">
               <label for="freq">Frequency <span class="v" id="freqV"></span></label>
               <div class="chips" id="freqChips"></div>
-              <input type="range" id="freq" min="-1" max="3.477" step="0.001" aria-label="Fine-tune frequency">
+              <input type="range" id="freq" min="-1" max="4.477" step="0.001" aria-label="Fine-tune frequency">
             </div>
             <div class="two">
               <div class="field"><label for="htx">TX antenna (m)</label><input type="number" id="htx" min="1" max="2000" step="1"></div>
@@ -445,7 +495,8 @@ table.sites tr.selrow{background:var(--accent-soft)}
             <p class="hint" style="margin-top:-8px">Antenna heights matter most at VHF and UHF (line of sight).</p>
             <div class="field">
               <label for="pow">Transmitter power <span class="v" id="powV"></span></label>
-              <input type="range" id="pow" min="-1" max="3" step="0.01">
+              <div class="chips" id="powChips"></div>
+              <input type="range" id="pow" min="-3" max="3.7" step="0.01" aria-label="Fine-tune power">
             </div>
           </div>
         </details>
@@ -520,6 +571,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <main class="main">
       <section class="panel card">
         <p class="eyebrow">Result for <span id="selName"></span></p>
+        <p class="method"><span class="badge">ITU method</span> <span id="methodV"></span></p>
         <p class="summary" id="summary"></p>
         <div class="tiles" id="tiles"></div>
       </section>
@@ -528,9 +580,9 @@ table.sites tr.selrow{background:var(--accent-soft)}
         <div class="chart-head">
           <h2>Signal strength vs distance</h2>
           <div class="chart-opts">
-            <select id="yunit" aria-label="Units"><option value="mv">Units: mV/m</option><option value="db">Units: dBµV/m</option></select>
+            <select id="yunit" aria-label="Units"><option value="mv">Units: mV/m</option><option value="db">Units: dBµV/m</option><option value="dbm">Units: dBm (mobile)</option></select>
             <select id="xscale" aria-label="Distance scale"><option value="log">Log distance</option><option value="lin">Linear distance</option></select>
-            <select id="range" aria-label="Distance range"><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select>
+            <select id="range" aria-label="Distance range"><option value="30">0–30 km</option><option value="100">0–100 km</option><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select>
           </div>
         </div>
         <div class="chart-box">
@@ -560,7 +612,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
   <section class="panel card stagebar">
     <div class="row">
       <div class="field" style="min-width:200px"><label for="animModel">Model</label><select id="animModel"></select></div>
-      <div class="field"><label for="animRange">View</label><select id="animRange"><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select></div>
+      <div class="field"><label for="animRange">View</label><select id="animRange"><option value="30">0–30 km</option><option value="100">0–100 km</option><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select></div>
     </div>
     <div class="row">
       <button class="btn primary" id="tourBtn" type="button">▶ Guided tour</button>
@@ -578,12 +630,21 @@ table.sites tr.selrow{background:var(--accent-soft)}
           <button class="iconbtn mapbtn" id="aZoomIn" type="button" aria-label="Zoom in">＋</button>
           <button class="iconbtn mapbtn" id="aZoomOut" type="button" aria-label="Zoom out">－</button>
           <button class="iconbtn mapbtn" id="aReset" type="button" aria-label="Reset view" title="Reset view">⟲</button>
+          <button class="iconbtn mapbtn" id="aFull" type="button" aria-label="Full screen" title="Full screen (F)">⛶</button>
         </div>
         <div class="tourbox" id="tourBox" hidden>
           <p class="eyebrow" id="tourStep" style="margin:0"></p>
           <h3 id="tourTitle"></h3>
           <p id="tourText"></p>
           <div class="row"><button class="btn" id="tourBack" type="button">← Back</button><button class="btn primary" id="tourNext" type="button">Next →</button><button class="btn ghost" id="tourClose" type="button">Close tour</button></div>
+        </div>
+        <div class="fsbar" role="toolbar" aria-label="Full-screen controls">
+          <button class="btn" id="fsPlay" type="button">❚❚</button>
+          <label class="sr" for="fsFreq">Frequency</label><select id="fsFreq"></select>
+          <span class="fsclock mono" id="fsClock">12:00</span>
+          <input type="range" id="fsHour" min="0" max="24" step="0.05" aria-label="Time of day">
+          <label class="check"><input type="checkbox" id="fsLabels" checked> Labels</label>
+          <button class="btn" id="fsExit" type="button">Exit full screen</button>
         </div>
         <button class="bigplay" id="bigPlay" type="button" hidden>▶ Play animation</button>
         <p class="animerr" id="animErr" hidden></p>
@@ -613,9 +674,10 @@ table.sites tr.selrow{background:var(--accent-soft)}
           </div></div>
         <div class="field"><label for="aFreq">Frequency <span class="v" id="aFreqV"></span></label>
           <div class="chips" id="aFreqChips"></div>
-          <input type="range" id="aFreq" min="-1" max="3.477" step="0.001" aria-label="Fine-tune frequency"></div>
+          <input type="range" id="aFreq" min="-1" max="4.477" step="0.001" aria-label="Fine-tune frequency"></div>
         <div class="field"><label for="aPow">Power <span class="v" id="aPowV"></span></label>
-          <input type="range" id="aPow" min="-1" max="3" step="0.01"></div>
+          <div class="chips" id="aPowChips"></div>
+          <input type="range" id="aPow" min="-3" max="3.7" step="0.01" aria-label="Fine-tune power"></div>
         <div class="field"><label for="aGround">Ground</label><select id="aGround"></select></div>
         <div class="field"><span class="lbl">Weather</span><div class="chips" id="aWx"></div></div>
       </section>
@@ -679,10 +741,12 @@ table.sites tr.selrow{background:var(--accent-soft)}
         <input type="radio" name="clickset" id="modeDel" value="del"><label for="modeDel" class="dellbl">✕ Remove</label>
       </div>
       <button class="btn mapbtn" id="gpsBtn" type="button" hidden>◎ Use my location</button>
+      <button class="btn mapbtn" id="findTowers" type="button" title="Search OpenStreetMap for mobile towers within 8 km of the selected receiver">📶 Find nearest cell towers</button>
     </div>
     <div class="map-tr">
       <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in">＋</button>
       <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out">－</button>
+      <button class="iconbtn mapbtn" id="zoomRx" type="button" aria-label="Zoom to the selected receiver (street level)" title="Zoom to the selected receiver">⌖</button>
       <button class="iconbtn mapbtn" id="fitBtn" type="button" aria-label="Fit all sites" title="Fit all sites">⤢</button>
       <button class="iconbtn mapbtn" id="mapReset" type="button" aria-label="Reset all sites" title="Reset all sites">↺</button>
       <button class="iconbtn mapbtn" id="mapPlay" type="button" aria-label="Pause map animation" title="Pause map animation">❚❚</button>
@@ -696,9 +760,10 @@ table.sites tr.selrow{background:var(--accent-soft)}
       </select>
     </div>
     <div class="map-br" id="attrib"></div>
-    <div class="mapmsg" id="mapMsg" hidden></div>
+    <button class="pindel" id="pinDel" type="button" hidden>✕ Delete</button>
+    <div class="mapmsg" id="mapMsg" role="status" hidden></div>
   </div>
-  <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span>■ Buildings (zoom in)</span></div>
+  <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span style="color:#e8862a">○ Secondary edge (Deygout)</span><span>■ Buildings (zoom in)</span></div>
   <p class="hint">Choose <b>+ Transmitter</b> or <b>+ Receiver</b> and click the map to add a site. To remove a pin, choose <b>✕ Remove</b> and click it, or right-click or double-click it. Use ↺ to reset. Drag to pan, scroll to zoom.</p>
 
   <div class="mapresult">
@@ -806,6 +871,16 @@ table.sites tr.selrow{background:var(--accent-soft)}
       </details>
     </div>
   
+  <section class="panel card learn-build">
+    <div class="chart-head"><h2>Build and simulate your own model</h2><button class="btn primary" type="button" data-open-help="build">Open step-by-step guide</button></div>
+    <ol>
+      <li><b>Lab → + New</b> (or <b>+ Copy selected</b>) creates a model. Click its name to rename it.</li>
+      <li>Under <b>Signal</b>, choose the mechanism (ground wave, sky wave, both, or your own formula), then set the frequency, power and antenna heights.</li>
+      <li>Under <b>Ground &amp; path</b> and <b>Time &amp; weather</b>, describe the path and the conditions. Or build a real path on the <b>Map</b> and choose <b>Open in Lab</b>.</li>
+      <li>Read the result card and the plot, then open <b>Animation</b> to watch it propagate. Drag the receiver and use ⛶ for full screen.</li>
+      <li>To compare, copy the model and change exactly one setting.</li>
+    </ol>
+  </section>
   <section class="panel pad stack">
     <h2>Glossary</h2>
     <div class="tablewrap"><table class="gloss">
@@ -831,7 +906,57 @@ table.sites tr.selrow{background:var(--accent-soft)}
   <div class="quiz" id="quizBox"></div>
 </section>
 
-<div class="wrap" style="padding-top:0"><footer>Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
+
+<dialog id="helpDlg" aria-labelledby="helpTitle">
+  <div class="dlg">
+    <div class="dlg-h"><h2 id="helpTitle">Welcome to the Groundwave Propagation Lab</h2><button class="iconbtn" id="helpClose" type="button" aria-label="Close help">✕</button></div>
+    <div class="dlg-tabs" role="tablist" aria-label="Help topics">
+      <button class="tab" role="tab" data-h="start" aria-selected="true">Quick start</button>
+      <button class="tab" role="tab" data-h="build" aria-selected="false">Build your own model</button>
+      <button class="tab" role="tab" data-h="about" aria-selected="false">About &amp; accuracy</button>
+    </div>
+    <div class="dlg-b" data-hp="start">
+      <p>This lab predicts how far a radio signal reaches, from LF and AM broadcasting up to VHF/UHF. You can change the ground, weather, time of day and terrain.</p>
+      <ol class="steps-list">
+        <li><b>Lab:</b> pick a ready-made experiment, then change one setting and compare the curves.</li>
+        <li><b>Animation:</b> watch ground and sky waves travel. Use <i>Quick settings</i> to switch frequency, and ⛶ for full screen.</li>
+        <li><b>Map:</b> place transmitters and receivers anywhere in the world. Each site gets a reception verdict.</li>
+        <li><b>Terrain profile:</b> see the mountains, buildings and main obstacle between a transmitter and a receiver.</li>
+        <li><b>Mobile coverage at home:</b> on the Map, set a receiver at your home (Move RX or Use my location), then choose <b>📶 Find nearest cell towers</b>. Towers mapped in OpenStreetMap are added as transmitters with their heights, ready to simulate 2G–5G.</li>
+        <li><b>Learn and Quiz:</b> read the theory and check your understanding.</li>
+      </ol>
+    </div>
+    <div class="dlg-b" data-hp="build" hidden>
+      <ol class="steps-list">
+        <li><b>Start a model.</b> In <b>Lab → Models</b>, choose <b>+ New</b>, or select a model and choose <b>+ Copy selected</b>. Rename it by clicking its name.</li>
+        <li><b>Choose what to calculate.</b> Under <b>Settings → Signal</b>, pick <i>Ground wave + sky wave</i> (most realistic), <i>Ground wave only</i>, <i>Sky wave only</i>, or <i>My own formula</i>.</li>
+        <li><b>Set the station.</b> Set the frequency (buttons or slider), transmitter power and antenna heights.</li>
+        <li><b>Set the path.</b> Under <b>Ground &amp; path</b>, choose the ground type or a land-to-sea boundary. For a real path, place the sites on the <b>Map</b> and choose <b>Open in Lab</b>.</li>
+        <li><b>Set conditions.</b> Under <b>Time &amp; weather</b> and <b>Advanced</b>, set the time of day, weather, solar activity and the listener's surroundings.</li>
+        <li><b>Simulate.</b> Read the result card and the plot. Choose <b>Animation</b> to watch it, and drag the receiver to any distance.</li>
+        <li><b>Compare.</b> Copy the model, change <i>one</i> setting, and compare the two curves. The table under <i>Technical details</i> lists both models side by side.</li>
+      </ol>
+      <p><b>Your own formula:</b> choose <i>My own formula</i> and type the field strength E in mV/m. You can use <span class="mono">d</span> (km), <span class="mono">f</span> (MHz), <span class="mono">P</span> (kW), <span class="mono">sigma</span>, <span class="mono">er</span>, <span class="mono">A</span> (Norton attenuation factor) and <span class="mono">lam</span> (km). For example:</p>
+      <div class="eq">300*sqrt(P)/d * exp(-0.004*d*pow(f,0.7))</div>
+      <p>Plot it next to the built-in <i>Ground wave only</i> model to test your formula.</p>
+    </div>
+    <div class="dlg-b" data-hp="about" hidden>
+      <p><b>Who it is for:</b> engineering students, broadcast trainees and educators. Radio amateurs and engineers can also use it for quick what-if comparisons.</p>
+      <p><b>Models used:</b></p>
+      <ul>
+        <li>Ground wave: Sommerfeld–Norton with curved-earth loss and Millington mixed paths.</li>
+        <li>Sky wave: secant law and P.533-style absorption.</li>
+        <li>VHF/UHF: two-ray model plus a radio-horizon loss.</li>
+        <li>Mobile networks: ITU-R P.529 Okumura–Hata (2G), COST-231 Hata (3G/4G), ITU-R M.2412 UMa (5G), ITU-R P.838 rain, P.676 gases (approx.) and P.2109 building entry.</li>
+        <li>Terrain: Copernicus DEM with ITU-R P.526 diffraction. LF–HF uses a single knife-edge; VHF and above use the Deygout multiple knife-edge method. Buildings and peaks come from OpenStreetMap.</li>
+      </ul>
+      <p><b>Accuracy:</b> results are teaching-grade estimates, typically within several dB of the ITU curves for simple paths. Do not use them for licensing or frequency coordination. For that, use ITU-R P.368, P.1147, P.533, P.1546/P.1812 or professional planning software.</p>
+      <p class="hint">Map data © OpenStreetMap contributors · OpenTopoMap (CC-BY-SA) · Elevation: Copernicus DEM GLO-90 via Open-Meteo.</p>
+    </div>
+    <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
+  </div>
+</dialog>
+<div class="wrap" style="padding-top:0"><footer><b>Groundwave Propagation Lab v1.0</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
 
 <script>
 "use strict";
@@ -971,6 +1096,7 @@ function compileExpr(src){
   return exprCache[src];
 }
 function threshold(p){
+  if(p.type==="cell") return mVfromdB(dBm2dBuV(cellThrdBm(p),p.f));
   if(p.f>=30){ // FM / TV practice (ITU-R BS.412-style levels); atmospheric static is negligible at VHF/UHF
     const b={rural:0.25,suburban:1,urban:3,industrial:6}[p.env]; return b*(p.f>=300?2:1);
   }
@@ -994,6 +1120,7 @@ function evalP(p,d,io){
       const eg=mVfromdB(g), es=sf.E;
       t=dBuV(Math.sqrt(eg*eg+es*es)); break;
     }
+    case "cell": { const e=dBm2dBuV(cellRxdBm(d,p),p.f); g=e; t=e; break; }
     case "custom": {
       const c=compileExpr(p.expr);
       if(c.fn){
@@ -1021,6 +1148,7 @@ function spaceDB(d,p){
   const lam=300/p.f, dm=d*1000, h1=p.htx||30, h2=p.hrx||10;
   const F=Math.max(2*Math.abs(Math.sin(2*Math.PI*h1*h2/(lam*dm))),1e-3);
   let v=dBuV(222*Math.sqrt(p.P)/d*F);
+  v-=atmosLoss(d,p);
   const hz=radioHorizon(p);
   if(d>hz) v-=0.04*Math.cbrt(p.f)*Math.pow((4/3)/kFac(p),2/3)*(d-hz)+6*Math.min(1,(d-hz)/20);
   return v;
@@ -1030,13 +1158,74 @@ function groundPath(d,p,curv){
   if(s===null) return g;
   return dBuV(Math.hypot(mVfromdB(g),mVfromdB(s)));
 }
+/* ===================== MOBILE NETWORKS (2G/3G/4G/5G) =====================
+   ITU-R P.529 (Okumura–Hata, 150–1500 MHz), COST-231 Hata (1500–2200 MHz),
+   ITU-R M.2412 / 3GPP UMa (IMT-2020, 0.5–100 GHz), ITU-R P.838 rain,
+   ITU-R P.676 (approx.) gases, ITU-R P.2109 building entry loss (median, traditional building). */
+const CELL_TECH={
+  "2g":{name:"2G GSM 900",f:900,P:1,thr:-100,sys:"GSM"},
+  "3g":{name:"3G UMTS 2100",f:2100,P:1,thr:-102,sys:"UMTS"},
+  "4g":{name:"4G LTE 1800",f:1800,P:1,thr:-105,sys:"LTE"},
+  "5g":{name:"5G NR 3.5 GHz",f:3500,P:10,thr:-105,sys:"NR n78"},
+  "5gmm":{name:"5G mmWave 28 GHz",f:28000,P:3.16,thr:-100,sys:"NR n257"}
+};
+const dBm=kW=>10*Math.log10(kW*1e6);
+function rainRate(p){ if(p.storm==="local") return 100; if(p.moisture==="saturated") return 50; if(p.storm==="distant") return 25; if(p.moisture==="wet") return 10; return 0; }
+/* ITU-R P.838-3 horizontal-polarisation coefficients (log-interpolated) */
+const P838=[[1,0.0000259,0.9691],[2,0.0000847,1.0664],[4,0.0001071,1.6009],[6,0.0007056,1.5900],[8,0.004115,1.3905],[10,0.01217,1.2571],[12,0.02386,1.1825],[15,0.04481,1.1233],[20,0.09164,1.0568],[25,0.1571,0.9991],[30,0.2403,0.9485],[40,0.4431,0.8673]];
+function rainSpecific(fGHz,R){ if(R<=0||fGHz<1) return 0; const t=P838; let i=0; while(i<t.length-2&&fGHz>t[i+1][0]) i++;
+  const u=clamp(Math.log(fGHz/t[i][0])/Math.log(t[i+1][0]/t[i][0]),0,1);
+  const k=Math.exp(Math.log(t[i][1])+u*(Math.log(t[i+1][1])-Math.log(t[i][1]))), a=t[i][2]+u*(t[i+1][2]-t[i][2]);
+  return k*Math.pow(R,a); }
+function rainLoss(d,p){ const R=rainRate(p); if(!R) return 0; const d0=35*Math.exp(-0.015*Math.min(R,100)); const deff=d/(1+d/d0); return rainSpecific(p.f/1000,R)*deff; }
+/* gaseous attenuation, approx. ITU-R P.676 at sea level, humid tropical air (dB/km) */
+function gasSpecific(fGHz){ const pts=[[1,0.006],[3,0.008],[10,0.015],[22,0.2],[28,0.12],[40,0.15]]; if(fGHz<=1) return 0.006; for(let i=0;i<pts.length-1;i++){ if(fGHz<=pts[i+1][0]){ const u=(fGHz-pts[i][0])/(pts[i+1][0]-pts[i][0]); return pts[i][1]+u*(pts[i+1][1]-pts[i][1]); } } return 0.15; }
+function atmosLoss(d,p){ return p.f>=1000? rainLoss(d,p)+gasSpecific(p.f/1000)*d : 0; }
+/* ITU-R P.2109 median building entry loss, traditional building (approx. fit) */
+function buildingEntry(p){ return p.indoor? 11.6+3.0*Math.log2(Math.max(p.f/1000,0.5)) : 0; }
+function hataLoss(dkm,p){
+  const f=clamp(p.f,150,2200), hb=clamp(p.htx||30,10,200), hm=clamp(p.hrx||1.5,1,10), d=Math.max(dkm,0.02), lf=Math.log10(f);
+  const ahm=(1.1*lf-0.7)*hm-(1.56*lf-0.8);
+  const slope=(44.9-6.55*Math.log10(hb))*Math.log10(d);
+  let L = f<=1500 ? 69.55+26.16*lf-13.82*Math.log10(hb)-ahm+slope
+                  : 46.3+33.9*lf-13.82*Math.log10(hb)-ahm+slope+(p.env==="industrial"?3:0);
+  if(p.env==="suburban") L-=2*Math.pow(Math.log10(f/28),2)+5.4;
+  else if(p.env==="rural") L-=4.78*lf*lf-18.33*lf+40.94;
+  return L;
+}
+function umaLoss(dkm,p){
+  const fc=p.f/1000, hBS=clamp(p.htx||25,10,150), hUT=clamp(p.hrx||1.5,1,22.5);
+  const d2=Math.max(dkm*1000,10), d3=Math.hypot(d2,hBS-hUT);
+  const dBP=4*(hBS-1)*(hUT-1)*fc*1e9/3e8;
+  const los = d2<=dBP ? 28+22*Math.log10(d3)+20*Math.log10(fc) : 28+40*Math.log10(d3)+20*Math.log10(fc)-9*Math.log10(dBP*dBP+(hBS-hUT)**2);
+  const nlos=Math.max(los,13.54+39.08*Math.log10(d3)+20*Math.log10(fc)-0.6*(hUT-1.5));
+  let pl=d2<=18?1:18/d2+Math.exp(-d2/63)*(1-18/d2);           // UMa LOS probability
+  if(p.env==="suburban") pl=Math.min(1,pl*2+0.1); else if(p.env==="rural") pl=1;
+  // expected (power-weighted) median loss
+  return -10*Math.log10(pl*Math.pow(10,-los/10)+(1-pl)*Math.pow(10,-nlos/10));
+}
+function cellMethod(p){ return p.f>2200?"ITU-R M.2412 UMa (IMT-2020)":p.f>1500?"COST-231 Hata (ext. of ITU-R P.529)":"ITU-R P.529 Okumura–Hata"; }
+function cellLoss(dkm,p){ let L=p.f>2200?umaLoss(dkm,p):hataLoss(dkm,p); if(p.f<=2200&&dkm>20) L+=0; return L+atmosLoss(dkm,p)+buildingEntry(p); }
+/* received power (dBm, isotropic receive antenna) and the equivalent field strength */
+function cellRxdBm(dkm,p){ return dBm(p.P)-cellLoss(dkm,p); }
+const dBm2dBuV=(prx,fMHz)=>prx+20*Math.log10(fMHz)+77.2;
+const dBuV2dBm=(e,fMHz)=>e-20*Math.log10(fMHz)-77.2;
+function cellThrdBm(p){ const t=CELL_TECH[p.tech]; return t?t.thr:-105; }
+function methodOf(p){
+  if(p.type==="cell") return cellMethod(p)+" · P.838 rain · P.676 gases"+(p.indoor?" · P.2109 indoor":"");
+  if(p.type==="sky") return "ITU-R P.533-style sky wave (secant law, D-layer absorption)";
+  if(p.type==="inverse") return "Inverse-distance reference (ITU-R P.525 free space ×2)";
+  if(p.type==="custom") return "Your own formula";
+  const gw="ITU-R P.368-style ground wave (Sommerfeld–Norton"+(p.type==="gwflat"?", flat earth)":", curved earth)")+(p.path!=="uniform"?" + Millington mixed path":"");
+  return (p.f>=30?"Two-ray + ITU-R P.526 diffraction · ":"")+gw+(p.type==="combined"?" + P.533-style sky wave":"");
+}
 
 /* ================= STATE ================= */
 const COLORS=["#2f6fdf","#e0662f","#1f9e74","#b0429c","#c99a10","#6a5bd6","#d13b4f","#2a9bb5"];
-const TYPE_TAG={gwflat:"Ground (flat)",gw:"Ground wave",sky:"Sky wave",combined:"Ground + sky",inverse:"Ideal 1/d",custom:"Own formula"};
+const TYPE_TAG={gwflat:"Ground (flat)",gw:"Ground wave",sky:"Sky wave",combined:"Ground + sky",inverse:"Ideal 1/d",custom:"Own formula",cell:"Mobile"};
 const DEFAULT={type:"combined",f:1.0,P:50,ground:"land",sigmaC:0.005,erC:15,path:"uniform",ground2:"sea",coast:60,
   moisture:"normal",frozen:false,refr:"standard",storm:"none",time:"day",cosChi:null,solar:"medium",flare:false,gstorm:false,env:"rural",
-  expr:"300*sqrt(P)*A/d",htx:50,hrx:10,segs:null,rxDist:null,pathLabel:null};
+  expr:"300*sqrt(P)*A/d",htx:50,hrx:10,tech:"4g",indoor:false,segs:null,rxDist:null,pathLabel:null};
 let models=[], selId=null, nextId=1, colorIx=0, currentPreset=0;
 function mk(name,over){ return {id:nextId++,name,visible:true,color:COLORS[(colorIx++)%COLORS.length],p:Object.assign({},DEFAULT,over||{})}; }
 const $=id=>document.getElementById(id);
@@ -1052,6 +1241,7 @@ const PRESETS=[
   {label:"HF skip zone",goal:"See the skip zone at HF.",look:"The ground wave dies near the transmitter. There is a gap before the sky wave lands hundreds of km away.",models:[["10 MHz · day",{f:10,P:1,time:"day"}],["10 MHz · night",{f:10,P:1,time:"night"}]],range:"3000"},
   {label:"Solar flare",goal:"See how a solar flare blacks out HF.",look:"With the flare, D-layer absorption jumps and the sky-wave curve drops sharply.",models:[["7 MHz · quiet sun",{f:7,P:1}],["7 MHz · solar flare",{f:7,P:1,flare:true}]],range:"3000"},
   {label:"VHF & UHF",goal:"Compare line-of-sight VHF/UHF broadcasting with MW ground wave.",look:"FM (100 MHz) and TV (600 MHz) stay strong until the radio horizon set by the antenna heights, then drop fast. MW keeps going along the ground. The ducting model shows how warm, humid weather can stretch VHF range.",models:[["FM 100 MHz · 300 m mast",{type:"gw",f:100,P:10,htx:300,hrx:10}],["TV 600 MHz · 300 m mast",{type:"gw",f:600,P:50,htx:300,hrx:10}],["FM 100 MHz · ducting",{type:"gw",f:100,P:10,htx:300,hrx:10,refr:"super"}],["MW 1 MHz",{type:"gw",f:1,P:50}]],range:"300"},
+  {label:"2G · 3G · 4G · 5G",goal:"Compare mobile-network coverage from one tower (30 m mast, suburban, phone at 1.5 m).",look:"Lower frequencies reach further: 2G at 900 MHz covers the most ground and 5G mmWave at 28 GHz the least. Switch the weather to Thunderstorm to see rain attenuation (ITU-R P.838) hit mmWave hardest.",models:[["2G GSM 900",{type:"cell",tech:"2g",f:900,P:1,htx:30,hrx:1.5,env:"suburban"}],["3G UMTS 2100",{type:"cell",tech:"3g",f:2100,P:1,htx:30,hrx:1.5,env:"suburban"}],["4G LTE 1800",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,env:"suburban"}],["5G NR 3.5 GHz",{type:"cell",tech:"5g",f:3500,P:10,htx:30,hrx:1.5,env:"suburban"}],["5G mmWave 28 GHz",{type:"cell",tech:"5gmm",f:28000,P:3.16,htx:30,hrx:1.5,env:"suburban"}]],range:"30"},
   {label:"Build your own",goal:"Write your own propagation formula and test it against the built-in model.",look:"Edit the formula in Settings. If your curve stays close to the Norton curve, your formula captures the ground losses.",models:[["Norton (built in)",{type:"gw"}],["My formula",{type:"custom",expr:"300*sqrt(P)/d*exp(-0.004*d*pow(f,0.7))"}]]}
 ];
 const FREQS=[["LF 200 kHz",0.2],["MW 1 MHz",1],["MW 1.5 MHz",1.5],["HF 7 MHz",7],["HF 15 MHz",15],["VHF 100 MHz",100],["UHF 600 MHz",600]];
@@ -1076,8 +1266,24 @@ function refreshAll(){ renderPresets(); renderList(); syncControls(); renderGuid
 
 /* ================= FORMAT ================= */
 function fmtF(f){ if(f>=1000) return `${(f/1000).toFixed(2).replace(/\.?0+$/,"")} GHz`; return f<1?`${Math.round(f*1000)} kHz`:`${f.toFixed(f<10?2:1).replace(/\.?0+$/,"")} MHz`; }
-function band(f){ return f<0.3?"LF":f<3?"MF":f<30?"HF":f<300?"VHF":"UHF"; }
-function fmtP(P){ return P<1?`${(P*1000).toFixed(0)} W`:P<10?`${P.toFixed(1)} kW`:`${Math.round(P)} kW`; }
+function band(f){ return f<0.3?"LF":f<3?"MF":f<30?"HF":f<300?"VHF":f<3000?"UHF":"SHF"; }
+function fmtP(P){ return P>=1000?`${(P/1000).toFixed(P>=10000?0:1).replace(/\.0$/,"")} MW`:P<1?`${+(P*1000).toPrecision(3)} W`:P<10?`${P.toFixed(1)} kW`:`${Math.round(P)} kW`; }
+/* typical and maximum standard transmitter powers by service (broadcast: carrier/ERP; mobile: EIRP). Limits vary by country. */
+function powerPresets(p){
+  if(p.type==="cell"){ if(p.tech==="5g") return [["Small cell",0.01],["Macro, typical",10],["Max, massive MIMO",60]]; if(p.tech==="5gmm") return [["Small cell",0.1],["Typical",3.16],["Max, 75 dBm",31.6]]; return [["Small cell",0.01],["Macro, typical",1],["Max macro",4]]; }
+  const f=p.f;
+  if(f<0.3) return [["Local",10],["Typical LW",500],["Max LW",2000]];
+  if(f<3) return [["Local",1],["Regional",50],["National",300],["Max MW",2000]];
+  if(f<30) return [["Amateur",0.4],["Typical SW",100],["Max SW",500]];
+  if(f<300) return [["Community",0.1],["Typical FM",10],["Max FM ERP",100]];
+  if(f<3000) return [["Low power",1],["Typical TV",100],["Max TV ERP",1000]];
+  return [["Typical",1],["High",10],["Max",60]];
+}
+function renderPowChips(boxId,p,onPick){
+  const box=$(boxId); if(!box) return; const list=powerPresets(p);
+  box.innerHTML=list.map(([l,kW])=>`<button type="button" class="chip" data-kw="${kW}" aria-pressed="${Math.abs(p.P-kW)/kW<0.02}" title="${fmtP(kW)}${p.type==="cell"?" EIRP = "+dBm(kW).toFixed(0)+" dBm":""}">${l} · ${fmtP(kW)}</button>`).join("");
+  box.querySelectorAll(".chip").forEach(b=>b.onclick=()=>onPick(+b.dataset.kw));
+}
 function fmtD(d){ return d<10?d.toFixed(1):d<100?d.toFixed(0):String(Math.round(d/5)*5); }
 function fmtField(dB){ if(dB===null||!isFinite(dB)) return "—"; const mV=mVfromdB(dB);
   if(mV>=1000) return (mV/1000).toFixed(mV>=10000?0:1)+" V/m";
@@ -1103,7 +1309,7 @@ function fillGroundSelects(){
 function renderPresets(){
   const box=$("presets"); box.innerHTML="";
   PRESETS.forEach((ps,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=ps.label;
-    b.setAttribute("aria-pressed",String(i===currentPreset)); b.addEventListener("click",()=>loadPreset(i)); box.appendChild(b); });
+    b.setAttribute("aria-pressed",String(i===currentPreset)); b.addEventListener("click",()=>{ loadPreset(i); $("yunit").value=PRESETS[i].models.every(([,o])=>o.type==="cell")?"dbm":($("yunit").value==="dbm"?"mv":$("yunit").value); redraw(); }); box.appendChild(b); });
 }
 function renderGuide(){
   const g=$("guide"), b=$("gNext");
@@ -1149,9 +1355,13 @@ function syncControls(){
 function updateLabels(){
   const m=sel(); if(!m) return; const p=m.p;
   $("freqV").textContent=`${fmtF(p.f)} · ${band(p.f)}`;
-  $("powV").textContent=fmtP(p.P);
+  $("powV").textContent=fmtP(p.P)+(p.type==="cell"?` · ${dBm(p.P).toFixed(0)} dBm EIRP`:"");
+  renderPowChips("powChips",p,kW=>{ const m=sel(); m.p.P=kW; $("pow").value=Math.log10(kW); currentPreset=-1; updateLabels(); renderList(); redraw(); if(typeof syncAnimControls==="function"){ AN.gwKey=""; AN.anaKey=""; syncAnimControls(); } });
   $("coastV").textContent=`${p.coast} km`;
   $("exprBox").hidden=p.type!=="custom";
+  $("cellBox").hidden=p.type!=="cell"; $("indoor").checked=!!p.indoor;
+  document.querySelectorAll("#cellChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(p.type==="cell"&&b.dataset.k===p.tech)));
+  $("methodV").textContent=methodOf(p);
   $("customGround").hidden=!(p.ground==="custom"||(p.ground2==="custom"&&p.path==="mixed"));
   $("mixedBox").hidden=p.path!=="mixed";
   $("path").querySelector("option[value=geo]").disabled=p.path!=="geo";
@@ -1169,6 +1379,8 @@ function updateLabels(){
 function bindLab(){
   const set=(obj)=>{ const m=sel(); if(!m) return; Object.assign(m.p,obj); currentPreset=-1; renderPresets(); renderGuide(); updateLabels(); renderList(); redraw(); syncModelSelects(); if(typeof syncAnimControls==="function"){ AN.gwKey=""; AN.anaKey=""; syncAnimControls(); } };
   const fc=$("freqChips"); FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f; b.onclick=()=>{ set({f}); $("freq").value=Math.log10(f); }; fc.appendChild(b); });
+  const cc=$("cellChips"); Object.entries(CELL_TECH).forEach(([k,t])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=k; b.textContent=t.name; b.onclick=()=>{ set({type:"cell",tech:k,f:t.f,P:t.P,htx:30,hrx:1.5,env:sel().p.env==="rural"?"rural":sel().p.env}); $("range").value="30"; $("yunit").value="dbm"; syncControls(); redraw(); }; cc.appendChild(b); });
+  $("indoor").addEventListener("change",e=>set({indoor:e.target.checked}));
   const wc=$("wxChips"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>{ set(Object.assign({},w.set)); syncControls(); }; wc.appendChild(b); });
   $("type").addEventListener("change",e=>set({type:e.target.value}));
   $("expr").addEventListener("input",e=>set({expr:e.target.value.trim()||"0"}));
@@ -1203,8 +1415,8 @@ let chartGeom=null, curveCache=[];
 function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; }
 function computeCurves(){
-  const dmax=+$("range").value, N=320, lg=$("xscale").value==="log", ds=[];
-  for(let i=0;i<N;i++) ds.push(lg?Math.pow(10,Math.log10(dmax)*i/(N-1)):Math.max(1,dmax*i/(N-1)));
+  const dmax=+$("range").value, N=320, lg=$("xscale").value==="log", ds=[], dmin=dmax<=100?0.1:1;
+  for(let i=0;i<N;i++) ds.push(lg?dmin*Math.pow(dmax/dmin,i/(N-1)):Math.max(dmin,dmax*i/(N-1)));
   curveCache=models.map(m=>{ const io=iono(m.p); return {m,io,thr:dBuV(threshold(m.p)),pts:ds.map(d=>Object.assign({d},evalP(m.p,d,io)))}; });
   return {dmax,lg};
 }
@@ -1212,21 +1424,24 @@ const Y_MV={"-20":"0.1 µV/m","0":"1 µV/m","20":"10 µV/m","40":"100 µV/m","60
 function drawChart(hoverX){
   const W=chart.clientWidth, H=chart.clientHeight; if(!W) return;
   const dpr=window.devicePixelRatio||1; chart.width=W*dpr; chart.height=H*dpr; cctx.setTransform(dpr,0,0,dpr,0,0);
-  const {dmax,lg}=computeCurves(); const mvMode=$("yunit").value==="mv";
-  const L=mvMode?74:52,R=14,T=12,B=40,w=W-L-R,h=H-T-B, ymin=-20,ymax=130;
-  const xs=d=>lg?L+Math.log10(Math.max(d,1))/Math.log10(dmax)*w:L+d/dmax*w;
+  const {dmax,lg}=computeCurves(); const unit=$("yunit").value, mvMode=unit==="mv", dbmMode=unit==="dbm";
+  const cv=(v,m)=>v===null||!isFinite(v)?v:(dbmMode?v-20*Math.log10(m.p.f)-77.2:v);
+  const L=mvMode?74:58,R=14,T=12,B=40,w=W-L-R,h=H-T-B, ymin=dbmMode?-150:-20,ymax=dbmMode?0:130;
+  const dmin=dmax<=100?0.1:1;
+  const xs=d=>lg?L+Math.log10(Math.max(d,dmin)/dmin)/Math.log10(dmax/dmin)*w:L+d/dmax*w;
   const ys=v=>T+(ymax-clamp(v,ymin-50,ymax+50))/(ymax-ymin)*h;
-  chartGeom={L,w,T,h,lg,dmax};
+  chartGeom={L,w,T,h,lg,dmax,dmin};
   const muted=cssVar("--muted"), line=cssVar("--line");
   cctx.clearRect(0,0,W,H); cctx.font="12px "+cssVar("--font-mono");
   cctx.strokeStyle=line; cctx.lineWidth=1; cctx.fillStyle=muted; cctx.textAlign="right"; cctx.textBaseline="middle";
-  for(let v=ymin;v<=120;v+=20){ const y=ys(v); cctx.beginPath(); cctx.moveTo(L,y); cctx.lineTo(L+w,y); cctx.stroke(); cctx.fillText(mvMode?Y_MV[v]:v,L-6,y); }
+  for(let v=ymin;v<=(dbmMode?-10:120);v+=20){ const y=ys(v); cctx.beginPath(); cctx.moveTo(L,y); cctx.lineTo(L+w,y); cctx.stroke(); cctx.fillText(mvMode?Y_MV[v]:dbmMode?v+" dBm":v,L-6,y); }
   cctx.textAlign="center"; cctx.textBaseline="top";
-  const xt=lg?[1,2,5,10,20,50,100,200,500,1000,2000,3000].filter(d=>d<=dmax):Array.from({length:7},(_,i)=>Math.round(dmax*i/6));
+  const xt=lg?[0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000,2000,3000].filter(d=>d<=dmax&&d>=dmin):Array.from({length:7},(_,i)=>Math.round(dmax*i/6));
   for(const d of xt){ const x=xs(d); cctx.beginPath(); cctx.moveTo(x,T); cctx.lineTo(x,T+h); cctx.stroke(); cctx.fillText(d,x,T+h+5); }
   cctx.font="12px "+cssVar("--font-body"); cctx.fillText("Distance from transmitter (km)",L+w/2,T+h+22);
-  if(!mvMode){ cctx.save(); cctx.translate(12,T+h/2); cctx.rotate(-Math.PI/2); cctx.fillText("dBµV/m",0,-6); cctx.restore(); }
+  if(!mvMode){ cctx.save(); cctx.translate(12,T+h/2); cctx.rotate(-Math.PI/2); cctx.fillText(dbmMode?"Received power (dBm, isotropic antenna)":"dBµV/m",0,-6); cctx.restore(); }
   cctx.save(); cctx.beginPath(); cctx.rect(L,T,w,h); cctx.clip();
+  if(dbmMode) curveCache.forEach(c=>{ c.thr=cv(c.thr,c.m); c.pts=c.pts.map(pt=>({d:pt.d,g:cv(pt.g,c.m),s:cv(pt.s,c.m),t:cv(pt.t,c.m)})); });
   const s=curveCache.find(c=>c.m.id===selId);
   if(s && s.m.visible && s.m.p.type==="combined"){
     cctx.fillStyle=hexA(s.m.color,0.13); let inZ=false,x0=0;
@@ -1240,7 +1455,7 @@ function drawChart(hoverX){
   if(s&&s.m.visible&&s.m.p.type==="combined"){ plot(s.pts,"g",s.m.color,1.3,[6,4],0.85); plot(s.pts,"s",s.m.color,1.3,[1.5,3],0.85); }
   for(const c of curveCache){ if(c.m.visible) plot(c.pts,"t",c.m.color,c.m.id===selId?3:1.8,[],c.m.id===selId?1:0.75); }
   if(s&&s.m.visible){ const r=serviceRadius(s.m); if(r&&r<dmax){ const x=xs(r),y=ys(s.thr); cctx.fillStyle=s.m.color; cctx.beginPath(); cctx.arc(x,y,5.5,0,7); cctx.fill(); cctx.strokeStyle=cssVar("--panel"); cctx.lineWidth=2; cctx.stroke(); } }
-  for(const c of curveCache){ const rd=c.m.p.rxDist; if(c.m.visible&&rd&&rd<=dmax){ const v=evalRx(c.m.p,c.io).t; if(v!==null){ const x=xs(rd),y=ys(v); cctx.fillStyle=c.m.color; cctx.font="600 11px "+cssVar("--font-body"); cctx.textAlign="center"; cctx.textBaseline="bottom"; cctx.fillText("📻 receiver",x,y-8); cctx.beginPath(); cctx.moveTo(x-5,y-5); cctx.lineTo(x+5,y-5); cctx.lineTo(x,y); cctx.fill(); } } }
+  for(const c of curveCache){ const rd=c.m.p.rxDist; if(c.m.visible&&rd&&rd<=dmax){ const v=cv(evalRx(c.m.p,c.io).t,c.m); if(v!==null){ const x=xs(rd),y=ys(v); cctx.fillStyle=c.m.color; cctx.font="600 11px "+cssVar("--font-body"); cctx.textAlign="center"; cctx.textBaseline="bottom"; cctx.fillText("📻 receiver",x,y-8); cctx.beginPath(); cctx.moveTo(x-5,y-5); cctx.lineTo(x+5,y-5); cctx.lineTo(x,y); cctx.fill(); } } }
   if(hoverX!==undefined){ cctx.strokeStyle=muted; cctx.lineWidth=1; cctx.beginPath(); cctx.moveTo(hoverX,T); cctx.lineTo(hoverX,T+h); cctx.stroke(); }
   cctx.restore();
   drawLegend();
@@ -1254,11 +1469,11 @@ function drawLegend(){
 chart.addEventListener("mousemove",e=>{
   if(!chartGeom) return; const r=chart.getBoundingClientRect(), x=e.clientX-r.left; const {L,w,lg,dmax}=chartGeom;
   if(x<L||x>L+w){ $("tip").style.display="none"; drawChart(); return; }
-  const fr=(x-L)/w, d=lg?Math.pow(10,fr*Math.log10(dmax)):Math.max(1,fr*dmax);
+  const dmin=chartGeom.dmin||1, fr=(x-L)/w, d=lg?dmin*Math.pow(dmax/dmin,fr):Math.max(dmin,fr*dmax);
   drawChart(x);
   let html=`<div class="mono" style="margin-bottom:3px"><b>${fmtD(d)} km</b></div>`;
   for(const m of models){ if(!m.visible) continue; const io=iono(m.p), v=evalP(m.p,d,io).t, ok=v!==null&&v>=dBuV(threshold(m.p));
-    html+=`<div class="r"><span><span class="sw9" style="background:${m.color}"></span>${esc(m.name)}</span><span class="mono" style="color:${ok?"var(--ink)":"var(--muted)"}">${fmtField(v)}</span></div>`; }
+    html+=`<div class="r"><span><span class="sw9" style="background:${m.color}"></span>${esc(m.name)}</span><span class="mono" style="color:${ok?"var(--ink)":"var(--muted)"}">${m.p.type==="cell"&&v!==null?dBuV2dBm(v,m.p.f).toFixed(0)+" dBm":fmtField(v)}</span></div>`; }
   const tip=$("tip"); tip.innerHTML=html; tip.style.display="block"; const tw=tip.offsetWidth; tip.style.left=(x+14+tw>r.width?x-tw-14:x+14)+"px"; tip.style.top="16px";
 });
 chart.addEventListener("mouseleave",()=>{ $("tip").style.display="none"; drawChart(); });
@@ -1268,7 +1483,8 @@ function scan(p,fn,max=3000,n=500){ const io=iono(p); const out=[]; for(let i=0;
 function serviceRadius(m){
   const p=m.p, thr=dBuV(threshold(p)), io=iono(p);
   if(p.type==="sky") return null;
-  for(let i=0;i<=500;i++){ const d=Math.pow(10,i/500*Math.log10(3000)); const r=evalP(p,d,io); const v=p.type==="combined"?r.g:r.t;
+  const d0=p.type==="cell"?0.02:1;
+  for(let i=0;i<=500;i++){ const d=d0*Math.pow(3000/d0,i/500); const r=evalP(p,d,io); const v=p.type==="combined"?r.g:r.t;
     if(v===null||v<thr) return i===0?0:d; }
   return 3000;
 }
@@ -1291,9 +1507,10 @@ function readouts(){
   const tiles=[]; const sent=[];
   const thrTxt=fmtField(A.thr);
   if(p.type!=="sky"){
-    const rv=A.r===null?"—":A.r>=3000?"> 3000 km":`${fmtD(A.r)} km`;
-    tiles.push({k:"Reliable coverage",tip:"Distance out to which the ground wave (or, at VHF/UHF, the line-of-sight wave) stays above the minimum usable signal.",val:rv,sub:p.f>=30?"line-of-sight coverage":"ground-wave service radius",cls:A.r<20?"bad":A.r<80?"warn":"good"});
-    sent.push(A.r>=3000?`The signal stays usable beyond 3000 km.`:`Listeners get reliable ${p.f>=30?"line-of-sight":"ground-wave"} reception out to about <b>${fmtD(A.r)} km</b>.`);
+    const rv=A.r===null?"—":A.r>=3000?"> 3000 km":A.r<1?`${Math.round(A.r*1000)} m`:`${fmtD(A.r)} km`;
+    tiles.push({k:"Reliable coverage",tip:"Distance out to which the ground wave (or, at VHF/UHF, the line-of-sight wave) stays above the minimum usable signal.",val:rv,sub:p.f>=30?"line-of-sight coverage":"ground-wave service radius",cls:p.type==="cell"?(A.r>=3?"good":A.r>=1?"warn":"bad"):(A.r<20?"bad":A.r<80?"warn":"good")});
+    if(p.type==="cell") sent.push(`Phones ${p.indoor?"indoors":"outdoors"} get a usable ${CELL_TECH[p.tech]?CELL_TECH[p.tech].sys:""} signal out to about <b>${A.r<1?Math.round(A.r*1000)+" m":fmtD(A.r)+" km"}</b> from the tower.`);
+    else sent.push(A.r>=3000?`The signal stays usable beyond 3000 km.`:`Listeners get reliable ${p.f>=30?"line-of-sight":"ground-wave"} reception out to about <b>${fmtD(A.r)} km</b>.`);
   }
   if(p.type==="sky"||p.type==="combined"){
     tiles.push({k:"Sky-wave reach",tip:"Distances where the reflected sky wave is above the minimum usable signal (median value; it fades).",val:A.sky?`${fmtD(A.sky.a)}–${fmtD(A.sky.b)} km`:"none",sub:A.sky?"usable but fades":"absorbed or not returning",cls:A.sky?"info":"bad"});
@@ -1303,7 +1520,9 @@ function readouts(){
     if(p.type==="combined"){ tiles.push({k:"Fading zone",tip:"Ground and sky wave arrive within 6 dB of each other and interfere, so the signal swells and fades.",val:A.fade?`${fmtD(A.fade.a)}–${fmtD(A.fade.b)} km`:"none",sub:A.fade?"expect fading & distortion":"one wave always dominates",cls:A.fade?"warn":"good"});
       if(A.fade) sent.push(`Expect <b>fading</b> between about ${fmtD(A.fade.a)} and ${fmtD(A.fade.b)} km.`); }
   }
-  tiles.push({k:"Signal needed",tip:"Minimum usable field strength. It rises with man-made noise, thunderstorms, night-time static and lower frequency.",val:thrTxt,sub:`${A.thr.toFixed(0)} dBµV/m · ${p.env}${p.storm!=="none"?" + storms":""}`,cls:"info"});
+  if(p.type==="cell"){ const r1=cellRxdBm(1,p); tiles.push({k:"Signal at 1 km",tip:"Received power at a phone 1 km from the tower (isotropic antenna), after path, rain, gas and building-entry losses.",val:`${r1.toFixed(0)} dBm`,sub:r1>-80?"excellent":r1>-95?"good":r1>cellThrdBm(p)?"fair":"poor",cls:r1>-95?"good":r1>cellThrdBm(p)?"warn":"bad"});
+    if(rainRate(p)&&p.f>=1000) tiles.push({k:"Rain loss @ 5 km",tip:"ITU-R P.838 specific attenuation with an effective path-length reduction.",val:`${rainLoss(5,p).toFixed(1)} dB`,sub:`${rainRate(p)} mm/h rain`,cls:rainLoss(5,p)>6?"bad":"warn"}); }
+  tiles.push({k:"Signal needed",tip:p.type==="cell"?"Typical cell-edge level for this technology (outdoor, teaching estimate).":"Minimum usable field strength. It rises with man-made noise, thunderstorms, night-time static and lower frequency.",val:p.type==="cell"?`${cellThrdBm(p)} dBm`:thrTxt,sub:`${A.thr.toFixed(0)} dBµV/m · ${p.env}${p.storm!=="none"?" + storms":""}`,cls:"info"});
   if(p.rxDist){ const v=evalRx(p,A.io).t; const ok=v!==null&&v>=A.thr; tiles.unshift({k:"At your receiver",tip:"Predicted total field at the receiver placed on the map, including the terrain shadowing estimate.",val:fmtField(v),sub:`${fmtD(p.rxDist)} km${p.terrainLossDb?` · terrain −${p.terrainLossDb.toFixed(1)} dB`:""} · ${ok?"usable":"below minimum"}`,cls:ok?"good":"bad"});
     sent.unshift(`At the receiver (${fmtD(p.rxDist)} km away) the predicted signal is <b>${fmtField(v)}</b>, ${ok?"which is enough for reception":"which is below the minimum usable level"}.`); }
   $("selName").textContent=`${m.name} · ${fmtF(p.f)} · ${fmtP(p.P)} · ${timeLabel(p)}`;
@@ -1366,14 +1585,15 @@ function animModel(){ return models.find(m=>m.id===AN.id)||sel(); }
 function animParams(){ const m=animModel(); return Object.assign({},m.p,{cosChi:cosFromHour(AN.hour)}); }
 function resetView(){ const span=+$("animRange").value; AN.view={d0:-span*0.03,span}; syncRx(); }
 /* ---- quick settings: edit the animated model directly ---- */
-const A_FREQS=[["LF 200k",0.2],["MW 1M",1],["HF 7M",7],["HF 15M",15],["VHF 100M",100],["UHF 600M",600]];
+const A_FREQS=[["LF 200k",0.2],["MW 1M",1],["HF 7M",7],["HF 15M",15],["VHF 100M",100],["UHF 600M",600],["4G 1.8G",1800],["5G 3.5G",3500]];
 function syncAnimControls(){
   const m=animModel(); if(!m) return; const p=m.p;
   $("qsModel").textContent=m.name;
-  document.querySelectorAll('input[name="aType"]').forEach(r=>r.checked=(r.value===p.type||(r.value==="gw"&&p.type==="gwflat")));
+  document.querySelectorAll('input[name="aType"]').forEach(r=>r.checked=(r.value===p.type||(r.value==="gw"&&(p.type==="gwflat"||p.type==="cell"))));
   $("aFreq").value=Math.log10(p.f); $("aFreqV").textContent=`${fmtF(p.f)} · ${band(p.f)}`;
   document.querySelectorAll("#aFreqChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(Math.abs(+b.dataset.f-p.f)<1e-6)));
   $("aPow").value=Math.log10(p.P); $("aPowV").textContent=fmtP(p.P);
+  renderPowChips("aPowChips",p,kW=>animSet({P:kW}));
   $("aGround").value=p.ground; $("aGround").disabled=p.path==="geo";
   $("aGround").title=p.path==="geo"?"This path comes from the map; its land and sea sections are fixed.":"";
   const wk=weatherKey(p); document.querySelectorAll("#aWx .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===wk)));
@@ -1381,11 +1601,12 @@ function syncAnimControls(){
 function animSet(obj,autoRange){
   const m=animModel(); if(!m) return; const oldBand=band(m.p.f); Object.assign(m.p,obj);
   AN.gwKey=""; AN.anaKey=""; AN.scope=[];
-  if(autoRange&&band(m.p.f)!==oldBand&&!m.p.rxDist){ const span=m.p.f>=30?300:m.p.f>3?3000:1000; $("animRange").value=String(span); resetView(); }
+  if(autoRange&&band(m.p.f)!==oldBand&&!m.p.rxDist){ const span=m.p.type==="cell"?30:m.p.f>=30?300:m.p.f>3?3000:1000; $("animRange").value=String(span); resetView(); }
   syncAnimControls(); if(m.id===selId){ syncControls(); } renderList();
 }
 function bindAnimQuick(){
-  const fc=$("aFreqChips"); A_FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f; b.onclick=()=>animSet({f},true); fc.appendChild(b); });
+  const fc=$("aFreqChips"); A_FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f;
+    b.onclick=()=>{ if(f===1800) animSet({type:"cell",tech:"4g",f,P:1,htx:30,hrx:1.5},true); else if(f===3500) animSet({type:"cell",tech:"5g",f,P:10,htx:30,hrx:1.5},true); else animSet({f,type:animModel().p.type==="cell"?"combined":animModel().p.type},true); }; fc.appendChild(b); });
   const wc=$("aWx"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.title=w.label; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>animSet(Object.assign({},w.set)); wc.appendChild(b); });
   document.querySelectorAll('input[name="aType"]').forEach(r=>r.addEventListener("change",e=>animSet({type:e.target.value})));
   $("aFreq").addEventListener("input",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)}));
@@ -1396,7 +1617,7 @@ function bindAnimQuick(){
 function setAnimModel(id){ AN.id=id; const m=animModel(); AN.hour=hourFromCos(cosChiOf(m.p)); $("hour").value=AN.hour;
   let span=+$("animRange").value;
   if(m.p.rxDist){ AN.rx=m.p.rxDist; span=m.p.rxDist>900?3000:m.p.rxDist>280?1000:300; }
-  else if(m.p.f>=30) span=300; else if(m.p.f>3) span=3000;
+  else if(m.p.type==="cell") span=30; else if(m.p.f>=30) span=300; else if(m.p.f>3) span=3000;
   $("animRange").value=String(span); resetView(); AN.scope=[]; AN.gwKey=""; AN.anaKey=""; syncAnimControls(); }
 function syncRx(){ const max=Math.max(+$("animRange").value, AN.view.d0+AN.view.span); $("rxSlider").max=Math.round(max); AN.rx=clamp(AN.rx,1,max); $("rxSlider").value=AN.rx; }
 function syncModelSelects(){
@@ -1443,6 +1664,27 @@ function bindAnim(){
   const zoomAt=(f,x)=>{ const g=AN.geom; if(!g) return; const W=anim.clientWidth; x=x??W/2;
     const frac=clamp((x-g.x0)/(g.x1-g.x0),0,1), dAt=AN.view.d0+frac*AN.view.span;
     const ns=clamp(AN.view.span*f,10,4000); AN.view.span=ns; AN.view.d0=clamp(dAt-frac*ns,-ns*0.1,4000-ns*0.3); syncRx(); };
+  // full screen (falls back to an expanded view where the Fullscreen API is blocked)
+  const stage=document.querySelector("#animation .stage");
+  const isFull=()=>document.fullscreenElement===stage||stage.classList.contains("is-expanded");
+  const setFullIcon=()=>{ const b=$("aFull"); const on=isFull(); b.textContent=on?"⤡":"⛶"; b.setAttribute("aria-label",on?"Exit full screen":"Full screen"); b.title=on?"Exit full screen (Esc)":"Full screen (F)"; };
+  const toggleFull=async()=>{
+    if(isFull()){ if(document.fullscreenElement) await document.exitFullscreen().catch(()=>{}); stage.classList.remove("is-expanded"); setFullIcon(); return; }
+    try{ if(stage.requestFullscreen) await stage.requestFullscreen(); else throw 0; }catch(e){ stage.classList.add("is-expanded"); }
+    setFullIcon(); };
+  $("aFull").addEventListener("click",toggleFull);
+  // full-screen control bar
+  const ff=$("fsFreq"); ff.innerHTML=A_FREQS.map(([l,f])=>`<option value="${f}">${l}Hz</option>`).join("");
+  ff.addEventListener("change",e=>animSet({f:+e.target.value},true));
+  $("fsPlay").addEventListener("click",()=>setPlaying(!AN.playing));
+  $("fsHour").addEventListener("input",e=>{ AN.hour=+e.target.value; $("hour").value=AN.hour; AN.cycle=false; $("cycle").checked=false; });
+  $("fsLabels").addEventListener("change",e=>{ AN.labels=e.target.checked; $("explainT").checked=AN.labels; });
+  $("fsExit").addEventListener("click",()=>{ if(isFull()) toggleFull(); });
+  document.addEventListener("fullscreenchange",setFullIcon);
+  document.addEventListener("keydown",e=>{ if(currentTab!=="animation"||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    if(e.key==="f"||e.key==="F"){ e.preventDefault(); toggleFull(); }
+    if(e.key==="Escape"&&stage.classList.contains("is-expanded")){ stage.classList.remove("is-expanded"); setFullIcon(); }
+    if(e.key===" "&&document.activeElement===document.body){ e.preventDefault(); setPlaying(!AN.playing); } });
   $("aZoomIn").onclick=()=>zoomAt(0.6); $("aZoomOut").onclick=()=>zoomAt(1/0.6); $("aReset").onclick=resetView;
   anim.addEventListener("wheel",e=>{ e.preventDefault(); const r=anim.getBoundingClientRect(); zoomAt(e.deltaY<0?0.8:1.25,e.clientX-r.left); },{passive:false});
   const pos=e=>{ const r=anim.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
@@ -1615,7 +1857,7 @@ function drawAnim(dt){
     const r=AN.svc; if(r&&r<d0+span*1.05&&r>d0){ const [xr,y]=map(r/RE,0); c.strokeStyle="rgba(255,255,255,.85)"; c.setLineDash([3,3]); c.lineWidth=1.2; c.beginPath(); c.moveTo(xr,y); c.lineTo(xr,y-80); c.stroke(); c.setLineDash([]);
       pill(c,`${p.f>=30?"Coverage":"Ground-wave"} limit ${fmtD(r)} km`,xr,y-92,{accent:SC.gw}); }
     if(AN.labels&&!TR){ const dl=clamp((r||span)*0.35,d0+span*0.1,d0+span*0.45); const q=AN.gw[Math.min(300,Math.max(0,Math.round((dl-d0)/(span*1.12)*300)))]; const [gx,gy]=map(dl/RE,0);
-      pill(c,p.f>=30?"Space wave: direct + reflected, line of sight":"Ground wave: follows the curve, fades with distance",gx+30,gy-amp(q.v)-78,{to:[gx,gy-amp(q.v)*0.6],accent:SC.gw}); }
+      pill(c,p.type==="cell"?`${(CELL_TECH[p.tech]||{}).name||"Mobile"}: ${cellMethod(p)}`:p.f>=30?"Space wave: direct + reflected, line of sight":"Ground wave: follows the curve, fades with distance",gx+30,gy-amp(q.v)-78,{to:[gx,gy-amp(q.v)*0.6],accent:SC.gw}); }
     c.globalAlpha=1;
   }
 
@@ -1695,6 +1937,8 @@ function updateMeter(p,io,thr,dt){
   const qe=$("quality"); qe.textContent=q; qe.style.color=cls;
   const hh=Math.floor(AN.hour)%24, mm=Math.floor((AN.hour%1)*60);
   $("clock").textContent=`${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
+  $("fsClock").textContent=$("clock").textContent; $("fsHour").value=AN.hour; $("fsPlay").textContent=AN.playing?"❚❚ Pause":"▶ Play";
+  { const f=animModel()&&animModel().p.f; const ff=$("fsFreq"); if(!ff.querySelector(`option[value="${f}"]`)){ ff.querySelectorAll("option.custom").forEach(o=>o.remove()); const o=document.createElement("option"); o.value=f; o.className="custom"; o.textContent=fmtF(f); ff.appendChild(o); } ff.value=String(f); }
   const ph=phaseOf(cosFromHour(AN.hour)); const pe=$("phase"); pe.textContent={day:"Day",dusk:"Dawn / dusk",night:"Night"}[ph]; pe.className="pill "+(ph==="day"?"info":ph==="dusk"?"warn":"bad");
   drawScope(thr);
 }
@@ -1856,8 +2100,20 @@ function terrainAnalyse(P,elev,txH,rxH,f,manual,extras){
   }
   const inner=e.slice(1,-1).sort((a,b)=>a-b);
   const pct=q=>inner.length?inner[Math.floor(q*(inner.length-1))]:0;
-  const loss=best.o?(f>=30?J(best.nu):(best.nu>0?Math.max(0,J(best.nu)-J(0)):0)):0;
-  return {d,e,txE:e[0],rxE:e[n-1],nu:best.nu,ob:best.o,obst:best.o&&best.o.kind==="terrain"?best.o.i:-1,loss,los,dh:pct(0.9)-pct(0.1),maxE:Math.max(...e),manual:!!manual,txH,rxH,buildings:extras||[]};
+  let loss=best.o?(f>=30?J(best.nu):(best.nu>0?Math.max(0,J(best.nu)-J(0)):0)):0, edges=best.o&&loss>0.05?[{o:best.o,nu:best.nu,role:"main"}]:[];
+  // VHF and above: ITU-R P.526 Deygout method (principal edge + one secondary edge each side)
+  if(f>=30&&best.o&&best.nu>-0.78){
+    const pts=obs.filter(o=>!o.skip).map(o=>({dm:o.dm,h:o.top+o.dm*(D-o.dm)/(2*Re),o}));
+    const gap=Math.max(2000,0.05*D); // a secondary edge must be a separate obstacle, not the flank of the main one
+    const sub=(x0,h0,x1,h1)=>{ let b=null; const L=x1-x0; for(const q of pts){ if(q.dm<=x0+gap||q.dm>=x1-gap) continue; const a=q.dm-x0, bb=x1-q.dm; const c=q.h-(h0+(h1-h0)*a/L); const nu=c*Math.sqrt(2*L/(lam*a*bb)); if(!b||nu>b.nu) b={nu,q}; } return b; };
+    const P0=pts.find(q=>q.o===best.o)||{dm:best.o.dm,h:best.o.top};
+    const tL=sub(0,tA,P0.dm,P0.h), tR=sub(P0.dm,P0.h,D,tB);
+    const Jp=J(best.nu), Jt=tL&&tL.nu>-0.78?J(tL.nu):0, Jr=tR&&tR.nu>-0.78?J(tR.nu):0;
+    const T=1-Math.exp(-Jp/6), C=8+0.04*(D/1000);
+    loss = (Jt||Jr) ? Jp+T*(Jt+Jr+C) : Jp;
+    if(Jt) edges.push({o:tL.q.o,nu:tL.nu,role:"secondary"}); if(Jr) edges.push({o:tR.q.o,nu:tR.nu,role:"secondary"});
+  }
+  return {d,e,edges,method:f>=30?"ITU-R P.526 Deygout (multiple knife-edge)":"ITU-R P.526 single knife-edge above the ground-level line",txE:e[0],rxE:e[n-1],nu:best.nu,ob:best.o,obst:best.o&&best.o.kind==="terrain"?best.o.i:-1,loss,los,dh:pct(0.9)-pct(0.1),maxE:Math.max(...e),manual:!!manual,txH,rxH,buildings:extras||[]};
 }
 /* ===== OpenStreetMap features near the path: buildings (with heights) and named peaks, via the Overpass API ===== */
 const OSMF={cache:new Map(),ok:null};
@@ -1941,6 +2197,25 @@ function coverage(){
   const r=p.type==="sky"?null:serviceRadius({p});
   MP.cover={sig,r,ring:r?Array.from({length:73},(_,i)=>destPoint(MP.tx,i*5,Math.min(r,3000))):null};
   return MP.cover;
+}
+
+/* ===== nearest mobile towers mapped in OpenStreetMap (Overpass) ===== */
+async function findTowers(pt,radiusM){
+  const q=`[out:json][timeout:25];(node["man_made"~"^(mast|tower|antenna)$"]["tower:type"~"communication"](around:${radiusM},${pt.lat},${pt.lon});way["man_made"~"^(mast|tower)$"]["tower:type"~"communication"](around:${radiusM},${pt.lat},${pt.lon});node["communication:mobile_phone"~"yes"](around:${radiusM},${pt.lat},${pt.lon});node["man_made"="mast"](around:${radiusM},${pt.lat},${pt.lon}););out center tags 60;`;
+  const EPS=["https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter","https://maps.mail.ru/osm/tools/overpass/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+  for(const ep of EPS){
+    try{ const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),15000);
+      const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ctl.signal}); clearTimeout(to);
+      if(!r.ok) continue; const j=await r.json(); const seen=new Set(), out=[];
+      for(const el of j.elements||[]){ const lat=el.lat??(el.center&&el.center.lat), lon=el.lon??(el.center&&el.center.lon); if(lat==null) continue; const key=lat.toFixed(4)+","+lon.toFixed(4); if(seen.has(key)) continue; seen.add(key);
+        const t=el.tags||{}; const h=parseFloat(t.height)||parseFloat(t["tower:height"])||30;
+        const op=t.operator||t["communication:mobile_phone:operator"]||t.brand||""; const nm=t.name||(op?op+" tower":"Mobile tower");
+        const mobile=/yes/.test(t["communication:mobile_phone"]||"")||/communication/.test(t["tower:type"]||"");
+        out.push({name:nm,lat,lon,h:clamp(h,5,300),mobile,op,dist:hav(pt,{lat,lon})}); }
+      out.sort((a,b)=>(b.mobile-a.mobile)||(a.dist-b.dist)); return out;
+    }catch(e){}
+  }
+  return null;
 }
 
 /* drawing: Web Mercator view with OpenStreetMap tiles (falls back to vector outlines) */
@@ -2044,11 +2319,13 @@ function drawMap(){
     const tri=(x,y,col,s)=>{ c.fillStyle=col; c.strokeStyle="#fff"; c.lineWidth=1.5; c.beginPath(); c.moveTo(x,y-s); c.lineTo(x-s*0.9,y+s*0.6); c.lineTo(x+s*0.9,y+s*0.6); c.closePath(); c.fill(); c.stroke(); };
     // named peaks near the path (skip the one already labelled as the main obstacle)
     const obXY=T.ob&&T.loss>0.05?(q=>proj(q.lon,q.lat))(gcPoint(MP.tx,MP.rx,clamp(T.ob.dm/D,0,1))):null;
-    if(T.osm&&T.osm.peaks){ const shown=obXY?[obXY]:[]; T.osm.peaks.filter(k=>k.xt<4000&&k.lat!=null).sort((a,b)=>(b.ele||0)-(a.ele||0)).slice(0,10).forEach(k=>{ const [x,y]=proj(k.lon,k.lat); if(x<0||y<0||x>W||y>H||shown.some(([sx,sy])=>Math.hypot(sx-x,sy-y)<70)) return; shown.push([x,y]); tri(x,y,"#5a3d1c",7); if(v.z>6.5) tag(x,y-6,`${k.name}${isFinite(k.ele)?" "+Math.round(k.ele)+" m":""}`,"rgba(255,250,240,.95)","#3d2a10"); }); }
+    if(T.osm&&T.osm.peaks){ const shown=obXY?[obXY]:[]; T.osm.peaks.filter(k=>k.xt<4000&&k.lat!=null).sort((a,b)=>(b.ele||0)-(a.ele||0)).slice(0,14).forEach(k=>{ const [x,y]=proj(k.lon,k.lat); if(x<0||y<0||x>W||y>H||shown.some(([sx,sy])=>Math.hypot(sx-x,sy-y)<70)) return; shown.push([x,y]); tri(x,y,"#5a3d1c",7); if(v.z>5) tag(x,y-6,`${k.name}${isFinite(k.ele)?" "+Math.round(k.ele)+" m":""}`,"rgba(255,250,240,.95)","#3d2a10"); }); }
     // buildings (only when zoomed in enough to tell them apart)
     if(T.osm&&T.osm.buildings&&v.z>=12){ for(const b of T.osm.buildings){ if(b.lat==null) continue; const [x,y]=proj(b.lon,b.lat); c.fillStyle=b.est?"rgba(60,66,82,.75)":"rgba(25,30,42,.95)"; c.fillRect(x-3,y-3,6,6); } }
     // highest point marker (when it isn't the main obstacle)
     if(!T.ob||Math.abs((T.ob.dm||0)-T.d[hi])>D*0.03){ const q=at(hi); const [x,y]=proj(q.lon,q.lat); tri(x,y,"#7a5a33",6); if(v.z>5.5) tag(x,y-4,`highest ${Math.round(T.e[hi])} m`,"rgba(255,250,240,.92)","#3d2a10"); }
+    // secondary Deygout edges
+    (T.edges||[]).filter(ed=>ed.role==="secondary").forEach(ed=>{ const q=gcPoint(MP.tx,MP.rx,clamp(ed.o.dm/D,0,1)); const [x,y]=proj(q.lon,q.lat); c.strokeStyle="#fff"; c.lineWidth=3.5; c.beginPath(); c.arc(x,y,6,0,7); c.stroke(); c.strokeStyle="#e8862a"; c.lineWidth=2.2; c.beginPath(); c.arc(x,y,6,0,7); c.stroke(); });
     // main obstacle
     if(T.ob&&T.loss>0.05){ const q=gcPoint(MP.tx,MP.rx,clamp(T.ob.dm/D,0,1)); const [x,y]=proj(q.lon,q.lat);
       c.strokeStyle="#fff"; c.lineWidth=4; c.beginPath(); c.moveTo(x-7,y-7); c.lineTo(x+7,y+7); c.moveTo(x+7,y-7); c.lineTo(x-7,y+7); c.stroke();
@@ -2063,6 +2340,10 @@ function drawMap(){
   MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9","R"+(i+1),false,v.z>4.5?rx.name:""); });
   MP.txs.forEach((t,i)=>{ if(i!==MP.ti) pin(t,"#e0828f","T"+(i+1),false,v.z>4.5?t.name:""); });
   pin(MP.tx,"#d13b4f","T"+(MP.ti+1),true,MP.tx.name); pin(MP.rx,"#1f5fd1","R"+(MP.ai+1),true,MP.rx.name);
+  // floating delete button beside the selected pin
+  { const s=MP.lastSel&&((MP.lastSel.kind==="tx"&&MP.txs[MP.lastSel.i])||(MP.lastSel.kind==="rx"&&MP.rxs[MP.lastSel.i]))?MP.lastSel:{kind:"rx",i:MP.ai};
+    const pt=s.kind==="tx"?MP.txs[s.i]:MP.rxs[s.i], bt=$("pinDel");
+    if(pt){ const [x,y]=proj(pt.lon,pt.lat); const can=(s.kind==="tx"?MP.txs:MP.rxs).length>1; bt.hidden=!can||x<0||y<0||x>W||y>H; bt.style.left=x+"px"; bt.style.top=(y+8)+"px"; bt.textContent=`✕ Delete ${s.kind==="tx"?"T":"R"}${s.i+1}`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?"transmitter":"receiver"} ${pt.name}`); } }
   const msg=$("mapMsg");
   if(MP.source==="loading"){ msg.hidden=false; msg.textContent="Loading map data…"; }
   else if(TILE.blockedMsg&&TILE.base==="vector"){ msg.hidden=false; msg.textContent="Map tiles can\'t load here because this page blocks outside images. Open the lab from its public website (or the downloadable copy) for the full OpenStreetMap and terrain. (Click to hide)"; }
@@ -2168,6 +2449,7 @@ function renderActive(){
   const tiles=[
     ["Distance",`${fmtD(P.dist)} km`,`bearing ${P.brg.toFixed(0)}° · ${P.landPct}% land`,"info"],
     ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
+    ["Obstacle method",T?(T.edges&&T.edges.length>1?`Deygout · ${T.edges.length} edges`:"single knife-edge"):"…",T?T.method:"","info"],
     ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?(T.ob&&T.loss>0.05?(T.ob.kind==="building"?"caused by a building":(T.peakName?`at ${T.peakName}`:`ridge at ${fmtD(T.ob.dm/1000)} km`)):`highest ${Math.round(T.maxE)} m`)+` · Δh ${Math.round(T.dh)} m`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"],
     ["Line of sight",T?(T.los?"Yes":"No"):"…",T?`masts ${T.txH} m / ${T.rxH} m`:"","info"],
     ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmPending?"loading…":T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
@@ -2179,7 +2461,7 @@ function renderActive(){
   $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
   const note=$("terrainNote");
   if(ELEV.ok===false){ note.innerHTML="Terrain data couldn't be downloaded right now (the free terrain service is busy, this page blocks outside data, or you are offline). The lab retries automatically in a minute. Type ground heights under <b>Coordinates &amp; manual ground height</b>, or open the lab from its public website for automatic worldwide terrain."; }
-  else note.innerHTML="Terrain: Copernicus DEM GLO-90 via Open-Meteo. Buildings and peak names: © OpenStreetMap contributors (Overpass API); buildings without a height tag are estimated from floors, or 7 m. Shadowing counts hills that rise above the line joining the two sites&#39; ground levels (single knife-edge, ITU-R P.526), added to the smooth-earth ground wave. It is an estimate, not a planning-grade result.";
+  else note.innerHTML="Terrain: Copernicus DEM GLO-90 via Open-Meteo. Buildings and peak names: © OpenStreetMap contributors (Overpass API); buildings without a height tag are estimated from floors, or 7 m. Obstacle loss uses ITU-R P.526: a single knife-edge above the ground-level line for LF–HF, and the Deygout multiple knife-edge method (main edge plus secondary edges) for VHF and above. It is an estimate, not a planning-grade result.";
   $("manualElevHint").textContent=ELEV.ok===false?"Terrain download unavailable, so these values are used.":"Only used when terrain data can't be downloaded.";
 }
 function drawTerrain(P,T){
@@ -2215,10 +2497,11 @@ function drawTerrain(P,T){
   if(T.osm&&T.osm.peaks){ c.font="10.5px "+cssVar("--font-body"); c.textAlign="center"; c.textBaseline="bottom";
     const seen=[]; T.osm.peaks.filter(pk=>pk.xt<2500).sort((a,b)=>(b.ele||0)-(a.ele||0)).slice(0,8).forEach(pk=>{ const x=xd(pk.dm); if(seen.some(s=>Math.abs(s-x)<70)) return; if(T.ob&&T.loss>0.05&&Math.abs(xd(T.ob.dm)-x)<110) return; seen.push(x); const gi=Math.min(n-1,Math.round(pk.dm/Dm*(n-1))); const y=ys(Math.max(T.e[gi],0)+bulD(pk.dm));
       c.fillStyle="#3d2f1a"; c.beginPath(); c.moveTo(x,y-3); c.lineTo(x-4,y-10); c.lineTo(x+4,y-10); c.closePath(); c.fill(); c.fillStyle=cssVar("--ink"); c.fillText(`${pk.name}${isFinite(pk.ele)?" "+Math.round(pk.ele)+" m":""}`,x,y-12); }); }
+  (T.edges||[]).filter(ed=>ed.role==="secondary").forEach(ed=>{ const x=xd(ed.o.dm), y=ys(ed.o.top+bulD(ed.o.dm)); c.strokeStyle="#e8862a"; c.lineWidth=2; c.beginPath(); c.arc(x,y-6,5,0,7); c.stroke(); c.font="10.5px "+cssVar("--font-body"); c.fillStyle="#b35f12"; c.textAlign="center"; c.textBaseline="bottom"; c.fillText("2nd edge",x,y-13); });
   if(T.ob&&T.loss>0.05){ const x=xd(T.ob.dm), y=ys(T.ob.top+bulD(T.ob.dm)); c.fillStyle="#c2413a"; c.beginPath(); c.moveTo(x,y-2); c.lineTo(x-6,y-13); c.lineTo(x+6,y-13); c.closePath(); c.fill();
     const what=T.ob.kind==="building"?`building${T.ob.b.name?" "+T.ob.b.name:""} ${Math.round(T.ob.b.h)} m tall`:(T.peakName?`${T.peakName}, ${Math.round(T.ob.top)} m`:`ridge ${Math.round(T.ob.top)} m`);
     c.font="600 11px "+cssVar("--font-body"); c.textAlign=x>W*0.7?"right":"left"; c.textBaseline="bottom"; c.fillStyle=cssVar("--ink"); c.fillText(`main obstacle: ${what} · −${T.loss.toFixed(1)} dB`,x+(x>W*0.7?-8:8),y-14); }
-  c.textAlign="left"; c.textBaseline="top"; c.font="11px "+cssVar("--font-body"); c.fillStyle=muted; c.fillText(T.los?"Line of sight: clear":"Line of sight: blocked (ground wave still bends around terrain)",L+6,Tp+4);
+  c.textAlign="left"; c.textBaseline="top"; c.font="11px "+cssVar("--font-body"); c.fillStyle=muted; c.textBaseline="bottom"; c.fillText(T.los?"Line of sight: clear":"Line of sight: blocked"+(baseModel().p.f<30?" (the ground wave still bends around terrain)":""),L+6,Tp+h-4);
 }
 function renderSites(){
   const rows=MP.rxs.map((rx,i)=>{ const r=MP.res.get(rx.id), T=r&&r.T, pr=r&&r.pred;
@@ -2279,8 +2562,12 @@ function bindMap(){
     if(h.kind==="tx"){ if(MP.txs.length<2){ msg.hidden=false; msg.textContent="Keep at least one transmitter. Use Move TX to place it elsewhere. (Click to hide)"; return; } MP.txs.splice(h.i,1); MP.ti=Math.min(MP.ti>h.i?MP.ti-1:MP.ti,MP.txs.length-1); MP.res.clear(); }
     else { if(MP.rxs.length<2){ msg.hidden=false; msg.textContent="Keep at least one receiver. Use Move RX to place it elsewhere. (Click to hide)"; return; } const id=MP.rxs[h.i].id; MP.rxs.splice(h.i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>h.i?MP.ai-1:MP.ai,MP.rxs.length-1); }
     updateMap(); };
+  MP.removePin=removePin;
+  $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
+  mapC.tabIndex=0;
+  mapC.addEventListener("keydown",e=>{ if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removePin(MP.lastSel||{kind:"rx",i:MP.ai}); MP.lastSel={kind:"rx",i:MP.ai}; } });
   $("mapReset").addEventListener("click",()=>{ MP.txs=DEFAULT_TXS(); MP.rxs=DEFAULT_RXS(); MP.ti=0; MP.ai=0; MP.nextTx=2; MP.nextRx=4; MP.res.clear(); setMode("add"); MP.view=null; updateMap(); MP.view=defaultView("sites"); drawMap(); });
-  const zoom=(dz,x,y)=>{ const W=mapC.clientWidth,H=mapC.clientHeight; x=x??W/2; y=y??H/2; const before=unproj(x,y); MP.view.z=clamp(MP.view.z+dz,1,17); const after=unproj(x,y); MP.view.lon=clamp(MP.view.lon+before.lon-after.lon,-180,180); MP.view.lat=clamp(MP.view.lat+before.lat-after.lat,-80,80); drawMap(); };
+  const zoom=(dz,x,y)=>{ const W=mapC.clientWidth,H=mapC.clientHeight; x=x??W/2; y=y??H/2; const before=unproj(x,y); MP.view.z=clamp(MP.view.z+dz,1,PROVIDERS[TILE.base]&&PROVIDERS[TILE.base].max?PROVIDERS[TILE.base].max:19); const after=unproj(x,y); MP.view.lon=clamp(MP.view.lon+before.lon-after.lon,-180,180); MP.view.lat=clamp(MP.view.lat+before.lat-after.lat,-80,80); drawMap(); };
   $("zoomIn").onclick=()=>zoom(1); $("zoomOut").onclick=()=>zoom(-1); $("fitBtn").onclick=fit;
   $("mapPlay").addEventListener("click",()=>setMapPlaying(!MP.anim.playing)); setMapPlaying(MP.anim.playing);
   $("basemap").addEventListener("change",e=>{ TILE.blockedMsg=false; setBase(e.target.value); });
@@ -2296,7 +2583,7 @@ function bindMap(){
     // remove mode: clicking a pin deletes it
     if(MP.mode==="del"){ const h=hitPin(x,y); if(h) removePin(h); else { const m=$("mapMsg"); m.hidden=false; m.textContent="Click directly on a pin to remove it. (Click to hide)"; } return; }
     // clicking an existing pin selects it (double-click removes it)
-    const hp=hitPin(x,y); if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
+    const hp=hitPin(x,y); if(hp) MP.lastSel=hp; if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
     let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
     const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180};
     if(MP.mode==="addtx") pt.name=best?best.c[0]:`Transmitter ${MP.nextTx}`;
@@ -2329,6 +2616,22 @@ function bindMap(){
   $("when").addEventListener("change",e=>{ const d=new Date(e.target.value); if(!isNaN(d)){ MP.date=d; updateMap(); } });
   $("nowBtn").addEventListener("click",()=>{ MP.date=new Date(); $("when").value=toLocalInput(MP.date); updateMap(); });
   $("mapModel").addEventListener("change",updateMap); $("mapLand").addEventListener("change",updateMap);
+  $("zoomRx").addEventListener("click",()=>{ MP.view={lon:MP.rx.lon,lat:MP.rx.lat,z:16}; drawMap(); });
+  $("findTowers").addEventListener("click",async()=>{
+    const b=$("findTowers"), msg=$("mapMsg"); b.disabled=true; b.textContent="Searching…";
+    const home=MP.rx; const list=await findTowers(home,8000);
+    b.disabled=false; b.textContent="📶 Find nearest cell towers";
+    if(!list){ msg.hidden=false; msg.textContent="The OpenStreetMap tower search is busy. Try again in a minute. (Click to hide)"; return; }
+    if(!list.length){ msg.hidden=false; msg.textContent=`No towers are mapped in OpenStreetMap within 8 km of ${home.name}. Many are missing from OSM, so add yours with "+ Transmitter". (Click to hide)`; return; }
+    const pick=list.slice(0,5);
+    pick.forEach(t=>MP.txs.push({id:MP.nextTx++,name:`${t.name} (OSM)`,lat:t.lat,lon:t.lon,h:t.h}));
+    MP.ti=MP.txs.length-pick.length; // nearest first
+    // use a 4G model for the station settings, creating one if needed
+    let m=models.find(x=>x.p.type==="cell"); if(!m){ m=mk("4G LTE 1800 · home",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,env:"suburban"}); models.push(m); refreshAll(); }
+    $("mapModel").value=String(m.id); MP.res.clear(); updateMap();
+    MP.view=defaultView("path"); MP.view.z=Math.max(MP.view.z,13); drawMap();
+    msg.hidden=false; msg.textContent=`Added ${pick.length} tower${pick.length>1?"s":""} from OpenStreetMap. The nearest is ${fmtD(pick[0].dist)} km away (${pick[0].h} m). Switch towers in "Selected transmitter". (Click to hide)`;
+  });
   $("tTx").addEventListener("change",e=>{ MP.ti=+e.target.value; updateMap(); });
   $("tRx").addEventListener("change",e=>{ MP.ai=+e.target.value; updateMap(); });
   $("toTerrain").addEventListener("click",()=>go("terrain"));
@@ -2408,6 +2711,21 @@ function bindTheme(){
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ if(!document.documentElement.dataset.theme){ if(currentTab==="lab") redraw(); if(currentTab==="map"||currentTab==="terrain"){ drawMap(); renderActive(); } } });
 }
 
+/* ================= HELP ================= */
+function bindHelp(){
+  const d=$("helpDlg");
+  const show=topic=>{ document.querySelectorAll(".dlg-tabs .tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.h===topic))); document.querySelectorAll(".dlg-b").forEach(p=>p.hidden=p.dataset.hp!==topic); };
+  const open=(topic="start")=>{ show(topic); try{ d.showModal(); }catch(e){ d.setAttribute("open",""); } };
+  const close=()=>{ try{ if($("helpNoShow").checked) localStorage.setItem("gwlab-help","off"); }catch(e){} d.close?d.close():d.removeAttribute("open"); };
+  $("helpBtn").addEventListener("click",()=>open());
+  $("helpClose").addEventListener("click",close); $("helpGo").addEventListener("click",close);
+  d.addEventListener("click",e=>{ if(e.target===d) close(); });
+  document.querySelectorAll(".dlg-tabs .tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.h)));
+  document.querySelectorAll("[data-open-help]").forEach(el=>el.addEventListener("click",()=>open(el.dataset.openHelp)));
+  let seen=null; try{ seen=localStorage.getItem("gwlab-help"); }catch(e){}
+  if(!seen){ try{ localStorage.setItem("gwlab-help","seen"); }catch(e){} setTimeout(()=>open(),400); }
+}
+
 /* ================= INIT ================= */
 function init(){
   fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindTabs(); renderQuiz();
@@ -2415,6 +2733,7 @@ function init(){
   loadPreset(0);
   go(location.hash.slice(1)||"lab",true);
   bindTheme();
+  bindHelp();
   new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map"||currentTab==="terrain") { drawMap(); renderActive(); } }).observe(document.body);
   const mo=new MutationObserver(()=>{ if(currentTab==="lab") redraw(); }); mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
   requestAnimationFrame(animTick);
