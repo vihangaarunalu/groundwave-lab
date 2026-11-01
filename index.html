@@ -471,6 +471,74 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .guide-text{overflow-wrap:anywhere}
 @media (max-width:760px){ .brand{flex:1 1 0} }
 
+/* ===== v1.4 · Models & equations, bottom navigation, polish ===== */
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--radius-sm:6px;--radius-md:10px;--radius-lg:14px;--shadow-1:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);--ease:cubic-bezier(.2,.7,.2,1);--bnav-h:64px}
+.panel{box-shadow:var(--shadow-1)}
+.btn,.tab,.chip,select,input{transition:background-color .15s var(--ease),border-color .15s var(--ease),color .15s var(--ease)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.linkbtn{border:0;background:none;color:var(--accent);font:inherit;font-weight:600;font-size:13px;cursor:pointer;padding:4px 2px;margin-left:6px;text-decoration:underline;text-underline-offset:3px}
+.linkbtn:hover{text-decoration-thickness:2px}
+.mxctl{display:flex;gap:var(--space-4);flex-wrap:wrap;align-items:end;margin-bottom:var(--space-3)}
+.mxctl .field{min-width:220px}.mxctl .field.grow{flex:1 1 280px}
+.mxctl .field > span{font-size:13px;font-weight:600;display:flex;justify-content:space-between}
+.mxctl .field b{font-family:var(--font-mono);color:var(--accent);font-weight:500}
+.mxchecks{list-style:none;padding:0;margin:var(--space-3) 0;display:grid;gap:6px}
+.mxchecks li{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border-radius:var(--radius-sm);font-size:13.5px;border:1px solid var(--line)}
+.mxchecks li span{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff}
+.mxchecks li.ok span{background:var(--good)} .mxchecks li.no span{background:var(--warn)}
+.mxchecks li.no{background:color-mix(in srgb,var(--warn) 9%,transparent);border-color:color-mix(in srgb,var(--warn) 35%,var(--line))}
+.mxsteps td:first-child{color:var(--muted);font-family:var(--font-mono);width:2.5em}
+.mxsteps .eqc{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);max-width:46ch}
+.mxsteps td.mono{white-space:nowrap;text-align:right;font-family:var(--font-mono)}
+.mxlib{display:grid;gap:var(--space-2)}
+.mxcard{border:1px solid var(--line);border-radius:var(--radius-md);background:var(--panel)}
+.mxcard summary{cursor:pointer;padding:12px 14px;display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:baseline;list-style:none;min-height:44px}
+.mxcard summary::-webkit-details-marker{display:none}
+.mxcard summary::before{content:"▸";color:var(--muted);margin-right:4px;transition:transform .15s var(--ease)}
+.mxcard[open] summary::before{transform:rotate(90deg)}
+.mxname{font-weight:700;flex:1 1 auto}.mxband{font-size:12.5px;color:var(--muted);font-family:var(--font-mono)}
+.mxbody{padding:0 14px 14px;font-size:14px}
+.mxref{color:var(--muted);margin-top:0}
+.eqblock{display:grid;gap:6px;margin:10px 0;padding:12px;border-radius:var(--radius-sm);background:var(--accent-soft);overflow-x:auto}
+.eqblock code{font-family:var(--font-mono);font-size:13px;white-space:pre-wrap;color:var(--ink)}
+.mxlim{margin:4px 0 0;padding-left:20px;color:var(--muted)} .mxlimh{margin-bottom:0}
+/* bottom navigation (phones) */
+.bnav,.moresheet{display:none}
+@media (max-width:760px){
+  .appbar-in .tabs{display:none}
+  body{padding-bottom:calc(var(--bnav-h) + env(safe-area-inset-bottom))}
+  .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+  .bnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:var(--bnav-h);color:var(--muted);text-decoration:none;font-size:11.5px;font-weight:600}
+  .bnav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .bnav circle{fill:currentColor;stroke:none}
+  .bnav a[aria-current="page"]{color:var(--accent)}
+  .bnav a[aria-current="page"] svg{background:var(--accent-soft);border-radius:999px;padding:2px 14px;box-sizing:content-box}
+  .moresheet:not([hidden]){display:grid;position:fixed;right:8px;bottom:calc(var(--bnav-h) + 8px + env(safe-area-inset-bottom));z-index:41;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:0 8px 28px rgba(0,0,0,.18);padding:6px;min-width:200px}
+  .moresheet button{border:0;background:none;color:var(--ink);font:inherit;font-weight:600;text-align:left;padding:12px 14px;border-radius:var(--radius-sm);min-height:44px;cursor:pointer}
+  .moresheet button:hover{background:var(--accent-soft)}
+  .btn,select,.chip{min-height:44px}
+  input[type=range]{min-height:32px}
+  .wrap{padding-left:12px;padding-right:12px}
+  .card{padding:14px}
+  .mxsteps .eqc{max-width:none;min-width:22ch}
+  .intro h2{font-size:20px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+.mxsteps th,.mxsteps td{text-align:left}
+.mxsteps th:last-child{text-align:right}
+.mxsteps td:nth-child(2){font-weight:600}
+
+.mxsteps tr.mxhead td{background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12.5px;letter-spacing:.02em;text-transform:uppercase}
+#cmpData{width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px;background:var(--panel);color:var(--ink);resize:vertical}
+#mxVer td:nth-child(2){max-width:34ch}
+
+.qbar{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:12px}.qbar .field{min-width:200px}
+.qhead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}.qm{font-size:12px;color:var(--muted)}
+.q.q-right{border-left:4px solid var(--good)}.q.q-part{border-left:4px solid var(--warn)}.q.q-wrong{border-left:4px solid var(--bad)}
+.q .opts button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.numrow{display:flex;gap:8px;align-items:center}.numrow input{width:140px;min-height:40px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:6px 10px;font:inherit;background:var(--panel);color:var(--ink)}
+@media print{.appbar,.bnav,.qbar,.moresheet,footer,#qSubmit{display:none!important}.wrap[hidden]{display:none!important}.q{break-inside:avoid}}
+
 </style>
 </head>
 <body>
@@ -486,8 +554,9 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
       <button class="tab" role="tab" id="tab-animation" aria-controls="animation" data-tab="animation"><span class="n">2</span>Animation</button>
       <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map"><span class="n">3</span>Map</button>
       <button class="tab" role="tab" id="tab-terrain" aria-controls="terrain-tab" data-tab="terrain"><span class="n">4</span>Terrain profile</button>
-      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">5</span>Learn</button>
-      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">6</span>Quiz</button>
+      <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods"><span class="n">5</span>Models</button>
+      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">6</span>Learn</button>
+      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">7</span>Quiz</button>
     </nav>
     <button class="iconbtn themebtn" id="helpBtn" type="button" aria-haspopup="dialog" title="Help and quick start">? Help</button>
     <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
@@ -625,10 +694,36 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
               <select id="refr"><option value="sub">Sub-refraction (k = 1)</option><option value="standard">Standard (k = 4/3)</option><option value="super">Super-refraction (k = 2)</option></select></div>
             <div class="field"><label for="solar">Solar activity</label>
               <select id="solar"><option value="low">Low (sunspots ≈ 10)</option><option value="medium">Medium (≈ 80)</option><option value="high">High (≈ 160)</option></select></div>
-            <label class="check"><input type="checkbox" id="flare"> Solar flare in progress</label>
             <label class="check"><input type="checkbox" id="gstorm"> Geomagnetic storm</label>
             <div class="field"><label for="env">Listener's surroundings</label>
               <select id="env"><option value="rural">Rural (quiet)</option><option value="suburban">Suburban</option><option value="urban">Urban</option><option value="industrial">Industrial / city centre (noisy)</option></select></div>
+          </div>
+        </details>
+
+        <details class="acc" name="settings" id="spaceBox" open>
+          <summary>Solar flare &amp; space weather</summary>
+          <div class="acc-body">
+            <div class="field"><label for="flareR">Solar flare (NOAA radio-blackout scale)</label>
+              <select id="flareR"><option value="0">None</option><option value="1">R1 minor · M1 flare</option><option value="2">R2 moderate · M5</option><option value="3">R3 strong · X1</option><option value="4">R4 severe · X10</option><option value="5">R5 extreme · X20</option></select></div>
+            <label class="check"><input type="checkbox" id="sunBeam"> Sun in the receiving antenna beam (sunrise / sunset)</label>
+            <p class="note">The flare is applied to every band: HF fade-out (NOAA D-RAP), no effect on ground waves, and solar radio-burst noise at VHF/UHF and mobile bands.</p>
+          </div>
+        </details>
+
+        <details class="acc" name="settings" id="ituBox">
+          <summary>ITU planning parameters</summary>
+          <div class="acc-body">
+            <div class="field"><label for="pL">Locations covered (P.1812 / P.1546 location variability)</label>
+              <select id="pL"><option value="50">50% (median)</option><option value="70">70%</option><option value="90">90% (good coverage)</option><option value="95">95% (mobile planning)</option><option value="99">99%</option></select></div>
+            <div class="field"><label for="cellModel">Mobile path-loss method</label>
+              <select id="cellModel"><option value="auto">Auto: P.529 Hata / M.2412 UMa in range, P.1812 beyond</option><option value="p1812">ITU-R P.1812 + P.2108 clutter everywhere</option></select></div>
+            <label class="check"><input type="checkbox" id="stereo"> FM stereo reception (BS.412 stereo levels)</label>
+            <label class="check"><input type="checkbox" id="thermal"> Indoor: thermally-efficient building (P.2109)</label>
+            <div class="two">
+              <div class="field"><label for="gmlat">Geomagnetic latitude Φ (°)</label><input type="number" id="gmlat" min="-90" max="90" step="1"></div>
+              <div class="field"><label for="azi">Path azimuth (° from N)</label><input type="number" id="azi" min="0" max="359" step="5"></div>
+            </div>
+            <p class="note">Φ and azimuth drive the P.1147 MF sky-wave loss factor and polarization coupling loss (dip from a dipole field, tan I = 2 tan Φ). The map sets them for real paths.</p>
           </div>
         </details>
       </section>
@@ -637,7 +732,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
     <main class="main">
       <section class="panel card">
         <p class="eyebrow">Result for <span id="selName"></span></p>
-        <p class="method"><span class="badge">ITU method</span> <span id="methodV"></span></p>
+        <p class="method"><span class="badge">ITU method</span> <span id="methodV"></span> <button class="linkbtn" type="button" data-show-calc>Show the calculation →</button></p>
         <p class="summary" id="summary"></p>
         <div class="tiles" id="tiles"></div>
       </section>
@@ -767,6 +862,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
           <div class="chips" id="aPowChips"></div>
           <input type="range" id="aPow" min="-3" max="3.7" step="0.01" aria-label="Fine-tune power"></div>
         <div class="field"><label for="aGround">Ground</label><select id="aGround"></select></div>
+        <div class="field"><label for="aFlare">Solar flare</label><select id="aFlare"><option value="0">None</option><option value="1">R1 · M1</option><option value="2">R2 · M5</option><option value="3">R3 · X1</option><option value="4">R4 · X10</option><option value="5">R5 · X20</option></select><span class="hint" id="aFlareNote"></span></div>
         <div class="field"><span class="lbl">Weather</span><div class="chips" id="aWx"></div></div>
       </section>
       <section class="panel card">
@@ -924,6 +1020,42 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
   </section>
 </section>
 
+<!-- ======================= MODELS & EQUATIONS ======================= -->
+<section class="wrap" id="methods" role="tabpanel" aria-labelledby="tab-methods" hidden>
+  <div class="intro"><div class="stack" style="gap:4px"><h2>Models &amp; equations</h2><p>Every number in this app comes from the equations below. Pick a model to see the calculation step by step, which checks pass, and where the model stops being valid. Lecturers can use this to discuss accuracy and limitations.</p></div></div>
+  <section class="panel card mxcalc" aria-labelledby="mxH">
+    <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><button class="btn" id="mxCopy" type="button">Copy steps</button></div>
+    <div class="mxctl">
+      <label class="field"><span>Model</span><select id="mxModel"></select></label>
+      <label class="field grow"><span>Distance <b id="mxDv"></b></span><input type="range" id="mxD" min="0" max="1000" step="1" aria-describedby="mxDv"></label>
+    </div>
+    <p class="method"><span class="badge">Method</span> <span id="mxMethod"></span></p>
+    <ul class="mxchecks" id="mxChecks" aria-label="Validity checks"></ul>
+    <div class="tablewrap"><table class="fs mxsteps" id="mxSteps"></table></div>
+    <p class="hint">“!” marks a check that fails or a known simplification. Values update as you move the distance slider or change the model in the Lab.</p>
+  </section>
+  <section class="panel card" aria-labelledby="mxVerH">
+    <div class="chart-head"><h2 id="mxVerH">Verification tests</h2><div class="row"><span id="mxVerSum" class="pill info">not run yet</span><button class="btn primary" id="mxRunVer" type="button">Run tests</button></div></div>
+    <p class="hint" style="margin-top:0">Each test compares the app's code with an independent reference value: published tables, ITU definitions, hand calculations, or limits that the physics must satisfy.</p>
+    <div class="tablewrap"><table class="fs mxsteps" id="mxVer"></table></div>
+  </section>
+  <section class="panel card" aria-labelledby="cmpH">
+    <h2 id="cmpH">Check accuracy against measurements</h2>
+    <p class="hint" style="margin-top:0">Paste drive-test or field-strength measurements, or values read from an ITU-R curve (e.g. P.368, P.1546). One row per point: <code>distance_km, value</code>. The selected model above is compared, and the points are drawn on the Lab chart.</p>
+    <div class="mxctl">
+      <label class="field grow"><span>Data</span><textarea id="cmpData" rows="6" spellcheck="false" style="font-family:var(--font-mono);font-size:13px"></textarea></label>
+      <label class="field"><span>Units</span><select id="cmpUnit"><option value="db">dB(µV/m)</option><option value="mv">mV/m</option><option value="dbm">dBm (mobile)</option></select></label>
+    </div>
+    <div class="row"><button class="btn primary" id="cmpRun" type="button">Compare</button><button class="btn" id="cmpClear" type="button">Clear</button></div>
+    <div id="cmpOut" style="margin-top:12px"></div>
+  </section>
+  <section class="panel card" aria-labelledby="mxLibH">
+    <h2 id="mxLibH">Model library</h2>
+    <p class="hint" style="margin-top:0">Equations, validity range, ITU reference and known limitations of each model.</p>
+    <div id="mxLib" class="mxlib"></div>
+  </section>
+</section>
+
 <!-- ======================= LEARN ======================= -->
 <section class="wrap" id="learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
   <div class="intro"><div class="stack" style="gap:4px"><h2>Concepts behind the lab</h2><p>Short explanations of each effect you can test. Open a card, then try the matching experiment in the Lab.</p></div></div>
@@ -1017,9 +1149,17 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 
 <!-- ======================= QUIZ ======================= -->
 <section class="wrap" id="quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden>
-  <div class="intro"><div class="stack" style="gap:4px"><h2>Check your understanding</h2><p>Several questions ask you to load an experiment in the Lab first. Your score updates as you answer.</p></div>
-    <div class="row"><span class="pill info score" id="score">0 / 0 correct</span><button class="btn sm" id="quizReset" type="button">Start again</button></div></div>
+  <div class="intro"><div class="stack" style="gap:4px"><h2>Check your understanding</h2><p>Multiple choice, true/false, select-all and numeric questions. Numeric answers are marked against the app's own ITU calculations. Practice mode shows feedback straight away; exam mode marks everything when you submit.</p></div>
+    <div class="row"><span class="pill info score" id="score">0 / 0</span><button class="btn sm" id="quizReset" type="button">Start again</button></div></div>
+  <section class="panel card qbar">
+    <label class="field"><span class="lbl">Mode</span><select id="qMode"><option value="practice">Practice (instant feedback)</option><option value="exam">Exam (marked on submit)</option></select></label>
+    <label class="field"><span class="lbl">Topic</span><select id="qTopic"></select></label>
+    <label class="field"><span class="lbl">Student name</span><input type="text" id="qName" placeholder="for the results file" autocomplete="name"></label>
+    <div class="row"><button class="btn" id="qExport" type="button">Export results (CSV)</button><button class="btn" id="qPrint" type="button">Print</button></div>
+  </section>
   <div class="quiz" id="quizBox"></div>
+  <div class="row" style="margin-top:12px"><button class="btn primary" id="qSubmit" type="button" hidden>Submit for marking</button></div>
+  <div id="qResult" style="margin-top:12px"></div>
 </section>
 
 
@@ -1062,19 +1202,33 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
       <p><b>Who it is for:</b> engineering students, broadcast trainees and educators. Radio amateurs and engineers can also use it for quick what-if comparisons.</p>
       <p><b>Models used:</b></p>
       <ul>
-        <li>Ground wave: Sommerfeld–Norton with curved-earth loss and Millington mixed paths.</li>
-        <li>Sky wave: secant law and P.533-style absorption.</li>
-        <li>VHF/UHF: two-ray model plus a radio-horizon loss.</li>
-        <li>Mobile networks: ITU-R P.529 Okumura–Hata (2G), COST-231 Hata (3G/4G), ITU-R M.2412 UMa (5G), ITU-R P.838 rain, P.676 gases (approx.) and P.2109 building entry.</li>
-        <li>Terrain: Copernicus DEM with ITU-R P.526 diffraction. LF–HF uses a single knife-edge; VHF and above use the Deygout multiple knife-edge method. Buildings and peaks come from OpenStreetMap.</li>
+        <li>Ground wave: ITU-R P.368 by the GRWAVE method (exact Sommerfeld–Norton flat earth, Fock/Wait residue series for the curved earth) and the P.368 Millington method for mixed paths.</li>
+        <li>Sky wave: ITU-R P.1147 for LF/MF. HF uses a P.533-style teaching approximation (secant law, D-layer absorption); full P.533 needs the P.1239 ionospheric maps.</li>
+        <li>VHF/UHF: ITU-R P.1812 (free space, delta-Bullington diffraction, troposcatter) with P.2108 receiver clutter and P.1812/P.1546 location variability. Ducting at 50% time is not included.</li>
+        <li>Mobile networks: ITU-R P.529 Okumura–Hata and COST-231 Hata within 100 km, ITU-R M.2412 UMa within 5 km, ITU-R P.1812 beyond; P.838 rain, P.676 gases (approx.), P.2109 building entry.</li>
+        <li>Reception levels: ITU-R BS.703 (LF/MF/HF), BS.412 (FM), BT.417 (TV bands). Solar flares: NOAA D-RAP for HF absorption and a radio-burst noise model for VHF and above.</li>
+        <li>Terrain: Copernicus DEM GLO-90. VHF and above use the ITU-R P.1812 delta-Bullington method (P.526-15 §4.5) over the real profile, with OpenStreetMap buildings as surface heights. LF–HF ground waves (P.368) assume a smooth earth; the app adds a P.526 single knife-edge estimate for hills.</li>
       </ul>
-      <p><b>Accuracy:</b> results are teaching-grade estimates, typically within several dB of the ITU curves for simple paths. Do not use them for licensing or frequency coordination. For that, use ITU-R P.368, P.1147, P.533, P.1546/P.1812 or professional planning software.</p>
+      <p><b>Accuracy:</b> the Models tab lists every equation, the checks that pass or fail for your inputs, built-in verification tests, and a tool to compare predictions with your own measurements. Use certified planning software for licensing or frequency coordination.</p>
       <p class="hint">Map data © OpenStreetMap contributors · OpenTopoMap (CC-BY-SA) · Elevation: Copernicus DEM GLO-90 via Open-Meteo.</p>
     </div>
     <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
   </div>
 </dialog>
-<div class="wrap" style="padding-top:0"><footer><b>Groundwave Propagation Lab v1.0</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
+<div class="wrap" style="padding-top:0">
+<nav class="bnav" aria-label="Main sections">
+  <a href="#lab" data-tab="lab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v6L4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2l-5-10V3M8 3h8"/></svg><span>Lab</span></a>
+  <a href="#animation" data-tab="animation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c3-6 5-6 8 0s5 6 8 0 3-3 4-2"/></svg><span>Animate</span></a>
+  <a href="#map" data-tab="map"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg><span>Map</span></a>
+  <a href="#methods" data-tab="methods"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14M5 20h14M7 4l6 8-6 8"/></svg><span>Models</span></a>
+  <a href="#" data-tab="more" aria-expanded="false" aria-controls="moreSheet"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>More</span></a>
+</nav>
+<div class="moresheet" id="moreSheet" hidden>
+  <button type="button" data-tab="terrain">Terrain profile</button>
+  <button type="button" data-tab="learn">Learn</button>
+  <button type="button" data-tab="quiz">Quiz</button>
+</div>
+<footer><b>Groundwave Propagation Lab v2.0</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
 
 <script>
 "use strict";
@@ -1117,12 +1271,8 @@ function norton(d,f,g){
 const kFac=p=>({sub:1.0,standard:4/3,super:2.0})[p.refr]||4/3;
 function critDist(f,p){ return 80/Math.cbrt(f)*Math.pow(kFac(p)/(4/3),2/3); }
 function curvLoss(d,f,p){ const dc=critDist(f,p); return d>dc ? 3.2*(d/dc-1) : 0; }
-function gwSingle(d,p,g,curv){
-  const {A}=norton(d,p.f,g);
-  let v=dBuV(300*Math.sqrt(p.P)*A/d);
-  if(curv) v-=curvLoss(d,p.f,p);
-  return v;
-}
+/* ITU-R P.368 (GRWAVE method): exact Sommerfeld–Norton flat earth, Fock/Wait residue series for the curved earth */
+function gwSingle(d,p,g,curv){ return p368dB(d,p.f,g.er,g.sigma,kFac(p),curv,p.P); }
 /* path as list of {g:groundKey, end:km} (cumulative) */
 function pathSegs(p,d){
   let segs;
@@ -1162,7 +1312,6 @@ function iono(p){
   const fN=3+0.015*R, fD=6+0.035*R;
   o.foF2=fN+(fD-fN)*Math.sqrt(u);
   o.hF=340-40*u; o.hE=110;
-  if(p.flare && c>0){ o.I*=4; o.foE*=1.15; }
   if(p.gstorm){ o.foF2*=0.7; o.I+=0.05; }
   return o;
 }
@@ -1190,10 +1339,11 @@ function skyField(d,p,io){
     if(!layer) continue;
     const slant=n*2*Math.sqrt(RE*RE+(RE+layer.h)**2-2*RE*(RE+layer.h)*Math.cos(th));
     const a1=absdB(f,io.I,secAt(layer.del,100));
-    const loss=n*a1+(n-1)*reflLoss+6;
+    const fa=n*flareAbs(f,p)*secAt(layer.del,80);
+    const loss=n*a1+(n-1)*reflLoss+6+fa;
     const E=300*Math.sqrt(p.P)*Math.cos(layer.del)/slant*Math.pow(10,-loss/20);
     sumsq+=E*E;
-    if(!best||E>best.E) best={n,E,layer:layer.name,del:layer.del,abs:a1};
+    if(!best||E>best.E) best={n,E,layer:layer.name,del:layer.del,abs:a1,flare:fa};
   }
   return {E:Math.sqrt(sumsq), best};
 }
@@ -1213,29 +1363,41 @@ function compileExpr(src){
   exprCache[src]=err?{err}:{fn};
   return exprCache[src];
 }
-function threshold(p){
-  if(p.type==="cell") return mVfromdB(dBm2dBuV(cellThrdBm(p),p.f));
-  if(p.f>=30){ // FM / TV practice (ITU-R BS.412-style levels); atmospheric static is negligible at VHF/UHF
-    const b={rural:0.25,suburban:1,urban:3,industrial:6}[p.env]; return b*(p.f>=300?2:1);
-  }
-  const base={rural:0.5,suburban:2,urban:5,industrial:10}[p.env];
-  const storm={none:1,distant:2,local:5}[p.storm];
-  const night=cosChiOf(p)<-0.15?1.6:1;
-  const ff=clamp(Math.pow(1/p.f,0.6),0.15,4);
-  return base*storm*night*ff;
+/* minimum usable field strength (ITU): BS.703 (LF/MF/HF), BS.412 (FM), BT.417 (TV bands); + solar radio-burst noise rise */
+function ituMinRef(p){
+  const f=p.f;
+  if(f<0.3) return {v:66,ref:"ITU-R BS.703 (LF)"};
+  if(f<=1.705) return {v:60,ref:"ITU-R BS.703 (MF)"};
+  if(f<30) return {v:40,ref:"ITU-R BS.703 (HF)"};
+  if(f>=87.5&&f<=108){ const st=!!p.stereo; const v={rural:48,suburban:60,urban:60,industrial:70}[p.env]+(st?(p.env==="rural"?6:p.env==="industrial"?4:6):0);
+    return {v,ref:`ITU-R BS.412 (FM ${st?"stereo":"mono"}, ${p.env==="rural"?"rural":p.env==="industrial"?"large city":"urban"})`}; }
+  if(f<87.5) return {v:48,ref:"ITU-R BT.417 Band I level (nearest broadcast band)"};
+  if(f<300) return {v:55,ref:"ITU-R BT.417 Band III level"+(f>=174&&f<=230?"":" (nearest broadcast band)")};
+  if(f<582) return {v:65,ref:"ITU-R BT.417 Band IV level"+(f>=470?"":" (nearest broadcast band)")};
+  return {v:70,ref:"ITU-R BT.417 Band V level"+(f<=960?"":" (nearest broadcast band)")};
 }
+function threshold(p){
+  if(p.type==="cell") return mVfromdB(dBm2dBuV(cellThrdBm(p)+burstNoise(p,0,7),p.f));
+  return mVfromdB(ituMinRef(p).v+burstNoise(p,7,5));
+}
+/* ITU-R P.1812 field strength (VHF/UHF) for P (kW ERP), incl. P.2108 receiver clutter, P.2109 indoor and pL% locations */
+function usesP1812(p){ return p.f>=30 && /^(gw|gwflat|combined)$/.test(p.type); }
+function vhfLoss(d,p){ const r=p1812(d,p,p.profile), cl=p2108(p), ls=locStats(p), pl=pLoc(p);
+  const Lb=r.Lb50+cl.L+ls.Lloc-invQ(pl/100)*ls.sig+(p.f>=1000?rainLoss(d,p):0);
+  return {Lb,r,cl,ls,pl}; }
+function vhfField(d,p){ return 199.36+20*Math.log10(p.f/1000)-vhfLoss(d,p).Lb+10*Math.log10(p.P); }
 /* {g,s,t} in dBµV/m */
 function evalP(p,d,io){
   let g=null,s=null,t=null;
   switch(p.type){
-    case "gwflat": g=groundPath(d,p,false); t=g; break;
-    case "gw": g=groundPath(d,p,true); t=g; break;
+    case "gwflat": g=p.f>=30?vhfField(d,p):gwdB(d,p,false); t=g; break;
+    case "gw": g=p.f>=30?vhfField(d,p):gwdB(d,p,true); t=g; break;
     case "inverse": g=dBuV(300*Math.sqrt(p.P)/d); t=g; break;
-    case "sky": { const sf=skyField(d,p,io); s=sf.E>0?dBuV(sf.E):null; t=s; break; }
+    case "sky": { s=skyDB(d,p,io); t=s; break; }
     case "combined": {
-      g=groundPath(d,p,true);
-      const sf=skyField(d,p,io); s=sf.E>0?dBuV(sf.E):null;
-      const eg=mVfromdB(g), es=sf.E;
+      g=p.f>=30?vhfField(d,p):gwdB(d,p,true);
+      s=p.f>=30?null:skyDB(d,p,io);
+      const eg=mVfromdB(g), es=s===null?0:mVfromdB(s);
       t=dBuV(Math.sqrt(eg*eg+es*es)); break;
     }
     case "cell": { const e=dBm2dBuV(cellRxdBm(d,p),p.f); g=e; t=e; break; }
@@ -1251,9 +1413,11 @@ function evalP(p,d,io){
   }
   return {g,s,t};
 }
+/* sky wave: ITU-R P.1147 for LF/MF (≤ 1.705 MHz), P.533-style teaching model for HF */
+function skyDB(d,p,io){ if(p.f<=1.705){ const r=p1147(d,p); return r.E; } const sf=skyField(d,p,io); return sf.E>0?dBuV(sf.E):null; }
 /* value at the receiver, including the terrain shadowing estimate on the ground-wave part */
 function evalRx(p,io){
-  const r=evalP(p,p.rxDist,io); const L=p.terrainLossDb||0;
+  const r=evalP(p,p.rxDist,io); const L=(usesP1812(p)||(p.type==="cell"&&cellModelAt(p.rxDist,p)==="p1812"))?0:(p.terrainLossDb||0);
   if(!L||r.g===null||p.type==="sky") return r;
   const g=r.g-L; let t=g;
   if(p.type==="combined"){ const eg=mVfromdB(g), es=r.s===null?0:mVfromdB(r.s); t=dBuV(Math.hypot(eg,es)); }
@@ -1300,7 +1464,7 @@ function rainLoss(d,p){ const R=rainRate(p); if(!R) return 0; const d0=35*Math.e
 function gasSpecific(fGHz){ const pts=[[1,0.006],[3,0.008],[10,0.015],[22,0.2],[28,0.12],[40,0.15]]; if(fGHz<=1) return 0.006; for(let i=0;i<pts.length-1;i++){ if(fGHz<=pts[i+1][0]){ const u=(fGHz-pts[i][0])/(pts[i+1][0]-pts[i][0]); return pts[i][1]+u*(pts[i+1][1]-pts[i][1]); } } return 0.15; }
 function atmosLoss(d,p){ return p.f>=1000? rainLoss(d,p)+gasSpecific(p.f/1000)*d : 0; }
 /* ITU-R P.2109 median building entry loss, traditional building (approx. fit) */
-function buildingEntry(p){ return p.indoor? 11.6+3.0*Math.log2(Math.max(p.f/1000,0.5)) : 0; }
+function buildingEntry(p){ return p.indoor? p2109(p.f,0.5,p.thermal) : 0; }
 function hataLoss(dkm,p){
   const f=clamp(p.f,150,2200), hb=clamp(p.htx||30,10,200), hm=clamp(p.hrx||1.5,1,10), d=Math.max(dkm,0.02), lf=Math.log10(f);
   const ahm=(1.1*lf-0.7)*hm-(1.56*lf-0.8);
@@ -1324,31 +1488,236 @@ function umaLoss(dkm,p){
   // expected (power-weighted) median loss
   return -10*Math.log10(pl*Math.pow(10,-los/10)+(1-pl)*Math.pow(10,-nlos/10));
 }
-function cellMethod(p){ return p.f>2200?"ITU-R M.2412 UMa (IMT-2020)":p.f>1500?"COST-231 Hata (ext. of ITU-R P.529)":"ITU-R P.529 Okumura–Hata"; }
+function cellModelAt(d,p){ if(p.cellModel==="p1812") return "p1812"; if(p.f>2200) return d>5?"p1812":"uma"; return d>100?"p1812":"hata"; }
+function cellMethod(p){ if(p.cellModel==="p1812") return "ITU-R P.1812 + P.2108 clutter"; return (p.f>2200?"ITU-R M.2412 UMa (≤ 5 km)":p.f>1500?"COST-231 Hata (ext. of ITU-R P.529, ≤ 100 km)":"ITU-R P.529 Okumura–Hata (≤ 100 km)")+" · P.1812 beyond"; }
 /* radio horizon for mobile links and spherical-earth diffraction beyond it (ITU-R P.526, first-mode approximation) */
 function cellHorizon(p){ const k=kFac(p); return 3.57*(Math.sqrt(k*(p.htx||30))+Math.sqrt(k*(p.hrx||1.5))); }
 function beyondHorizonLoss(dkm,p){ const dh=cellHorizon(p); if(dkm<=dh) return 0; const x=dkm-dh;
   return 0.0402*Math.cbrt(p.f)*Math.pow((4/3)/kFac(p),2/3)*x + 6*Math.min(1,x/10); }
-function cellLoss(dkm,p){ let L=p.f>2200?umaLoss(dkm,p):hataLoss(dkm,p); return L+beyondHorizonLoss(dkm,p)+atmosLoss(dkm,p)+buildingEntry(p); }
+function cellLoss(dkm,p){ return cellParts(dkm,p).L; }
+function cellParts(dkm,p){ const m=cellModelAt(dkm,p), ls=locStats(p), pl=pLoc(p);
+  let base, r=null, cl={L:0};
+  if(m==="p1812"){ r=p1812(dkm,p,p.profile); cl=p2108(p); base=r.Lb50+cl.L; }
+  else base=m==="uma"?umaLoss(dkm,p):hataLoss(dkm,p);
+  const atm=atmosLoss(dkm,p), var_=-invQ(pl/100)*ls.sig;
+  return {m,base,r,cl,atm,ls,pl,var:var_,L:base+atm+ls.Lloc+var_}; }
 /* received power (dBm, isotropic receive antenna) and the equivalent field strength */
 function cellRxdBm(dkm,p){ return dBm(p.P)-cellLoss(dkm,p); }
 const dBm2dBuV=(prx,fMHz)=>prx+20*Math.log10(fMHz)+77.2;
 const dBuV2dBm=(e,fMHz)=>e-20*Math.log10(fMHz)-77.2;
 function cellThrdBm(p){ const t=CELL_TECH[p.tech]; return t?t.thr:-105; }
+function skyMethod(p){ return p.f<=1.705?"ITU-R P.1147 sky wave":"P.533-style HF sky wave (teaching approximation)"; }
 function methodOf(p){
-  if(p.type==="cell") return cellMethod(p)+" · P.526 beyond the radio horizon · P.838 rain · P.676 gases"+(p.indoor?" · P.2109 indoor":"");
-  if(p.type==="sky") return "ITU-R P.533-style sky wave (secant law, D-layer absorption)";
+  const loc=` · ${pLoc(p)}% locations`;
+  if(p.type==="cell") return cellMethod(p)+" · P.838 rain · P.676 gases"+(p.indoor?" · P.2109 indoor":"")+loc;
+  if(p.type==="sky") return skyMethod(p)+(p.f>1.705&&flareLevel(p)?" + NOAA D-RAP flare absorption":"");
   if(p.type==="inverse") return "Inverse-distance reference (ITU-R P.525 free space ×2)";
   if(p.type==="custom") return "Your own formula";
-  const gw="ITU-R P.368-style ground wave (Sommerfeld–Norton"+(p.type==="gwflat"?", flat earth)":", curved earth)")+(p.path!=="uniform"?" + Millington mixed path":"");
-  return (p.f>=30?"Two-ray + ITU-R P.526 diffraction · ":"")+gw+(p.type==="combined"?" + P.533-style sky wave":"");
+  if(p.f>=30) return "ITU-R P.1812 (delta-Bullington P.526 diffraction, troposcatter) + P.2108 clutter"+(p.indoor?" + P.2109":"")+loc;
+  const gw="ITU-R P.368 ground wave ("+(p.type==="gwflat"?"Sommerfeld–Norton flat earth":"GRWAVE method: Sommerfeld–Norton + residue series")+")"+(p.path!=="uniform"?" + Millington (P.368)":"");
+  return gw+(p.type==="combined"?" + "+skyMethod(p):"");
 }
+
+/* =====================================================================
+   ITU-R RECOMMENDATIONS IMPLEMENTED IN THIS FILE
+   P.368  ground wave (Sommerfeld–Norton flat earth + Fock/Wait residue series: the GRWAVE method)
+   P.1147 LF/MF sky wave (annual median, hourly loss factor, polarization coupling)
+   P.1812 VHF/UHF point-to-area (free space, delta-Bullington diffraction, troposcatter,
+          location variability) with P.526 spherical-earth diffraction
+   P.2108 terminal clutter loss (§3.1)     P.2109 building entry loss (full distribution)
+   NOAA D-RAP flare absorption (HF)         Solar radio-burst noise (VHF/UHF/mobile)
+   ===================================================================== */
+const Cx=(re,im=0)=>({re,im});
+const cAdd=(a,b)=>Cx(a.re+b.re,a.im+b.im), cSub=(a,b)=>Cx(a.re-b.re,a.im-b.im);
+const cMul=(a,b)=>Cx(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cDiv=(a,b)=>{const d=b.re*b.re+b.im*b.im; return Cx((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d);};
+const cAbs=a=>Math.hypot(a.re,a.im);
+const cExp=a=>{const e=Math.exp(a.re); return Cx(e*Math.cos(a.im),e*Math.sin(a.im));};
+const cSqrt=a=>{const r=cAbs(a); let im=Math.sqrt(Math.max(0,(r-a.re)/2)); if(a.im<0) im=-im; return Cx(Math.sqrt((r+a.re)/2),im);};
+const cSc=(a,s)=>Cx(a.re*s,a.im*s);
+/* Faddeeva function w(z)=exp(-z²)·erfc(-iz), Weideman (1994) rational approximation, N = 32 (≈1e-13) */
+const FADW=(()=>{ const N=32,M=2*N,M2=2*M,L=Math.sqrt(N/Math.SQRT2), f=[0];
+  for(let k=-M+1;k<=M-1;k++){ const t=L*Math.tan(k*Math.PI/M/2); f.push(Math.exp(-t*t)*(L*L+t*t)); }
+  const sh=f.slice(M).concat(f.slice(0,M)), a=[];
+  for(let n=0;n<=N;n++){ let s=0; for(let k=0;k<M2;k++) s+=sh[k]*Math.cos(2*Math.PI*n*k/M2); a.push(s/M2); }
+  return {c:a.slice(1,N+1).reverse(),L}; })();
+function faddeeva(z){
+  if(z.im<0){ const w=faddeeva(Cx(-z.re,-z.im)); return cSub(cSc(cExp(cSc(cMul(z,z),-1)),2),w); }
+  const iz=Cx(-z.im,z.re), Lm=cSub(Cx(FADW.L),iz), Z=cDiv(cAdd(Cx(FADW.L),iz),Lm);
+  let p=Cx(0); for(const c of FADW.c) p=cAdd(cMul(p,Z),Cx(c));
+  return cAdd(cDiv(cSc(p,2),cMul(Lm,Lm)),cDiv(Cx(1/Math.sqrt(Math.PI)),Lm));
+}
+/* ---------- ITU-R P.368: ground wave over a smooth homogeneous earth (vertical polarization, antennas at ground level) ---------- */
+const C_LIGHT=299.792458;
+function gwEps(er,sigma,fMHz){ return Cx(er,-60*(C_LIGHT/fMHz)*sigma); }            // complex permittivity εr − j60λσ
+function gwDelta(ec){ return cDiv(cSqrt(cSub(ec,Cx(1))),ec); }                    // normalized surface impedance Δ = √(εc−1)/εc
+/* flat earth: F(w) = 1 − j√(πw)·e^(−w)·erfc(j√w),  w = −j·(k·d/2)·Δ²  (Sommerfeld–Norton, exact) */
+function gwFlat(dkm,fMHz,er,sigma){
+  const k=2*Math.PI*fMHz/C_LIGHT, D=gwDelta(gwEps(er,sigma,fMHz));
+  const w=cMul(Cx(0,-k*dkm*1000/2),cMul(D,D)), sw=cSqrt(w);
+  const F=cSub(Cx(1),cMul(Cx(0,Math.sqrt(Math.PI)),cMul(sw,faddeeva(cSc(sw,-1)))));
+  return {F,w,D};
+}
+/* spherical earth: W = e^(−jπ/4)·√(πx)·Σ e^(−jx·t_s)/(t_s − q²), roots of w′(t) − q·w(t) = 0 (Fock / Wait / Bremmer) */
+const AIZ=[2.33810741,4.08794944,5.52055983,6.78670809,7.94413359,9.02265085,10.04017434,11.00852430,11.93601556,12.82877675];
+const AIPZ=[1.01879297,3.24819758,4.82009921,6.16330736,7.37217726,8.48848673,9.53544905,10.52766040,11.47505663,12.38478837];
+const aiZ=s=>s<=10?AIZ[s-1]:Math.pow(3*Math.PI/8*(4*s-1),2/3), aipZ=s=>s<=10?AIPZ[s-1]:Math.pow(3*Math.PI/8*(4*s-3),2/3);
+const ROT60=Cx(Math.cos(-Math.PI/3),Math.sin(-Math.PI/3));
+function rk4c(fn,y,x1,n){ const h=cSc(x1,1/n); let x=Cx(0);
+  for(let i=0;i<n;i++){ const h2=cSc(h,.5), k1=fn(x,y), k2=fn(cAdd(x,h2),cAdd(y,cMul(h2,k1))), k3=fn(cAdd(x,h2),cAdd(y,cMul(h2,k2))), k4=fn(cAdd(x,h),cAdd(y,cMul(h,k3)));
+    y=cAdd(y,cMul(cSc(h,1/6),cAdd(cAdd(k1,cSc(k2,2)),cAdd(cSc(k3,2),k4)))); x=cAdd(x,h); } return y; }
+const GW_ROOTS=new Map(); const GW_NT=80;
+function gwRoots(q){
+  const key=q.re.toFixed(6)+","+q.im.toFixed(6); if(GW_ROOTS.has(key)) return GW_ROOTS.get(key);
+  const out=[], big=cAbs(q)>1;
+  for(let s=1;s<=GW_NT;s++){
+    // |q| ≤ 1: integrate dt/dq = 1/(t − q²) from the zeros of Ai′ (q = 0, perfectly conducting earth)
+    // |q| > 1: integrate dt/du = 1/(1 − u²t), u = 1/q, from the zeros of Ai (q = ∞)
+    out.push(big ? rk4c((u,t)=>cDiv(Cx(1),cSub(Cx(1),cMul(cMul(u,u),t))),cSc(ROT60,aiZ(s)),cDiv(Cx(1),q),300)
+                 : rk4c((qq,t)=>cDiv(Cx(1),cSub(t,cMul(qq,qq))),cSc(ROT60,aipZ(s)),q,300));
+  }
+  if(GW_ROOTS.size>400) GW_ROOTS.clear(); GW_ROOTS.set(key,out); return out;
+}
+function gwSphere(dkm,fMHz,er,sigma,kf){
+  const k=2*Math.PI*fMHz/C_LIGHT, a=kf*6371e3, m=Math.cbrt(k*a/2), D=gwDelta(gwEps(er,sigma,fMHz));
+  const q=cMul(Cx(0,-m),D), x=m*dkm*1000/a, rts=gwRoots(q);
+  let s=Cx(0); for(const t of rts) s=cAdd(s,cDiv(cExp(cMul(Cx(0,-x),t)),cSub(t,cMul(q,q))));
+  return {W:cMul(cMul(cExp(Cx(0,-Math.PI/4)),Cx(Math.sqrt(Math.PI*x))),s),x,q,m};
+}
+/* |attenuation| in dB: flat earth for x ≤ 0.08, residue series for x ≥ 0.18, smooth blend between (agreement ≤ 0.2 dB) */
+function gwAttn(dkm,fMHz,er,sigma,kf,curved){
+  const fl=20*Math.log10(Math.max(cAbs(gwFlat(dkm,fMHz,er,sigma).F),1e-30));
+  if(!curved) return {dB:fl,x:null,flat:fl};
+  const m=Math.cbrt(Math.PI*fMHz/C_LIGHT*kf*6371e3), x=m*dkm*1000/(kf*6371e3);
+  if(x<=0.08) return {dB:fl,x,flat:fl};
+  const sp=20*Math.log10(Math.max(cAbs(gwSphere(dkm,fMHz,er,sigma,kf).W),1e-30));
+  if(x>=0.18) return {dB:sp,x,flat:fl};
+  const u=(x-0.08)/0.1; return {dB:fl*(1-u)+sp*u,x,flat:fl};
+}
+/* P.368 field: E = 109.54 + 10·log P[kW] − 20·log d[km] + 20·log|W|  dB(µV/m)  (short monopole, cymomotive force 300 V for 1 kW) */
+function p368dB(dkm,fMHz,er,sigma,kf,curved,PkW){ return 109.54+10*Math.log10(PkW)-20*Math.log10(dkm)+gwAttn(dkm,fMHz,er,sigma,kf,curved).dB; }
+
+/* ---------- inverse complementary normal I(x) (ITU-R P.1812 Attachment 2, P.1057) ---------- */
+function invQ(x){ x=clamp(x,1e-6,0.999999); const C0=2.515516698,C1=0.802853,C2=0.010328,D1=1.432788,D2=0.189269,D3=0.001308;
+  const xi=T=>(((C2*T+C1)*T)+C0)/(((D3*T+D2)*T+D1)*T+1);
+  if(x<=0.5){ const T=Math.sqrt(-2*Math.log(x)); return T-xi(T); } const T=Math.sqrt(-2*Math.log(1-x)); return xi(T)-T; }
+
+/* ---------- ITU-R P.1147: LF/MF sky wave, annual median ---------- */
+const P1147={
+  A:f=>f<0.3?110.2:107,                                   // dB, LF / MF
+  slant:d=>Math.sqrt(d*d+40000),                           // p (km), reflection height 100 km
+  k:phi=>{ const P=clamp(phi,-60,60); return 2*Math.PI+4.95*Math.pow(Math.tan(toRad(P)),2); },
+  Lp:(f,dip,azi)=>{ if(f<0.3||Math.abs(dip)>45) return 0; const th=Math.min(Math.abs(((azi%180)+180)%180-90),90); // azimuth from magnetic E–W
+    return Math.max(0,180/Math.sqrt(36+th*th+dip*dip)-2); },
+  Lt:(h)=>{ h=((h%24)+24)%24; let ts=h-18; if(ts<-12) ts+=24; let tr=h-6; if(tr>12) tr-=24;
+    if(ts>=-1&&ts<=4) return Math.min(30,12.40-9.248*ts+2.892*ts*ts-0.3343*ts**3);
+    if(tr>=-3&&tr<=1) return Math.min(30,9.6+12.2*tr+5.62*tr*tr+0.86*tr**3);
+    if(h>22||h<3) return 0; return 30; }
+};
+function solarHourOf(p){ if(p.hour!==undefined&&p.hour!==null) return p.hour; if(p.cosChi!==undefined&&p.cosChi!==null) return 12+Math.acos(clamp(p.cosChi,-1,1))*12/Math.PI; return {day:12,dusk:18,night:24}[p.time]??12; }
+function p1147(d,p){
+  const f=p.f, pk=P1147.slant(d), phi=p.gmlat??20, k=P1147.k(phi), dip=p.dip??toDeg(Math.atan(2*Math.tan(toRad(phi)))), Lp=2*P1147.Lp(f,dip,p.azi??0), Lt=P1147.Lt(solarHourOf(p));
+  const V=10*Math.log10(p.P); // short monopole: G_V = 0 dB (cymomotive force 300 V for 1 kW)
+  const E=V+P1147.A(f)-20*Math.log10(pk)-k*pk/1000-Lp-Lt;   // G_S (sea gain) = 0, L_r = 0 for |Φ| ≤ 45°
+  return {E,pk,k,Lp,Lt,V,A:P1147.A(f),phi,dip,h:solarHourOf(p)};
+}
+
+/* ---------- ITU-R P.526 / P.1812 diffraction ---------- */
+const Jnu=nu=>nu>-0.78?6.9+20*Math.log10(Math.sqrt((nu-0.1)**2+1)+nu-0.1):0;
+function bullington(d,hi,di,hts,hrs,ae,lam){ // P.1812 §4.3.1 (d km, h m, λ m)
+  const Ce=1/ae, n=di.length; let Stim=-Infinity, Str=(hrs-hts)/d;
+  for(let i=1;i<n-1;i++) Stim=Math.max(Stim,(hi[i]+500*Ce*di[i]*(d-di[i])-hts)/di[i]);
+  let Luc, bp=null;
+  if(Stim<Str){ let nm=-Infinity, im=-1; for(let i=1;i<n-1;i++){ const v=(hi[i]+500*Ce*di[i]*(d-di[i])-(hts*(d-di[i])+hrs*di[i])/d)*Math.sqrt(0.002*d/(lam*di[i]*(d-di[i]))); if(v>nm){nm=v;im=i;} }
+    Luc=Jnu(nm); bp={d:di[im],nu:nm,los:true}; }
+  else { let Srim=-Infinity; for(let i=1;i<n-1;i++) Srim=Math.max(Srim,(hi[i]+500*Ce*di[i]*(d-di[i])-hrs)/(d-di[i]));
+    const db=(hrs-hts+Srim*d)/(Stim+Srim), nub=(hts+Stim*db-(hts*(d-db)+hrs*db)/d)*Math.sqrt(0.002*d/(lam*db*(d-db)));
+    Luc=Jnu(nub); bp={d:db,nu:nub,los:false,h:hts+Stim*db}; }
+  return {L:Luc+(1-Math.exp(-Luc/6))*(10+0.02*d),Luc,bp,los:Stim<Str};
+}
+function ldft1(d,hte,hre,adft,fG,er,sg,pol){ // P.1812 §4.3.3 first-term spherical-earth loss, one ground type
+  const KH=0.036*Math.pow(adft*fG,-1/3)*Math.pow((er-1)**2+(18*sg/fG)**2,-0.25), K=pol==="h"?KH:KH*Math.sqrt(er*er+(18*sg/fG)**2);
+  const b=(1+1.6*K*K+0.67*K**4)/(1+4.5*K*K+1.53*K**4);
+  const X=21.88*b*Math.cbrt(fG/(adft*adft))*d, Yt=0.9575*b*Math.cbrt(fG*fG/adft)*hte, Yr=0.9575*b*Math.cbrt(fG*fG/adft)*hre;
+  const F=X>=1.6?11+10*Math.log10(X)-17.6*X:-20*Math.log10(X)-5.6488*Math.pow(X,1.425);
+  const G=Y=>{ const B=b*Y; const g=B>2?17.6*Math.sqrt(B-1.1)-5*Math.log10(B-1.1)-8:20*Math.log10(B+0.1*B**3); return Math.max(g,2+20*Math.log10(K)); };
+  return -F-G(Yt)-G(Yr);
+}
+function ldft(d,hte,hre,adft,fG,om,pol){ return om*ldft1(d,hte,hre,adft,fG,80,5,pol)+(1-om)*ldft1(d,hte,hre,adft,fG,22,0.003,pol); }
+function ldsph(d,hte,hre,ap,fG,om,pol){ // P.1812 §4.3.2
+  hte=Math.max(hte,1); hre=Math.max(hre,1); const lam=0.3/fG;
+  const dlos=Math.sqrt(2*ap)*(Math.sqrt(0.001*hte)+Math.sqrt(0.001*hre));
+  if(d>=dlos) return Math.max(0,ldft(d,hte,hre,ap,fG,om,pol));
+  const c=(hte-hre)/(hte+hre), m=250*d*d/(ap*(hte+hre));
+  const b=2*Math.sqrt((m+1)/(3*m))*Math.cos(Math.PI/3+Math.acos(clamp(3*c/2*Math.sqrt(3*m/Math.pow(m+1,3)),-1,1))/3);
+  const d1=d*(1+b)/2, d2=d-d1, hse=((hte-500*d1*d1/ap)*d2+(hre-500*d2*d2/ap)*d1)/d, hreq=17.456*Math.sqrt(d1*d2*lam/d);
+  if(hse>hreq) return 0;
+  const aem=500*Math.pow(d/(Math.sqrt(hte)+Math.sqrt(hre)),2), L=ldft(d,hte,hre,aem,fG,om,pol);
+  return L<0?0:(1-hse/hreq)*L;
+}
+function smoothSurface(di,hi,hts,hrs){ // P.1812 Attachment 1 §5.6
+  const n=di.length, d=di[n-1]; let v1=0,v2=0;
+  for(let i=1;i<n;i++){ const dd=di[i]-di[i-1]; v1+=dd*(hi[i]+hi[i-1]); v2+=dd*(hi[i]*(2*di[i]+di[i-1])+hi[i-1]*(di[i]+2*di[i-1])); }
+  const hst=(2*v1*d-v2)/(d*d), hsr=(v2-v1*d)/(d*d);
+  let hobs=-Infinity, at=-Infinity, ar=-Infinity;
+  for(let i=1;i<n-1;i++){ const H=hi[i]-(hts*(d-di[i])+hrs*di[i])/d; hobs=Math.max(hobs,H); at=Math.max(at,H/di[i]); ar=Math.max(ar,H/(d-di[i])); }
+  let hstp=hst, hsrp=hsr; if(hobs>0){ const gt=at/(at+ar), gr=ar/(at+ar); hstp=hst-hobs*gt; hsrp=hsr-hobs*gr; }
+  return {hst,hsr,hstd:Math.min(hstp,hi[0]),hsrd:Math.min(hsrp,hi[n-1])};
+}
+/* P.1812 median basic transmission loss (p = 50 % time), plus clutter, building entry and location variability */
+function p1812(dkm,p,prof){
+  const fG=p.f/1000, kf=kFac(p), ae=kf*6371, lam=0.3/fG, d=Math.max(dkm,0.25);
+  let di,hi;
+  if(prof&&prof.d&&prof.d.length>2&&Math.abs(prof.d[prof.d.length-1]-d)<0.05*d+0.1){ di=prof.d; hi=prof.h; }
+  else { const n=41; di=Array.from({length:n},(_,i)=>d*i/(n-1)); hi=new Array(n).fill(0); }
+  const n=di.length, hts=hi[0]+(p.htx||30), hrs=hi[n-1]+(p.hrx||10), om=p.seaFrac??(p.ground==="sea"||p.ground==="seaLow"?1:0), pol=p.pol||"v";
+  const dfs=Math.sqrt(d*d+((hts-hrs)/1000)**2), Lbfs=92.44+20*Math.log10(fG)+20*Math.log10(dfs);
+  const Ba=bullington(d,hi,di,hts,hrs,ae,lam), ss=smoothSurface(di,hi,hts,hrs);
+  const htsp=hts-ss.hstd, hrsp=hrs-ss.hsrd, Bs=bullington(d,new Array(n).fill(0),di,htsp,hrsp,ae,lam);
+  const Lsph=ldsph(d,htsp,hrsp,ae,fG,om,pol), Ld=Ba.L+Math.max(Lsph-Bs.L,0);
+  // angular distance θ (mrad), Attachment 1 §5.1–5.5
+  let tmax=-Infinity, rmax=-Infinity; for(let i=1;i<n-1;i++){ tmax=Math.max(tmax,(hi[i]-hts)/di[i]-500*di[i]/ae); rmax=Math.max(rmax,(hi[i]-hrs)/(d-di[i])-500*(d-di[i])/ae); }
+  const ttd=(hrs-hts)/d-500*d/ae, trd=(hts-hrs)/d-500*d/ae, trans=tmax>ttd;
+  const th=(trans?tmax:ttd)+(trans?rmax:trd)+1000*d/ae;
+  const fl=Math.log10(fG), Lf=25*fl-2.5*Math.log10(fG/2)**2, N0=p.N0??360;
+  const Ag=(fG>=1?gasSpecific(fG):0.005)*d, Lbs=190.1+Lf+20*Math.log10(d)+0.573*th-0.15*N0+0.051+Ag;
+  const Lbd=Lbfs+Ld, Lbc=-5*Math.log10(Math.pow(10,-0.2*Lbs)+Math.pow(10,-0.2*Lbd)), Lb50=Math.max(Lbfs,Lbc);
+  return {Lbfs,Ld,Lbulla:Ba.L,Lbulls:Bs.L,Lsph,Lbs,Lbd,Lbc,Lb50,theta:th,trans,los:Ba.los,bp:Ba.bp,dfs,hstd:ss.hstd,hsrd:ss.hsrd,htsp,hrsp,N0};
+}
+/* ITU-R P.2108 §3.1 terminal clutter loss (receiver end) */
+const CLUTTER={rural:{R:10,type:"hg",name:"Open / rural"},suburban:{R:10,type:"diff",name:"Suburban"},urban:{R:15,type:"diff",name:"Urban / trees"},industrial:{R:20,type:"diff",name:"Dense urban"}};
+function p2108(p){ const c=CLUTTER[p.env]||CLUTTER.rural, h=p.hrx||10, fG=p.f/1000; if(h>=c.R||p.f<30) return {L:0,c};
+  const Kh2=21.8+6.2*Math.log10(fG); if(c.type==="hg") return {L:-Kh2*Math.log10(h/c.R),c};
+  const ws=27, hd=c.R-h, thc=toDeg(Math.atan(hd/ws)), Knu=0.342*Math.sqrt(fG), nu=Knu*Math.sqrt(hd*thc);
+  return {L:Jnu(nu)-6.03,c,nu}; }
+/* ITU-R P.2109 building entry loss, traditional (default) or thermally efficient building, horizontal incidence */
+function p2109(fMHz,P,thermal){ const fG=Math.max(fMHz/1000,0.08), lf=Math.log10(fG);
+  const k=thermal?{r:28.19,s:-3.00,t:8.48,u:13.5,v:3.8,w:27.8,x:-2.9,y:9.4,z:-2.1}:{r:12.64,s:3.72,t:0.96,u:9.6,v:2.0,w:9.1,x:-3.0,y:4.5,z:-2.0};
+  const Lh=k.r+k.s*lf+k.t*lf*lf, mu1=Lh, mu2=k.w+k.x*lf, s1=k.u+k.v*lf, s2=k.y+k.z*lf, Fi=-invQ(P);
+  const A=Fi*s1+mu1, B=Fi*s2+mu2; return 10*Math.log10(Math.pow(10,0.1*A)+Math.pow(10,0.1*B)+Math.pow(10,-0.3)); }
+/* location variability σL (P.1812 / P.1546): K + 1.3·log f[GHz] */
+function sigmaL(p){ const below=(p.hrx||10)<(CLUTTER[p.env]||CLUTTER.rural).R; const K=p.env==="rural"?4.4:below?5.1:4.9; return K+1.3*Math.log10(p.f/1000); }
+/* combined location statistics: median extra loss and σ (outdoor or indoor, P.1812 §4.9) */
+function locStats(p){ const sL=sigmaL(p); if(!p.indoor) return {Lloc:0,sig:sL,sL,be:0,sbe:0};
+  const be=p2109(p.f,0.5,p.thermal), sbe=(p2109(p.f,0.84,p.thermal)-p2109(p.f,0.16,p.thermal))/2; return {Lloc:be,sig:Math.sqrt(sL*sL+sbe*sbe),sL,be,sbe}; }
+function pLoc(p){ return clamp(p.pL||50,1,99); }
+
+/* ---------- Solar flares (NOAA R-scale) ---------- */
+const FLARE={0:{x:0,name:"None"},1:{x:1e-5,name:"R1 · M1 flare",sfu:1e2},2:{x:5e-5,name:"R2 · M5 flare",sfu:1e3},3:{x:1e-4,name:"R3 · X1 flare",sfu:1e4},4:{x:1e-3,name:"R4 · X10 flare",sfu:1e5},5:{x:2e-3,name:"R5 · X20 flare",sfu:1e6}};
+function flareLevel(p){ const r=+p.flareR||0; return r>0?r:(p.flare?3:0); }
+/* NOAA D-RAP: HAF = 10·log F_X + 65 MHz at the sub-solar point, × (cos χ)^0.75; A(f) = (HAF/f)^1.5 dB per vertical round trip */
+function flareHAF(p){ const R=flareLevel(p), c=cosChiOf(p); if(!R||c<=0) return 0; return Math.max(0,(10*Math.log10(FLARE[R].x)+65)*Math.pow(c,0.75)); }
+function flareAbs(fMHz,p){ const H=flareHAF(p); return H>0?Math.pow(H/fMHz,1.5):0; }
+/* solar radio burst: noise rise ΔN = 10·log(1 + T_sun/T_sys), T_sun = S·A_e/(2k), A_e = G·λ²/4π (only with the sun in the antenna beam) */
+function burstNoise(p,GdBi,NFdB){ const R=flareLevel(p); if(!R||cosChiOf(p)<=0||!p.sunBeam||p.f<30) return 0;
+  const lam=C_LIGHT/p.f, Ae=Math.pow(10,GdBi/10)*lam*lam/(4*Math.PI), Ts=FLARE[R].sfu*1e-22*Ae/(2*1.380649e-23), Tsys=290*Math.pow(10,NFdB/10);
+  return 10*Math.log10(1+Ts/Tsys); }
 
 /* ================= STATE ================= */
 const COLORS=["#2f6fdf","#e0662f","#1f9e74","#b0429c","#c99a10","#6a5bd6","#d13b4f","#2a9bb5"];
 const TYPE_TAG={gwflat:"Ground (flat)",gw:"Ground wave",sky:"Sky wave",combined:"Ground + sky",inverse:"Ideal 1/d",custom:"Own formula",cell:"Mobile"};
 const DEFAULT={type:"combined",f:1.0,P:50,ground:"land",sigmaC:0.005,erC:15,path:"uniform",ground2:"sea",coast:60,
-  moisture:"normal",frozen:false,refr:"standard",storm:"none",time:"day",cosChi:null,solar:"medium",flare:false,gstorm:false,env:"rural",
+  moisture:"normal",frozen:false,refr:"standard",storm:"none",time:"day",cosChi:null,solar:"medium",flare:false,flareR:0,sunBeam:false,gstorm:false,env:"rural",pL:50,stereo:false,thermal:false,cellModel:"auto",gmlat:20,azi:0,N0:360,
   expr:"300*sqrt(P)*A/d",htx:50,hrx:10,tech:"4g",indoor:false,segs:null,rxDist:null,pathLabel:null};
 let models=[], selId=null, nextId=1, colorIx=0, currentPreset=0;
 function mk(name,over){ return {id:nextId++,name,visible:true,color:COLORS[(colorIx++)%COLORS.length],p:Object.assign({},DEFAULT,over||{})}; }
@@ -1363,7 +1732,8 @@ const PRESETS=[
   {label:"Monsoon vs drought",goal:"See how weather changes the soil and the noise.",look:"Wet monsoon soil carries the signal further, but thunderstorm noise raises the dashed line. Compare the service radius of each.",models:[["Drought soil",{type:"gw",ground:"medDry",moisture:"dry"}],["Normal soil",{type:"gw",ground:"medDry",moisture:"normal"}],["Monsoon + storms",{type:"gw",ground:"medDry",moisture:"saturated",storm:"local"}]]},
   {label:"Coastline",goal:"See what happens when a path crosses from land to sea.",look:"After the coast at 60 km, the mixed-path curve recovers toward the sea curve (Millington's recovery effect).",models:[["All land",{type:"gw",ground:"land"}],["Land → sea at 60 km",{type:"gw",ground:"land",path:"mixed",ground2:"sea",coast:60}],["All sea",{type:"gw",ground:"sea"}]]},
   {label:"HF skip zone",goal:"See the skip zone at HF.",look:"The ground wave dies near the transmitter. There is a gap before the sky wave lands hundreds of km away.",models:[["10 MHz · day",{f:10,P:1,time:"day"}],["10 MHz · night",{f:10,P:1,time:"night"}]],range:"3000"},
-  {label:"Solar flare",goal:"See how a solar flare blacks out HF.",look:"With the flare, D-layer absorption jumps and the sky-wave curve drops sharply.",models:[["7 MHz · quiet sun",{f:7,P:1}],["7 MHz · solar flare",{f:7,P:1,flare:true}]],range:"3000"},
+  {label:"Solar flare",goal:"See how a solar flare blacks out HF.",look:"With the flare, D-layer absorption jumps and the sky-wave curve drops sharply.",models:[["7 MHz · quiet sun",{f:7,P:1}],["7 MHz · R3 flare (X1)",{f:7,P:1,flareR:3}],["7 MHz · R5 flare (X20)",{f:7,P:1,flareR:5}]],range:"3000"},
+  {label:"Flare on every band",goal:"Compare what one R3 (X1) flare does to LF, MF, HF, VHF and mobile.",look:"Only HF collapses. LF/MF ground waves are unchanged, and VHF/UHF/mobile path loss is unchanged; with the sun in the antenna beam, VHF and mobile need more signal because of radio-burst noise (open Models → steps).",models:[["MW 1 MHz · R3",{f:1,P:10,type:"gw",flareR:3}],["HF 7 MHz · R3",{f:7,P:1,type:"combined",flareR:3}],["FM 100 MHz · R3 + sun in beam",{f:100,P:10,type:"gw",htx:300,hrx:10,flareR:3,sunBeam:true,time:"dusk"}],["4G 1800 · R3 + sun in beam",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,flareR:3,sunBeam:true,time:"dusk",env:"urban"}]],range:"1000"},
   {label:"VHF & UHF",goal:"Compare line-of-sight VHF/UHF broadcasting with MW ground wave.",look:"FM (100 MHz) and TV (600 MHz) stay strong until the radio horizon set by the antenna heights, then drop fast. MW keeps going along the ground. The ducting model shows how warm, humid weather can stretch VHF range.",models:[["FM 100 MHz · 300 m mast",{type:"gw",f:100,P:10,htx:300,hrx:10}],["TV 600 MHz · 300 m mast",{type:"gw",f:600,P:50,htx:300,hrx:10}],["FM 100 MHz · ducting",{type:"gw",f:100,P:10,htx:300,hrx:10,refr:"super"}],["MW 1 MHz",{type:"gw",f:1,P:50}]],range:"300"},
   {label:"2G · 3G · 4G · 5G",goal:"Compare mobile-network coverage from one tower (30 m mast, suburban, phone at 1.5 m).",look:"Lower frequencies reach further: 2G at 900 MHz covers the most ground and 5G mmWave at 28 GHz the least. Switch the weather to Thunderstorm to see rain attenuation (ITU-R P.838) hit mmWave hardest.",models:[["2G GSM 900",{type:"cell",tech:"2g",f:900,P:1,htx:30,hrx:1.5,env:"suburban"}],["3G UMTS 2100",{type:"cell",tech:"3g",f:2100,P:1,htx:30,hrx:1.5,env:"suburban"}],["4G LTE 1800",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,env:"suburban"}],["5G NR 3.5 GHz",{type:"cell",tech:"5g",f:3500,P:10,htx:30,hrx:1.5,env:"suburban"}],["5G mmWave 28 GHz",{type:"cell",tech:"5gmm",f:28000,P:3.16,htx:30,hrx:1.5,env:"suburban"}]],range:"30"},
   {label:"Build your own",goal:"Write your own propagation formula and test it against the built-in model.",look:"Edit the formula in Settings. If your curve stays close to the Norton curve, your formula captures the ground losses.",models:[["Norton (built in)",{type:"gw"}],["My formula",{type:"custom",expr:"300*sqrt(P)/d*exp(-0.004*d*pow(f,0.7))"}]]}
@@ -1473,7 +1843,7 @@ function syncControls(){
   $("path").value=p.path; $("ground2").value=p.ground2; $("coast").value=p.coast;
   $("moisture").value=p.moisture; $("frozen").checked=p.frozen; $("refr").value=p.refr; $("storm").value=p.storm;
   document.querySelectorAll("input[name=time]").forEach(r=>r.checked=(p.cosChi===null && r.value===p.time));
-  $("solar").value=p.solar; $("flare").checked=p.flare; $("gstorm").checked=p.gstorm; $("env").value=p.env;
+  $("solar").value=p.solar; $("flareR").value=String(flareLevel(p)); $("sunBeam").checked=!!p.sunBeam; $("pL").value=String(p.pL||50); $("stereo").checked=!!p.stereo; $("thermal").checked=!!p.thermal; $("cellModel").value=p.cellModel||"auto"; $("gmlat").value=p.gmlat??20; $("azi").value=p.azi??0; $("gstorm").checked=p.gstorm; $("env").value=p.env;
   updateLabels();
 }
 function updateLabels(){
@@ -1524,7 +1894,14 @@ function bindLab(){
   $("storm").addEventListener("change",e=>set({storm:e.target.value}));
   document.querySelectorAll("input[name=time]").forEach(r=>r.addEventListener("change",e=>set({time:e.target.value,cosChi:null})));
   $("solar").addEventListener("change",e=>set({solar:e.target.value}));
-  $("flare").addEventListener("change",e=>set({flare:e.target.checked}));
+  $("flareR").addEventListener("change",e=>set({flareR:+e.target.value,flare:false}));
+  $("sunBeam").addEventListener("change",e=>set({sunBeam:e.target.checked}));
+  $("pL").addEventListener("change",e=>set({pL:+e.target.value}));
+  $("stereo").addEventListener("change",e=>set({stereo:e.target.checked}));
+  $("thermal").addEventListener("change",e=>set({thermal:e.target.checked}));
+  $("cellModel").addEventListener("change",e=>set({cellModel:e.target.value}));
+  $("gmlat").addEventListener("change",e=>set({gmlat:clamp(+e.target.value||0,-90,90)}));
+  $("azi").addEventListener("change",e=>set({azi:((+e.target.value||0)%360+360)%360}));
   $("gstorm").addEventListener("change",e=>set({gstorm:e.target.checked}));
   $("env").addEventListener("change",e=>set({env:e.target.value}));
   $("gNext").addEventListener("click",()=>loadPreset(currentPreset<0?0:(currentPreset+1)%PRESETS.length));
@@ -1580,6 +1957,9 @@ function drawChart(hoverX){
   for(const c of curveCache){ if(c.m.visible) plot(c.pts,"t",c.m.color,c.m.id===selId?3:1.8,[],c.m.id===selId?1:0.75); }
   if(s&&s.m.visible){ const r=serviceRadius(s.m); if(r&&r<dmax){ const x=xs(r),y=ys(s.thr); cctx.fillStyle=s.m.color; cctx.beginPath(); cctx.arc(x,y,5.5,0,7); cctx.fill(); cctx.strokeStyle=cssVar("--panel"); cctx.lineWidth=2; cctx.stroke(); } }
   for(const c of curveCache){ const rd=c.m.p.rxDist; if(c.m.visible&&rd&&rd<=dmax){ const v=cv(evalRx(c.m.p,c.io).t,c.m); if(v!==null){ const x=xs(rd),y=ys(v); cctx.fillStyle=c.m.color; cctx.font="600 11px "+cssVar("--font-body"); cctx.textAlign="center"; cctx.textBaseline="bottom"; cctx.fillText("📻 receiver",x,y-8); cctx.beginPath(); cctx.moveTo(x-5,y-5); cctx.lineTo(x+5,y-5); cctx.lineTo(x,y); cctx.fill(); } } }
+  if(typeof MEAS!=="undefined"&&MEAS.pts.length){ const mm=models.find(x=>x.id===MEAS.modelId); if(mm){ cctx.strokeStyle=cssVar("--ink"); cctx.lineWidth=1.5; cctx.fillStyle=hexA(mm.color,0.9);
+    for(const q of MEAS.pts){ if(q.d>dmax||q.d<dmin) continue; const x=xs(q.d), y=ys(cv(q.dB,mm)); cctx.beginPath(); cctx.rect(x-4,y-4,8,8); cctx.fill(); cctx.stroke(); }
+    cctx.fillStyle=cssVar("--ink"); cctx.font="600 11px "+cssVar("--font-body"); cctx.textAlign="left"; cctx.textBaseline="top"; cctx.fillText(`■ measured / reference (${MEAS.pts.length}) vs ${mm.name}`,L+6,T+4); } }
   if(hoverX!==undefined){ cctx.strokeStyle=muted; cctx.lineWidth=1; cctx.beginPath(); cctx.moveTo(hoverX,T); cctx.lineTo(hoverX,T+h); cctx.stroke(); }
   cctx.restore();
   drawLegend();
@@ -1647,7 +2027,9 @@ function readouts(){
   if(p.type==="cell") tiles.push({k:"Radio horizon",tip:"Beyond this distance the earth's curve blocks the direct path and the mobile signal falls quickly (spherical-earth diffraction, ITU-R P.526). Raise the tower to push it further.",val:`${fmtD(cellHorizon(p))} km`,sub:`tower ${p.htx||30} m · phone ${p.hrx||1.5} m`,cls:"info"});
   if(p.type==="cell"){ const r1=cellRxdBm(1,p); tiles.push({k:"Signal at 1 km",tip:"Received power at a phone 1 km from the tower (isotropic antenna), after path, rain, gas and building-entry losses.",val:`${r1.toFixed(0)} dBm`,sub:r1>-80?"excellent":r1>-95?"good":r1>cellThrdBm(p)?"fair":"poor",cls:r1>-95?"good":r1>cellThrdBm(p)?"warn":"bad"});
     if(rainRate(p)&&p.f>=1000) tiles.push({k:"Rain loss @ 5 km",tip:"ITU-R P.838 specific attenuation with an effective path-length reduction.",val:`${rainLoss(5,p).toFixed(1)} dB`,sub:`${rainRate(p)} mm/h rain`,cls:rainLoss(5,p)>6?"bad":"warn"}); }
-  tiles.push({k:"Signal needed",tip:p.type==="cell"?"Typical cell-edge level for this technology (outdoor, teaching estimate).":"Minimum usable field strength. It rises with man-made noise, thunderstorms, night-time static and lower frequency.",val:p.type==="cell"?`${cellThrdBm(p)} dBm`:thrTxt,sub:`${A.thr.toFixed(0)} dBµV/m · ${p.env}${p.storm!=="none"?" + storms":""}`,cls:"info"});
+  const bn=p.type==="cell"?burstNoise(p,0,7):burstNoise(p,7,5);
+  tiles.push({k:"Signal needed",tip:p.type==="cell"?"Typical cell-edge level for this technology (industry practice; ITU does not set one).":"ITU minimum usable field strength for this band and area.",val:p.type==="cell"?`${(cellThrdBm(p)+bn).toFixed(0)} dBm`:thrTxt,sub:p.type==="cell"?`${A.thr.toFixed(0)} dBµV/m · industry cell edge${bn?` + ${bn.toFixed(1)} dB burst noise`:""}`:`${A.thr.toFixed(0)} dBµV/m · ${ituMinRef(p).ref}${bn?` + ${bn.toFixed(1)} dB burst noise`:""}`,cls:"info"});
+  const fl=flareLevel(p); if(fl) tiles.push({k:"Solar flare",tip:"Effect of the selected NOAA radio-blackout level on this band.",val:FLARE[fl].name,sub:flareImpact(p).short,cls:flareImpact(p).cls});
   if(p.rxDist){ const v=evalRx(p,A.io).t; const ok=v!==null&&v>=A.thr; tiles.unshift({k:"At your receiver",tip:"Predicted total field at the receiver placed on the map, including the terrain shadowing estimate.",val:fmtField(v),sub:`${fmtD(p.rxDist)} km${p.terrainLossDb?` · terrain −${p.terrainLossDb.toFixed(1)} dB`:""} · ${ok?"usable":"below minimum"}`,cls:ok?"good":"bad"});
     sent.unshift(`At the receiver (${fmtD(p.rxDist)} km away) the predicted signal is <b>${fmtField(v)}</b>, ${ok?"which is enough for reception":"which is below the minimum usable level"}.`); }
   $("selName").textContent=`${m.name} · ${fmtF(p.f)} · ${fmtP(p.P)} · ${timeLabel(p)}`;
@@ -1657,12 +2039,15 @@ function readouts(){
   // technical tiles
   const g=effGround(p.ground,p), nt=norton(100,p.f,g), tilt=toDeg(Math.atan(1/Math.sqrt(Math.hypot(g.er,nt.x))));
   const tt=[];
-  if(p.type!=="inverse"&&p.type!=="sky"){
-    tt.push(["Effective ground",`σ ${fmtSig(g.sigma)} S/m`,`εr ${g.er.toFixed(0)} after weather`]);
-    tt.push(["Numerical distance @100 km",nt.p<10?nt.p.toFixed(2):nt.p.toFixed(0),`A = ${nt.A.toFixed(3)} (${(20*Math.log10(nt.A)).toFixed(1)} dB)`]);
+  if(p.type!=="inverse"&&p.type!=="sky"&&p.type!=="cell"&&p.f<30){
+    const fw=gwFlat(100,p.f,g.er,g.sigma), at=gwAttn(100,p.f,g.er,g.sigma,kFac(p),p.type!=="gwflat");
+    tt.push(["Effective ground",`σ ${fmtSig(g.sigma)} S/m`,`εr ${g.er.toFixed(0)} after weather · |Δ| = ${cAbs(fw.D).toFixed(4)}`]);
+    tt.push(["Numerical distance |w| @100 km",cAbs(fw.w)<10?cAbs(fw.w).toFixed(2):cAbs(fw.w).toFixed(0),`flat earth |F| = ${fw.F?(20*Math.log10(cAbs(fw.F))).toFixed(1):"—"} dB (P.368)`]);
+    tt.push(["Attenuation @100 km",`${at.dB.toFixed(1)} dB`,at.x!==null?`curvature x = ${at.x.toFixed(2)} (residue series ${at.x>=0.18?"used":"blended"})`:"flat earth"]);
     tt.push(["Wave tilt",`${tilt.toFixed(1)}°`,"forward tilt of wavefront"]);
-    tt.push(["Flat-earth limit",`${fmtD(critDist(p.f,p))} km`,`curvature loss beyond (k = ${kFac(p).toFixed(2)})`]);
   }
+  if(usesP1812(p)||p.type==="cell"){ const r=p1812(50,p,null); tt.push(["P.1812 @ 50 km",`${r.Lb50.toFixed(1)} dB`,`free space ${r.Lbfs.toFixed(1)} · diffraction ${r.Ld.toFixed(1)} · troposcatter ${r.Lbs.toFixed(0)} dB`]);
+    tt.push(["Location variability",`σL ${sigmaL(p).toFixed(1)} dB`,`${pLoc(p)}% locations → ${(-invQ(pLoc(p)/100)*locStats(p).sig).toFixed(1)} dB margin`]); }
   if(p.type==="sky"||p.type==="combined"){
     const s5=skyField(500,p,A.io);
     tt.push(["Ionosphere",`foF2 ${A.io.foF2.toFixed(1)} MHz`,`foE ${A.io.foE.toFixed(1)} MHz · absorption index ${A.io.I.toFixed(2)}`]);
@@ -1689,14 +2074,28 @@ function readouts(){
     if(ph==="day") ex.push(p.f<3?"By day the D layer absorbs MF sky waves, so listeners depend on the ground wave.":"By day the F2 layer is strong, but the D layer still absorbs lower HF frequencies.");
     if(ph==="night") ex.push("At night the D layer disappears, so sky waves return with little loss. Distant stations come in, and where both waves meet the signal fades.");
     if(ph==="dusk") ex.push("At dawn and dusk the D layer is forming or decaying, so the sky wave changes quickly.");
-    if(p.flare) ex.push(cosChiOf(p)>0?"The solar flare floods the D layer with ionization and can black out HF on the sunlit side.":"A solar flare does not affect the night side of the earth.");
     if(p.gstorm) ex.push("The geomagnetic storm weakens the F2 layer, so higher frequencies escape and the skip zone grows.");
   }
-  if(p.type==="cell"){ ex.push(`A ${fmtD(cellHorizon(p))} km radio horizon limits this tower: past it the signal drops by about ${(0.0402*Math.cbrt(p.f)).toFixed(2)} dB per km. That is why a 4G tower in Colombo cannot serve Jaffna, 300 km away, however powerful it is.`); ex.push("Mobile networks are line-of-sight systems. Coverage depends mostly on frequency, antenna heights and the surroundings. Higher bands carry more data but need more towers, closer together."); }
-  if(p.storm!=="none") ex.push("Thunderstorm static raises the noise, so a stronger signal is needed and the service area shrinks.");
+  if(flareLevel(p)) ex.push(flareImpact(p).long);
+  if(p.type==="cell"){ ex.push(`A ${fmtD(cellHorizon(p))} km radio horizon limits this tower. ${p.f>2200?"UMa is defined only to 5 km":"Hata (P.529) is defined only to 100 km"}; beyond that the app switches to ITU-R P.1812, whose spherical-earth diffraction makes the loss rise steeply. That is why a 4G tower in Colombo cannot serve Jaffna, 300 km away, however powerful it is.`); ex.push("Mobile networks are line-of-sight systems. Coverage depends mostly on frequency, antenna heights and the surroundings. Higher bands carry more data but need more towers, closer together."); }
+  if(p.storm!=="none"&&p.f<30) ex.push("Thunderstorms raise atmospheric noise at LF–HF (ITU-R P.372). The ITU planning levels used here (BS.703) do not include it, so expect worse reception than predicted.");
+  if(p.pL&&p.pL!==50&&(p.type==="cell"||p.f>=30)) ex.push(`Results are for ${p.pL}% of locations: ${(-invQ(p.pL/100)*locStats(p).sig).toFixed(1)} dB is added to the median loss (σ = ${locStats(p).sig.toFixed(1)} dB).`);
   $("explain").innerHTML=`<h3>Why it behaves this way</h3>`+ex.map(t=>`<p>${t}</p>`).join("");
 }
 function redraw(){ drawChart(); readouts(); }
+
+/* plain-language solar-flare impact for every band */
+function flareImpact(p){
+  const R=flareLevel(p), c=cosChiOf(p), f=p.f; if(!R) return {short:"",long:"",cls:"info"};
+  const nm=FLARE[R].name;
+  if(c<=0) return {short:"no effect at night",long:`${nm}: the flare's X-rays only reach the sunlit side of the earth, so at night this path is not affected.`,cls:"good"};
+  if(f<0.3) return {short:"ground wave unaffected",long:`${nm} at LF: the ground wave (P.368) does not use the ionosphere and is unaffected. LF sky waves see a sudden phase anomaly as the D-layer reflection height drops; P.1147 does not model this.`,cls:"good"};
+  if(f<=1.705) return {short:"ground wave unaffected",long:`${nm} at MF: the ground wave (P.368) is unaffected, so daytime AM coverage stays the same. The daytime sky wave is already absorbed (P.1147 Lt = 30 dB); the flare's extra D-layer absorption removes what is left. NOAA D-RAP is defined for HF only, so no number is shown.`,cls:"good"};
+  if(f<30){ const H=flareHAF(p), a=flareAbs(f,p); return {short:H>f?`HF blackout · ${a.toFixed(0)} dB/hop (vertical)`:`${a.toFixed(1)} dB extra absorption`,long:`${nm} at HF: a short-wave fade-out. NOAA D-RAP gives a highest affected frequency of ${H.toFixed(1)} MHz here (HAF = 10·log F + 65 MHz, × cos χ^0.75) and an absorption of (HAF/f)^1.5 = ${a.toFixed(1)} dB per vertical round trip, multiplied by sec φ on each hop. ${H>f?"This frequency is below the HAF, so the sky wave is effectively blacked out.":"This frequency is above the HAF, so the effect is small."} The ground wave is unaffected.`,cls:H>f?"bad":"warn"}; }
+  const bnRx=p.type==="cell"?burstNoise(p,0,7):burstNoise(p,7,5), bnBS=burstNoise(p,17,3);
+  if(!p.sunBeam) return {short:"path loss unaffected",long:`${nm} at ${band(f)}: VHF/UHF and mobile signals do not use the ionosphere, so the path loss is unchanged. The risk is solar radio-burst noise when the sun is inside a receiving antenna's beam (sunrise or sunset for horizontal antennas). Tick “Sun in the antenna beam” to see it.`,cls:"good"};
+  return {short:`noise +${bnRx.toFixed(1)} dB${p.type==="cell"?` · uplink +${bnBS.toFixed(1)} dB`:""}`,long:`${nm} at ${band(f)}: the path loss is unchanged, but a solar radio burst of about ${FLARE[R].sfu.toExponential(0)} SFU (illustrative; burst flux is only loosely linked to the X-ray class) raises the receiver noise by ${bnRx.toFixed(1)} dB (ΔN = 10·log(1 + T_sun/T_sys), T_sun = S·A_e/2k). ${p.type==="cell"?`A base-station sector antenna (17 dBi) facing the sun sees +${bnBS.toFixed(1)} dB, so the uplink suffers far more than the phone.`:""}`,cls:bnRx>3||bnBS>6?"bad":"warn"};
+}
 
 /* ================= ANIMATION TAB ================= */
 const anim=$("anim"), actx=anim.getContext("2d");
@@ -1708,7 +2107,7 @@ const AN={id:null,hour:12,cycle:false,playing:!window.matchMedia("(prefers-reduc
 const cosFromHour=h=>Math.cos(2*Math.PI*(h-12)/24);
 const hourFromCos=c=>12-Math.acos(clamp(c,-1,1))*12/Math.PI;
 function animModel(){ return models.find(m=>m.id===AN.id)||sel(); }
-function animParams(){ const m=animModel(); return Object.assign({},m.p,{cosChi:cosFromHour(AN.hour)}); }
+function animParams(){ const m=animModel(); return Object.assign({},m.p,{cosChi:cosFromHour(AN.hour),hour:AN.hour}); }
 function resetView(){ const span=+$("animRange").value; AN.view={d0:-span*0.03,span}; syncRx(); }
 /* ---- quick settings: edit the animated model directly ---- */
 const A_FREQS=[["LF 200k",0.2],["MW 1M",1],["HF 7M",7],["HF 15M",15],["VHF 100M",100],["UHF 600M",600],["4G 1.8G",1800],["5G 3.5G",3500]];
@@ -1719,6 +2118,7 @@ function syncAnimControls(){
   $("aFreq").value=Math.log10(p.f); $("aFreqV").textContent=`${fmtF(p.f)} · ${band(p.f)}`;
   document.querySelectorAll("#aFreqChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(Math.abs(+b.dataset.f-p.f)<1e-6)));
   $("aPow").value=Math.log10(p.P); $("aPowV").textContent=fmtP(p.P);
+  $("aFlare").value=String(flareLevel(p)); $("aFlareNote").textContent=flareLevel(p)?flareImpact(Object.assign({},p,{cosChi:cosFromHour(AN.hour),hour:AN.hour})).short:"";
   renderPowChips("aPowChips",p,kW=>animSet({P:kW}));
   $("aGround").value=p.ground; $("aGround").disabled=p.path==="geo";
   $("aGround").title=p.path==="geo"?"This path comes from the map; its land and sea sections are fixed.":"";
@@ -1738,6 +2138,7 @@ function bindAnimQuick(){
   $("aFreq").addEventListener("input",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)}));
   $("aFreq").addEventListener("change",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)},true));
   $("aPow").addEventListener("input",e=>animSet({P:+Math.pow(10,+e.target.value).toPrecision(3)}));
+  $("aFlare").addEventListener("change",e=>animSet({flareR:+e.target.value,flare:false}));
   const g=$("aGround"); g.innerHTML=Object.entries(GROUNDS).filter(([k])=>k!=="custom").map(([k,v])=>`<option value="${k}">${v.name}</option>`).join(""); g.addEventListener("change",e=>animSet({ground:e.target.value}));
 }
 function setAnimModel(id){ AN.id=id; const m=animModel(); AN.hour=hourFromCos(cosChiOf(m.p)); $("hour").value=AN.hour;
@@ -1868,20 +2269,20 @@ function drawAnim(dt){
   const starA=clamp((-cosC-0.1)/0.4,0,1);
   if(starA>0){ for(let i=0;i<90;i++){ c.fillStyle=`rgba(255,255,255,${starA*(0.4+0.6*Math.abs(Math.sin(i+t/900)))})`; c.fillRect((i*97.3)%W,(i*53.7)%(gTop*0.85),1.4,1.4);} }
   const sunU=(AN.hour-6)/12; const body=(u,col,r)=>{ const x=W*0.1+u*W*0.8, y=26+(1-Math.sin(clamp(u,0,1)*Math.PI))*80; c.fillStyle=col; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); return [x,y]; };
-  if(sunU>-0.05&&sunU<1.05){ const [sx,sy]=body(sunU,"#ffd34d",14); if(p.flare){ c.strokeStyle="#ff7a2f"; c.lineWidth=2; for(let i=0;i<12;i++){ const a=i/12*Math.PI*2+t/900, L=24+5*Math.sin(t/120+i); c.beginPath(); c.moveTo(sx+Math.cos(a)*17,sy+Math.sin(a)*17); c.lineTo(sx+Math.cos(a)*L,sy+Math.sin(a)*L); c.stroke(); } } }
+  if(sunU>-0.05&&sunU<1.05){ const [sx,sy]=body(sunU,"#ffd34d",14); if(flareLevel(p)>0){ c.strokeStyle="#ff7a2f"; c.lineWidth=2; for(let i=0;i<12;i++){ const a=i/12*Math.PI*2+t/900, L=24+5*Math.sin(t/120+i); c.beginPath(); c.moveTo(sx+Math.cos(a)*17,sy+Math.sin(a)*17); c.lineTo(sx+Math.cos(a)*L,sy+Math.sin(a)*L); c.stroke(); } } }
   else { const mu=((AN.hour+6)%24)/12; const [mx,my]=body(mu,"#f3f0d8",11); c.fillStyle=top; c.beginPath(); c.arc(mx+5,my-4,10,0,7); c.fill(); }
 
   // ionosphere layers
   const band=(h1,h2,col)=>{ c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1); c.lineTo(x,y);} c.closePath(); c.fillStyle=col; c.fill(); };
   const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); pill(c,txt,W-14,y,{align:"right",accent:rgb,size:11.5}); };
   c.globalAlpha=fa("iono");
-  const dDens=clamp((io.I-0.08)/1.2,0,1)*(p.flare&&cosC>0?1.4:1);
+  const dDens=clamp((io.I-0.08)/1.2,0,1)*(flareLevel(p)>0&&cosC>0?1+0.15*flareLevel(p):1);
   if(dDens>0.02) band(60,90,`rgba(${SC.D},${clamp(dDens*0.6,0.06,0.78)})`);
   band(100,120,`rgba(${SC.E},${clamp(io.foE/4,0.08,0.45)})`);
   band(io.hF-45,io.hF+45,`rgba(${SC.F},${clamp(io.foF2/14,0.15,0.5)})`);
   if(p.gstorm){ c.strokeStyle="rgba(90,255,170,.5)"; c.lineWidth=3; for(let k=0;k<3;k++){ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((d0+span*(0.5+i/80))/RE,430+k*14+8*Math.sin(i/4+t/500+k)); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); } }
   layerTag(`F2 layer · foF2 ${io.foF2.toFixed(1)} MHz`,io.hF,SC.F); layerTag(`E layer · foE ${io.foE.toFixed(1)} MHz`,110,SC.E);
-  if(dDens>0.02) layerTag(`D layer${p.flare&&cosC>0?" · solar flare!":""}`,75,SC.D);
+  if(dDens>0.02) layerTag(`D layer${flareLevel(p)>0&&cosC>0?" · "+FLARE[flareLevel(p)].name:""}`,75,SC.D);
   c.globalAlpha=1;
 
   // earth
@@ -2182,9 +2583,14 @@ function computePath(){ MP.path=computePathFor(MP.tx,MP.rx); }
 function baseModel(){ return models.find(m=>String(m.id)===$("mapModel").value)||sel(); }
 function paramsFor(P,rx,T){
   const p=JSON.parse(JSON.stringify(baseModel().p));
+  const mid=gcPoint(MP.tx,rx,0.5);
   return Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,rxDist:Math.max(P.dist,0.5),
-    htx:MP.txH,hrx:rx.h,terrainLossDb:(MP.useTerrain&&T)?T.loss:0,pathLabel:`${MP.tx.name} → ${rx.name}, ${P.landPct}% land`});
+    htx:MP.txH,hrx:rx.h,terrainLossDb:(MP.useTerrain&&T)?T.loss:0,profile:(MP.useTerrain&&T&&T.prof)?T.prof:null,
+    gmlat:+geomagLat(mid.lat,mid.lon).toFixed(1),azi:+bearing(MP.tx,rx).toFixed(0),seaFrac:clamp(1-P.landPct/100,0,1),
+    pathLabel:`${MP.tx.name} → ${rx.name}, ${P.landPct}% land`});
 }
+/* dipole geomagnetic latitude (IGRF-13 pole 80.65° N, 72.68° W) */
+function geomagLat(lat,lon){ const a=toRad(80.65), b=toRad(-72.68), f=toRad(lat), l=toRad(lon); return toDeg(Math.asin(Math.sin(f)*Math.sin(a)+Math.cos(f)*Math.cos(a)*Math.cos(l-b))); }
 function mapParams(){ const r=MP.res.get(MP.rx.id); return paramsFor(MP.path||computePathFor(MP.tx,MP.rx),MP.rx,r&&r.T); }
 
 /* Elevation: Copernicus DEM GLO-90 via Open-Meteo (needs outside network access) */
@@ -2238,19 +2644,19 @@ function terrainAnalyse(P,elev,txH,rxH,f,manual,extras){
   const inner=e.slice(1,-1).sort((a,b)=>a-b);
   const pct=q=>inner.length?inner[Math.floor(q*(inner.length-1))]:0;
   let loss=best.o?(f>=30?J(best.nu):(best.nu>0?Math.max(0,J(best.nu)-J(0)):0)):0, edges=best.o&&loss>0.05?[{o:best.o,nu:best.nu,role:"main"}]:[];
-  // VHF and above: ITU-R P.526 Deygout method (principal edge + one secondary edge each side)
-  if(f>=30&&best.o&&best.nu>-0.78){
-    const pts=obs.filter(o=>!o.skip).map(o=>({dm:o.dm,h:o.top+o.dm*(D-o.dm)/(2*Re),o}));
-    const gap=Math.max(2000,0.05*D); // a secondary edge must be a separate obstacle, not the flank of the main one
-    const sub=(x0,h0,x1,h1)=>{ let b=null; const L=x1-x0; for(const q of pts){ if(q.dm<=x0+gap||q.dm>=x1-gap) continue; const a=q.dm-x0, bb=x1-q.dm; const c=q.h-(h0+(h1-h0)*a/L); const nu=c*Math.sqrt(2*L/(lam*a*bb)); if(!b||nu>b.nu) b={nu,q}; } return b; };
-    const P0=pts.find(q=>q.o===best.o)||{dm:best.o.dm,h:best.o.top};
-    const tL=sub(0,tA,P0.dm,P0.h), tR=sub(P0.dm,P0.h,D,tB);
-    const Jp=J(best.nu), Jt=tL&&tL.nu>-0.78?J(tL.nu):0, Jr=tR&&tR.nu>-0.78?J(tR.nu):0;
-    const T=1-Math.exp(-Jp/6), C=8+0.04*(D/1000);
-    loss = (Jt||Jr) ? Jp+T*(Jt+Jr+C) : Jp;
-    if(Jt) edges.push({o:tL.q.o,nu:tL.nu,role:"secondary"}); if(Jr) edges.push({o:tR.q.o,nu:tR.nu,role:"secondary"});
+  // VHF and above: ITU-R P.1812 / P.526 delta-Bullington over the real profile (terrain + OSM buildings as surface heights)
+  let prof=null;
+  { const pts=[]; for(let i=0;i<n;i++) pts.push([d[i]/1000,e[i]]);
+    for(const b of (extras||[])){ if(b.dm>20&&b.dm<D-20) pts.push([b.dm/1000,groundAt(b.dm)+b.h]); }
+    pts.sort((a,b)=>a[0]-b[0]); prof={d:pts.map(q=>q[0]),h:pts.map(q=>q[1])}; }
+  if(f>=30){
+    const pp={f,htx:txH,hrx:rxH,refr:"standard"}, dk=D/1000;
+    const ra=p1812(dk,pp,prof), rs=p1812(dk,pp,null);
+    loss=Math.max(0,ra.Ld-Math.max(ra.Lsph-ra.Lbulls,0)); los=ra.los; edges=[]; // irregular-terrain part of delta-Bullington (the smooth-earth part is in the base model)
+    if(ra.bp&&ra.Ld>0.5){ let bo=null,bd=Infinity; for(const o of obs){ const dd=Math.abs(o.dm/1000-ra.bp.d); if(dd<bd){bd=dd;bo=o;} } if(bo){ best={nu:ra.bp.nu,o:bo}; edges=[{o:bo,nu:ra.bp.nu,role:"main"}]; } }
+    var dbx={Ld:ra.Ld,Lsmooth:rs.Ld,Lbulla:ra.Lbulla,Lbulls:ra.Lbulls,Lsph:ra.Lsph};
   }
-  return {d,e,edges,method:f>=30?"ITU-R P.526 Deygout (multiple knife-edge)":"ITU-R P.526 single knife-edge above the ground-level line",txE:e[0],rxE:e[n-1],nu:best.nu,ob:best.o,obst:best.o&&best.o.kind==="terrain"?best.o.i:-1,loss,los,dh:pct(0.9)-pct(0.1),maxE:Math.max(...e),manual:!!manual,txH,rxH,buildings:extras||[]};
+  return {d,e,edges,prof,dbx:typeof dbx!=="undefined"?dbx:null,method:f>=30?"ITU-R P.1812 delta-Bullington (P.526-15 §4.5)":"P.526 single knife-edge above the ground-level line (estimate; P.368 assumes smooth earth)",txE:e[0],rxE:e[n-1],nu:best.nu,ob:best.o,obst:best.o&&best.o.kind==="terrain"?best.o.i:-1,loss,los,dh:pct(0.9)-pct(0.1),maxE:Math.max(...e),manual:!!manual,txH,rxH,buildings:extras||[]};
 }
 /* ===== OpenStreetMap features near the path: buildings (with heights) and named peaks, via the Overpass API ===== */
 const OSMF={cache:new Map(),ok:null};
@@ -2594,7 +3000,7 @@ function renderActive(){
   const tiles=[
     ["Distance",`${fmtD(P.dist)} km`,`bearing ${P.brg.toFixed(0)}° · ${P.landPct}% land`,"info"],
     ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
-    ["Obstacle method",T?(T.edges&&T.edges.length>1?`Deygout · ${T.edges.length} edges`:"single knife-edge"):"…",T?T.method:"","info"],
+    ["Obstacle method",T?(T.dbx?`delta-Bullington · ${T.dbx.Ld.toFixed(1)} dB`:"single knife-edge"):"…",T?(T.dbx?`${T.method} · Bullington ${T.dbx.Lbulla.toFixed(1)} dB, smooth ${T.dbx.Lsmooth.toFixed(1)} dB`:T.method):"","info"],
     ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?(T.ob&&T.loss>0.05?(T.ob.kind==="building"?"caused by a building":(T.peakName?`at ${T.peakName}`:`ridge at ${fmtD(T.ob.dm/1000)} km`)):`highest ${Math.round(T.maxE)} m`)+` · Δh ${Math.round(T.dh)} m`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"],
     ["Line of sight",T?(T.los?"Yes":"No"):"…",T?`masts ${T.txH} m / ${T.rxH} m`:"","info"],
     ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmPending?"loading…":T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
@@ -2988,6 +3394,300 @@ function bindCells(){
   $("meTowers").addEventListener("click",()=>{ if(!MP.me) return $("setMe").click(); const old=MP.rx; const tmp={...MP.rx}; $("findTowers").dataset.at="me"; $("findTowers").click(); });
 }
 
+/* ===================== MODELS & EQUATIONS · VERIFICATION · MEASURED DATA ===================== */
+const f2=v=>isFinite(v)?(Math.abs(v)>=1e4||(Math.abs(v)<0.01&&v!==0)?v.toExponential(2):(+v.toFixed(2)).toString()):"—";
+const lg=Math.log10;
+function explainCalc(p,d){
+  const S=[], W=[]; const io=iono(p);
+  const step=(label,eq,val,unit="")=>S.push({label,eq,val,unit}), head=t=>S.push({head:t});
+  const ok=t=>W.push({ok:true,t}), warn=t=>W.push({ok:false,t});
+  const locSteps=()=>{ const ls=locStats(p), pl=pLoc(p);
+    step("Location variability σL (P.1812 / P.1546)","σL = K + 1.3·log f[GHz]; K = 5.1 below clutter, 4.9 rooftop, 4.4 rural",ls.sL,"dB");
+    if(p.indoor){ step("Building entry, median (ITU-R P.2109)",`L_BEL(P = 0.5), ${p.thermal?"thermally-efficient":"traditional"} building`,ls.be,"dB"); step("Building entry spread σ_be","(L_BEL(0.84) − L_BEL(0.16)) / 2",ls.sbe,"dB"); step("Combined σ","√(σL² + σ_be²)",ls.sig,"dB"); }
+    step(`Location margin for ${pl}% of locations`,"−I(pL/100)·σ   (I = inverse complementary normal, P.1812 Att. 2)",-invQ(pl/100)*ls.sig,"dB"); };
+  const p1812Steps=(r,cl)=>{
+    head("ITU-R P.1812 (p = 50% time)");
+    step("Free-space basic loss Lbfs","92.44 + 20·log f[GHz] + 20·log d_fs[km]",r.Lbfs,"dB");
+    step("Bullington loss, actual profile","Luc = J(ν_max or ν_b);  L_bull = Luc + (1 − e^(−Luc/6))·(10 + 0.02d)",r.Lbulla,"dB");
+    step("Effective heights above smooth surface","h′ts = hts − hstd,  h′rs = hrs − hsrd",null,`${r.htsp.toFixed(1)} m / ${r.hrsp.toFixed(1)} m`);
+    step("Spherical-earth loss Ldsph (P.526 first term)","F(X) + G(Yt) + G(Yr), X = 21.88β(f/a²)^⅓d, Y = 0.9575β(f²/a)^⅓h",r.Lsph,"dB");
+    step("Bullington loss, smooth profile","same as above with all heights = 0",r.Lbulls,"dB");
+    step("Delta-Bullington diffraction Ld","L_bulla + max(Ldsph − L_bulls, 0)",r.Ld,"dB");
+    step("Angular distance θ","θt + θr + 1000·d/ae",r.theta,"mrad");
+    step("Troposcatter Lbs","190.1 + Lf + 20·log d + 0.573θ − 0.15N0 + Lc + Ag  (N0 = "+r.N0+")",r.Lbs,"dB");
+    step("Combined median loss Lb50","max(Lbfs, −5·log(10^(−0.2Lbs) + 10^(−0.2(Lbfs + Ld))))",r.Lb50,"dB");
+    if(cl) step(`Receiver clutter (ITU-R P.2108 §3.1, ${cl.c.name}, R = ${cl.c.R} m)`,cl.c.type==="hg"?"−K_h2·log(h/R), K_h2 = 21.8 + 6.2·log f":"J(ν) − 6.03, ν = K_ν·√(h_dif·θ_clut), w_s = 27 m",cl.L,"dB");
+    (r.trans?warn:ok)(r.trans?"Trans-horizon path: the result is set by diffraction and troposcatter.":"Line-of-sight path to the receiver.");
+    warn("Ducting / layer reflection (P.1812 §4.5) is not included. It matters mainly for p < 50% time and long paths.");
+    ok(p.profile&&Math.abs(p.profile.d[p.profile.d.length-1]-d)<0.05*d+0.1?"Real terrain profile from the map used (Copernicus DEM + OSM buildings).":"Smooth-earth profile (no terrain data at this distance).");
+  };
+  /* ---------- mobile ---------- */
+  if(p.type==="cell"){
+    const T=CELL_TECH[p.tech]||{}, f=p.f, hb=p.htx||30, hm=p.hrx||1.5, cp=cellParts(d,p);
+    step("EIRP","10·log10(P[mW])",dBm(p.P),"dBm");
+    if(cp.m==="hata"){
+      head(f<=1500?"ITU-R P.529 Okumura–Hata":"COST-231 Hata");
+      const lf=lg(clamp(f,150,2200)), ahm=(1.1*lf-0.7)*hm-(1.56*lf-0.8);
+      step("Mobile antenna correction a(hm)","(1.1·log f − 0.7)·hm − (1.56·log f − 0.8)",ahm,"dB");
+      let bexp=1; if(d>20){ const hb2=hb/Math.sqrt(1+7e-6*hb*hb); bexp=1+(0.14+1.87e-4*f+1.07e-3*hb2)*Math.pow(lg(Math.min(d,100)/20),0.8); }
+      step(f<=1500?"Urban loss":"Urban loss (Cm = 3 dB in dense urban)",f<=1500?"69.55 + 26.16·log f − 13.82·log hb − a(hm) + (44.9 − 6.55·log hb)·(log d)^b":"46.3 + 33.9·log f − 13.82·log hb − a(hm) + (44.9 − 6.55·log hb)·(log d)^b + Cm",null);
+      step("Distance exponent b (P.529 extension)","1 for d ≤ 20 km; 1 + (0.14 + 1.87·10⁻⁴f + 1.07·10⁻³hb′)·(log(d/20))^0.8",bexp);
+      step(`Environment correction (${p.env})`,p.env==="suburban"?"− 2·[log(f/28)]² − 5.4":p.env==="rural"?"− 4.78·(log f)² + 18.33·log f − 40.94":"0",null);
+      step("Median path loss","as above",cp.base,"dB");
+      if(f<150||f>2000) warn(`Hata/COST-231 is defined for 150–2000 MHz; ${fmtF(f)} is extrapolated.`); else ok("Frequency inside 150–2000 MHz.");
+      if(d<1) warn(`P.529 is defined from 1 km; d = ${fmtD(d)} km is extrapolated.`); else ok("Distance inside 1–100 km (P.529).");
+      if(hb<30||hb>200) warn(`Base-station height ${hb} m is outside 30–200 m.`); else ok("Base-station height inside 30–200 m.");
+      if(hm<1||hm>10) warn(`Mobile height ${hm} m is outside 1–10 m.`);
+    } else if(cp.m==="uma"){
+      head("ITU-R M.2412 / 3GPP TR 38.901 UMa");
+      const fc=f/1000, hBS=clamp(hb,10,150), hUT=clamp(hm,1,22.5), dBP=4*(hBS-1)*(hUT-1)*fc*1e9/3e8, d2=Math.max(d*1000,10);
+      step("Breakpoint distance d′BP","4·(hBS − 1)·(hUT − 1)·fc / c",dBP,"m");
+      step("LOS loss",d2<=dBP?"28 + 22·log d3D + 20·log fc":"28 + 40·log d3D + 20·log fc − 9·log(d′BP² + (hBS − hUT)²)",null);
+      step("NLOS loss","max(LOS, 13.54 + 39.08·log d3D + 20·log fc − 0.6·(hUT − 1.5))",null);
+      step("LOS probability","18/d + e^(−d/63)·(1 − 18/d)",d2<=18?1:18/d2+Math.exp(-d2/63)*(1-18/d2));
+      step("Expected median loss","−10·log(P_LOS·10^(−L_LOS/10) + (1 − P_LOS)·10^(−L_NLOS/10))",cp.base,"dB");
+      if(d*1000<10) warn("UMa is defined from 10 m."); else ok("Distance inside 10 m – 5 km.");
+      if(f>6000) ok("mmWave: rain (P.838) and gases (P.676) matter; see below.");
+    } else {
+      warn(p.cellModel==="p1812"?"P.1812 selected for the mobile link.":`${p.f>2200?"UMa ends at 5 km":"Hata ends at 100 km"}: switched to ITU-R P.1812 at ${fmtD(d)} km.`);
+      if(p.f>6000) warn("P.1812 is defined only up to 6 GHz: mmWave values beyond 5 km are extrapolated.");
+      p1812Steps(cp.r,cp.cl);
+    }
+    step("Radio horizon","3.57·(√(k·htx) + √(k·hrx))",cellHorizon(p),"km");
+    step(`Rain loss (ITU-R P.838, ${rainRate(p)} mm/h)`,"k·R^α·d_eff,  d_eff = d / (1 + d/d₀)",rainLoss(d,p),"dB");
+    step("Gas loss (≈ ITU-R P.676)","γ(f)·d",f>=1000?gasSpecific(f/1000)*d:0,"dB");
+    locSteps();
+    step("Total path loss","median + atmosphere + building entry + location margin",cp.L,"dB");
+    const pr=dBm(p.P)-cp.L, bn=burstNoise(p,0,7), need=cellThrdBm(p)+bn;
+    step("Received power","EIRP − total loss",pr,"dBm");
+    step(`Cell-edge level (${T.sys||"mobile"})`,"industry practice (ITU sets no single value)"+(bn?" + solar-burst noise rise":""),need,"dBm");
+    step("Margin","received − needed",pr-need,"dB");
+    flareSteps(p,step,warn,ok);
+    warn("Median models (Hata, UMa, P.1812) are statistical. Real sites need calibration with drive tests.");
+    return {S,W};
+  }
+  if(p.type==="custom"){ step("Your formula",p.expr,null); const r=evalP(p,d,io); step("Result","E(d)",r.t===null?NaN:mVfromdB(r.t),"mV/m"); warn("A custom formula has no validity range: compare it with the built-in models below."); return {S,W}; }
+  /* ---------- ground / space wave ---------- */
+  if(p.type!=="sky"&&p.type!=="inverse"){
+    if(p.f>=30){
+      const v=vhfLoss(d,p); p1812Steps(v.r,v.cl); locSteps();
+      step("Rain (P.838, above 1 GHz)","k·R^α·d_eff",p.f>=1000?rainLoss(d,p):0,"dB");
+      step("Total basic loss Lb","Lb50 + clutter + building entry + location margin",v.Lb,"dB");
+      step("Field strength (P.1812 eq. for ERP)","E = 199.36 + 20·log f[GHz] − Lb + 10·log P[kW]",vhfField(d,p),"dBµV/m");
+      if(p.f>6000) warn("P.1812 is defined for 30 MHz – 6 GHz."); else ok("Frequency inside 30 MHz – 6 GHz (P.1812).");
+      if(d<0.25||d>3000) warn("P.1812 is defined for 0.25–3000 km."); else ok("Distance inside 0.25–3000 km.");
+    } else {
+      head("ITU-R P.368 ground wave (GRWAVE method)");
+      const g=effGround(p.ground,p), fw=gwFlat(d,p.f,g.er,g.sigma), curved=p.type!=="gwflat", at=gwAttn(d,p.f,g.er,g.sigma,kFac(p),curved);
+      step("Effective ground",`σ = ${fmtSig(g.sigma)} S/m, εr = ${g.er.toFixed(0)} (${g.name}, after weather)`,null);
+      step("Complex permittivity εc","εr − j·60·λ·σ",null,`${g.er.toFixed(1)} − j${(60*C_LIGHT/p.f*g.sigma).toFixed(1)}`);
+      step("Surface impedance |Δ|","Δ = √(εc − 1) / εc",cAbs(fw.D));
+      step("Numerical distance |w|","w = −j·(k·d/2)·Δ²",cAbs(fw.w));
+      step("Flat-earth attenuation |F| (Sommerfeld–Norton)","F = 1 − j√(πw)·e^(−w)·erfc(j√w)  (Faddeeva function)",20*lg(cAbs(fw.F)),"dB");
+      if(curved){ const sp=gwSphere(d,p.f,g.er,g.sigma,kFac(p));
+        step("Curvature distance x","x = (k·a/2)^⅓ · d/a,  a = k·6371 km",sp.x);
+        step("Surface parameter |q|","q = −j·(k·a/2)^⅓·Δ",cAbs(sp.q));
+        step("Spherical-earth attenuation |W| (residue series, 80 terms)","W = e^(−jπ/4)·√(πx)·Σ e^(−jx·t_s)/(t_s − q²),  w′(t_s) = q·w(t_s)",20*lg(Math.max(cAbs(sp.W),1e-30)),"dB");
+        step("Attenuation used",at.x<=0.08?"flat earth (x ≤ 0.08)":at.x>=0.18?"residue series (x ≥ 0.18)":"blend of the two (0.08 < x < 0.18)",at.dB,"dB"); }
+      step("Unattenuated field E₀","109.54 + 10·log P[kW] − 20·log d[km]  (300 mV/m at 1 km, 1 kW)",109.54+10*lg(p.P)-20*lg(d),"dBµV/m");
+      if(pathSegs(p,d).length>1) step("Mixed path (Millington, P.368)","½·[forward + reverse] over each ground section",gwdB(d,p,curved),"dBµV/m");
+      else step("Ground-wave field","E₀ + 20·log|W|",gwdB(d,p,curved),"dBµV/m");
+      ok("Frequency inside 10 kHz – 30 MHz (P.368).");
+      warn("P.368 assumes both antennas at ground level over a smooth, homogeneous earth (k = "+kFac(p).toFixed(2)+"). Hills are added separately as an estimate.");
+      if(p.f>3) warn("Above about 3 MHz with elevated antennas a space wave also exists; P.368 does not include it.");
+    }
+  }
+  if(p.type==="inverse"){ step("Inverse-distance field","300·√P / d  (P.525 free space for a short monopole over perfect ground)",300*Math.sqrt(p.P)/d,"mV/m"); }
+  /* ---------- sky wave ---------- */
+  if(p.type==="sky"||(p.type==="combined"&&p.f<30)){
+    if(p.f<=1.705){
+      const r=p1147(d,p); head("ITU-R P.1147 sky wave (annual median)");
+      step("Slant distance p","√(d² + 40 000)",r.pk,"km");
+      step("Geomagnetic latitude Φ (path midpoint)","dipole pole 80.65° N, 72.68° W (map) or the value you set",r.phi,"°");
+      step("Loss factor k","2π + 4.95·tan²Φ  (|Φ| ≤ 60°)",r.k);
+      step("Absorption loss","k·p / 1000",r.k*r.pk/1000,"dB");
+      step("Magnetic dip I","tan I = 2·tan Φ (dipole field)",r.dip,"°");
+      step("Polarization coupling loss Lp (both terminals)","2 × [180·(36 + θ² + I²)^(−½) − 2], θ from magnetic E–W, |I| ≤ 45°",r.Lp,"dB");
+      step("Local solar time at midpoint",p.hour!==undefined&&p.hour!==null?"from the clock":"Day = 12 h, Dawn/dusk = 18 h, Night = 24 h",r.h,"h");
+      step("Hourly loss factor Lt","sunset: 12.40 − 9.248t + 2.892t² − 0.3343t³; sunrise: 9.6 + 12.2t + 5.62t² + 0.86t³; day 30; night 0",r.Lt,"dB");
+      step("Constant A",p.f<0.3?"LF":"MF",r.A,"dB");
+      step("Cymomotive force V","10·log P[kW] + G_V (short monopole, G_V = 0)",r.V,"dB(300 V)");
+      step("Sky-wave field","E = V + A − 20·log p − k·p/1000 − Lp − Lt  (G_S = 0, L_r = 0)",r.E,"dBµV/m");
+      if(d<50||d>12000) warn("P.1147 is defined for 50–12 000 km."); else ok("Distance inside 50–12 000 km.");
+      warn("Sea gain G_S and the transmitting antenna's vertical gain are set to 0. P.1147 adds them from Figs. 1–2.");
+      if(Math.abs(r.phi)>45) warn("|Φ| > 45°: the solar-activity loss L_r is not applied."); else ok("|Φ| ≤ 45°, so L_r = 0 (P.1147 §2.8).");
+    } else {
+      head("HF sky wave (P.533-style teaching approximation)");
+      step("Ionosphere",`foE ${io.foE.toFixed(2)} MHz · foF2 ${io.foF2.toFixed(2)} MHz · hF ${io.hF.toFixed(0)} km`,null);
+      step("Absorption index I","≈ 1 + 0.0037·R, scaled by cos χ^0.75",io.I);
+      const sf=skyField(d,p,io);
+      if(sf.best){ step("Hop solution, elevation angle",`${sf.best.n} hop(s) via the ${sf.best.layer} layer`,toDeg(sf.best.del),"°");
+        step("Secant law check","f ≤ fo·sec φ  (the wave is returned, not lost to space)",null);
+        step("D-layer absorption per hop","677.2·I·sec φ / ((f + 1.4)^1.98 + 10.2)",sf.best.abs,"dB");
+        if(flareLevel(p)) step("Flare absorption (NOAA D-RAP), all hops","n·(HAF/f)^1.5·sec φ",sf.best.flare,"dB");
+        step("Sky-wave field (median)","300·√P·cos Δ / slant · 10^(−loss/20)",sf.E,"mV/m"); }
+      else step("Sky wave","no hop returns at this distance (skip zone, or absorbed)",null);
+      warn("Not ITU-R P.533: P.533 needs the P.1239 monthly ionospheric maps and gives MUF, field strength and reliability. Use ITURHFProp (ITU) for real HF circuits.");
+    }
+  }
+  const r=evalP(p,d,io), thr=dBuV(threshold(p)), ref=ituMinRef(p);
+  head("Result");
+  step("Total field",p.type==="combined"?"√(E_ground² + E_sky²)":"as above",r.t===null?NaN:r.t,"dBµV/m");
+  step("Minimum usable field",ref.ref+(burstNoise(p,7,5)?" + solar-burst noise rise":""),thr,"dBµV/m");
+  step("Margin","E − E_min",r.t===null?NaN:r.t-thr,"dB");
+  flareSteps(p,step,warn,ok);
+  return {S,W};
+}
+function flareSteps(p,step,warn,ok){
+  const R=flareLevel(p); if(!R) return;
+  const fi=flareImpact(p);
+  step(`Solar flare: ${FLARE[R].name}`,`X-ray flux ${FLARE[R].x.toExponential(0)} W/m²`,null);
+  if(p.f>=1.705&&p.f<30){ step("Highest affected frequency (NOAA D-RAP)","(10·log F + 65)·cos χ^0.75",flareHAF(p),"MHz"); step("Absorption per vertical round trip","(HAF/f)^1.5",flareAbs(p.f,p),"dB"); }
+  if(p.f>=30){ step("Receiver noise rise (radio burst)","10·log(1 + T_sun/T_sys)",p.type==="cell"?burstNoise(p,0,7):burstNoise(p,7,5),"dB");
+    if(p.type==="cell") step("Base-station uplink noise rise (17 dBi facing the sun)","same, G = 17 dBi, NF = 3 dB",burstNoise(p,17,3),"dB"); }
+  (fi.cls==="good"?ok:warn)(fi.long);
+}
+
+/* ---------- model library ---------- */
+const MODEL_LIB=[
+ {id:"p368",name:"Ground wave · ITU-R P.368 (GRWAVE method)",band:"10 kHz – 30 MHz",ref:"ITU-R P.368-10; Sommerfeld (1909), Norton (1937), Fock (1965), Wait (1962)",
+  eq:["εc = εr − j60λσ,  Δ = √(εc − 1)/εc","Flat earth: F = 1 − j√(πw)·e^(−w)·erfc(j√w),  w = −j(kd/2)Δ²","Curved earth: W = e^(−jπ/4)√(πx)·Σ e^(−jxt_s)/(t_s − q²),  x = (ka/2)^⅓·d/a,  q = −j(ka/2)^⅓Δ","Roots: w′(t) = q·w(t), tracked from the Airy zeros with dt/dq = 1/(t − q²)","E = 109.54 + 10·log P[kW] − 20·log d[km] + 20·log|W|  dB(µV/m)"],
+  valid:"Smooth homogeneous earth, vertical polarization, both antennas at ground level, k-factor atmosphere.",
+  lim:["P.368 curves use an exponential atmosphere; the app uses the equivalent k-factor (4/3 by default).","No antenna height-gain (P.368 curves are for h = 0).","Flat/residue crossover between x = 0.08 and 0.18 agrees within 0.2 dB (see verification tests)."]},
+ {id:"mill",name:"Mixed paths · Millington (P.368)",band:"10 kHz – 30 MHz",ref:"ITU-R P.368 §3",
+  eq:["E_fwd = Σ field steps over each section, transmitter → receiver","E_rev = the same, receiver → transmitter","E = ½·(E_fwd + E_rev) in dB"],
+  valid:"Any number of land/sea sections.",lim:["Map paths use only land or sea (the land type is the one you choose)."]},
+ {id:"p1147",name:"LF/MF sky wave · ITU-R P.1147",band:"150 – 1700 kHz, 50 – 12 000 km",ref:"ITU-R P.1147-4",
+  eq:["E = V + G_S − L_p + A − 20·log p − k·p/1000 − L_r − L_t","p = √(d² + 40 000);  k = 2π + 4.95·tan²Φ","L_p = 180·(36 + θ² + I²)^(−½) − 2 per terminal (|I| ≤ 45°)","L_t: sunset 12.40 − 9.248t + 2.892t² − 0.3343t³; sunrise 9.6 + 12.2t + 5.62t² + 0.86t³","A = 110.2 (LF), 107 (MF)"],
+  valid:"Annual median of half-hourly medians.",lim:["G_S (sea gain) and G_V (antenna vertical gain) = 0 in the app.","Time is the local solar time at the path midpoint with sunrise 06:00 and sunset 18:00 (equinox).","Geomagnetic latitude from a dipole field; dip from tan I = 2 tan Φ."]},
+ {id:"hf",name:"HF sky wave · teaching approximation (not P.533)",band:"1.7 – 30 MHz",ref:"Secant law; P.533-style absorption term; Davies (1990)",
+  eq:["f ≤ fo·sec φ (reflection condition)","foE ≈ 0.9·[(180 + 1.44R)·cos χ]^0.25","L_abs = 677.2·I·sec φ / ((f + 1.4)^1.98 + 10.2) per hop"],
+  valid:"Median trends for teaching skip zones and day/night behaviour.",lim:["Full P.533 needs the P.1239 foF2 maps: use ITURHFProp for planning.","No MUF statistics, sporadic-E or polar effects."]},
+ {id:"p1812",name:"VHF/UHF · ITU-R P.1812",band:"30 MHz – 6 GHz, 0.25 – 3000 km",ref:"ITU-R P.1812-6 (troposcatter per P.1812-6 as advised for -7/-8)",
+  eq:["Lbfs = 92.44 + 20·log f + 20·log d_fs","Ld = L_bulla + max(Ldsph − L_bulls, 0)  (delta-Bullington, P.526-15 §4.5)","Lbs = 190.1 + Lf + 20·log d + 0.573θ − 0.15N0 + Lc + Ag","Lb50 = max(Lbfs, −5·log(10^(−0.2Lbs) + 10^(−0.2(Lbfs + Ld))))","E = 199.36 + 20·log f[GHz] − Lb + 10·log P[kW ERP]"],
+  valid:"Path-specific; real terrain + buildings from the map, or a smooth earth in the Lab.",lim:["Ducting / layer reflection (§4.5) omitted; matters for p < 50% time.","N0 = 360 N-units by default (P.1812 uses the N050 map)."]},
+ {id:"p2108",name:"Receiver clutter · ITU-R P.2108 §3.1",band:"30 MHz – 3 GHz",ref:"ITU-R P.2108-1",
+  eq:["Height-gain (rural, sea): A_h = −K_h2·log(h/R),  K_h2 = 21.8 + 6.2·log f[GHz]","Diffraction (suburban, urban): A_h = J(ν) − 6.03,  ν = K_ν√(h_dif·θ_clut),  K_ν = 0.342√f","R = 10 m rural/suburban, 15 m urban, 20 m dense urban; w_s = 27 m"],
+  valid:"Receiver below the representative clutter height.",lim:["Applied only at the receiver; the transmitter is assumed above clutter."]},
+ {id:"loc",name:"Location variability · P.1812 / P.1546",band:"VHF / UHF / mobile",ref:"ITU-R P.1812 §4.7, P.1546 Annex 5 §12, P.1057",
+  eq:["σL = K + 1.3·log f[GHz], K = 5.1 / 4.9 / 4.4","L(pL) = L50 − I(pL/100)·σ","I(x): Attachment 2 rational approximation (error < 0.00054)"],
+  valid:"Log-normal shadowing over a ~500 m area.",lim:["Larger areas have larger σ (up to +8 dB at 50 km radius)."]},
+ {id:"hata",name:"Okumura–Hata · ITU-R P.529 and COST-231",band:"150 – 2000 MHz, 1 – 100 km",ref:"ITU-R P.529-3; COST-231 final report",
+  eq:["L = 69.55 + 26.16·log f − 13.82·log hb − a(hm) + (44.9 − 6.55·log hb)·(log d)^b","COST-231: L = 46.3 + 33.9·log f − … + Cm","b = 1 (d ≤ 20 km); 1 + (0.14 + 1.87·10⁻⁴f + 1.07·10⁻³hb′)·(log(d/20))^0.8"],
+  valid:"f 150–2000 MHz, hb 30–200 m, hm 1–10 m, d 1–100 km.",lim:["Beyond 100 km the app switches to P.1812.","Statistical median; calibrate with drive tests."]},
+ {id:"uma",name:"Urban Macro · ITU-R M.2412 / 3GPP TR 38.901",band:"0.5 – 100 GHz, 10 m – 5 km",ref:"ITU-R M.2412-0 Annex 1",
+  eq:["LOS: 28 + 22·log d3D + 20·log fc (d ≤ d′BP)","NLOS: max(LOS, 13.54 + 39.08·log d3D + 20·log fc − 0.6(hUT − 1.5))","P_LOS = 18/d + e^(−d/63)(1 − 18/d)"],
+  valid:"hBS ≈ 25 m, hUT 1.5–22.5 m.",lim:["LOS/NLOS blended by probability (expected value).","Beyond 5 km the app switches to P.1812."]},
+ {id:"atm",name:"Rain · gases · building entry",band:"Above 1 GHz (P.2109: 80 MHz – 100 GHz)",ref:"ITU-R P.838-3, P.676 (approx.), P.2109-2",
+  eq:["γ_R = k·R^α dB/km (P.838 coefficients, horizontal)","L_BEL(P) = 10·log(10^(0.1A) + 10^(0.1B) + 10^(0.1C)), A = F⁻¹(P)σ1 + μ1, B = F⁻¹(P)σ2 + μ2, C = −3","μ1 = r + s·log f + t·(log f)², μ2 = w + x·log f, σ1 = u + v·log f, σ2 = y + z·log f"],
+  valid:"Horizontal incidence; traditional or thermally-efficient building.",lim:["Gas loss is an approximate curve, not the P.676 line-by-line model.","Rain path reduction factor is a simple d₀ model."]},
+ {id:"thr",name:"Minimum usable field strength",band:"All",ref:"ITU-R BS.703, BS.412-9, BT.417-5",
+  eq:["LF 66, MF 60, HF 40 dB(µV/m) (BS.703)","FM mono 48 / 60 / 70, stereo 54 / 66 / 74 dB(µV/m): rural / urban / large city (BS.412)","TV bands I / III / IV / V: 48 / 55 / 65 / 70 dB(µV/m) (BT.417)","Mobile: cell-edge −100 to −105 dBm (industry practice)"],
+  valid:"Planning levels at 10 m height.",lim:["Atmospheric noise (P.372) is not added on top of BS.703."]},
+ {id:"flare",name:"Solar flares · every band",band:"All",ref:"NOAA SWPC D-RAP; NOAA R-scale; radio-astronomy noise temperature",
+  eq:["R1 M1 · R2 M5 · R3 X1 · R4 X10 · R5 X20 (GOES 0.1–0.8 nm flux)","HAF = 10·log F + 65 MHz (sub-solar), × cos χ^0.75;  A(f) = (HAF/f)^1.5 dB","Radio burst: T_sun = S·A_e/2k,  A_e = Gλ²/4π,  ΔN = 10·log(1 + T_sun/T_sys)"],
+  valid:"Sunlit side only. Ground waves (LF/MF) are unaffected.",lim:["Burst flux per R-level is illustrative; real bursts vary widely.","D-RAP is defined for HF; MF/LF sky-wave effects are described, not computed."]}
+];
+function renderModelLib(){
+  const el=$("mxLib"); if(!el||el.dataset.done) return; el.dataset.done=1;
+  el.innerHTML=MODEL_LIB.map(m=>`<details class="mxcard" id="mx-${m.id}"><summary><span class="mxname">${esc(m.name)}</span><span class="mxband">${esc(m.band)}</span></summary>
+   <div class="mxbody"><p class="mxref"><b>Reference:</b> ${esc(m.ref)}</p>
+   <div class="eqblock">${m.eq.map(e=>`<code>${esc(e)}</code>`).join("")}</div>
+   <p><b>Valid for:</b> ${esc(m.valid)}</p>
+   <p class="mxlimh"><b>Known limitations</b></p><ul class="mxlim">${m.lim.map(l=>`<li>${esc(l)}</li>`).join("")}</ul></div></details>`).join("");
+}
+
+/* ---------- verification tests (independent reference values) ---------- */
+function verificationTests(){
+  const base={type:"gw",P:1,refr:"standard",moisture:"normal",frozen:false,env:"urban",storm:"none",indoor:false,pL:50,htx:30,hrx:1.5,path:"uniform",ground:"land"};
+  const T=[];
+  const t=(name,src,exp,got,tol,unit="")=>T.push({name,src,exp,got,tol,unit,pass:isFinite(got)&&Math.abs(got-exp)<=tol});
+  const w1=faddeeva(Cx(1,0));
+  t("Faddeeva w(1), real part","Abramowitz & Stegun Table 7.9",0.367879,w1.re,1e-5);
+  t("Faddeeva w(1), imaginary part","Abramowitz & Stegun Table 7.9",0.607158,w1.im,1e-5);
+  t("P.368: 1 kW short monopole at 1 km over sea, 1 MHz","Cymomotive force 300 V → 300 mV/m = 109.54 dB(µV/m)",109.54,p368dB(1,1,70,5,4/3,true,1),0.1,"dBµV/m");
+  { const q0=Cx(1e-9,0), r=gwRoots(q0); let s=Cx(0); const x=0.05; for(const tt of r) s=cAdd(s,cDiv(cExp(cMul(Cx(0,-x),tt)),cSub(tt,cMul(q0,q0))));
+    const W=cMul(cMul(cExp(Cx(0,-Math.PI/4)),Cx(Math.sqrt(Math.PI*x))),s);
+    t("Residue series, perfectly conducting earth, x → 0","Fock: |W| → 1",1,cAbs(W),0.01); }
+  for(const [n,f,er,sg] of [["sea, 1 MHz",1,70,5],["average land, 1 MHz",1,22,0.003],["dry ground, 10 MHz",10,7,0.0003]]){
+    const m=Math.cbrt(Math.PI*f/C_LIGHT*(4/3)*6371e3), d=0.1*(4/3)*6371/m;
+    const fl=20*lg(cAbs(gwFlat(d,f,er,sg).F)), sp=20*lg(cAbs(gwSphere(d,f,er,sg,4/3).W));
+    t(`P.368 flat vs residue series at x = 0.1 (${n})`,"Curvature negligible at small x: methods must agree",fl,sp,0.3,"dB"); }
+  { const fw=gwFlat(1,1,1,1); } // warm-up
+  t("Free space (P.525 / P.1812) at 1 km, 1 kW ERP","E = 106.92 − 20·log d",106.92,199.36+20*lg(0.1)-p1812(1,Object.assign({},base,{f:100,htx:1000,hrx:1000}),null).Lb50,0.05,"dBµV/m");
+  t("Inverse normal I(0.1)","Normal tables: 1.2816",1.2816,invQ(0.1),0.001);
+  t("Inverse normal I(0.95)","Normal tables: −1.6449",-1.6449,invQ(0.95),0.001);
+  t("Hata, 900 MHz, hb 30 m, hm 1.5 m, 1 km, urban","Hand calculation of P.529 eq.: 126.40 dB",126.40,hataLoss(1,Object.assign({},base,{f:900})),0.05,"dB");
+  t("COST-231 Hata, 1800 MHz, hb 30 m, hm 1.5 m, 1 km","Hand calculation: 136.20 dB",136.20,hataLoss(1,Object.assign({},base,{f:1800})),0.05,"dB");
+  t("P.2109 median, 2 GHz, traditional building","Hand calculation of P.2109 eqs. (≈ Fig. 1)",14.96,p2109(2000,0.5,false),0.05,"dB");
+  t("P.838 k at 10 GHz (horizontal)","P.838-3 Table 5: 0.01217",0.01217,rainSpecific(10,1),1e-5);
+  t("P.1147 hourly loss factor at sunset","Polynomial at t = 0: 12.40 dB",12.40,P1147.Lt(18),0.01,"dB");
+  t("P.1147 hourly loss factor at midnight","Lt = 0 near midnight",0,P1147.Lt(0),0.01,"dB");
+  t("NOAA D-RAP: X1 flare, sun overhead","SWPC table: X1.0 → 25 MHz",25,flareHAF({flareR:3,cosChi:1}),0.01,"MHz");
+  t("NOAA D-RAP: M1 flare, sun overhead","SWPC table: M1.0 → 15 MHz",15,flareHAF({flareR:1,cosChi:1}),0.01,"MHz");
+  t("dBm → dB(µV/m) at 1000 MHz, −100 dBm","E = P + 20·log f + 77.2",37.2,dBm2dBuV(-100,1000),0.01,"dBµV/m");
+  { const r=p1812(5,Object.assign({},base,{f:600,htx:300,hrx:300}),null); t("Delta-Bullington, clear line of sight","Ld = 0 when the first Fresnel zone is clear",0,r.Ld,0.05,"dB"); }
+  return T;
+}
+function renderVerify(){
+  const T=verificationTests(), np=T.filter(x=>x.pass).length;
+  $("mxVerSum").innerHTML=`<b>${np} / ${T.length}</b> tests passed`+(np===T.length?" ✓":" — see the failed rows");
+  $("mxVerSum").className="pill "+(np===T.length?"good":"bad");
+  $("mxVer").innerHTML=`<tr><th>Test</th><th>Reference</th><th>Expected</th><th>App</th><th>Result</th></tr>`+T.map(x=>`<tr><td>${esc(x.name)}</td><td class="eqc">${esc(x.src)}</td><td class="mono">${f2(x.exp)} ${x.unit}</td><td class="mono">${f2(x.got)} ${x.unit}</td><td>${x.pass?'<span class="pill good">pass</span>':'<span class="pill bad">fail</span>'}</td></tr>`).join("");
+}
+
+/* ---------- compare with measured or reference data ---------- */
+const MEAS={pts:[],modelId:null};
+function parseMeas(txt,unit){ const out=[];
+  for(const line of txt.split(/\r?\n/)){ const t=line.trim(); if(!t||/^[#a-z]/i.test(t)) continue; const c=t.split(/[,;\t ]+/).map(Number); if(c.length<2||!isFinite(c[0])||!isFinite(c[1])||c[0]<=0) continue; out.push({d:c[0],v:c[1]}); }
+  return out; }
+function runCompare(){
+  const m=models.find(x=>String(x.id)===$("mxModel").value)||sel(); const p=m.p, unit=$("cmpUnit").value, io=iono(p);
+  const pts=parseMeas($("cmpData").value,unit);
+  if(!pts.length){ $("cmpOut").innerHTML=`<p class="hint">Paste at least one row: distance (km), value.</p>`; MEAS.pts=[]; redraw(); return; }
+  const toDB=v=>unit==="mv"?dBuV(v):unit==="dbm"?dBm2dBuV(v,p.f):v;
+  const rows=pts.map(q=>{ const meas=toDB(q.v), pr=evalP(p,q.d,io).t; return {d:q.d,meas,pr,e:pr===null?NaN:pr-meas}; });
+  const e=rows.map(r=>r.e).filter(isFinite), n=e.length, mean=e.reduce((a,b)=>a+b,0)/n, rms=Math.sqrt(e.reduce((a,b)=>a+b*b,0)/n), sd=Math.sqrt(e.reduce((a,b)=>a+(b-mean)**2,0)/Math.max(1,n-1)), mx=Math.max(...e.map(Math.abs));
+  MEAS.pts=rows.map(r=>({d:r.d,dB:r.meas})); MEAS.modelId=m.id;
+  const u=unit==="dbm"?"dB":"dB";
+  const verdict=Math.abs(mean)<=3&&sd<=6?["good","Good agreement"]:Math.abs(mean)<=6&&sd<=9?["warn","Typical for a median model"]:["bad","Poor agreement: check inputs or model choice"];
+  $("cmpOut").innerHTML=`<div class="tiles"><div class="tile info"><span class="k">Points</span><span class="val">${n}</span><span class="sub">${esc(m.name)}</span></div>
+    <div class="tile ${Math.abs(mean)<=3?"good":Math.abs(mean)<=6?"warn":"bad"}"><span class="k">Mean error (bias)</span><span class="val">${mean>=0?"+":""}${mean.toFixed(1)} ${u}</span><span class="sub">prediction − measurement</span></div>
+    <div class="tile ${sd<=6?"good":sd<=9?"warn":"bad"}"><span class="k">Std deviation</span><span class="val">${sd.toFixed(1)} ${u}</span><span class="sub">spread of the errors</span></div>
+    <div class="tile info"><span class="k">RMS error</span><span class="val">${rms.toFixed(1)} ${u}</span><span class="sub">max |error| ${mx.toFixed(1)} ${u}</span></div>
+    <div class="tile ${verdict[0]}"><span class="k">Verdict</span><span class="val" style="font-size:16px">${verdict[1]}</span><span class="sub">ITU-R P.1148-style statistics</span></div></div>
+    <div class="tablewrap"><table class="fs mxsteps"><tr><th>Distance</th><th>Measured</th><th>Predicted</th><th>Error</th></tr>${rows.map(r=>`<tr><td class="mono">${fmtD(r.d)} km</td><td class="mono">${r.meas.toFixed(1)} dBµV/m</td><td class="mono">${r.pr===null?"—":r.pr.toFixed(1)+" dBµV/m"}</td><td class="mono">${isFinite(r.e)?(r.e>=0?"+":"")+r.e.toFixed(1)+" dB":"—"}</td></tr>`).join("")}</table></div>
+    <p class="hint">The points are also drawn on the Lab chart. A median model is usually judged good when the bias is within ±3 dB and the standard deviation is below 6–9 dB.</p>`;
+  redraw();
+}
+const CMP_SAMPLE="# distance_km, field (dBµV/m)\n# example: reference values you read from an ITU-R P.368 curve or your own drive test\n10, 67\n25, 56\n50, 47\n100, 37\n200, 24";
+
+function renderMethods(){
+  const sel2=$("mxModel"); if(!sel2) return;
+  const v=sel2.value; sel2.innerHTML=models.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join(""); if(models.some(m=>String(m.id)===v)) sel2.value=v; else sel2.value=String(selId);
+  const m=models.find(x=>String(x.id)===sel2.value)||sel(); const p=m.p;
+  const dmax=p.type==="cell"?300:3000, dmin=p.type==="cell"?0.05:1;
+  const s=$("mxD"); s.dataset.min=dmin; s.dataset.max=dmax;
+  let d=+s.dataset.d||(p.rxDist||(p.type==="cell"?2:100)); d=clamp(d,dmin,dmax); s.dataset.d=d; s.value=Math.log10(d/dmin)/Math.log10(dmax/dmin)*1000;
+  $("mxDv").textContent=d<1?`${Math.round(d*1000)} m`:`${fmtD(d)} km`;
+  $("mxMethod").textContent=methodOf(p);
+  const {S,W}=explainCalc(p,d);
+  $("mxChecks").innerHTML=W.map(w=>`<li class="${w.ok?"ok":"no"}"><span aria-hidden="true">${w.ok?"✓":"!"}</span>${esc(w.t)}</li>`).join("");
+  let i=0;
+  $("mxSteps").innerHTML=`<tr><th>#</th><th>Quantity</th><th>Equation</th><th>Value</th></tr>`+S.map(r=>r.head?`<tr class="mxhead"><td colspan="4">${esc(r.head)}</td></tr>`:`<tr><td>${++i}</td><td>${esc(r.label)}</td><td class="eqc">${esc(r.eq)}</td><td class="mono">${r.val===null||r.val===undefined?esc(r.unit||""):f2(r.val)+" "+r.unit}</td></tr>`).join("");
+}
+function bindMethods(){
+  renderModelLib();
+  $("mxModel").addEventListener("change",()=>{ $("mxD").dataset.d=""; renderMethods(); });
+  $("mxD").addEventListener("input",e=>{ const s=e.target, lo=+s.dataset.min, hi=+s.dataset.max; s.dataset.d=lo*Math.pow(hi/lo,+s.value/1000); renderMethods(); });
+  $("mxCopy").addEventListener("click",async()=>{ const rows=[...$("mxSteps").querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>td.textContent).join("\t")).join("\n"); try{ await navigator.clipboard.writeText($("mxMethod").textContent+"\n"+rows); $("mxCopy").textContent="Copied ✓"; }catch(e){ $("mxCopy").textContent="Copy blocked"; } setTimeout(()=>$("mxCopy").textContent="Copy steps",1600); });
+  $("mxRunVer").addEventListener("click",renderVerify);
+  $("cmpData").value=CMP_SAMPLE;
+  $("cmpRun").addEventListener("click",runCompare);
+  $("cmpClear").addEventListener("click",()=>{ MEAS.pts=[]; $("cmpOut").innerHTML=""; redraw(); });
+  document.addEventListener("click",e=>{ const b=e.target.closest("[data-show-calc]"); if(!b) return; $("mxModel").value=String(selId); const m=sel(); const A=analyse(m); $("mxD").dataset.d=m.p.rxDist||(A.r&&A.r<3000?A.r:(m.p.type==="cell"?2:100)); go("methods"); });
+}
+
 /* ================= QUIZ ================= */
 const QUIZ=[
   {q:"Why do groundwave broadcast stations use vertical masts?",o:["Vertical polarization is not short-circuited by the conducting ground","Vertical antennas are cheaper","Horizontal waves reflect from the ionosphere too much","The D layer absorbs horizontal polarization"],a:0,e:"A horizontally polarized field parallel to a conducting surface is shorted out; vertical polarization can travel along the surface."},
@@ -3001,36 +3701,100 @@ const QUIZ=[
 QUIZ.push({q:"On the Animation tab, a listener sits where ground and sky waves are almost equally strong. What does the 'Received signal' trace show?",o:["A steady flat line","Deep, irregular swings up and down (fading)","No signal at all","A slowly rising line"],a:1,e:"The two waves arrive with a changing phase difference, so they alternately add and cancel."});
 QUIZ.push({q:"On the Map tab, a path from Colombo runs mostly over the sea. Compared with an all-land path of the same length, the ground wave is…",o:["Weaker","About the same","Stronger","Only present at night"],a:2,e:"Sea water conducts very well (σ ≈ 5 S/m), so ground-wave losses are much lower."});
 
-let qAnswered=0,qRight=0;
+/* ---- extra question types: true/false, select-all, numeric (answers computed by the app's ITU code) ---- */
+QUIZ.forEach(q=>{ q.t=q.t||"mc"; q.m=q.m||1; q.topic=q.topic||"Concepts"; });
+QUIZ.push(
+ {t:"tf",topic:"Space weather",q:"An X-class solar flare weakens the daytime MF (AM) ground wave.",a:false,e:"The ground wave (P.368) travels along the earth's surface and does not use the ionosphere, so flares do not affect it. Flares hit HF sky waves.",m:1},
+ {t:"tf",topic:"ITU methods",q:"ITU-R P.1812 can give the field strength exceeded at 95% of locations, not just the median.",a:true,e:"P.1812 adds location variability: L = L50 − I(pL/100)·σL with σL ≈ 5–6 dB.",m:1},
+ {t:"tf",topic:"Mobile",q:"The Okumura–Hata model (ITU-R P.529) may be used for a 4G link of 300 km.",a:false,e:"P.529 is defined for 1–100 km. Beyond that the app switches to P.1812, which shows the link is impossible beyond the radio horizon.",m:1},
+ {t:"multi",topic:"ITU methods",q:"Which ITU-R Recommendations does the app use for mobile (2G–5G) links? Select all that apply.",o:["P.529 (Okumura–Hata)","M.2412 (UMa)","P.1812 beyond the model range","BS.412 (FM planning)"],a:[0,1,2],e:"BS.412 is for FM broadcasting. Mobile uses P.529, M.2412 and P.1812, plus P.838, P.2109 and P.2108.",m:2},
+ {t:"multi",topic:"Ground wave",q:"Which changes increase the MF ground-wave range? Select all that apply.",o:["A path over sea water","Rain-soaked soil","A higher frequency","Dry rocky ground"],a:[0,1],e:"Higher conductivity (sea, wet soil) reduces ground loss. Higher frequency and dry rock increase it.",m:2},
+ {t:"multi",topic:"Space weather",q:"During an R3 (X1) flare with the sun low in a base-station antenna's beam, what is affected? Select all that apply.",o:["HF sky waves on the day side","The 4G uplink noise floor","The LF ground wave","FM path loss"],a:[0,1],e:"D-layer absorption blacks out HF, and solar radio bursts raise receiver noise. Ground-wave and VHF path losses do not change.",m:2},
+ {t:"num",topic:"Calculation",q:"A 1 kW short vertical monopole transmits at 1 MHz over sea water. What is the field at 1 km in dB(µV/m)? (ITU-R P.368)",ans:()=>p368dB(1,1,70,5,4/3,true,1),tol:0.5,unit:"dBµV/m",e:"Cymomotive force 300 V gives 300 mV/m at 1 km = 109.5 dB(µV/m), with negligible ground loss over sea.",m:2},
+ {t:"num",topic:"Calculation",q:"Hata (P.529), urban, f = 900 MHz, hb = 30 m, hm = 1.5 m, d = 1 km. What is the path loss in dB?",ans:()=>hataLoss(1,{f:900,htx:30,hrx:1.5,env:"urban"}),tol:1,unit:"dB",e:"69.55 + 26.16·log 900 − 13.82·log 30 − a(hm) ≈ 126.4 dB (the distance term is 0 at 1 km).",m:2},
+ {t:"num",topic:"Calculation",q:"What is the free-space field at 10 km for 1 kW ERP, in dB(µV/m)?",ans:()=>106.92-20,tol:0.5,unit:"dBµV/m",e:"E = 106.9 − 20·log d = 86.9 dB(µV/m).",m:2},
+ {t:"num",topic:"Calculation",q:"Radio horizon for a 30 m tower and a 1.5 m phone with k = 4/3, in km?",ans:()=>3.57*(Math.sqrt(4/3*30)+Math.sqrt(4/3*1.5)),tol:1,unit:"km",e:"d = 3.57·(√(k·h1) + √(k·h2)) ≈ 27.6 km.",m:2},
+ {t:"num",topic:"Calculation",q:"Convert −95 dBm received at 1800 MHz (isotropic antenna) to dB(µV/m).",ans:()=>dBm2dBuV(-95,1800),tol:0.5,unit:"dBµV/m",e:"E = P + 20·log f[MHz] + 77.2 = −95 + 65.1 + 77.2 ≈ 47.3 dB(µV/m).",m:2},
+ {t:"num",topic:"Space weather",q:"NOAA D-RAP: what is the highest affected frequency for an X1 flare with the sun overhead, in MHz?",ans:()=>flareHAF({flareR:3,cosChi:1}),tol:1,unit:"MHz",e:"HAF = 10·log(10⁻⁴) + 65 = 25 MHz.",m:2}
+);
+const QZ={mode:"practice",ans:{},submitted:false};
+const gradeOf=p=>p>=85?"A":p>=70?"B":p>=55?"C":p>=40?"S (pass)":"F";
+function markQ(it,a){ // returns marks earned (0..it.m)
+  if(a===undefined||a===null||a==="") return 0;
+  if(it.t==="mc") return a===it.a?it.m:0;
+  if(it.t==="tf") return a===it.a?it.m:0;
+  if(it.t==="multi"){ const sel=new Set(a), cor=new Set(it.a); let r=0,w=0; sel.forEach(x=>cor.has(x)?r++:w++); return Math.max(0,(r-w)/cor.size)*it.m; }
+  if(it.t==="num"){ const v=parseFloat(String(a).replace(",",".")), t=it.ans(); if(!isFinite(v)) return 0; const e=Math.abs(v-t); return e<=it.tol?it.m:e<=2*it.tol?it.m/2:0; }
+  return 0; }
+function correctText(it){ return it.t==="mc"?it.o[it.a]:it.t==="tf"?(it.a?"True":"False"):it.t==="multi"?it.a.map(i=>it.o[i]).join(" · "):`${it.ans().toFixed(1)} ${it.unit} (±${it.tol})`; }
+function updateScore(){ let got=0,max=0,n=0; QUIZ.forEach((it,i)=>{ max+=it.m; if(QZ.mode==="practice"?QZ.ans[i]!==undefined&&QZ.ans[i].locked:QZ.submitted){ got+=markQ(it,QZ.ans[i]&&QZ.ans[i].v); n++; } });
+  const shown=QZ.mode==="practice"?QUIZ.filter((_,i)=>QZ.ans[i]&&QZ.ans[i].locked).reduce((s,it)=>s+it.m,0):max;
+  const pct=shown?got/shown*100:0;
+  $("score").textContent=QZ.mode==="exam"&&!QZ.submitted?`${Object.keys(QZ.ans).length} / ${QUIZ.length} answered`:`${+got.toFixed(1)} / ${shown} marks · ${pct.toFixed(0)}%${shown?` · grade ${gradeOf(pct)}`:""}`;
+  return {got,max,pct}; }
+function feedback(d,it,v){ const mk=markQ(it,v), full=mk>=it.m-1e-9; d.classList.toggle("q-right",full); d.classList.toggle("q-part",mk>0&&!full); d.classList.toggle("q-wrong",mk===0);
+  d.querySelector(".fb").innerHTML=`<b>${full?"Correct":mk>0?"Partly correct":"Not quite"} · ${+mk.toFixed(2)} / ${it.m} mark${it.m>1?"s":""}.</b> ${it.t!=="mc"?`Answer: ${esc(correctText(it))}. `:""}${esc(it.e)}`;
+  if(it.t==="mc"||it.t==="tf"||it.t==="multi"){ const btns=[...d.querySelectorAll(".opts button")]; btns.forEach((b,j)=>{ const val=it.t==="tf"?j===0:j; const isC=it.t==="multi"?it.a.includes(j):val===it.a; if(isC) b.classList.add("right"); else if(b.getAttribute("aria-pressed")==="true") b.classList.add("wrong"); b.disabled=true; }); }
+  const inp=d.querySelector("input.qnum"); if(inp) inp.disabled=true; }
 function renderQuiz(){
-  qAnswered=0; qRight=0; $("score").textContent="0 / 0 correct";
-  const box=$("quizBox"); box.innerHTML="";
-  QUIZ.forEach((it,i)=>{
-    const d=document.createElement("div"); d.className="q";
-    d.innerHTML=`<b>${i+1}. ${esc(it.q)}</b><div class="opts"></div><p class="fb" aria-live="polite"></p>`;
-    const opts=d.querySelector(".opts"); let done=false;
-    it.o.forEach((o,j)=>{ const b=document.createElement("button"); b.type="button"; b.className="btn"; b.textContent=o;
-      b.addEventListener("click",()=>{ if(done) return; done=true; qAnswered++;
-        if(j===it.a){ qRight++; b.classList.add("right"); d.querySelector(".fb").textContent="Correct. "+it.e; }
-        else { b.classList.add("wrong"); opts.children[it.a].classList.add("right"); d.querySelector(".fb").textContent="Not quite. "+it.e; }
-        $("score").textContent=`${qRight} / ${qAnswered} correct`; });
-      opts.appendChild(b); });
-    box.appendChild(d);
-  });
+  QZ.ans={}; QZ.submitted=false; QZ.mode=$("qMode").value;
+  const topic=$("qTopic").value, box=$("quizBox"); box.innerHTML="";
+  QUIZ.forEach((it,i)=>{ if(topic!=="all"&&it.topic!==topic) return;
+    const d=document.createElement("div"); d.className="q"; d.dataset.i=i;
+    const tag={mc:"Multiple choice",tf:"True / false",multi:"Select all that apply",num:"Numeric answer"}[it.t];
+    d.innerHTML=`<div class="qhead"><span class="pill info">${tag}</span><span class="qm">${it.m} mark${it.m>1?"s":""} · ${esc(it.topic)}</span></div><b>${i+1}. ${esc(it.q)}</b><div class="opts"></div><p class="fb" aria-live="polite"></p>`;
+    const opts=d.querySelector(".opts");
+    const commit=v=>{ QZ.ans[i]={v,locked:QZ.mode==="practice"}; if(QZ.mode==="practice") feedback(d,it,v); updateScore(); };
+    if(it.t==="mc"||it.t==="tf"){ const os=it.t==="tf"?["True","False"]:it.o;
+      os.forEach((o,j)=>{ const b=document.createElement("button"); b.type="button"; b.className="btn"; b.textContent=o; b.setAttribute("aria-pressed","false");
+        b.addEventListener("click",()=>{ [...opts.children].forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); commit(it.t==="tf"?j===0:j); }); opts.appendChild(b); }); }
+    else if(it.t==="multi"){ const chosen=new Set();
+      it.o.forEach((o,j)=>{ const b=document.createElement("button"); b.type="button"; b.className="btn"; b.textContent="☐ "+o; b.setAttribute("aria-pressed","false");
+        b.addEventListener("click",()=>{ chosen.has(j)?chosen.delete(j):chosen.add(j); b.setAttribute("aria-pressed",String(chosen.has(j))); b.textContent=(chosen.has(j)?"☑ ":"☐ ")+o; if(QZ.mode==="exam") commit([...chosen]); }); opts.appendChild(b); });
+      if(QZ.mode==="practice"){ const c=document.createElement("button"); c.type="button"; c.className="btn primary sm"; c.textContent="Check answer"; c.addEventListener("click",()=>{ commit([...chosen]); c.remove(); }); d.appendChild(c); } }
+    else { opts.innerHTML=`<label class="numrow"><input class="qnum" type="text" inputmode="decimal" aria-label="Your answer"> <span>${esc(it.unit)}</span></label>`;
+      const inp=opts.querySelector("input");
+      if(QZ.mode==="practice"){ const c=document.createElement("button"); c.type="button"; c.className="btn primary sm"; c.textContent="Check answer"; c.addEventListener("click",()=>{ if(inp.value.trim()===""){ inp.focus(); return; } commit(inp.value); c.remove(); }); opts.appendChild(c);
+        inp.addEventListener("keydown",e=>{ if(e.key==="Enter") c.click(); }); }
+      else inp.addEventListener("input",()=>commit(inp.value)); }
+    box.appendChild(d); });
+  $("qSubmit").hidden=QZ.mode!=="exam"; $("qResult").innerHTML=""; updateScore();
 }
+function submitQuiz(){ QZ.submitted=true;
+  document.querySelectorAll("#quizBox .q").forEach(d=>{ const i=+d.dataset.i; feedback(d,QUIZ[i],QZ.ans[i]&&QZ.ans[i].v); });
+  const r=updateScore(); $("qSubmit").hidden=true;
+  const byT={}; QUIZ.forEach((it,i)=>{ const t=it.topic; byT[t]=byT[t]||{g:0,m:0}; byT[t].m+=it.m; byT[t].g+=markQ(it,QZ.ans[i]&&QZ.ans[i].v); });
+  $("qResult").innerHTML=`<div class="tiles"><div class="tile ${r.pct>=55?"good":r.pct>=40?"warn":"bad"}"><span class="k">Total</span><span class="val">${+r.got.toFixed(1)} / ${r.max}</span><span class="sub">${r.pct.toFixed(0)}% · grade ${gradeOf(r.pct)}</span></div>`+
+   Object.entries(byT).map(([t,v])=>`<div class="tile info"><span class="k">${esc(t)}</span><span class="val">${+v.g.toFixed(1)} / ${v.m}</span><span class="sub">${(v.g/v.m*100).toFixed(0)}%</span></div>`).join("")+`</div>
+   <p class="hint">Marking: multiple choice and true/false score full marks or zero. Select-all questions give partial credit (correct picks minus wrong picks). Numeric answers get full marks within the tolerance and half marks within twice the tolerance. Grades: A ≥ 85%, B ≥ 70%, C ≥ 55%, S ≥ 40%.</p>`;
+  $("qResult").scrollIntoView({behavior:"smooth",block:"start"}); }
+function exportQuiz(){ const name=($("qName").value||"student").trim(); const rows=[["Student",name],["Date",new Date().toISOString()],["Mode",QZ.mode],[],["#","Topic","Type","Question","Answer given","Correct answer","Marks","Max"]];
+  QUIZ.forEach((it,i)=>{ const a=QZ.ans[i]&&QZ.ans[i].v; const given=a===undefined?"":it.t==="mc"?it.o[a]:it.t==="tf"?(a?"True":"False"):it.t==="multi"?a.map(j=>it.o[j]).join(" | "):a; rows.push([i+1,it.topic,it.t,it.q,given,correctText(it),+markQ(it,a).toFixed(2),it.m]); });
+  const r=updateScore(); rows.push([],["Total",+r.got.toFixed(2),r.max,r.pct.toFixed(1)+"%",gradeOf(r.pct)]);
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download=`quiz-${name.replace(/\W+/g,"_")}.csv`; a.click(); }
+function bindQuiz(){ const topics=[...new Set(QUIZ.map(q=>q.topic))]; $("qTopic").innerHTML=`<option value="all">All topics (${QUIZ.length})</option>`+topics.map(t=>`<option>${esc(t)}</option>`).join("");
+  $("qMode").addEventListener("change",renderQuiz); $("qTopic").addEventListener("change",renderQuiz); $("qSubmit").addEventListener("click",submitQuiz); $("qExport").addEventListener("click",exportQuiz); $("qPrint").addEventListener("click",()=>window.print()); }
 
 /* ================= TABS ================= */
-const TABS=["lab","animation","map","terrain","learn","quiz"];
+const TABS=["lab","animation","map","terrain","methods","learn","quiz"];
 let currentTab="lab";
 function go(t,noHash){
   if(!TABS.includes(t)) t="lab"; currentTab=t;
   document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
-  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("quiz").hidden=t!=="quiz";
+  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz";
   if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
   if(t==="lab") redraw();
   if(t==="map"||t==="terrain") updateMap();
   if(t==="animation"){ syncRx(); }
+  if(t==="methods") renderMethods();
+  document.querySelectorAll(".bnav a").forEach(a=>a.setAttribute("aria-current",a.dataset.tab===t?"page":"false"));
   window.scrollTo({top:0});
+}
+function bindBottomNav(){
+  document.querySelectorAll(".bnav a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); if(a.dataset.tab==="more"){ const sh=$("moreSheet"); sh.hidden=!sh.hidden; a.setAttribute("aria-expanded",String(!sh.hidden)); return; } $("moreSheet").hidden=true; go(a.dataset.tab); }));
+  document.querySelectorAll("#moreSheet [data-tab]").forEach(b=>b.addEventListener("click",()=>{ $("moreSheet").hidden=true; go(b.dataset.tab); }));
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape") $("moreSheet").hidden=true; });
 }
 function bindTabs(){
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
@@ -3072,7 +3836,7 @@ function bindHelp(){
 
 /* ================= INIT ================= */
 function init(){
-  fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindCells(); bindTabs(); renderQuiz();
+  fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindCells(); bindMethods(); bindBottomNav(); bindTabs(); bindQuiz(); renderQuiz();
   $("quizReset").addEventListener("click",renderQuiz);
   loadPreset(0);
   go(location.hash.slice(1)||"lab",true);
