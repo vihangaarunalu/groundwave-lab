@@ -1731,17 +1731,26 @@ function buildingHeight(t){ const h=parseFloat(t.height); if(isFinite(h)&&h>0) r
 async function fetchOSMFeatures(P,rx){
   const key=[MP.tx.lat,MP.tx.lon,rx.lat,rx.lon].map(v=>v.toFixed(4)).join(",");
   if(OSMF.cache.has(key)) return OSMF.cache.get(key);
-  if(OSMF.ok===false) return null;
+  if(OSMF.failedAt&&Date.now()-OSMF.failedAt<60000) return null; // wait a minute before asking busy servers again
   const poly=(f0,f1,k)=>{ const a=[]; for(let i=0;i<=k;i++){ const q=gcPoint(MP.tx,rx,f0+(f1-f0)*i/k); a.push(q.lat.toFixed(5),q.lon.toFixed(5)); } return a.join(","); };
   const D=P.dist, nearKm=Math.min(D,8);
   const bParts = D<=60 ? [`way["building"](around:25,${poly(0,1,Math.max(8,Math.round(D/2)))});`]
     : [`way["building"](around:25,${poly(0,nearKm/D,8)});`,`way["building"](around:25,${poly(1-nearKm/D,1,8)});`];
   const q=`[out:json][timeout:25];(${bParts.join("")}node["natural"="peak"](around:4000,${poly(0,1,40)}););out tags center 4000;`;
+  // several public Overpass mirrors; the first one that answers wins
+  const EPS=["https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter","https://maps.mail.ru/osm/tools/overpass/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+  let j=null;
+  for(const ep of EPS){
+    try{
+      const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),20000);
+      const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ctl.signal});
+      clearTimeout(to); if(!r.ok) continue;
+      j=await r.json(); break;
+    }catch(e){ /* try next mirror */ }
+  }
+  if(!j){ OSMF.failedAt=Date.now(); return null; }
   try{
-    const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),30000);
-    const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ctl.signal});
-    clearTimeout(to); if(!r.ok) throw new Error("HTTP "+r.status);
-    const j=await r.json(); const res={buildings:[],peaks:[],partial:D>60};
+    const res={buildings:[],peaks:[],partial:D>60};
     for(const el of j.elements||[]){
       const lat=el.lat??(el.center&&el.center.lat), lon=el.lon??(el.center&&el.center.lon); if(lat==null) continue;
       const {at,xt}=alongTrack(MP.tx,rx,{lat,lon}); if(at<0||at>D) continue;
@@ -1750,7 +1759,7 @@ async function fetchOSMFeatures(P,rx){
       else if(t.building){ const bh=buildingHeight(t); res.buildings.push({dm:at*1000,h:bh.h,est:bh.est,name:t.name||""}); }
     }
     OSMF.ok=true; OSMF.cache.set(key,res); return res;
-  }catch(e){ if(String(e).includes("HTTP 429")||String(e).includes("abort")) return null; OSMF.ok=false; return null; }
+  }catch(e){ return null; }
 }
 async function terrainFor(P,rx){
   const n=clamp(Math.round(P.dist/0.5)+1,101,301), pts=[]; for(let i=0;i<n;i++) pts.push(gcPoint(MP.tx,rx,i/(n-1)));
@@ -1980,7 +1989,7 @@ function renderActive(){
     ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
     ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?(T.ob&&T.loss>0.05?(T.ob.kind==="building"?"caused by a building":(T.peakName?`at ${T.peakName}`:`ridge at ${fmtD(T.ob.dm/1000)} km`)):`highest ${Math.round(T.maxE)} m`)+` · Δh ${Math.round(T.dh)} m`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"],
     ["Line of sight",T?(T.los?"Yes":"No"):"…",T?`masts ${T.txH} m / ${T.rxH} m`:"","info"],
-    ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmTried?"unavailable":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":"OpenStreetMap"),"info"],
+    ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
     ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
     ["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],
     ["Needed",fmtField(pr.thr),"minimum usable","info"]];
