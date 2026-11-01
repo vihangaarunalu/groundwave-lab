@@ -349,6 +349,9 @@ table.sites tr.selrow{background:var(--accent-soft)}
 
 .route2 .check{justify-content:flex-start !important}
 
+.mapseg input:checked + label.dellbl{background:#c2413a;color:#fff}
+.mapseg{flex-wrap:wrap}
+
 </style>
 </head>
 <body>
@@ -643,6 +646,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
         <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd">+ Receiver</label>
         <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move TX</label>
         <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move RX</label>
+        <input type="radio" name="clickset" id="modeDel" value="del"><label for="modeDel" class="dellbl">✕ Remove</label>
       </div>
       <button class="btn mapbtn" id="gpsBtn" type="button" hidden>◎ Use my location</button>
     </div>
@@ -664,7 +668,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <div class="map-br" id="attrib"></div>
     <div class="mapmsg" id="mapMsg" hidden></div>
   </div>
-  <p class="hint">Click the map to add a transmitter or receiver. Click a pin to select it, <b>double-click a pin to remove it</b>, and use ↺ to reset. Drag to pan, scroll to zoom.</p>
+  <p class="hint">Choose <b>+ Transmitter</b> or <b>+ Receiver</b> and click the map to add a site. To remove a pin, choose <b>✕ Remove</b> and click it, or right-click or double-click it. Use ↺ to reset. Drag to pan, scroll to zoom.</p>
 
   <div class="mapresult">
     <section class="panel card verdict" aria-live="polite" id="mapVerdict"></section>
@@ -674,8 +678,10 @@ table.sites tr.selrow{background:var(--accent-soft)}
   </div>
 
   <section class="panel card">
-    <div class="chart-head"><h2>Receiver sites</h2>
-      <div class="row"><button class="btn" id="copyCsv" type="button">Copy table (CSV)</button><button class="btn" id="dlCsv" type="button" hidden>Download CSV</button><button class="btn ghost" id="clearRx" type="button">Remove all but selected</button></div></div>
+    <div class="chart-head"><h2>Transmitters</h2></div>
+    <div class="tablewrap"><table class="fs sites" id="txTable"></table></div>
+    <div class="chart-head" style="margin-top:6px"><h2>Receiver sites</h2>
+      <div class="row"><button class="btn" id="copyCsv" type="button">Copy table (CSV)</button><button class="btn" id="dlCsv" type="button" hidden>Download CSV</button><button class="btn ghost" id="clearRx" type="button">✕ Clear receivers (keep selected)</button></div></div>
     <p class="hint">Paths are from the selected transmitter. Choose "+ Receiver" or "+ Transmitter" on the map and click anywhere in the world to add sites. Select a row to see its path below.</p>
     <div class="tablewrap"><table class="fs sites" id="sitesTable"></table></div>
   </section>
@@ -2035,7 +2041,7 @@ function setPoint(which,pt){
 }
 function updateMap(){
   if(MP.source==="loading"){ drawMap(); return; }
-  computePath(); refreshSites(); drawMap(); renderSites(); renderActive();
+  computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderActive();
   $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
   $("rxH").value=MP.rx.h; $("txH").value=MP.txH;
   const ts=$("txCity"); ts.innerHTML=MP.txs.map((t,i)=>`<option value="tx:${i}">T${i+1} · ${esc(t.name)}</option>`).join("")+`<optgroup label="Move selected transmitter to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
@@ -2124,6 +2130,16 @@ function renderSites(){
       <td><button class="iconbtn del" type="button" aria-label="Remove receiver ${i+1}" ${MP.rxs.length===1?"disabled":""}>✕</button></td></tr>`; }).join("");
   $("sitesTable").innerHTML=`<tr><th></th><th>Site</th><th>Lat, lon</th><th>Ground</th><th>Antenna (m)</th><th>Distance</th><th>Terrain</th><th>Signal</th><th>Reception</th><th></th></tr>`+rows;
 }
+function renderTxTable(){
+  const rows=MP.txs.map((t,i)=>`<tr data-t="${i}" class="${i===MP.ti?"selrow":""}">
+      <td><span class="pin-n" style="background:#d13b4f">T${i+1}</span></td>
+      <td><input type="text" class="tnm" value="${esc(t.name)}" aria-label="Transmitter ${i+1} name"></td>
+      <td class="mono">${t.lat.toFixed(3)}, ${t.lon.toFixed(3)}</td>
+      <td><input type="number" class="tah" min="1" max="1000" step="1" value="${t.h}" aria-label="Transmitter ${i+1} mast height" style="width:76px"></td>
+      <td>${i===MP.ti?'<span class="pill info">paths shown</span>':'<button class="btn sm tsel" type="button">Show paths</button>'}</td>
+      <td><button class="iconbtn tdel" type="button" aria-label="Remove transmitter ${i+1}" title="Remove transmitter" ${MP.txs.length===1?"disabled":""}>✕</button></td></tr>`).join("");
+  $("txTable").innerHTML=`<tr><th></th><th>Transmitter</th><th>Lat, lon</th><th>Mast (m)</th><th></th><th></th></tr>`+rows;
+}
 function sitesCSV(){
   const head=["Site","Latitude","Longitude","Ground height (m)","Antenna height (m)","Distance (km)","Terrain loss (dB)","Signal (dBuV/m)","Signal","Reception"];
   const lines=[head.join(",")];
@@ -2149,8 +2165,8 @@ function bindMap(){
   $("useBuildings").addEventListener("change",e=>{ MP.useBuildings=e.target.checked; updateMap(); });
   $("txElevM").addEventListener("change",e=>{ MP.manual.tx=+e.target.value||0; updateMap(); });
   $("rxElevM").addEventListener("change",e=>{ MP.manual.rx=+e.target.value||0; MP.rx.manualElev=MP.manual.rx; updateMap(); });
-  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; $("modeAddTx").checked=m==="addtx"; };
-  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
+  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; $("modeAddTx").checked=m==="addtx"; $("modeDel").checked=m==="del"; mapC.style.cursor=m==="del"?"not-allowed":""; };
+  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeDel","del"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
   // pins: TX and RX hit-testing (the pin head sits ~20 px above the point)
   const hitPin=(x,y)=>{ for(let i=MP.txs.length-1;i>=0;i--){ const [px,py]=proj(MP.txs[i].lon,MP.txs[i].lat); if(Math.hypot(px-x,py-18-y)<15) return {kind:"tx",i}; }
     for(let i=MP.rxs.length-1;i>=0;i--){ const [px,py]=proj(MP.rxs[i].lon,MP.rxs[i].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"rx",i}; } return null; };
@@ -2164,6 +2180,7 @@ function bindMap(){
   $("mapPlay").addEventListener("click",()=>setMapPlaying(!MP.anim.playing)); setMapPlaying(MP.anim.playing);
   $("basemap").addEventListener("change",e=>{ TILE.blockedMsg=false; setBase(e.target.value); });
   mapC.addEventListener("wheel",e=>{ e.preventDefault(); const r=mapC.getBoundingClientRect(); zoom(e.deltaY<0?0.5:-0.5,e.clientX-r.left,e.clientY-r.top); },{passive:false});
+  mapC.addEventListener("contextmenu",e=>{ const r=mapC.getBoundingClientRect(); const h=hitPin(e.clientX-r.left,e.clientY-r.top); if(h){ e.preventDefault(); removePin(h); } });
   mapC.addEventListener("dblclick",e=>{ const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; const h=hitPin(x,y); if(h){ removePin(h); return; } zoom(1,x,y); });
   let down=null;
   mapC.addEventListener("pointerdown",e=>{ down={x:e.clientX,y:e.clientY,cx:wx(MP.view.lon,MP.view.z),cy:wy(MP.view.lat,MP.view.z),moved:false}; mapC.setPointerCapture(e.pointerId); });
@@ -2171,6 +2188,8 @@ function bindMap(){
     if(down.moved){ mapC.style.cursor="grabbing"; MP.view.lon=clamp(ilon(down.cx-dx,MP.view.z),-180,180); MP.view.lat=clamp(ilat(down.cy-dy,MP.view.z),-80,80); scheduleMapDraw(); } });
   mapC.addEventListener("pointerup",e=>{ mapC.style.cursor=""; if(!down) return; const moved=down.moved; down=null; if(moved) return;
     const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, q=unproj(x,y);
+    // remove mode: clicking a pin deletes it
+    if(MP.mode==="del"){ const h=hitPin(x,y); if(h) removePin(h); else { const m=$("mapMsg"); m.hidden=false; m.textContent="Click directly on a pin to remove it. (Click to hide)"; } return; }
     // clicking an existing pin selects it (double-click removes it)
     const hp=hitPin(x,y); if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
     let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
@@ -2185,6 +2204,13 @@ function bindMap(){
   tb.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const rx=MP.rxs[+tr.dataset.i];
     if(e.target.classList.contains("nm")){ rx.name=e.target.value.trim()||rx.name; updateMap(); }
     if(e.target.classList.contains("ah")){ rx.h=clamp(+e.target.value||0,0,500); updateMap(); } });
+  const tt=$("txTable");
+  tt.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-t]"); if(!tr) return; const i=+tr.dataset.t;
+    if(e.target.closest(".tdel")){ removePin({kind:"tx",i}); return; }
+    if(e.target.closest("input")) return; if(MP.ti!==i){ MP.ti=i; updateMap(); } });
+  tt.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-t]"); if(!tr) return; const t=MP.txs[+tr.dataset.t];
+    if(e.target.classList.contains("tnm")){ t.name=e.target.value.trim()||t.name; updateMap(); }
+    if(e.target.classList.contains("tah")){ t.h=clamp(+e.target.value||1,1,1000); updateMap(); } });
   $("clearRx").addEventListener("click",()=>{ const keep=MP.rx; MP.rxs=[keep]; MP.ai=0; MP.res=new Map([...MP.res].filter(([k])=>k===keep.id)); updateMap(); });
   $("copyCsv").addEventListener("click",async()=>{ const b=$("copyCsv"); try{ await navigator.clipboard.writeText(sitesCSV()); b.textContent="Copied ✓"; }catch(e){ b.textContent="Copy blocked"; } setTimeout(()=>b.textContent="Copy table (CSV)",1800); });
   let topLevel=false; try{ topLevel=window.top===window.self; }catch(e){}
