@@ -1114,7 +1114,7 @@ function norton(d,f,g){
   const p=Math.PI*d/(lam*x)*Math.cos(b);
   return {A:(2+0.3*p)/(2+p+0.6*p*p), p, x};
 }
-const kFac=p=>({sub:1.0,standard:4/3,super:2.0})[p.refr];
+const kFac=p=>({sub:1.0,standard:4/3,super:2.0})[p.refr]||4/3;
 function critDist(f,p){ return 80/Math.cbrt(f)*Math.pow(kFac(p)/(4/3),2/3); }
 function curvLoss(d,f,p){ const dc=critDist(f,p); return d>dc ? 3.2*(d/dc-1) : 0; }
 function gwSingle(d,p,g,curv){
@@ -1304,7 +1304,9 @@ function buildingEntry(p){ return p.indoor? 11.6+3.0*Math.log2(Math.max(p.f/1000
 function hataLoss(dkm,p){
   const f=clamp(p.f,150,2200), hb=clamp(p.htx||30,10,200), hm=clamp(p.hrx||1.5,1,10), d=Math.max(dkm,0.02), lf=Math.log10(f);
   const ahm=(1.1*lf-0.7)*hm-(1.56*lf-0.8);
-  const slope=(44.9-6.55*Math.log10(hb))*Math.log10(d);
+  // ITU-R P.529 extension of Hata to 20–100 km: distance exponent b > 1 beyond 20 km
+  let bexp=1; if(d>20){ const hb2=hb/Math.sqrt(1+7e-6*hb*hb); bexp=1+(0.14+1.87e-4*f+1.07e-3*hb2)*Math.pow(Math.log10(Math.min(d,100)/20),0.8); }
+  const slope=(44.9-6.55*Math.log10(hb))*Math.pow(Math.log10(d),bexp);
   let L = f<=1500 ? 69.55+26.16*lf-13.82*Math.log10(hb)-ahm+slope
                   : 46.3+33.9*lf-13.82*Math.log10(hb)-ahm+slope+(p.env==="industrial"?3:0);
   if(p.env==="suburban") L-=2*Math.pow(Math.log10(f/28),2)+5.4;
@@ -1323,14 +1325,18 @@ function umaLoss(dkm,p){
   return -10*Math.log10(pl*Math.pow(10,-los/10)+(1-pl)*Math.pow(10,-nlos/10));
 }
 function cellMethod(p){ return p.f>2200?"ITU-R M.2412 UMa (IMT-2020)":p.f>1500?"COST-231 Hata (ext. of ITU-R P.529)":"ITU-R P.529 Okumura–Hata"; }
-function cellLoss(dkm,p){ let L=p.f>2200?umaLoss(dkm,p):hataLoss(dkm,p); if(p.f<=2200&&dkm>20) L+=0; return L+atmosLoss(dkm,p)+buildingEntry(p); }
+/* radio horizon for mobile links and spherical-earth diffraction beyond it (ITU-R P.526, first-mode approximation) */
+function cellHorizon(p){ const k=kFac(p); return 3.57*(Math.sqrt(k*(p.htx||30))+Math.sqrt(k*(p.hrx||1.5))); }
+function beyondHorizonLoss(dkm,p){ const dh=cellHorizon(p); if(dkm<=dh) return 0; const x=dkm-dh;
+  return 0.0402*Math.cbrt(p.f)*Math.pow((4/3)/kFac(p),2/3)*x + 6*Math.min(1,x/10); }
+function cellLoss(dkm,p){ let L=p.f>2200?umaLoss(dkm,p):hataLoss(dkm,p); return L+beyondHorizonLoss(dkm,p)+atmosLoss(dkm,p)+buildingEntry(p); }
 /* received power (dBm, isotropic receive antenna) and the equivalent field strength */
 function cellRxdBm(dkm,p){ return dBm(p.P)-cellLoss(dkm,p); }
 const dBm2dBuV=(prx,fMHz)=>prx+20*Math.log10(fMHz)+77.2;
 const dBuV2dBm=(e,fMHz)=>e-20*Math.log10(fMHz)-77.2;
 function cellThrdBm(p){ const t=CELL_TECH[p.tech]; return t?t.thr:-105; }
 function methodOf(p){
-  if(p.type==="cell") return cellMethod(p)+" · P.838 rain · P.676 gases"+(p.indoor?" · P.2109 indoor":"");
+  if(p.type==="cell") return cellMethod(p)+" · P.526 beyond the radio horizon · P.838 rain · P.676 gases"+(p.indoor?" · P.2109 indoor":"");
   if(p.type==="sky") return "ITU-R P.533-style sky wave (secant law, D-layer absorption)";
   if(p.type==="inverse") return "Inverse-distance reference (ITU-R P.525 free space ×2)";
   if(p.type==="custom") return "Your own formula";
@@ -1544,7 +1550,7 @@ function drawChart(hoverX){
   const dpr=window.devicePixelRatio||1; chart.width=W*dpr; chart.height=H*dpr; cctx.setTransform(dpr,0,0,dpr,0,0);
   const {dmax,lg}=computeCurves(); const unit=$("yunit").value, mvMode=unit==="mv", dbmMode=unit==="dbm";
   const cv=(v,m)=>v===null||!isFinite(v)?v:(dbmMode?v-20*Math.log10(m.p.f)-77.2:v);
-  const L=mvMode?74:58,R=14,T=12,B=40,w=W-L-R,h=H-T-B, ymin=dbmMode?-150:-20,ymax=dbmMode?0:130;
+  const L=mvMode?74:dbmMode?92:58,R=14,T=12,B=40,w=W-L-R,h=H-T-B, ymin=dbmMode?-150:-20,ymax=dbmMode?0:130;
   const dmin=dmax<=100?0.1:1;
   const xs=d=>lg?L+Math.log10(Math.max(d,dmin)/dmin)/Math.log10(dmax/dmin)*w:L+d/dmax*w;
   const ys=v=>T+(ymax-clamp(v,ymin-50,ymax+50))/(ymax-ymin)*h;
@@ -1638,6 +1644,7 @@ function readouts(){
     if(p.type==="combined"){ tiles.push({k:"Fading zone",tip:"Ground and sky wave arrive within 6 dB of each other and interfere, so the signal swells and fades.",val:A.fade?`${fmtD(A.fade.a)}–${fmtD(A.fade.b)} km`:"none",sub:A.fade?"expect fading & distortion":"one wave always dominates",cls:A.fade?"warn":"good"});
       if(A.fade) sent.push(`Expect <b>fading</b> between about ${fmtD(A.fade.a)} and ${fmtD(A.fade.b)} km.`); }
   }
+  if(p.type==="cell") tiles.push({k:"Radio horizon",tip:"Beyond this distance the earth's curve blocks the direct path and the mobile signal falls quickly (spherical-earth diffraction, ITU-R P.526). Raise the tower to push it further.",val:`${fmtD(cellHorizon(p))} km`,sub:`tower ${p.htx||30} m · phone ${p.hrx||1.5} m`,cls:"info"});
   if(p.type==="cell"){ const r1=cellRxdBm(1,p); tiles.push({k:"Signal at 1 km",tip:"Received power at a phone 1 km from the tower (isotropic antenna), after path, rain, gas and building-entry losses.",val:`${r1.toFixed(0)} dBm`,sub:r1>-80?"excellent":r1>-95?"good":r1>cellThrdBm(p)?"fair":"poor",cls:r1>-95?"good":r1>cellThrdBm(p)?"warn":"bad"});
     if(rainRate(p)&&p.f>=1000) tiles.push({k:"Rain loss @ 5 km",tip:"ITU-R P.838 specific attenuation with an effective path-length reduction.",val:`${rainLoss(5,p).toFixed(1)} dB`,sub:`${rainRate(p)} mm/h rain`,cls:rainLoss(5,p)>6?"bad":"warn"}); }
   tiles.push({k:"Signal needed",tip:p.type==="cell"?"Typical cell-edge level for this technology (outdoor, teaching estimate).":"Minimum usable field strength. It rises with man-made noise, thunderstorms, night-time static and lower frequency.",val:p.type==="cell"?`${cellThrdBm(p)} dBm`:thrTxt,sub:`${A.thr.toFixed(0)} dBµV/m · ${p.env}${p.storm!=="none"?" + storms":""}`,cls:"info"});
@@ -1685,6 +1692,7 @@ function readouts(){
     if(p.flare) ex.push(cosChiOf(p)>0?"The solar flare floods the D layer with ionization and can black out HF on the sunlit side.":"A solar flare does not affect the night side of the earth.");
     if(p.gstorm) ex.push("The geomagnetic storm weakens the F2 layer, so higher frequencies escape and the skip zone grows.");
   }
+  if(p.type==="cell"){ ex.push(`A ${fmtD(cellHorizon(p))} km radio horizon limits this tower: past it the signal drops by about ${(0.0402*Math.cbrt(p.f)).toFixed(2)} dB per km. That is why a 4G tower in Colombo cannot serve Jaffna, 300 km away, however powerful it is.`); ex.push("Mobile networks are line-of-sight systems. Coverage depends mostly on frequency, antenna heights and the surroundings. Higher bands carry more data but need more towers, closer together."); }
   if(p.storm!=="none") ex.push("Thunderstorm static raises the noise, so a stronger signal is needed and the service area shrinks.");
   $("explain").innerHTML=`<h3>Why it behaves this way</h3>`+ex.map(t=>`<p>${t}</p>`).join("");
 }
