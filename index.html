@@ -352,6 +352,19 @@ table.sites tr.selrow{background:var(--accent-soft)}
 .mapseg input:checked + label.dellbl{background:#c2413a;color:#fff}
 .mapseg{flex-wrap:wrap}
 
+/* terrain tab */
+.route3{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px}
+.route3 .field{min-width:220px;flex:1 1 220px}
+.route3 .arrow{font-size:22px;color:var(--muted);padding-bottom:6px}
+.tsum{flex:2 1 320px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding-bottom:6px;font-size:14px}
+.tsum .mono{font-size:18px}
+#terrain{height:320px}
+/* animation quick settings */
+.quick .chips .chip{font-size:12.5px;padding:4px 10px;min-height:30px}
+.quick .seg label{font-size:12.5px}
+
+.route3 label{justify-content:flex-start !important;gap:7px !important}
+
 </style>
 </head>
 <body>
@@ -364,9 +377,10 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button class="tab" role="tab" id="tab-lab" aria-controls="lab" data-tab="lab"><span class="n">1</span>Lab</button>
       <button class="tab" role="tab" id="tab-animation" aria-controls="animation" data-tab="animation"><span class="n">2</span>Animation</button>
-      <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map"><span class="n">3</span>Map &amp; location</button>
-      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">4</span>Learn</button>
-      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">5</span>Quiz</button>
+      <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map"><span class="n">3</span>Map</button>
+      <button class="tab" role="tab" id="tab-terrain" aria-controls="terrain-tab" data-tab="terrain"><span class="n">4</span>Terrain profile</button>
+      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">5</span>Learn</button>
+      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">6</span>Quiz</button>
     </nav>
     <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
   </div>
@@ -589,6 +603,22 @@ table.sites tr.selrow{background:var(--accent-soft)}
     </div>
 
     <aside class="stack">
+      <section class="panel card quick" aria-labelledby="qsH">
+        <div class="card-h"><h3 id="qsH">Quick settings</h3><span class="editing">changes <b id="qsModel"></b></span></div>
+        <div class="field"><span class="lbl">Show</span>
+          <div class="seg" role="radiogroup" aria-label="Waves to show">
+            <input type="radio" name="aType" id="aT1" value="combined"><label for="aT1">Both</label>
+            <input type="radio" name="aType" id="aT2" value="gw"><label for="aT2">Ground</label>
+            <input type="radio" name="aType" id="aT3" value="sky"><label for="aT3">Sky</label>
+          </div></div>
+        <div class="field"><label for="aFreq">Frequency <span class="v" id="aFreqV"></span></label>
+          <div class="chips" id="aFreqChips"></div>
+          <input type="range" id="aFreq" min="-1" max="3.477" step="0.001" aria-label="Fine-tune frequency"></div>
+        <div class="field"><label for="aPow">Power <span class="v" id="aPowV"></span></label>
+          <input type="range" id="aPow" min="-1" max="3" step="0.01"></div>
+        <div class="field"><label for="aGround">Ground</label><select id="aGround"></select></div>
+        <div class="field"><span class="lbl">Weather</span><div class="chips" id="aWx"></div></div>
+      </section>
       <section class="panel card meter" aria-live="polite">
         <div class="card-h"><h3>Receiver</h3><span class="mono" id="rxD">–</span></div>
         <input type="range" id="rxSlider" min="2" max="1000" step="1" value="150" aria-label="Receiver distance">
@@ -687,6 +717,19 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <div class="tablewrap"><table class="fs sites" id="sitesTable"></table></div>
   </section>
 
+  <section class="panel card"><div class="row" style="justify-content:space-between"><p class="hint" style="margin:0">See the mountains, buildings and signal level along the selected path in the <b>Terrain profile</b> tab.</p><div class="row"><button class="btn primary" id="toTerrain" type="button">View terrain profile →</button><button class="btn" id="toLab" type="button">Open in Lab</button><button class="btn" id="toAnim" type="button">Animate it</button></div></div></section>
+</section>
+
+<!-- ======================= TERRAIN ======================= -->
+<section class="wrap" id="terrain-tab" role="tabpanel" aria-labelledby="tab-terrain" hidden>
+  <section class="panel card routebar">
+    <div class="route3">
+      <div class="field"><label for="tTx"><span class="dot tx"></span>Transmitter</label><select id="tTx"></select></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="field"><label for="tRx"><span class="dot rx"></span>Receiver</label><select id="tRx"></select></div>
+      <div class="tsum" id="tSum" aria-live="polite"></div>
+    </div>
+  </section>
   <section class="panel card">
     <div class="chart-head"><h2>Terrain profile: <span id="profName" class="muted"></span></h2>
       <div class="row"><span class="legend"><span><i style="border-top:8px solid rgba(40,50,70,.9);width:6px"></i>Building (OSM)</span><span>▲ Named peak</span><span style="color:#c2413a">▼ Main obstacle</span></span><label class="check"><input type="checkbox" id="showBulge"> Show earth curvature</label></div></div>
@@ -696,7 +739,7 @@ table.sites tr.selrow{background:var(--accent-soft)}
     <div class="strip" id="strip" aria-label="Land and sea along the path"></div>
     <div class="legend"><span><i style="border-top:8px solid #8a7a4c;width:14px"></i>Land</span><span><i style="border-top:8px solid #2a62a8;width:14px"></i>Sea</span><span style="color:var(--accent)"><i style="border-top-width:3px"></i><b style="color:var(--ink);font-weight:500">Total signal (smooth earth)</b></span><span><i style="border-top-style:dashed"></i>Minimum usable</span></div>
     <canvas id="profile" aria-label="Signal strength along the path"></canvas>
-    <div class="row"><button class="btn primary" id="toLab" type="button">Open selected path in Lab</button><button class="btn" id="toAnim" type="button">Animate it</button><a class="btn ghost" id="osmLink" href="https://www.openstreetmap.org/" target="_blank" rel="noopener">View on openstreetmap.org ↗</a></div>
+    <div class="row"><button class="btn primary" id="toLab2" type="button">Open in Lab</button><button class="btn" id="toAnim2" type="button">Animate this path</button><button class="btn" id="toMap" type="button">← Back to map</button><a class="btn ghost" id="osmLink" href="https://www.openstreetmap.org/" target="_blank" rel="noopener">View on openstreetmap.org ↗</a></div>
   </section>
 </section>
 
@@ -1124,7 +1167,7 @@ function updateLabels(){
   if(p.type==="custom"){ const c=compileExpr(p.expr); $("exprErr").textContent=c.err||""; }
 }
 function bindLab(){
-  const set=(obj)=>{ const m=sel(); if(!m) return; Object.assign(m.p,obj); currentPreset=-1; renderPresets(); renderGuide(); updateLabels(); renderList(); redraw(); syncModelSelects(); };
+  const set=(obj)=>{ const m=sel(); if(!m) return; Object.assign(m.p,obj); currentPreset=-1; renderPresets(); renderGuide(); updateLabels(); renderList(); redraw(); syncModelSelects(); if(typeof syncAnimControls==="function"){ AN.gwKey=""; AN.anaKey=""; syncAnimControls(); } };
   const fc=$("freqChips"); FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f; b.onclick=()=>{ set({f}); $("freq").value=Math.log10(f); }; fc.appendChild(b); });
   const wc=$("wxChips"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>{ set(Object.assign({},w.set)); syncControls(); }; wc.appendChild(b); });
   $("type").addEventListener("change",e=>set({type:e.target.value}));
@@ -1322,11 +1365,39 @@ const hourFromCos=c=>12-Math.acos(clamp(c,-1,1))*12/Math.PI;
 function animModel(){ return models.find(m=>m.id===AN.id)||sel(); }
 function animParams(){ const m=animModel(); return Object.assign({},m.p,{cosChi:cosFromHour(AN.hour)}); }
 function resetView(){ const span=+$("animRange").value; AN.view={d0:-span*0.03,span}; syncRx(); }
+/* ---- quick settings: edit the animated model directly ---- */
+const A_FREQS=[["LF 200k",0.2],["MW 1M",1],["HF 7M",7],["HF 15M",15],["VHF 100M",100],["UHF 600M",600]];
+function syncAnimControls(){
+  const m=animModel(); if(!m) return; const p=m.p;
+  $("qsModel").textContent=m.name;
+  document.querySelectorAll('input[name="aType"]').forEach(r=>r.checked=(r.value===p.type||(r.value==="gw"&&p.type==="gwflat")));
+  $("aFreq").value=Math.log10(p.f); $("aFreqV").textContent=`${fmtF(p.f)} · ${band(p.f)}`;
+  document.querySelectorAll("#aFreqChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(Math.abs(+b.dataset.f-p.f)<1e-6)));
+  $("aPow").value=Math.log10(p.P); $("aPowV").textContent=fmtP(p.P);
+  $("aGround").value=p.ground; $("aGround").disabled=p.path==="geo";
+  $("aGround").title=p.path==="geo"?"This path comes from the map; its land and sea sections are fixed.":"";
+  const wk=weatherKey(p); document.querySelectorAll("#aWx .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===wk)));
+}
+function animSet(obj,autoRange){
+  const m=animModel(); if(!m) return; const oldBand=band(m.p.f); Object.assign(m.p,obj);
+  AN.gwKey=""; AN.anaKey=""; AN.scope=[];
+  if(autoRange&&band(m.p.f)!==oldBand&&!m.p.rxDist){ const span=m.p.f>=30?300:m.p.f>3?3000:1000; $("animRange").value=String(span); resetView(); }
+  syncAnimControls(); if(m.id===selId){ syncControls(); } renderList();
+}
+function bindAnimQuick(){
+  const fc=$("aFreqChips"); A_FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f; b.onclick=()=>animSet({f},true); fc.appendChild(b); });
+  const wc=$("aWx"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.title=w.label; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>animSet(Object.assign({},w.set)); wc.appendChild(b); });
+  document.querySelectorAll('input[name="aType"]').forEach(r=>r.addEventListener("change",e=>animSet({type:e.target.value})));
+  $("aFreq").addEventListener("input",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)}));
+  $("aFreq").addEventListener("change",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)},true));
+  $("aPow").addEventListener("input",e=>animSet({P:+Math.pow(10,+e.target.value).toPrecision(3)}));
+  const g=$("aGround"); g.innerHTML=Object.entries(GROUNDS).filter(([k])=>k!=="custom").map(([k,v])=>`<option value="${k}">${v.name}</option>`).join(""); g.addEventListener("change",e=>animSet({ground:e.target.value}));
+}
 function setAnimModel(id){ AN.id=id; const m=animModel(); AN.hour=hourFromCos(cosChiOf(m.p)); $("hour").value=AN.hour;
   let span=+$("animRange").value;
   if(m.p.rxDist){ AN.rx=m.p.rxDist; span=m.p.rxDist>900?3000:m.p.rxDist>280?1000:300; }
   else if(m.p.f>=30) span=300; else if(m.p.f>3) span=3000;
-  $("animRange").value=String(span); resetView(); AN.scope=[]; AN.gwKey=""; AN.anaKey=""; }
+  $("animRange").value=String(span); resetView(); AN.scope=[]; AN.gwKey=""; AN.anaKey=""; syncAnimControls(); }
 function syncRx(){ const max=Math.max(+$("animRange").value, AN.view.d0+AN.view.span); $("rxSlider").max=Math.round(max); AN.rx=clamp(AN.rx,1,max); $("rxSlider").value=AN.rx; }
 function syncModelSelects(){
   for(const id of ["animModel","mapModel"]){ const s=$(id); const v=s.value; s.innerHTML=models.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join("");
@@ -1354,6 +1425,7 @@ function showTour(i){
 const fa=k=>AN.tour===null?1:(TOUR[AN.tour].f.includes(k)?1:0.14);
 
 function bindAnim(){
+  bindAnimQuick();
   $("animModel").addEventListener("change",e=>setAnimModel(+e.target.value));
   $("animRange").addEventListener("change",()=>{ resetView(); AN.gwKey=""; });
   $("playBtn").addEventListener("click",()=>setPlaying(!AN.playing));
@@ -2078,6 +2150,8 @@ function updateMap(){
   ts.value="tx:"+MP.ti;
   const rs=$("rxCity"); rs.innerHTML=MP.rxs.map((r,i)=>`<option value="${i}">R${i+1} · ${esc(r.name)}</option>`).join("")+`<optgroup label="Move selected receiver to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
   rs.value=String(MP.ai);
+  $("tTx").innerHTML=MP.txs.map((t,i)=>`<option value="${i}">T${i+1} · ${esc(t.name)}</option>`).join(""); $("tTx").value=String(MP.ti);
+  $("tRx").innerHTML=MP.rxs.map((r,i)=>`<option value="${i}">R${i+1} · ${esc(r.name)}</option>`).join(""); $("tRx").value=String(MP.ai);
 }
 function renderActive(){
   const P=MP.path, r=MP.res.get(MP.rx.id); if(!P||!r) return;
@@ -2100,6 +2174,7 @@ function renderActive(){
     ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
     ["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],
     ["Needed",fmtField(pr.thr),"minimum usable","info"]];
+  $("tSum").innerHTML=`<span class="pill ${pr.cls}">${pr.verdict}</span><span class="mono">${fmtField(pr.t)}</span><span class="muted">${fmtD(P.dist)} km · ${T?(T.loss>0.05?"terrain −"+T.loss.toFixed(1)+" dB":"no terrain loss"):"terrain loading…"} · ${T?(T.los?"line of sight clear":"line of sight blocked"):""}</span>`;
   $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
   $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
   const note=$("terrainNote");
@@ -2254,6 +2329,12 @@ function bindMap(){
   $("when").addEventListener("change",e=>{ const d=new Date(e.target.value); if(!isNaN(d)){ MP.date=d; updateMap(); } });
   $("nowBtn").addEventListener("click",()=>{ MP.date=new Date(); $("when").value=toLocalInput(MP.date); updateMap(); });
   $("mapModel").addEventListener("change",updateMap); $("mapLand").addEventListener("change",updateMap);
+  $("tTx").addEventListener("change",e=>{ MP.ti=+e.target.value; updateMap(); });
+  $("tRx").addEventListener("change",e=>{ MP.ai=+e.target.value; updateMap(); });
+  $("toTerrain").addEventListener("click",()=>go("terrain"));
+  $("toMap").addEventListener("click",()=>{ go("map"); MP.view=defaultView("path"); drawMap(); });
+  $("toLab2").addEventListener("click",()=>$("toLab").click());
+  $("toAnim2").addEventListener("click",()=>$("toAnim").click());
   $("toLab").addEventListener("click",()=>{ pathModel(); const d=MP.path.dist; $("range").value=d>900?"3000":d>280?"1000":"300"; refreshAll(); go("lab"); });
   $("toAnim").addEventListener("click",()=>{ const m=pathModel(); refreshAll(); setAnimModel(m.id); $("animModel").value=String(m.id); go("animation"); });
   $("mapMsg").addEventListener("click",()=>{ $("mapMsg").hidden=true; TILE.blockedMsg=false; });
@@ -2292,15 +2373,15 @@ function renderQuiz(){
 }
 
 /* ================= TABS ================= */
-const TABS=["lab","animation","map","learn","quiz"];
+const TABS=["lab","animation","map","terrain","learn","quiz"];
 let currentTab="lab";
 function go(t,noHash){
   if(!TABS.includes(t)) t="lab"; currentTab=t;
   document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
-  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("learn").hidden=t!=="learn"; $("quiz").hidden=t!=="quiz";
+  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("quiz").hidden=t!=="quiz";
   if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
   if(t==="lab") redraw();
-  if(t==="map") updateMap();
+  if(t==="map"||t==="terrain") updateMap();
   if(t==="animation"){ syncRx(); }
   window.scrollTo({top:0});
 }
@@ -2317,14 +2398,14 @@ function applyTheme(t){
   const b=$("themeBtn"); b.textContent=THEME_LABEL[t]; b.setAttribute("aria-label","Colour theme: "+t);
   try{ localStorage.setItem("gwlab-theme",t); }catch(e){}
   // canvases read the theme tokens, so redraw the visible ones
-  if(currentTab==="lab") redraw(); if(currentTab==="map"){ drawMap(); renderActive(); }
+  if(currentTab==="lab") redraw(); if(currentTab==="map"||currentTab==="terrain"){ drawMap(); renderActive(); }
 }
 function bindTheme(){
   let t="auto"; try{ t=localStorage.getItem("gwlab-theme")||"auto"; }catch(e){}
   if(!THEMES.includes(t)) t="auto";
   applyTheme(t);
   $("themeBtn").addEventListener("click",()=>{ const cur=document.documentElement.dataset.theme||"auto"; applyTheme(THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]); });
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ if(!document.documentElement.dataset.theme){ if(currentTab==="lab") redraw(); if(currentTab==="map"){ drawMap(); renderActive(); } } });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ if(!document.documentElement.dataset.theme){ if(currentTab==="lab") redraw(); if(currentTab==="map"||currentTab==="terrain"){ drawMap(); renderActive(); } } });
 }
 
 /* ================= INIT ================= */
@@ -2334,7 +2415,7 @@ function init(){
   loadPreset(0);
   go(location.hash.slice(1)||"lab",true);
   bindTheme();
-  new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map") { drawMap(); renderActive(); } }).observe(document.body);
+  new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map"||currentTab==="terrain") { drawMap(); renderActive(); } }).observe(document.body);
   const mo=new MutationObserver(()=>{ if(currentTab==="lab") redraw(); }); mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
   requestAnimationFrame(animTick);
   loadLand();
