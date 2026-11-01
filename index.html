@@ -405,6 +405,25 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .pindel{position:absolute;z-index:5;transform:translate(-50%,0);background:#c2413a;color:#fff;border:2px solid #fff;border-radius:999px;font:inherit;font-size:12px;font-weight:700;padding:3px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap}
 .pindel:hover{background:#a5322c}
 
+/* live signal readout on the animation */
+.rxhud{position:absolute;left:12px;top:64px;width:250px;background:rgba(10,17,30,.86);color:#fff;border-radius:12px;padding:10px 12px;display:grid;gap:6px;box-shadow:0 6px 20px rgba(0,0,0,.3);font-size:12.5px;backdrop-filter:blur(3px)}
+.hud-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hud-q{font-family:var(--font-display);font-weight:800;font-size:15px}
+.hud-d{font-size:12px;opacity:.85}
+.hud-val{font-size:22px;line-height:1.1}
+.hud-row{display:grid;grid-template-columns:62px 1fr 74px;gap:6px;align-items:center}
+.hud-k{display:flex;gap:5px;align-items:center}
+.hud-k i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.hud-bar{position:relative;height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:visible}
+.hud-bar span{display:block;height:100%;border-radius:4px}
+.hud-bar b{position:absolute;top:-3px;width:2px;height:14px;background:#fff;border-radius:1px}
+.hud-row .mono{text-align:right;font-size:11.5px}
+.hud-foot{font-size:11px;opacity:.75}
+.rxbar{display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+.rxbar label{font-weight:600;font-size:14px;white-space:nowrap}
+.rxbar input{flex:1 1 260px}
+@media (max-width:700px){.rxhud{top:auto;bottom:10px;width:auto;right:60px}}
+
 </style>
 </head>
 <body>
@@ -646,9 +665,21 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
           <label class="check"><input type="checkbox" id="fsLabels" checked> Labels</label>
           <button class="btn" id="fsExit" type="button">Exit full screen</button>
         </div>
+        <div class="rxhud" id="rxHud" aria-live="polite">
+          <div class="hud-top"><span class="hud-q" id="hudQ">–</span><span class="mono hud-d" id="hudD">–</span></div>
+          <div class="hud-val mono" id="hudT">–</div>
+          <div class="hud-row"><span class="hud-k"><i class="k-gw"></i>Ground</span><div class="hud-bar"><span id="hbG" class="b-gw"></span><b id="hbT"></b></div><span class="mono" id="hvG">–</span></div>
+          <div class="hud-row"><span class="hud-k"><i class="k-sky"></i>Sky</span><div class="hud-bar"><span id="hbS" class="b-sky"></span><b id="hbT2"></b></div><span class="mono" id="hvS">–</span></div>
+          <div class="hud-foot">Needed <span class="mono" id="hvT">–</span> · white mark on bars</div>
+        </div>
         <button class="bigplay" id="bigPlay" type="button" hidden>▶ Play animation</button>
         <p class="animerr" id="animErr" hidden></p>
         <div class="zoominfo" id="zoomInfo"></div>
+      </div>
+      <div class="rxbar panel">
+        <label for="rxSlider2">📻 Receiver distance <b class="mono" id="rxD2">–</b></label>
+        <input type="range" id="rxSlider2" min="1" max="1000" step="0.1" value="150">
+        <span class="hint">or drag the radio in the animation</span>
       </div>
       <div class="keyrow">
         <span><i class="k-gw"></i>Ground wave (height = strength)</span>
@@ -664,6 +695,16 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
     </div>
 
     <aside class="stack">
+      <section class="panel card meter" aria-live="polite">
+        <div class="card-h"><h3>Receiver</h3><span class="mono" id="rxD">–</span></div>
+        <input type="range" id="rxSlider" min="2" max="1000" step="1" value="150" aria-label="Receiver distance">
+        <div class="quality" id="quality">–</div>
+        <div class="mrow"><span>Ground wave</span><div class="bar"><span id="bG" class="b-gw"></span></div><span class="mono" id="vG">–</span></div>
+        <div class="mrow"><span>Sky wave</span><div class="bar"><span id="bS" class="b-sky"></span></div><span class="mono" id="vS">–</span></div>
+        <div class="mrow"><span>Needed</span><div class="bar"><span id="bT" style="background:var(--muted)"></span></div><span class="mono" id="vT">–</span></div>
+        <div class="field"><span class="lbl">Received signal over time</span><canvas id="scope" aria-label="Received signal level over time"></canvas>
+        <p class="hint">When ground and sky waves are similar in strength they interfere, and the level swings up and down. This is fading.</p></div>
+      </section>
       <section class="panel card quick" aria-labelledby="qsH">
         <div class="card-h"><h3 id="qsH">Quick settings</h3><span class="editing">changes <b id="qsModel"></b></span></div>
         <div class="field"><span class="lbl">Show</span>
@@ -680,16 +721,6 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
           <input type="range" id="aPow" min="-3" max="3.7" step="0.01" aria-label="Fine-tune power"></div>
         <div class="field"><label for="aGround">Ground</label><select id="aGround"></select></div>
         <div class="field"><span class="lbl">Weather</span><div class="chips" id="aWx"></div></div>
-      </section>
-      <section class="panel card meter" aria-live="polite">
-        <div class="card-h"><h3>Receiver</h3><span class="mono" id="rxD">–</span></div>
-        <input type="range" id="rxSlider" min="2" max="1000" step="1" value="150" aria-label="Receiver distance">
-        <div class="quality" id="quality">–</div>
-        <div class="mrow"><span>Ground wave</span><div class="bar"><span id="bG" class="b-gw"></span></div><span class="mono" id="vG">–</span></div>
-        <div class="mrow"><span>Sky wave</span><div class="bar"><span id="bS" class="b-sky"></span></div><span class="mono" id="vS">–</span></div>
-        <div class="mrow"><span>Needed</span><div class="bar"><span id="bT" style="background:var(--muted)"></span></div><span class="mono" id="vT">–</span></div>
-        <div class="field"><span class="lbl">Received signal over time</span><canvas id="scope" aria-label="Received signal level over time"></canvas>
-        <p class="hint">When ground and sky waves are similar in strength they interfere, and the level swings up and down. This is fading.</p></div>
       </section>
       <section class="panel card">
         <div class="card-h"><h3>Time of day</h3><span class="pill info" id="phase">Day</span></div>
@@ -1619,7 +1650,9 @@ function setAnimModel(id){ AN.id=id; const m=animModel(); AN.hour=hourFromCos(co
   if(m.p.rxDist){ AN.rx=m.p.rxDist; span=m.p.rxDist>900?3000:m.p.rxDist>280?1000:300; }
   else if(m.p.type==="cell") span=30; else if(m.p.f>=30) span=300; else if(m.p.f>3) span=3000;
   $("animRange").value=String(span); resetView(); AN.scope=[]; AN.gwKey=""; AN.anaKey=""; syncAnimControls(); }
-function syncRx(){ const max=Math.max(+$("animRange").value, AN.view.d0+AN.view.span); $("rxSlider").max=Math.round(max); AN.rx=clamp(AN.rx,1,max); $("rxSlider").value=AN.rx; }
+function syncRx(){ const max=Math.max(+$("animRange").value, AN.view.d0+AN.view.span); const lo=max<=100?0.05:1;
+  for(const id of ["rxSlider","rxSlider2"]){ const el=$(id); el.max=Math.round(max); el.min=lo; el.step=max<=100?0.05:0.5; }
+  AN.rx=clamp(AN.rx,lo,max); $("rxSlider").value=AN.rx; $("rxSlider2").value=AN.rx; }
 function syncModelSelects(){
   for(const id of ["animModel","mapModel"]){ const s=$(id); const v=s.value; s.innerHTML=models.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join("");
     if(models.some(m=>String(m.id)===v)) s.value=v; else s.value=String(selId); }
@@ -1655,7 +1688,8 @@ function bindAnim(){
   $("speed").addEventListener("input",e=>AN.speed=+e.target.value);
   $("hour").addEventListener("input",e=>{ AN.hour=+e.target.value; AN.cycle=false; $("cycle").checked=false; });
   $("cycle").addEventListener("change",e=>{ AN.cycle=e.target.checked; if(AN.cycle&&!AN.playing) setPlaying(true); });
-  $("rxSlider").addEventListener("input",e=>{ AN.rx=+e.target.value; AN.scope=[]; });
+  $("rxSlider").addEventListener("input",e=>{ AN.rx=+e.target.value; $("rxSlider2").value=AN.rx; AN.scope=[]; AN.meterT=999; });
+  $("rxSlider2").addEventListener("input",e=>{ AN.rx=+e.target.value; $("rxSlider").value=AN.rx; AN.scope=[]; AN.meterT=999; });
   $("explainT").addEventListener("change",e=>AN.labels=e.target.checked);
   $("tourBtn").addEventListener("click",()=>showTour(0));
   $("tourNext").addEventListener("click",()=>showTour(AN.tour+1>=TOUR.length?null:AN.tour+1));
@@ -1692,11 +1726,11 @@ function bindAnim(){
   anim.addEventListener("pointerdown",e=>{ anim.setPointerCapture(e.pointerId); const q=pos(e); AN.ptrs.set(e.pointerId,q);
     if(AN.ptrs.size===2){ const [a,b]=[...AN.ptrs.values()]; AN.drag={mode:"pinch",dist:Math.hypot(a.x-b.x,a.y-b.y),span:AN.view.span}; return; }
     const g=AN.geom; if(!g) return; const [rx,ry]=g.map(AN.rx/RE,0);
-    if(Math.hypot(q.x-rx,q.y-ry+14)<34) AN.drag={mode:"rx"}; else AN.drag={mode:"pan",x:q.x,d0:AN.view.d0}; });
+    if(Math.hypot(q.x-rx,q.y-ry+14)<34){ AN.drag={mode:"rx"}; } else AN.drag={mode:"pan",x:q.x,d0:AN.view.d0}; });
   anim.addEventListener("pointermove",e=>{ const q=pos(e); if(AN.ptrs.has(e.pointerId)) AN.ptrs.set(e.pointerId,q);
     const g=AN.geom; if(!g) return;
     if(!AN.drag){ const [rx,ry]=g.map(AN.rx/RE,0); anim.style.cursor=Math.hypot(q.x-rx,q.y-ry+14)<34?"grab":"move"; return; }
-    if(AN.drag.mode==="rx"){ AN.rx=clamp(dAtX(q.x,q.y),1,4000); $("rxSlider").value=AN.rx; AN.scope=[]; }
+    if(AN.drag.mode==="rx"){ AN.rx=clamp(dAtX(q.x,q.y),0.05,4000); $("rxSlider").value=AN.rx; $("rxSlider2").value=AN.rx; AN.scope=[]; AN.meterT=999; }
     else if(AN.drag.mode==="pan"){ const kmPerPx=AN.view.span/(g.x1-g.x0); AN.view.d0=clamp(AN.drag.d0-(q.x-AN.drag.x)*kmPerPx,-AN.view.span*0.1,4000-AN.view.span*0.3); }
     else if(AN.drag.mode==="pinch"&&AN.ptrs.size===2){ const [a,b]=[...AN.ptrs.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); const target=clamp(AN.drag.span*AN.drag.dist/Math.max(d,1),10,4000); zoomAt(target/AN.view.span,(a.x+b.x)/2); } });
   const up=e=>{ AN.ptrs.delete(e.pointerId); if(AN.ptrs.size===0){ AN.drag=null; syncRx(); } };
@@ -1935,6 +1969,14 @@ function updateMeter(p,io,thr,dt){
   else if(tot>=thr+6){ q="Good reception"; cls="var(--good)"; }
   else { q="Weak but usable"; cls="var(--warn)"; }
   const qe=$("quality"); qe.textContent=q; qe.style.color=cls;
+  // live HUD on the animation
+  const isCell=p.type==="cell", fmtV=v=>v===null?"—":isCell?`${dBuV2dBm(v,p.f).toFixed(0)} dBm`:fmtField(v);
+  const dTxt=AN.rx<1?`${Math.round(AN.rx*1000)} m`:`${fmtD(AN.rx)} km`;
+  $("hudQ").textContent=q; $("hudQ").style.color=cls.replace("var(--good)","#4cd68f").replace("var(--warn)","#f3b54a").replace("var(--bad)","#ff7a70");
+  $("hudD").textContent=`📻 ${dTxt}`; $("hudT").textContent=fmtV(tot);
+  $("hbG").style.width=sc(g)+"%"; $("hbS").style.width=sc(s)+"%"; $("hbT").style.left=sc(thr)+"%"; $("hbT2").style.left=sc(thr)+"%";
+  $("hvG").textContent=fmtV(g); $("hvS").textContent=s===null?"none":fmtV(s); $("hvT").textContent=fmtV(thr);
+  $("rxD2").textContent=dTxt;
   const hh=Math.floor(AN.hour)%24, mm=Math.floor((AN.hour%1)*60);
   $("clock").textContent=`${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
   $("fsClock").textContent=$("clock").textContent; $("fsHour").value=AN.hour; $("fsPlay").textContent=AN.playing?"❚❚ Pause":"▶ Play";
