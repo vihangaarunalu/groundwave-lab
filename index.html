@@ -1228,7 +1228,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v2.0</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
+<footer><b>Groundwave Propagation Lab v2.1</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
 
 <script>
 "use strict";
@@ -1377,7 +1377,7 @@ function ituMinRef(p){
   return {v:70,ref:"ITU-R BT.417 Band V level"+(f<=960?"":" (nearest broadcast band)")};
 }
 function threshold(p){
-  if(p.type==="cell") return mVfromdB(dBm2dBuV(cellThrdBm(p)+burstNoise(p,0,7),p.f));
+  if(p.type==="cell") return mVfromdB(dBm2dBuV(cellThrdBm(p)+burstNoise(p,0,7),p.f)); // effective level already contains the uplink limit
   return mVfromdB(ituMinRef(p).v+burstNoise(p,7,5));
 }
 /* ITU-R P.1812 field strength (VHF/UHF) for P (kW ERP), incl. P.2108 receiver clutter, P.2109 indoor and pL% locations */
@@ -1444,12 +1444,15 @@ function groundPath(d,p,curv){
    ITU-R P.529 (Okumura–Hata, 150–1500 MHz), COST-231 Hata (1500–2200 MHz),
    ITU-R M.2412 / 3GPP UMa (IMT-2020, 0.5–100 GHz), ITU-R P.838 rain,
    ITU-R P.676 (approx.) gases, ITU-R P.2109 building entry loss (median, traditional building). */
+/* Mobile link budget per technology. The phone measures a reference signal, not total power:
+   2G RxLev (one 200 kHz carrier), 3G CPICH RSCP (≈ 10% of power), 4G/5G RSRP (power per resource element).
+   off = dB from total EIRP to the measured reference; edge = cell-edge level; ul = uplink maximum allowable path loss (typical operator link budget). */
 const CELL_TECH={
-  "2g":{name:"2G GSM 900",f:900,P:1,thr:-100,sys:"GSM"},
-  "3g":{name:"3G UMTS 2100",f:2100,P:1,thr:-102,sys:"UMTS"},
-  "4g":{name:"4G LTE 1800",f:1800,P:1,thr:-105,sys:"LTE"},
-  "5g":{name:"5G NR 3.5 GHz",f:3500,P:10,thr:-105,sys:"NR n78"},
-  "5gmm":{name:"5G mmWave 28 GHz",f:28000,P:3.16,thr:-100,sys:"NR n257"}
+  "2g":{name:"2G GSM 900",f:900,P:1,thr:-100,sys:"GSM",meas:"RxLev",off:0,ul:158,ueP:33,bw:"200 kHz carrier",bands:[-70,-80,-90],real:{urban:[1,3],suburban:[3,8],rural:[8,35]},ta:35},
+  "3g":{name:"3G UMTS 2100",f:2100,P:1,thr:-105,sys:"UMTS",meas:"RSCP",off:10,ul:148,ueP:24,bw:"5 MHz, CPICH = 10% of power",bands:[-75,-85,-95],real:{urban:[0.5,1.5],suburban:[1.5,4],rural:[4,10]}},
+  "4g":{name:"4G LTE 1800",f:1800,P:1,thr:-110,sys:"LTE",meas:"RSRP",off:30.8,ul:140,ueP:23,bw:"20 MHz, 1200 subcarriers",bands:[-80,-90,-100],real:{urban:[0.5,2],suburban:[2,5],rural:[5,15]}},
+  "5g":{name:"5G NR 3.5 GHz",f:3500,P:10,thr:-110,sys:"NR n78",meas:"SS-RSRP",off:35.2,ul:136,ueP:26,bw:"100 MHz, 3276 subcarriers",bands:[-80,-90,-100],real:{urban:[0.2,0.8],suburban:[0.5,1.5],rural:[1,5]}},
+  "5gmm":{name:"5G mmWave 28 GHz",f:28000,P:3.16,thr:-110,sys:"NR n257",meas:"SS-RSRP",off:32.0,ul:130,ueP:23,bw:"200 MHz, 1584 subcarriers",bands:[-80,-90,-100],real:{urban:[0.1,0.3],suburban:[0.1,0.4],rural:[0.2,1]}}
 };
 const dBm=kW=>10*Math.log10(kW*1e6);
 function rainRate(p){ if(p.storm==="local") return 100; if(p.moisture==="saturated") return 50; if(p.storm==="distant") return 25; if(p.moisture==="wet") return 10; return 0; }
@@ -1502,7 +1505,16 @@ function cellParts(dkm,p){ const m=cellModelAt(dkm,p), ls=locStats(p), pl=pLoc(p
   const atm=atmosLoss(dkm,p), var_=-invQ(pl/100)*ls.sig;
   return {m,base,r,cl,atm,ls,pl,var:var_,L:base+atm+ls.Lloc+var_}; }
 /* received power (dBm, isotropic receive antenna) and the equivalent field strength */
-function cellRxdBm(dkm,p){ return dBm(p.P)-cellLoss(dkm,p); }
+/* reference-signal level and both link margins; the cell edge is where either the downlink or the uplink fails */
+function cellLevel(dkm,p,extraLoss=0){ const T=CELL_TECH[p.tech]||CELL_TECH["4g"], L=cellLoss(dkm,p)+extraLoss;
+  const ref=dBm(p.P)-T.off-L, dlm=ref-(T.thr+burstNoise(p,0,7)), ulm=T.ul-burstNoise(p,17,3)-L;
+  return {ref,L,dlm,ulm,m:Math.min(dlm,ulm),lim:ulm<dlm?"uplink":"downlink",eff:ref-Math.max(0,dlm-ulm)}; }
+/* effective level (dBm): the reference-signal level, lowered where the uplink runs out first */
+function cellRxdBm(dkm,p){ return cellLevel(dkm,p).eff; }
+function cellQuality(v,tech){ const T=CELL_TECH[tech]||CELL_TECH["4g"], b=T.bands; if(v===null||v<T.thr) return ["No service","bad"]; if(v>=b[0]) return ["Excellent","good"]; if(v>=b[1]) return ["Good","good"]; if(v>=b[2]) return ["Fair","warn"]; return ["Poor (cell edge)","warn"]; }
+/* single-cell radius: furthest distance where both links still work (and the GSM timing-advance limit) */
+function cellRange(p){ let dl=0,ul=0,both=0; for(let i=0;i<=500;i++){ const d=0.02*Math.pow(300/0.02,i/500), c=cellLevel(d,p); if(c.dlm>=0) dl=d; if(c.ulm>=0) ul=d; if(c.m>=0) both=d; }
+  const T=CELL_TECH[p.tech]||{}; if(T.ta) both=Math.min(both,T.ta); return {dl,ul,r:both,lim:dl<=ul?"downlink":"uplink",ta:T.ta&&both>=T.ta}; }
 const dBm2dBuV=(prx,fMHz)=>prx+20*Math.log10(fMHz)+77.2;
 const dBuV2dBm=(e,fMHz)=>e-20*Math.log10(fMHz)-77.2;
 function cellThrdBm(p){ const t=CELL_TECH[p.tech]; return t?t.thr:-105; }
@@ -1940,7 +1952,7 @@ function drawChart(hoverX){
   const xt=lg?[0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000,2000,3000].filter(d=>d<=dmax&&d>=dmin):Array.from({length:7},(_,i)=>Math.round(dmax*i/6));
   for(const d of xt){ const x=xs(d); cctx.beginPath(); cctx.moveTo(x,T); cctx.lineTo(x,T+h); cctx.stroke(); cctx.fillText(d,x,T+h+5); }
   cctx.font="12px "+cssVar("--font-body"); cctx.fillText("Distance from transmitter (km)",L+w/2,T+h+22);
-  if(!mvMode){ cctx.save(); cctx.translate(12,T+h/2); cctx.rotate(-Math.PI/2); cctx.fillText(dbmMode?"Received power (dBm, isotropic antenna)":"dBµV/m",0,-6); cctx.restore(); }
+  if(!mvMode){ cctx.save(); cctx.translate(12,T+h/2); cctx.rotate(-Math.PI/2); cctx.fillText(dbmMode?"RSRP / RSCP / RxLev (dBm), uplink-limited":"dBµV/m",0,-6); cctx.restore(); }
   cctx.save(); cctx.beginPath(); cctx.rect(L,T,w,h); cctx.clip();
   if(dbmMode) curveCache.forEach(c=>{ c.thr=cv(c.thr,c.m); c.pts=c.pts.map(pt=>({d:pt.d,g:cv(pt.g,c.m),s:cv(pt.s,c.m),t:cv(pt.t,c.m)})); });
   const s=curveCache.find(c=>c.m.id===selId);
@@ -2012,8 +2024,8 @@ function readouts(){
   const thrTxt=fmtField(A.thr);
   if(p.type!=="sky"){
     const rv=A.r===null?"—":A.r>=3000?"> 3000 km":A.r<1?`${Math.round(A.r*1000)} m`:`${fmtD(A.r)} km`;
-    tiles.push({k:"Reliable coverage",tip:"Distance out to which the ground wave (or, at VHF/UHF, the line-of-sight wave) stays above the minimum usable signal.",val:rv,sub:p.f>=30?"line-of-sight coverage":"ground-wave service radius",cls:p.type==="cell"?(A.r>=3?"good":A.r>=1?"warn":"bad"):(A.r<20?"bad":A.r<80?"warn":"good")});
-    if(p.type==="cell") sent.push(`Phones ${p.indoor?"indoors":"outdoors"} get a usable ${CELL_TECH[p.tech]?CELL_TECH[p.tech].sys:""} signal out to about <b>${A.r<1?Math.round(A.r*1000)+" m":fmtD(A.r)+" km"}</b> from the tower.`);
+    if(p.type!=="cell") tiles.push({k:"Reliable coverage",tip:"Distance out to which the ground wave (or, at VHF/UHF, the line-of-sight wave) stays above the minimum usable signal.",val:rv,sub:p.f>=30?"line-of-sight coverage":"ground-wave service radius",cls:p.type==="cell"?(A.r>=3?"good":A.r>=1?"warn":"bad"):(A.r<20?"bad":A.r<80?"warn":"good")});
+    if(p.type==="cell"){ const cr=cellRange(p); sent.push(`One ${CELL_TECH[p.tech]?CELL_TECH[p.tech].sys:""} cell serves phones ${p.indoor?"indoors":"outdoors"} out to about <b>${cr.r<1?Math.round(cr.r*1000)+" m":fmtD(cr.r)+" km"}</b> (${pLoc(p)}% of locations). Beyond that the ${cr.lim} fails first.`); }
     else sent.push(A.r>=3000?`The signal stays usable beyond 3000 km.`:`Listeners get reliable ${p.f>=30?"line-of-sight":"ground-wave"} reception out to about <b>${fmtD(A.r)} km</b>.`);
   }
   if(p.type==="sky"||p.type==="combined"){
@@ -2024,11 +2036,14 @@ function readouts(){
     if(p.type==="combined"){ tiles.push({k:"Fading zone",tip:"Ground and sky wave arrive within 6 dB of each other and interfere, so the signal swells and fades.",val:A.fade?`${fmtD(A.fade.a)}–${fmtD(A.fade.b)} km`:"none",sub:A.fade?"expect fading & distortion":"one wave always dominates",cls:A.fade?"warn":"good"});
       if(A.fade) sent.push(`Expect <b>fading</b> between about ${fmtD(A.fade.a)} and ${fmtD(A.fade.b)} km.`); }
   }
-  if(p.type==="cell") tiles.push({k:"Radio horizon",tip:"Beyond this distance the earth's curve blocks the direct path and the mobile signal falls quickly (spherical-earth diffraction, ITU-R P.526). Raise the tower to push it further.",val:`${fmtD(cellHorizon(p))} km`,sub:`tower ${p.htx||30} m · phone ${p.hrx||1.5} m`,cls:"info"});
-  if(p.type==="cell"){ const r1=cellRxdBm(1,p); tiles.push({k:"Signal at 1 km",tip:"Received power at a phone 1 km from the tower (isotropic antenna), after path, rain, gas and building-entry losses.",val:`${r1.toFixed(0)} dBm`,sub:r1>-80?"excellent":r1>-95?"good":r1>cellThrdBm(p)?"fair":"poor",cls:r1>-95?"good":r1>cellThrdBm(p)?"warn":"bad"});
+  if(p.type==="cell"){ const T=CELL_TECH[p.tech]||CELL_TECH["4g"], cr=cellRange(p), c1=cellLevel(1,p), q=cellQuality(c1.eff,p.tech), rr=T.real[p.env==="industrial"?"urban":p.env]||T.real.urban;
+    tiles.push({k:"Single-cell radius",tip:"Furthest distance at which one cell still works in both directions: the phone hears the tower (downlink) and the tower hears the phone (uplink).",val:cr.r<1?`${Math.round(cr.r*1000)} m`:`${fmtD(cr.r)} km`,sub:`downlink ${cr.dl<1?Math.round(cr.dl*1000)+" m":fmtD(cr.dl)+" km"} · uplink ${cr.ul<1?Math.round(cr.ul*1000)+" m":fmtD(cr.ul)+" km"}${cr.ta?" · GSM timing-advance limit 35 km":""} · ${cr.lim}-limited`,cls:"info"});
+    tiles.push({k:"Typical real cell radius",tip:"Typical radius operators design for this technology and area (industry practice). Real cells are made smaller for capacity and to limit interference.",val:`${rr[0]}–${rr[1]} km`,sub:`${T.sys} · ${p.env} design practice`,cls:"info"});
+    tiles.push({k:`${T.meas} at 1 km`,tip:`Level the phone reports (${T.meas}, ${T.bw}). Excellent ≥ ${T.bands[0]}, good ≥ ${T.bands[1]}, fair ≥ ${T.bands[2]}, cell edge ${T.thr} dBm.`,val:`${c1.ref.toFixed(0)} dBm`,sub:`${q[0]} · uplink margin ${c1.ulm.toFixed(0)} dB`,cls:q[1]});
+    tiles.push({k:"Radio horizon",tip:"Beyond this distance the earth's curve blocks the direct path (ITU-R P.526 / P.1812).",val:`${fmtD(cellHorizon(p))} km`,sub:`tower ${p.htx||30} m · phone ${p.hrx||1.5} m`,cls:"info"});
     if(rainRate(p)&&p.f>=1000) tiles.push({k:"Rain loss @ 5 km",tip:"ITU-R P.838 specific attenuation with an effective path-length reduction.",val:`${rainLoss(5,p).toFixed(1)} dB`,sub:`${rainRate(p)} mm/h rain`,cls:rainLoss(5,p)>6?"bad":"warn"}); }
   const bn=p.type==="cell"?burstNoise(p,0,7):burstNoise(p,7,5);
-  tiles.push({k:"Signal needed",tip:p.type==="cell"?"Typical cell-edge level for this technology (industry practice; ITU does not set one).":"ITU minimum usable field strength for this band and area.",val:p.type==="cell"?`${(cellThrdBm(p)+bn).toFixed(0)} dBm`:thrTxt,sub:p.type==="cell"?`${A.thr.toFixed(0)} dBµV/m · industry cell edge${bn?` + ${bn.toFixed(1)} dB burst noise`:""}`:`${A.thr.toFixed(0)} dBµV/m · ${ituMinRef(p).ref}${bn?` + ${bn.toFixed(1)} dB burst noise`:""}`,cls:"info"});
+  tiles.push({k:"Signal needed",tip:p.type==="cell"?"Cell-edge reference-signal level (industry practice; ITU does not set one), and the uplink maximum allowable path loss.":"ITU minimum usable field strength for this band and area.",val:p.type==="cell"?`${(cellThrdBm(p)+bn).toFixed(0)} dBm`:thrTxt,sub:p.type==="cell"?`${CELL_TECH[p.tech].meas} cell edge · uplink ≤ ${CELL_TECH[p.tech].ul} dB path loss${bn?` · +${bn.toFixed(1)} dB burst noise`:""}`:`${A.thr.toFixed(0)} dBµV/m · ${ituMinRef(p).ref}${bn?` + ${bn.toFixed(1)} dB burst noise`:""}`,cls:"info"});
   const fl=flareLevel(p); if(fl) tiles.push({k:"Solar flare",tip:"Effect of the selected NOAA radio-blackout level on this band.",val:FLARE[fl].name,sub:flareImpact(p).short,cls:flareImpact(p).cls});
   if(p.rxDist){ const v=evalRx(p,A.io).t; const ok=v!==null&&v>=A.thr; tiles.unshift({k:"At your receiver",tip:"Predicted total field at the receiver placed on the map, including the terrain shadowing estimate.",val:fmtField(v),sub:`${fmtD(p.rxDist)} km${p.terrainLossDb?` · terrain −${p.terrainLossDb.toFixed(1)} dB`:""} · ${ok?"usable":"below minimum"}`,cls:ok?"good":"bad"});
     sent.unshift(`At the receiver (${fmtD(p.rxDist)} km away) the predicted signal is <b>${fmtField(v)}</b>, ${ok?"which is enough for reception":"which is below the minimum usable level"}.`); }
@@ -2464,6 +2479,7 @@ function updateMeter(p,io,thr,dt){
   else if(tot>=thr+20){ q="Excellent reception"; cls="var(--good)"; }
   else if(tot>=thr+6){ q="Good reception"; cls="var(--good)"; }
   else { q="Weak but usable"; cls="var(--warn)"; }
+  if(p.type==="cell"){ const cq=cellQuality(tot===null?null:dBuV2dBm(tot,p.f),p.tech); q=cq[0]==="No service"?"No service":cq[0]+" signal"; cls=cq[1]==="good"?"var(--good)":cq[1]==="warn"?"var(--warn)":"var(--bad)"; }
   const qe=$("quality"); qe.textContent=q; qe.style.color=cls;
   // live HUD on the animation
   const isCell=p.type==="cell", fmtV=v=>v===null?"—":isCell?`${dBuV2dBm(v,p.f).toFixed(0)} dBm`:fmtField(v);
@@ -2710,6 +2726,8 @@ async function terrainFor(P,rx,onTerrain){
 function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(threshold(p));
   const ok=r.t!==null&&r.t>=thr, fading=r.g!==null&&r.s!==null&&Math.abs(r.g-r.s)<6&&Math.max(r.g,r.s)>thr-6;
   let v,cls; if(!ok){v="No reliable reception";cls="bad";} else if(fading){v="Receivable, with fading";cls="warn";} else if(r.t>=thr+20){v="Excellent";cls="good";} else {v="Good";cls="good";}
+  if(p.type==="cell"){ const lv=r.t===null?null:dBuV2dBm(r.t,p.f), q=cellQuality(lv,p.tech), c=cellLevel(p.rxDist,p,(p.terrainLossDb&&cellModelAt(p.rxDist,p)!=="p1812")?p.terrainLossDb:0), T=CELL_TECH[p.tech];
+    v=`${q[0]} · ${T.meas} ${c.ref.toFixed(0)} dBm${c.ulm<0?" · uplink fails":""}`; cls=q[1]; return {...r,thr,ok:lv!==null&&lv>=T.thr,fading:false,verdict:v,cls,cell:c}; }
   return {...r,thr,ok,fading,verdict:v,cls}; }
 function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
 let siteQueue=Promise.resolve();
@@ -3221,7 +3239,7 @@ const TECHS=["2g","3g","4g","5g"];
 const TECH_LABEL={"2g":"2G","3g":"3G","4g":"4G","5g":"5G"};
 const RADIO2TECH={GSM:"2g",UMTS:"3g",LTE:"4g",NR:"5g"};
 const TECH_COL={"2g":"#7b8ba3","3g":"#8a5cc7","4g":"#2f6fdf","5g":"#d0368a"};
-const TECH_MAXR={"2g":35,"3g":20,"4g":20,"5g":6};           // search radius (km) around a point
+const TECH_MAXR={"2g":35,"3g":15,"4g":20,"5g":6};           // search radius (km) around a point
 const OPERATORS={"413-1":"Mobitel","413-2":"Dialog","413-3":"Hutch","413-5":"Airtel","413-8":"Hutch"};
 Object.assign(MP,{cells:[],useCells:true,me:null,cov:{tech:"off",env:"urban",indoor:false},covStat:null,covCache:null});
 
@@ -3247,13 +3265,15 @@ function rxFrom(tw,tech,pt){
   return {dBm:cellRxdBm(d,p)+antGain(tw,bearing(tw,pt),elev),d};
 }
 const TECH_THR=t=>CELL_TECH[t].thr;
-function verdictDBm(v,tech){ if(v===null) return ["No coverage","bad"]; if(v>=-80) return ["Excellent","good"]; if(v>=-90) return ["Good","good"]; if(v>=TECH_THR(tech)) return ["Fair","warn"]; return ["No coverage","bad"]; }
+function verdictDBm(v,tech){ const q=cellQuality(v,tech); return [q[0]==="No service"?"No coverage":q[0],q[1]]; }
+/* a real cell only serves points inside its measured range (OpenCelliD 'range', metres), never beyond the GSM timing-advance limit */
+function inRealRange(tw,d,tech){ if(tw.src==="ocid"&&tw.range>0&&d>Math.max(tw.range/1000*1.2,0.3)) return false; const T=CELL_TECH[tech]; if(T.ta&&d>T.ta) return false; return true; }
 
 /* ---------- my coverage (one point, all technologies) ---------- */
 function coverageAt(pt){
   return TECHS.map(tech=>{
     let best=null, nReal=0;
-    for(const tw of towersFor(tech)){ const dd=hav(tw,pt); if(dd>TECH_MAXR[tech]) continue; if(tw.src==="ocid"&&dd<2) nReal++;
+    for(const tw of towersFor(tech)){ const dd=hav(tw,pt); if(dd>TECH_MAXR[tech]) continue; if(tw.src==="ocid"&&dd<2) nReal++; if(!inRealRange(tw,dd,tech)) continue;
       const r=rxFrom(tw,tech,pt); if(!best||r.dBm>best.dBm) best={...r,tw}; }
     const [v,cls]=verdictDBm(best?best.dBm:null,tech);
     return {tech,best,verdict:v,cls,nReal};
@@ -3292,7 +3312,7 @@ function analyseTowerPath(tech,tw){
 }
 
 /* ---------- coverage heat map (best server) ---------- */
-function covFit(tech,h){ const p=cellParams(tech,h); const L1=cellLoss(0.5,p), L2=cellLoss(5,p); const b=(L2-L1); return {a:L1-b*Math.log10(0.5),b,eirp:dBm(p.P)}; }
+function covFit(tech,h){ const p=cellParams(tech,h); const e1=cellRxdBm(0.5,p), e2=cellRxdBm(5,p), b=e1-e2; return {a:0,b,eirp:e1+b*Math.log10(0.5),rmax:cellRange(p).r}; }
 function drawCoverage(c,W,H){
   const tech=MP.cov.tech; MP.covStat=null; if(tech==="off") return;
   const tl=unproj(0,0), br=unproj(W,H), mid=unproj(W/2,H/2), pad=TECH_MAXR[tech]/111;
@@ -3302,7 +3322,7 @@ function drawCoverage(c,W,H){
   const thr=TECH_THR(tech), cell=14; let n=0, ok=0;
   for(let y=0;y<H;y+=cell){ for(let x=0;x<W;x+=cell){
     const q=unproj(x+cell/2,y+cell/2); let best=-999;
-    for(const tw of tws){ const dLat=(q.lat-tw.lat)*111.2, dLon=(q.lon-tw.lon)*111.2*Math.cos(toRad(q.lat)); const d=Math.max(Math.hypot(dLat,dLon),0.02); if(d>TECH_MAXR[tech]) continue;
+    for(const tw of tws){ const dLat=(q.lat-tw.lat)*111.2, dLon=(q.lon-tw.lon)*111.2*Math.cos(toRad(q.lat)); const d=Math.max(Math.hypot(dLat,dLon),0.02); if(d>TECH_MAXR[tech]||!inRealRange(tw,d,tech)||d>fitFor(tw.h).rmax) continue;
       const F=fitFor(tw.h); let v=F.eirp-(F.a+F.b*Math.log10(d));
       if(tw.sector!=="omni"||true){ const brg=(toDeg(Math.atan2(dLon,dLat))+360)%360, el=toDeg(Math.atan((tw.h-1.5)/(d*1000))); v+=antGain(tw,brg,el); }
       if(v>best) best=v; }
@@ -3458,10 +3478,17 @@ function explainCalc(p,d){
     step("Gas loss (≈ ITU-R P.676)","γ(f)·d",f>=1000?gasSpecific(f/1000)*d:0,"dB");
     locSteps();
     step("Total path loss","median + atmosphere + building entry + location margin",cp.L,"dB");
-    const pr=dBm(p.P)-cp.L, bn=burstNoise(p,0,7), need=cellThrdBm(p)+bn;
-    step("Received power","EIRP − total loss",pr,"dBm");
-    step(`Cell-edge level (${T.sys||"mobile"})`,"industry practice (ITU sets no single value)"+(bn?" + solar-burst noise rise":""),need,"dBm");
-    step("Margin","received − needed",pr-need,"dB");
+    const c=cellLevel(d,p), bn=burstNoise(p,0,7), need=cellThrdBm(p)+bn, cr=cellRange(p);
+    head(`Link budget (${T.meas})`);
+    step(`Measured reference (${T.bw})`,`${T.meas} = EIRP − ${T.off} dB − path loss`,c.ref,"dBm");
+    step(`Cell-edge ${T.meas}`,"industry practice (ITU sets no single value)"+(bn?" + solar-burst noise rise":""),need,"dBm");
+    step("Downlink margin",`${T.meas} − edge`,c.dlm,"dB");
+    step("Uplink maximum allowable path loss",`phone ${T.ueP} dBm → tower (typical operator link budget)`,T.ul,"dB");
+    step("Uplink margin","MAPL_UL − total path loss"+(burstNoise(p,17,3)?" − base-station burst noise":""),c.ulm,"dB");
+    step("Limiting link",c.lim,Math.min(c.dlm,c.ulm),"dB");
+    step("Single-cell radius","furthest distance where both margins ≥ 0"+(T.ta?" (GSM timing advance ≤ 35 km)":""),cr.r,"km");
+    const q=cellQuality(c.eff,p.tech); (q[1]==="bad"?warn:ok)(`At ${fmtD(d)} km: ${q[0]} (${T.meas} ${c.ref.toFixed(0)} dBm, uplink margin ${c.ulm.toFixed(0)} dB).`);
+    if(c.ulm<c.dlm) warn("The uplink fails before the downlink here. More tower power does not help; only a closer or taller site does.");
     flareSteps(p,step,warn,ok);
     warn("Median models (Hata, UMa, P.1812) are statistical. Real sites need calibration with drive tests.");
     return {S,W};
