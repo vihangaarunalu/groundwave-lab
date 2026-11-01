@@ -1742,7 +1742,7 @@ async function fetchOSMFeatures(P,rx){
   let j=null;
   for(const ep of EPS){
     try{
-      const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),20000);
+      const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),12000);
       const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ctl.signal});
       clearTimeout(to); if(!r.ok) continue;
       j=await r.json(); break;
@@ -1761,10 +1761,12 @@ async function fetchOSMFeatures(P,rx){
     OSMF.ok=true; OSMF.cache.set(key,res); return res;
   }catch(e){ return null; }
 }
-async function terrainFor(P,rx){
+async function terrainFor(P,rx,onTerrain){
   const n=clamp(Math.round(P.dist/0.5)+1,101,301), pts=[]; for(let i=0;i<n;i++) pts.push(gcPoint(MP.tx,rx,i/(n-1)));
   let elev=await fetchElev(pts), manual=false;
   if(!elev){ manual=true; const a=+MP.manual.tx||0, b=(rx.id===MP.rx.id?+MP.manual.rx:rx.manualElev)||0; elev=pts.map((_,i)=>a+(b-a)*i/(n-1)); }
+  // show terrain straight away; buildings/peaks are added when the (sometimes slow) OSM servers answer
+  if(onTerrain){ const T0=terrainAnalyse(P,elev,MP.txH,rx.h,baseModel().p.f,manual,[]); T0.osmPending=MP.useBuildings&&!manual; onTerrain(T0); }
   let osm=null; if(MP.useBuildings&&!manual) osm=await fetchOSMFeatures(P,rx);
   const T=terrainAnalyse(P,elev,MP.txH,rx.h,baseModel().p.f,manual,osm?osm.buildings:[]);
   T.osm=osm; T.osmTried=MP.useBuildings&&!manual;
@@ -1786,7 +1788,8 @@ function refreshSites(){
     MP.res.set(rx.id,entry);
     siteQueue=siteQueue.then(async()=>{
       if(MP.res.get(rx.id)!==entry) return;
-      try{ entry.T=await terrainFor(P,rx); }catch(e){ entry.T=null; }
+      const show=T=>{ entry.T=T; entry.loading=false; entry.pred=predict(paramsFor(P,rx,T)); if(MP.res.get(rx.id)===entry){ renderSites(); if(rx.id===MP.rx.id) renderActive(); drawMap(); } };
+      try{ entry.T=await terrainFor(P,rx,show); }catch(e){ entry.T=entry.T||null; }
       entry.loading=false; entry.pred=predict(paramsFor(P,rx,entry.T));
       if(MP.res.get(rx.id)===entry){ renderSites(); if(rx.id===MP.rx.id) renderActive(); drawMap(); }
     });
@@ -1989,7 +1992,7 @@ function renderActive(){
     ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
     ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?(T.ob&&T.loss>0.05?(T.ob.kind==="building"?"caused by a building":(T.peakName?`at ${T.peakName}`:`ridge at ${fmtD(T.ob.dm/1000)} km`)):`highest ${Math.round(T.maxE)} m`)+` · Δh ${Math.round(T.dh)} m`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"],
     ["Line of sight",T?(T.los?"Yes":"No"):"…",T?`masts ${T.txH} m / ${T.rxH} m`:"","info"],
-    ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
+    ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmPending?"loading…":T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
     ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
     ["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],
     ["Needed",fmtField(pr.thr),"minimum usable","info"]];
