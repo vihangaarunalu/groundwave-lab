@@ -700,6 +700,16 @@ input[type=range]{min-height:28px}
 .brand h1 small,.brand small{font-size:12.5px!important;font-weight:400!important}
 #nowBtn{white-space:nowrap;min-width:max-content;flex:none}
 
+/* ===== aim-the-antenna popover ===== */
+.aimbox{position:absolute;z-index:7;transform:translate(-50%,0);width:300px;max-width:calc(100vw - 32px);background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-lg);padding:12px;display:grid;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.aimbox[hidden]{display:none}
+.aimhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.aimrow{display:grid;grid-template-columns:86px minmax(0,1fr) 62px auto;gap:6px;align-items:center;font-size:13px}
+.aimrow label{font-weight:600}
+.aimrow input[type=number]{min-height:34px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:2px 6px;font:inherit;background:var(--panel);color:var(--ink);width:100%}
+.aimrow input[type=range]{min-height:26px}
+@media (max-width:760px), (pointer:coarse){ .aimrow input[type=number]{min-height:44px} .aimrow{grid-template-columns:76px minmax(0,1fr) 68px auto} }
+
 </style>
 </head>
 <body>
@@ -1134,7 +1144,8 @@ input[type=range]{min-height:28px}
       </select>
     </div>
     <div class="map-br" id="attrib"></div>
-    <div class="pintools" id="pinTools" hidden><button class="pinbtn" id="pinPanel" type="button">⚙ Panel</button><button class="pinbtn" id="pinRen" type="button">✎ Rename</button><button class="pinbtn del" id="pinDel" type="button">✕ Delete</button></div>
+    <div class="pintools" id="pinTools" hidden><button class="pinbtn" id="pinAim" type="button" hidden>🧭 Aim</button><button class="pinbtn" id="pinPanel" type="button">⚙ Panel</button><button class="pinbtn" id="pinRen" type="button">✎ Rename</button><button class="pinbtn del" id="pinDel" type="button">✕ Delete</button></div>
+    <div class="aimbox" id="aimBox" hidden role="dialog" aria-label="Aim the antenna"></div>
     <div class="renbox" id="renBox" hidden role="dialog" aria-label="Rename pin">
       <label for="renInput" class="lbl">Pin name</label>
       <input type="text" id="renInput" maxlength="60">
@@ -1143,8 +1154,8 @@ input[type=range]{min-height:28px}
     </div>
     <div class="mapmsg" id="mapMsg" role="status" hidden></div>
   </div>
-  <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span class="bcast-only" style="color:#1d8a8a">🔁 Relay (dashed = feed from main transmitter)</span><span>■ Buildings (zoom in)</span></div>
-  <p class="hint">Search a place or pick an action above, then click the map. Click a pin to select it; right-click or double-click removes it. Drag to pan, scroll or pinch to zoom. Your scenario is saved automatically on this device.</p>
+  <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span class="bcast-only" style="color:#1d8a8a">🔁 Relay (dashed = feed from main transmitter)</span><span>🧭 Beam handle: drag to aim the antenna</span><span>■ Buildings (zoom in)</span></div>
+  <p class="hint">Click a transmitter, relay or tower to select it, then drag its 🧭 handle to aim the antenna (Shift snaps to 15°, A opens exact controls, Shift + ← → turns it). Search a place or pick an action above, then click the map. Click a pin to select it; right-click or double-click removes it. Drag to pan, scroll or pinch to zoom. Your scenario is saved automatically on this device.</p>
 
   <div class="mapresult" id="mapResult">
     <section class="panel card verdict" aria-live="polite" id="mapVerdict"></section>
@@ -1474,7 +1485,7 @@ input[type=range]{min-height:28px}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v3.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v3.4</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -3386,17 +3397,25 @@ function drawMap(){
     c.closePath(); c.fillStyle=col+"26"; c.fill(); c.strokeStyle=col; c.lineWidth=1.6; c.stroke();
     if(antBeamwidths(a).h<300){ const b=s.best.az; c.strokeStyle=col; c.lineWidth=2.5; c.beginPath(); c.moveTo(x,y); c.lineTo(x+(R+14)*Math.sin(rad(b)),y-(R+14)*Math.cos(rad(b))); c.stroke(); } };
   if(MP.layer==="bcast"){ MP.txs.forEach(t=>lobe(t,"#d13b4f")); MP.relays.forEach(r=>lobe(r,"#1d8a8a")); }
+  else { // mobile: sector pattern of every tower that has sectors
+    const col=TECH_COL[MP.cov.tech]||"#2f6fdf";
+    MP.txs.forEach(t=>{ if((t.sector||"omni")==="omni"||t.on===false) return; const [x,y]=proj(t.lon,t.lat), R=42, tl=(t.tilt??2)+(t.etilt||0);
+      c.beginPath(); for(let i=0;i<=360;i+=4){ const g=antGain(t,i,tl), r=R*Math.max(0.05,1+g/30); const px=x+r*Math.sin(rad(i)), py=y-r*Math.cos(rad(i)); i?c.lineTo(px,py):c.moveTo(px,py); }
+      c.closePath(); c.fillStyle=col+"22"; c.fill(); c.strokeStyle=col; c.lineWidth=1.4; c.stroke(); }); }
   MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9",(MP.layer==="mobile"?"P":"R")+(i+1),false,v.z>4.5?rx.name:""); });
   if(MP.layer==="mobile") drawCellDots(c,W,H);
   MP.txs.forEach((t,i)=>{ if(i!==MP.ti) pin(t,"#e0828f","T"+(i+1),false,v.z>4.5?t.name:""); });
   pin(MP.tx,"#d13b4f","T"+(MP.ti+1),true,MP.tx.name); pin(MP.rx,"#1f5fd1",(MP.layer==="mobile"?"P":"R")+(MP.ai+1),true,MP.rx.name);
   if(MP.layer==="mobile") drawMe(c);
+  drawBeamHandles(c,W,H);
   // floating rename/delete tools beside the selected pin
   { const arrOf=k=>k==="tx"?MP.txs:k==="relay"?MP.relays:MP.rxs;
     const s=MP.lastSel&&arrOf(MP.lastSel.kind)[MP.lastSel.i]?MP.lastSel:{kind:"rx",i:MP.ai};
     const pt=arrOf(s.kind)[s.i], box=$("pinTools"), bt=$("pinDel");
-    if(pt){ const [x,y]=proj(pt.lon,pt.lat); box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+8)+"px";
+    if(pt){ const [x,y]=proj(pt.lon,pt.lat), off=beamsOf(s).length?BEAM.R+22:8; // keep the buttons clear of the beam handles
+      box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+off)+"px";
       $("pinPanel").textContent=s.kind==="rx"?`⚙ T${MP.ti+1} panel`:"⚙ Panel";
+      $("pinAim").hidden=s.kind==="rx";
       const can=s.kind==="relay"||arrOf(s.kind).length>1; bt.hidden=!can; bt.textContent=`✕ Delete`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?(MP.layer==="mobile"?"tower":"transmitter"):s.kind==="relay"?"relay":(MP.layer==="mobile"?"test point":"receiver")} ${pt.name}`);
       $("pinRen").setAttribute("aria-label",`Rename ${pt.name}`); MP.toolSel=s; } }
   const msg=$("mapMsg");
@@ -3470,9 +3489,14 @@ function pathModel(){
   if(m){ m.p=p; } else { m=mk(name,p); models.push(m); MP.lastModelId=m.id; }
   selId=m.id; currentPreset=-1; return m;
 }
+/* every broadcast station carries an antenna, so it can be aimed straight after a click */
+function ensureAnts(){ if(MP.layer!=="bcast") return; const f=baseModel().p.f;
+  MP.txs.forEach(t=>{ if(!t.ant||!ANT_TYPES[t.ant.type]||ANT_TYPES[t.ant.type].band!==antBand(f)) t.ant=antDefault(f<30?"mono":"bays"); });
+  MP.relays.forEach(r=>{ if(!r.ant||!ANT_TYPES[r.ant.type]||ANT_TYPES[r.ant.type].band!=="vu") { r.ant=antDefault("panel"); r.ant.az=Math.round(bearing(relaySource(r),r)); } }); }
 function setPoint(which,pt){
   if(pt.auto){ delete pt.auto; pt.autoName=true; }
   const mob=MP.layer==="mobile";
+  if(which==="moverelay"){ const r=MP.relays[(MP.lastSel&&MP.lastSel.kind==="relay")?MP.lastSel.i:0]; if(r){ r.lat=pt.lat; r.lon=pt.lon; r.T=null; relayTerrain(r); MP.res.clear(); updateMap(); } return; }
   if(which==="tx") MP.tx={...MP.tx,...pt,id:MP.tx.id,h:MP.tx.h};
   else if(which==="addtx"){ if(!pt.autoName&&!/^(Site|Transmitter|Tower) /.test(pt.name||"")){} else pt.name=`${mob?"Tower":"Transmitter"} ${MP.txs.length+1}`;
     MP.txs.push(mob?{id:MP.nextTx++,h:MP.cov.htx||30,techs:TECHS.slice(),sector:"3sector",az:0,tilt:4,...pt}:{id:MP.nextTx++,h:+$("txH").value||120,techs:[],...pt}); MP.ti=MP.txs.length-1; }
@@ -3484,7 +3508,7 @@ function setPoint(which,pt){
 }
 function updateMap(){
   if(MP.source==="loading"){ drawMap(); return; }
-  computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderRelayTable(); renderActive(); renderMyCoverage(); saveState();
+  ensureAnts(); computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderRelayTable(); renderActive(); renderMyCoverage(); saveState();
   $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
   $("rxH").value=MP.rx.h; $("txH").value=MP.txH;
   const ts=$("txCity"); ts.innerHTML=MP.txs.map((t,i)=>`<option value="tx:${i}">T${i+1} · ${esc(t.name)}</option>`).join("")+`<optgroup label="Move selected transmitter to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
@@ -3595,7 +3619,7 @@ function renderTxTable(){
       <td><input type="number" class="tah" min="1" max="1000" step="1" value="${t.h}" aria-label="${mob?"Tower":"Transmitter"} ${i+1} mast height" style="width:76px"></td>
       ${mob?`<td><div class="netchips">${TECHS.map(k=>`<button type="button" class="chip tnet" data-k="${k}" aria-pressed="${(t.techs||["2g","3g","4g"]).includes(k)}" aria-label="${TECH_LABEL[k]} on ${esc(t.name)}">${TECH_LABEL[k]}</button>`).join("")}</div></td>
       <td><select class="tsec" aria-label="Antenna type of ${esc(t.name)}"><option value="omni"${(t.sector||"omni")==="omni"?" selected":""}>Omni</option><option value="3sector"${(t.sector||"omni")!=="omni"?" selected":""}>3-sector (3GPP)</option></select></td>
-      <td><input type="number" class="taz" min="0" max="359" step="5" value="${t.az||0}" aria-label="Azimuth of first sector, degrees" style="width:64px" ${(t.sector||"omni")==="omni"?"disabled":""}></td>
+      <td>${(t.sector||"omni")==="omni"?'<span class="muted">omni</span>':(t.azs?`<span class="mono">${sectorAzs(t).map(v=>Math.round(v)+"°").join(" · ")}</span>`:`<input type="number" class="taz" min="0" max="359" step="5" value="${t.az||0}" aria-label="Azimuth of first sector, degrees" style="width:64px">`)}</td>
       <td><input type="number" class="ttilt" min="-5" max="15" step="1" value="${t.tilt??2}" aria-label="Downtilt, degrees" style="width:56px"></td>`:""}
       <td><button class="btn sm" type="button" data-aui="tx:${i}">⚙ Panel</button></td>
       <td>${i===MP.ti?'<span class="pill info">paths shown</span>':'<button class="btn sm tsel" type="button">Show paths</button>'}</td>
@@ -3612,6 +3636,7 @@ function sitesCSV(){
 /* ---------- relays ---------- */
 function addRelay(pt){ const b=baseModel().p, f=b.f>=30?+(b.f*1.03).toFixed(1):600;
   const r={id:MP.nextRel++,name:pt.autoName||/^Site /.test(pt.name||"")?`Relay ${MP.relays.length+1}`:pt.name,lat:pt.lat,lon:pt.lon,h:50,P:b.f>=30?Math.max(0.05,+(b.P*0.05).toFixed(2)):0.5,f,src:MP.ti};
+  r.ant=antDefault("panel"); r.ant.az=Math.round(bearing(relaySource({src:MP.ti}),pt));
   MP.relays.push(r); if(b.f<30){ const m=$("mapMsg"); m.hidden=false; m.textContent="Relays (transposers) are a VHF/UHF technique. Pick a VHF/UHF station in “Station settings” to use them. (Click to hide)"; }
   relayTerrain(r); MP.res.clear(); updateMap(); }
 function renderRelayTable(){ const el=$("relayTable"); if(!el) return;
@@ -3700,7 +3725,8 @@ function bindMap(){
   $("txElevM").addEventListener("change",e=>{ MP.manual.tx=+e.target.value||0; updateMap(); });
   $("rxElevM").addEventListener("change",e=>{ MP.manual.rx=+e.target.value||0; MP.rx.manualElev=MP.manual.rx; updateMap(); });
   const MODES=[["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeAddRelay","addrelay"],["modeDel","del"],["modeMe","me"]];
-  const setMode=m=>{ MP.mode=m; MODES.forEach(([id,k])=>$(id).checked=k===m); mapC.style.cursor=m==="del"?"not-allowed":"crosshair"; $("modeHint").textContent=(MODE_HINT[m]||MODE_HINT.add)(); };
+  MODE_HINT.moverelay=()=>"Click the map to move the selected relay.";
+  const setMode=m=>{ MP.mode=m; MODES.forEach(([id,k])=>$(id).checked=(k===m||(m==="moverelay"&&k==="tx"))); mapC.style.cursor=m==="del"?"not-allowed":"crosshair"; $("modeHint").textContent=(MODE_HINT[m]||MODE_HINT.add)(); };
   MP.setMode=setMode;
   MODES.forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
   $("mapSearch").addEventListener("submit",e=>{ e.preventDefault(); const q=$("mapQ").value.trim(); if(q.length>1) placeSearch(q); });
@@ -3738,10 +3764,13 @@ function bindMap(){
     if(pt.suggest) show(pt.suggest); else reverseName(pt.lat,pt.lon).then(nm=>{ pt.suggest=nm; if(!$("renBox").hidden) show(nm); }); };
   const renSave=()=>{ const box=$("renBox"); const arr=arrOf(box.dataset.kind); const pt=arr[+box.dataset.i]; const v=$("renInput").value.trim(); if(pt&&v){ pt.name=v; pt.autoName=false; } box.hidden=true; updateMap(); };
   $("pinRen").addEventListener("click",e=>{ e.stopPropagation(); renOpen(); });
+  $("pinAim").addEventListener("click",e=>{ e.stopPropagation(); openAimBox(); });
   $("pinPanel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx"){ openAui("tx",MP.ti); } else openAui(s.kind,s.i); });
   $("renSave").addEventListener("click",renSave); $("renCancel").addEventListener("click",()=>$("renBox").hidden=true);
   $("renInput").addEventListener("keydown",e=>{ if(e.key==="Enter") renSave(); if(e.key==="Escape") $("renBox").hidden=true; });
-  mapC.addEventListener("keydown",e=>{ if(e.key==="F2"){ e.preventDefault(); renOpen(); } });
+  mapC.addEventListener("keydown",e=>{ if(e.key==="F2"){ e.preventDefault(); renOpen(); }
+    if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&(e.shiftKey||e.altKey)){ if(nudgeBeam((e.key==="ArrowRight"?1:-1)*(e.altKey?1:5))) e.preventDefault(); }
+    if(e.key==="a"||e.key==="A"){ e.preventDefault(); openAimBox(); } });
   $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
   mapC.tabIndex=0;
   mapC.addEventListener("keydown",e=>{ if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removePin(MP.lastSel||{kind:"rx",i:MP.ai}); MP.lastSel={kind:"rx",i:MP.ai}; } });
@@ -3755,10 +3784,13 @@ function bindMap(){
   mapC.addEventListener("contextmenu",e=>{ const r=mapC.getBoundingClientRect(); const h=hitPin(e.clientX-r.left,e.clientY-r.top); if(h){ e.preventDefault(); removePin(h); } });
   mapC.addEventListener("dblclick",e=>{ const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; const h=hitPin(x,y); if(h){ removePin(h); return; } zoom(1,x,y); });
   let down=null;
-  mapC.addEventListener("pointerdown",e=>{ down={x:e.clientX,y:e.clientY,cx:wx(MP.view.lon,MP.view.z),cy:wy(MP.view.lat,MP.view.z),moved:false}; mapC.setPointerCapture(e.pointerId); });
-  mapC.addEventListener("pointermove",e=>{ if(!down) return; const dx=e.clientX-down.x, dy=e.clientY-down.y; if(Math.hypot(dx,dy)>5) down.moved=true;
+  mapC.addEventListener("pointerdown",e=>{ const r0=mapC.getBoundingClientRect(), hb=hitBeam(e.clientX-r0.left,e.clientY-r0.top);
+    if(hb){ BEAM.drag=hb; BEAM.lastK=hb.k; mapC.setPointerCapture(e.pointerId); mapC.style.cursor="grabbing"; return; }
+    down={x:e.clientX,y:e.clientY,cx:wx(MP.view.lon,MP.view.z),cy:wy(MP.view.lat,MP.view.z),moved:false}; mapC.setPointerCapture(e.pointerId); });
+  mapC.addEventListener("pointermove",e=>{ if(BEAM.drag){ const r0=mapC.getBoundingClientRect(); beamDragMove(e.clientX-r0.left,e.clientY-r0.top,e.shiftKey); return; }
+    if(!down){ const r0=mapC.getBoundingClientRect(); mapC.style.cursor=hitBeam(e.clientX-r0.left,e.clientY-r0.top)?"grab":(MP.mode==="del"?"not-allowed":"crosshair"); return; } const dx=e.clientX-down.x, dy=e.clientY-down.y; if(Math.hypot(dx,dy)>5) down.moved=true;
     if(down.moved){ mapC.style.cursor="grabbing"; MP.view.lon=clamp(ilon(down.cx-dx,MP.view.z),-180,180); MP.view.lat=clamp(ilat(down.cy-dy,MP.view.z),-80,80); scheduleMapDraw(); } });
-  mapC.addEventListener("pointerup",e=>{ mapC.style.cursor=""; if(!down) return; const moved=down.moved; down=null; if(moved) return;
+  mapC.addEventListener("pointerup",e=>{ mapC.style.cursor=""; if(BEAM.drag){ beamDragEnd(); return; } if(!down) return; const moved=down.moved; down=null; if(moved) return;
     const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, q=unproj(x,y);
     // remove mode: clicking a pin deletes it
     if(MP.mode==="del"){ const h=hitPin(x,y); if(h) removePin(h); else { const m=$("mapMsg"); m.hidden=false; m.textContent="Click directly on a pin to remove it. (Click to hide)"; } return; }
@@ -3767,7 +3799,7 @@ function bindMap(){
     let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
     const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(3)}°, ${q.lon.toFixed(3)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180,auto:true};
     if(MP.mode==="me"){ MP.setMe(pt.lat,pt.lon,best?best.c[0]:null); setMode("add"); return; }
-    setPoint(MP.mode,pt); if(MP.mode==="tx"||MP.mode==="addtx"||MP.mode==="addrelay") setMode("add"); });
+    setPoint(MP.mode,pt); if(MP.mode==="tx"||MP.mode==="addtx"||MP.mode==="addrelay"||MP.mode==="moverelay") setMode("add"); });
   // sites table
   const tb=$("sitesTable");
   tb.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const i=+tr.dataset.i;
@@ -3845,7 +3877,7 @@ function antGain(t,brgDeg,elevDeg){
   const tilt=(t.tilt??2)+(t.etilt||0), hbw=t.hbw||65, vbw=t.vbw||10, Av=-Math.min(12*Math.pow((elevDeg-tilt)/vbw,2),20);
   if((t.sector||"omni")==="omni") return Math.max(Av,-30);
   let best=-99;
-  for(const off of [0,120,240]){ let phi=Math.abs(((brgDeg-(t.az||0)-off)%360+540)%360-180); const Ah=-Math.min(12*Math.pow(phi/hbw,2),30); best=Math.max(best,-Math.min(-(Ah+Av),30)); }
+  for(const A of sectorAzs(t)){ const phi=Math.abs((((brgDeg-A)%360)+540)%360-180); const Ah=-Math.min(12*Math.pow(phi/hbw,2),30); best=Math.max(best,-Math.min(-(Ah+Av),30)); }
   return best;
 }
 /* tower list for one technology: user/OSM transmitters that carry it + imported real cells */
@@ -4105,6 +4137,101 @@ function printReport(){
   const m=$("mxModel").value==="mob"?{name:"Mobile planner",p:plannerParams()}:(models.find(x=>String(x.id)===$("mxModel").value)||sel());
   $("rptHead").innerHTML=`<h1>Groundwave Propagation Lab · calculation report</h1><p>${esc(m.name)} · ${esc(methodOf(m.p))}</p><p>Distance ${$("mxDv").textContent} · ${fmtF(m.p.f)} · ${fmtP(m.p.P)} · printed ${new Date().toLocaleString()}</p>`;
   document.body.classList.add("print-report"); setTimeout(()=>{ window.print(); setTimeout(()=>document.body.classList.remove("print-report"),500); },50);
+}
+
+/* ===================== AIM THE ANTENNA ON THE MAP =====================
+   Click a transmitter, relay or tower, then drag its beam handle to turn the antenna.
+   Mobile towers show one handle per sector, so each sector can be aimed at its own town or road. */
+const BEAM={drag:null,R:66};
+function sectorAzs(t){ return (t.azs&&t.azs.length===3)?t.azs.map(v=>((v%360)+360)%360):[0,120,240].map(o=>((((t.az||0)+o)%360)+360)%360); }
+function setSectorAz(t,k,v){ const a=sectorAzs(t); a[k]=((Math.round(v)%360)+360)%360; t.azs=a; if(k===0) t.az=a[0]; }
+function stationOf(sel){ if(!sel) return null; return sel.kind==="relay"?MP.relays[sel.i]:sel.kind==="tx"?MP.txs[sel.i]:null; }
+/* every aimable beam of a station: its current azimuth, a setter and a colour */
+function beamsOf(sel){
+  const st=stationOf(sel); if(!st) return [];
+  if(MP.layer==="mobile"){ if((st.sector||"omni")==="omni") return [];
+    return sectorAzs(st).map((az,k)=>({az,label:"S"+(k+1),name:`Sector ${k+1}`,set:v=>setSectorAz(st,k,v),col:TECH_COL[MP.cov.tech]||"#2f6fdf"})); }
+  const a=st.ant; if(!a||a.az===undefined) return [];
+  return [{az:((a.az%360)+360)%360,label:"↻",name:ANT_TYPES[a.type]?ANT_TYPES[a.type].name:"Beam",set:v=>{ a.az=((Math.round(v)%360)+360)%360; },col:sel.kind==="relay"?"#1d8a8a":"#d13b4f"}];
+}
+function selStation(){ const s=MP.lastSel&&MP.lastSel.kind!=="rx"?MP.lastSel:{kind:"tx",i:MP.ti}; return stationOf(s)?s:null; }
+function drawBeamHandles(c,W,H){
+  const sel=selStation(); if(!sel) return; const bs=beamsOf(sel); if(!bs.length) return;
+  const st=stationOf(sel), [x,y]=proj(st.lon,st.lat), R=BEAM.R;
+  if(x<-80||y<-80||x>W+80||y>H+80) return;
+  c.setLineDash([3,4]); c.strokeStyle="rgba(120,132,152,.85)"; c.lineWidth=1.2; c.beginPath(); c.arc(x,y,R,0,7); c.stroke(); c.setLineDash([]);
+  for(const b of bs){
+    const t=rad(b.az), hx=x+R*Math.sin(t), hy=y-R*Math.cos(t);
+    c.lineCap="round"; c.strokeStyle="rgba(255,255,255,.92)"; c.lineWidth=6; c.beginPath(); c.moveTo(x,y); c.lineTo(hx,hy); c.stroke();
+    c.strokeStyle=b.col; c.lineWidth=2.6; c.stroke(); c.lineCap="butt";
+    c.fillStyle=b.col; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); c.arc(hx,hy,11,0,7); c.fill(); c.stroke();
+    c.fillStyle="#fff"; c.font="600 12px "+cssVar("--font-body"); c.textAlign="center"; c.textBaseline="middle"; c.fillText(b.label,hx,hy);
+    const lx=x+(R+26)*Math.sin(t), ly=y-(R+26)*Math.cos(t), s=`${Math.round(b.az)}°`;
+    c.font="600 12px "+cssVar("--font-mono"); const tw=c.measureText(s).width+10;
+    c.fillStyle="rgba(22,32,46,.9)"; c.fillRect(lx-tw/2,ly-9,tw,18); c.fillStyle="#fff"; c.fillText(s,lx,ly);
+  }
+  c.textAlign="left"; c.textBaseline="alphabetic";
+}
+function hitBeam(x,y){
+  const sel=selStation(); if(!sel) return null; const bs=beamsOf(sel); if(!bs.length) return null;
+  const st=stationOf(sel), [cx,cy]=proj(st.lon,st.lat);
+  for(let k=0;k<bs.length;k++){ const t=rad(bs[k].az), hx=cx+BEAM.R*Math.sin(t), hy=cy-BEAM.R*Math.cos(t); if(Math.hypot(hx-x,hy-y)<18) return {sel,k,cx,cy}; }
+  return null;
+}
+function beamFromPoint(d,x,y){ return (toDeg(Math.atan2(x-d.cx,d.cy-y))+360)%360; }
+function beamDragMove(x,y,snap){ const d=BEAM.drag; if(!d) return; let az=beamFromPoint(d,x,y); if(snap) az=Math.round(az/15)*15;
+  beamsOf(d.sel)[d.k].set(az); renderAimBox(); scheduleMapDraw(); }
+function beamDragEnd(){ if(!BEAM.drag) return; BEAM.drag=null; MP.res.clear(); updateMap(); if(!$("auiPanel").hidden) renderAui(); }
+function nudgeBeam(step){ const sel=selStation(); if(!sel) return false; const bs=beamsOf(sel); if(!bs.length) return false;
+  const k=clamp(BEAM.lastK||0,0,bs.length-1); bs[k].set(bs[k].az+step); MP.res.clear(); updateMap(); renderAimBox(); return true; }
+
+/* ---------- precise aim popover (keyboard friendly) ---------- */
+function openAimBox(){
+  const sel=selStation(); if(!sel) return; const st=stationOf(sel), box=$("aimBox");
+  const [x,y]=proj(st.lon,st.lat);
+  const W=mapC.clientWidth, H=mapC.clientHeight, side=x+BEAM.R+320<W?x+BEAM.R+170:(x-BEAM.R-320>0?x-BEAM.R-170:null);
+  if(side!==null){ box.style.left=side+"px"; box.style.top=clamp(y-90,8,Math.max(8,H-260))+"px"; }
+  else { box.style.left=clamp(x,152,W-152)+"px"; box.style.top=clamp(y+BEAM.R+54,8,Math.max(8,H-250))+"px"; }
+  box.hidden=false;
+  renderAimBox(true); const f=box.querySelector("input,select,button"); if(f) f.focus();
+}
+function renderAimBox(valuesOnly){
+  const box=$("aimBox"); if(!box||box.hidden) return;
+  const sel=selStation(); if(!sel){ box.hidden=true; return; }
+  const st=stationOf(sel), bs=beamsOf(sel), mob=MP.layer==="mobile";
+  if(!valuesOnly&&box.dataset.key===JSON.stringify([sel,bs.length])){ bs.forEach((b,k)=>{ const r=box.querySelector(`[data-bz="${k}"]`), n=box.querySelector(`[data-bn="${k}"]`); if(r&&document.activeElement!==r) r.value=b.az; if(n&&document.activeElement!==n) n.value=Math.round(b.az); }); return; }
+  box.dataset.key=JSON.stringify([sel,bs.length]);
+  const a=mob?null:st.ant, T=a?ANT_TYPES[a.type]:null, tiltP=T&&T.params.find(q=>q.k==="tilt");
+  const types=Object.entries(ANT_TYPES).filter(([,v])=>v.band===(mob?null:antBand(baseModel().p.f)));
+  const typeSel=mob?`<div class="aimrow"><label for="aimSec">Antenna</label><select id="aimSec" style="grid-column:2 / -1"><option value="omni"${(st.sector||"omni")==="omni"?" selected":""}>Omni (no sectors)</option><option value="3sector"${(st.sector||"omni")!=="omni"?" selected":""}>3 sectors (3GPP)</option></select></div>`
+    :`<div class="aimrow"><label for="aimType">Antenna</label><select id="aimType" style="grid-column:2 / -1">${types.map(([k,v])=>`<option value="${k}"${a&&k===a.type?" selected":""}>${esc(v.name)}</option>`).join("")}</select></div>`;
+  const rows=bs.length?bs.map((b,k)=>`<div class="aimrow"><label for="bz${k}">${esc(b.name)}</label>
+      <input type="range" id="bz${k}" data-bz="${k}" min="0" max="359" step="1" value="${Math.round(b.az)}" aria-label="${esc(b.name)} azimuth in degrees from north">
+      <input type="number" data-bn="${k}" min="0" max="359" step="1" value="${Math.round(b.az)}" aria-label="${esc(b.name)} azimuth value"><span>°</span></div>`).join("")
+    : `<p class="hint">This antenna radiates the same in every direction, so there is nothing to aim. Choose a directional antenna (${mob?"3 sectors":"array of masts, panel array or Yagi"}) in the panel.</p>`;
+  box.innerHTML=`<div class="aimhead"><b>🧭 Aim ${esc(st.name)}</b><button class="iconbtn" id="aimClose" type="button" aria-label="Close aiming" data-tip="Close aiming">✕</button></div>
+    ${typeSel}
+    ${rows}
+    ${bs.length?`<p class="hint">Drag the handle on the map, or use these. Hold Shift while dragging to snap to 15°.</p>`:""}
+    ${mob?`<div class="aimrow"><label for="aimTilt">Downtilt</label><input type="range" id="aimTilt" min="0" max="15" step="1" value="${st.tilt??2}" aria-label="Mechanical downtilt in degrees"><input type="number" id="aimTiltN" min="0" max="15" step="1" value="${st.tilt??2}" aria-label="Downtilt value"><span>°</span></div>`
+      :(tiltP?`<div class="aimrow"><label for="aimTilt">Beam tilt</label><input type="range" id="aimTilt" min="${tiltP.min}" max="${tiltP.max}" step="${tiltP.step}" value="${a[tiltP.k]??tiltP.def}" aria-label="Beam tilt in degrees"><input type="number" id="aimTiltN" min="${tiltP.min}" max="${tiltP.max}" step="${tiltP.step}" value="${a[tiltP.k]??tiltP.def}" aria-label="Beam tilt value"><span>°</span></div>`:"")}
+    <div class="aimrow"><label for="aimH">Antenna height</label><input type="range" id="aimH" min="5" max="${mob?300:600}" step="1" value="${st.h}" aria-label="Antenna height on the mast in metres"><input type="number" id="aimH2" min="1" max="${mob?300:600}" step="1" value="${st.h}" aria-label="Antenna height value"><span>m</span></div>
+    <div class="row"><button class="btn sm" id="aimMove" type="button">Move this ${mob?"tower":sel.kind==="relay"?"relay":"transmitter"}</button><button class="btn sm primary" id="aimPanel" type="button">Open full panel</button></div>`;
+  const live=(full)=>{ MP.res.clear(); if(full) renderAimBox(true); drawMap(); renderSites(); renderTxTable(); renderRelayTable(); renderActive(); if(mob) renderPlanner(); if(!$("auiPanel").hidden) renderAui(); };
+  bs.forEach((b,k)=>{ const r=box.querySelector(`[data-bz="${k}"]`), n=box.querySelector(`[data-bn="${k}"]`);
+    const put=v=>{ BEAM.lastK=k; beamsOf(sel)[k].set(v); r.value=Math.round(((v%360)+360)%360); n.value=r.value; live(false); };
+    r.addEventListener("input",e=>put(+e.target.value)); n.addEventListener("input",e=>put(+e.target.value||0)); });
+  const retype=()=>{ MP.res.clear(); box.dataset.key=""; renderAimBox(true); drawMap(); renderTxTable(); renderActive(); updateMap(); if(mob) renderPlanner(); if(!$("auiPanel").hidden) renderAui(); };
+  if($("aimType")) $("aimType").addEventListener("change",e=>{ st.ant=antDefault(e.target.value); if(st.ant.az!==undefined&&MP.rxs[MP.ai]) st.ant.az=Math.round(bearing(st,MP.rxs[MP.ai])); retype(); });
+  if($("aimSec")) $("aimSec").addEventListener("change",e=>{ st.sector=e.target.value; retype(); });
+  const tr=$("aimTilt"), tn=$("aimTiltN");
+  if(tr) { const putT=v=>{ v=+v; if(mob) st.tilt=v; else st.ant[tiltP.k]=v; tr.value=v; tn.value=v; live(false); };
+    tr.addEventListener("input",e=>putT(e.target.value)); tn.addEventListener("input",e=>putT(e.target.value)); }
+  const hr=$("aimH"), hn=$("aimH2"); const putH=v=>{ st.h=clamp(+v||1,1,mob?300:600); hr.value=st.h; hn.value=st.h; live(false); };
+  hr.addEventListener("input",e=>putH(e.target.value)); hn.addEventListener("change",e=>putH(e.target.value));
+  $("aimClose").addEventListener("click",()=>{ box.hidden=true; mapC.focus(); });
+  $("aimMove").addEventListener("click",()=>{ box.hidden=true; MP.setMode(sel.kind==="relay"?"moverelay":"tx"); });
+  $("aimPanel").addEventListener("click",()=>{ box.hidden=true; openAui(sel.kind,sel.i); });
 }
 
 /* ===================== TRANSMITTER PANEL (Nautel-AUI-style, simulated) ===================== */
