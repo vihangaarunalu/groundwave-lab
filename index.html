@@ -542,6 +542,46 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .srvtab tr.srv td{background:var(--accent-soft);font-weight:600}
 .srvtab td,.srvtab th{text-align:left}
 
+/* ===== v3 · map tools, search, layers, relays, planner, report ===== */
+body[data-layer="mobile"] .bcast-only{display:none!important}
+body:not([data-layer="mobile"]) .mob-only{display:none!important}
+.maptools{display:grid;gap:8px;margin-bottom:10px;position:relative}
+.mapsearch{display:flex;gap:8px;position:relative}
+.mapsearch input{flex:1;min-height:44px;border:1px solid var(--line);border-radius:var(--radius-md);padding:0 14px;font:inherit;background:var(--panel);color:var(--ink)}
+.mapsearch input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hits{position:absolute;top:48px;left:0;right:0;z-index:30;list-style:none;margin:0;padding:6px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:0 10px 28px rgba(0,0,0,.18);max-height:320px;overflow:auto}
+.hits li{display:grid;gap:2px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px}
+.hits li:hover,.hits li:focus{background:var(--accent-soft);outline:none}
+.hits li .muted{font-size:12.5px}
+.searchact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;border-radius:var(--radius-md);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line))}
+.toolrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolrow .mapseg{flex-wrap:wrap}
+.toolrow .mapseg label{min-height:40px;display:inline-flex;align-items:center;gap:4px}
+.toolsave{margin-left:auto}
+.modehint{margin:0;font-size:13px;color:var(--muted)}
+#map{cursor:crosshair}
+.planner .plgrid{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:var(--space-4)}
+.planner .plin{display:grid;gap:10px;align-content:start}
+.planner .plin input,.planner .plin select{min-height:40px}
+.planner .tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.plchart{height:240px;margin-top:10px}
+.plchart canvas{width:100%;height:100%}
+@media (max-width:900px){.planner .plgrid{grid-template-columns:1fr}}
+#relayTable td{white-space:nowrap}
+.rpthead{display:none}
+@media print{
+  body.print-report *{visibility:hidden}
+  body.print-report #methods, body.print-report #methods .mxcalc, body.print-report #methods .mxcalc *{visibility:visible}
+  body.print-report #methods .mxcalc{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:0}
+  body.print-report .rpthead{display:block}
+  body.print-report .rpthead h1{font-size:18px;margin:0 0 4px}
+  body.print-report #mxCopy,body.print-report #mxPrint,body.print-report .mxctl input[type=range]{display:none}
+}
+@media (max-width:760px){ .toolsave{margin-left:0} .mapsearch .btn{padding:0 12px} }
+@media (min-width:761px) and (max-width:1500px){ .appbar-in .tab .n{display:none} .appbar-in .tab{padding:10px 9px;font-size:13.5px} }
+@media (min-width:761px) and (max-width:1180px){ .brand small{display:none} }
+.panel.card > *, #mapCore > *, .bcast-only, .mob-only{min-width:0}
+
 </style>
 </head>
 <body>
@@ -557,9 +597,10 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
       <button class="tab" role="tab" id="tab-animation" aria-controls="animation" data-tab="animation"><span class="n">2</span>Animation</button>
       <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map"><span class="n">3</span>Map</button>
       <button class="tab" role="tab" id="tab-terrain" aria-controls="terrain-tab" data-tab="terrain"><span class="n">4</span>Terrain profile</button>
-      <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods"><span class="n">5</span>Models</button>
-      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">6</span>Learn</button>
-      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">7</span>Quiz</button>
+      <button class="tab" role="tab" id="tab-mobile" aria-controls="mobile-tab" data-tab="mobile"><span class="n">5</span>Mobile</button>
+      <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods"><span class="n">6</span>Models</button>
+      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">7</span>Learn</button>
+      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">8</span>Quiz</button>
     </nav>
     <button class="iconbtn themebtn" id="helpBtn" type="button" aria-haspopup="dialog" title="Help and quick start">? Help</button>
     <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
@@ -606,15 +647,13 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
                 <option value="sky">Sky wave only</option>
                 <option value="inverse">Ideal reference (no ground loss)</option>
                 <option value="custom">My own formula</option>
-                <option value="cell">Mobile network: 2G/3G/4G/5G (ITU-R P.529 / M.2412)</option>
               </select>
             </div>
             <div class="field" id="cellBox">
-              <span class="lbl">Mobile network</span>
-              <div class="chips" id="cellChips"></div>
-              <label class="check"><input type="checkbox" id="indoor"> Phone is indoors (ITU-R P.2109 building entry loss)</label>
-              <p class="hint">Tower height and phone height: set them under TX/RX antenna below (typical 30 m and 1.5 m). Power is the EIRP: 1 kW = 60 dBm.</p>
+              <div class="chips" id="cellChips" hidden></div>
+              <label class="check"><input type="checkbox" id="indoor"> Receiver is indoors (ITU-R P.2109 building entry loss)</label>
             </div>
+            <p class="note">Mobile networks (2G–5G) have their own planner: <button class="linkbtn" type="button" data-goto="mobile">open the Mobile tab →</button></p>
             <div class="field" id="exprBox">
               <label for="expr">Your formula for E (mV/m)</label>
               <textarea id="expr" spellcheck="false"></textarea>
@@ -709,7 +748,9 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
             <div class="field"><label for="flareR">Solar flare (NOAA radio-blackout scale)</label>
               <select id="flareR"><option value="0">None</option><option value="1">R1 minor · M1 flare</option><option value="2">R2 moderate · M5</option><option value="3">R3 strong · X1</option><option value="4">R4 severe · X10</option><option value="5">R5 extreme · X20</option></select></div>
             <label class="check"><input type="checkbox" id="sunBeam"> Sun in the receiving antenna beam (sunrise / sunset)</label>
-            <p class="note">The flare is applied to every band: HF fade-out (NOAA D-RAP), no effect on ground waves, and solar radio-burst noise at VHF/UHF and mobile bands.</p>
+            <div class="row"><button class="btn sm" id="liveFlare" type="button">🛰 Use live NOAA level now</button></div>
+            <p class="hint" id="liveMsg" aria-live="polite"></p>
+            <p class="note">The flare is applied to every band: HF fade-out (NOAA D-RAP), no effect on ground waves, and solar radio-burst noise at VHF/UHF.</p>
           </div>
         </details>
 
@@ -744,7 +785,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
         <div class="chart-head">
           <h2>Signal strength vs distance</h2>
           <div class="chart-opts">
-            <select id="yunit" aria-label="Units"><option value="mv">Units: mV/m</option><option value="db">Units: dBµV/m</option><option value="dbm">Units: dBm (mobile)</option></select>
+            <select id="yunit" aria-label="Units"><option value="mv">Units: mV/m</option><option value="db">Units: dBµV/m</option></select>
             <select id="xscale" aria-label="Distance scale"><option value="log">Log distance</option><option value="lin">Linear distance</option></select>
             <select id="range" aria-label="Distance range"><option value="30">0–30 km</option><option value="100">0–100 km</option><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select>
           </div>
@@ -892,6 +933,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
       <div class="field"><label for="txH">Selected transmitter mast (m)</label><input type="number" id="txH" min="1" max="1000" step="1" value="120"></div>
       <div class="field"><label for="rxH">Selected receiver antenna (m)</label><input type="number" id="rxH" min="0" max="500" step="1" value="10"></div>
       <div class="field"><label for="mapLand">Land along the path is mostly</label><select id="mapLand"></select></div>
+      <div class="field"><label for="mapEnv">Receiver surroundings</label><select id="mapEnv"><option value="rural">Rural / open</option><option value="suburban">Suburban</option><option value="urban">Urban</option><option value="industrial">Dense urban / large city</option></select></div>
       <div class="field" style="align-self:end;gap:6px"><label class="check"><input type="checkbox" id="useTerrain" checked> Include terrain shadowing</label><label class="check"><input type="checkbox" id="useBuildings" checked> Include buildings &amp; peaks (OSM)</label></div>
     </div>
     <details class="acc plain">
@@ -907,51 +949,35 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
     </details>
   </section>
 
-  <section class="panel card mobilecard" aria-labelledby="mcH">
-    <div class="chart-head"><h2 id="mcH">Mobile coverage <span class="badge">2G · 3G · 4G · 5G</span></h2>
-      <div class="row"><span class="hint">📍 <b id="meName">not set</b></span><button class="btn primary" id="setMe" type="button">📍 Set my location</button><button class="btn" id="meTowers" type="button">📶 Towers near me (OSM)</button></div></div>
-    <div class="tiles mycov" id="myCov"></div>
-    <div class="covbar">
-      <div class="field"><span class="lbl">Coverage map</span>
-        <div class="seg" role="radiogroup" aria-label="Coverage map technology">
-          <input type="radio" name="covTech" id="cvOff" value="off" checked><label for="cvOff">Off</label>
-          <input type="radio" name="covTech" id="cv2" value="2g"><label for="cv2">2G</label>
-          <input type="radio" name="covTech" id="cv3" value="3g"><label for="cv3">3G</label>
-          <input type="radio" name="covTech" id="cv4" value="4g"><label for="cv4">4G</label>
-          <input type="radio" name="covTech" id="cv5" value="5g"><label for="cv5">5G</label>
-        </div></div>
-      <div class="field"><label for="covEnv">Surroundings</label><select id="covEnv"><option value="industrial">Dense urban</option><option value="urban" selected>Urban</option><option value="suburban">Suburban</option><option value="rural">Rural / open</option></select></div>
-      <label class="check"><input type="checkbox" id="covIndoor"> Indoors (P.2109)</label>
-      <span class="covstat" id="covStat" aria-live="polite"></span>
-    </div>
-    <div class="legend covlegend"><span><i style="border-top:8px solid rgba(0,140,70,.7);width:14px"></i>Excellent ≥ −80 dBm</span><span><i style="border-top:8px solid rgba(90,180,70,.7);width:14px"></i>Good ≥ −90</span><span><i style="border-top:8px solid rgba(235,200,40,.8);width:14px"></i>≥ −100</span><span><i style="border-top:8px solid rgba(240,130,40,.8);width:14px"></i>Fair (cell edge)</span><span><i style="border-top:8px solid rgba(220,50,40,.45);width:14px"></i>Gap / no coverage</span><span>● real cells: <b style="color:#7b8ba3">2G</b> <b style="color:#8a5cc7">3G</b> <b style="color:#2f6fdf">4G</b> <b style="color:#d0368a">5G</b></span></div>
-    <details class="acc plain"><summary>Real network data: OpenCelliD (towers measured by phones)</summary>
-      <div class="acc-body">
-        <p class="hint">OpenCelliD is an open database of real cell sites (2G GSM, 3G UMTS, 4G LTE, 5G NR) with their operator and measured range. Create a free account at opencellid.org, then either import the Sri Lanka file (MCC 413, CSV or .csv.gz) or use your API key to load the cells around your location.</p>
-        <div class="row"><label class="btn" for="ocidFile">⬆ Import OpenCelliD file…</label><input type="file" id="ocidFile" accept=".csv,.gz,text/csv" class="sr">
-          <input type="text" id="ocidKey" placeholder="OpenCelliD API key" aria-label="OpenCelliD API key" style="max-width:240px" autocomplete="off"><label class="check"><input type="checkbox" id="ocidRemember"> Remember on this device</label>
-          <button class="btn" id="ocidApi" type="button">Load cells around my location</button>
-          <label class="check"><input type="checkbox" id="useCells" checked> Use real cells in coverage</label></div>
-        <p class="hint"><b id="cellCount">No real cell data loaded yet</b></p>
-        <p class="hint" id="ocidMsg" role="status"></p>
-        <p class="hint">OpenCelliD positions are estimated from crowd-sourced measurements, so they can be off by tens to hundreds of metres. Antenna height, direction and power aren't in the data, so imported cells are modelled as 30 m omni sites at typical power. For your own sites, set these in the Transmitters table.</p>
-      </div></details>
-  </section>
 
-  <div class="mapbox">
-    <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
-    <div class="map-tl">
-      <div class="seg mapseg" role="radiogroup" aria-label="Clicking the map">
-        <input type="radio" name="clickset" id="modeAddTx" value="addtx"><label for="modeAddTx">+ Transmitter</label>
-        <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd">+ Receiver</label>
-        <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move TX</label>
-        <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move RX</label>
-        <input type="radio" name="clickset" id="modeMe" value="me"><label for="modeMe">📍 Me</label>
+
+<div id="mapSlot">
+<div id="mapCore">
+  <div class="maptools">
+    <form class="mapsearch" id="mapSearch" role="search">
+      <input type="search" id="mapQ" placeholder="Search a place, e.g. Kandy, Galle Face, University of Peradeniya" aria-label="Search a place on the map" autocomplete="off">
+      <button class="btn primary" type="submit">Search</button>
+      <ul class="hits" id="mapHits" role="listbox" hidden></ul>
+    </form>
+    <div class="searchact" id="searchAct" hidden></div>
+    <div class="toolrow">
+      <div class="seg mapseg" role="radiogroup" aria-label="What a click on the map does">
+        <input type="radio" name="clickset" id="modeAddTx" value="addtx"><label for="modeAddTx"><span aria-hidden="true">📡</span> <span id="lblAddTx">Add transmitter</span></label>
+        <input type="radio" name="clickset" id="modeAddRelay" value="addrelay" class="bcast-only"><label for="modeAddRelay" class="bcast-only"><span aria-hidden="true">🔁</span> Add relay</label>
+        <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd"><span aria-hidden="true">📻</span> <span id="lblAdd">Add receiver</span></label>
+        <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move <span id="lblMoveTx">TX</span></label>
+        <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move <span id="lblMoveRx">RX</span></label>
+        <input type="radio" name="clickset" id="modeMe" value="me" class="mob-only"><label for="modeMe" class="mob-only">📍 Me</label>
         <input type="radio" name="clickset" id="modeDel" value="del"><label for="modeDel" class="dellbl">✕ Remove</label>
       </div>
-      <button class="btn mapbtn" id="gpsBtn" type="button" hidden>◎ Use my location</button>
-      <button class="btn mapbtn" id="findTowers" type="button" title="Search OpenStreetMap for mobile towers within 8 km of the selected receiver">📶 Find nearest cell towers</button>
+      <button class="btn" id="gpsBtn" type="button" hidden>◎ My location</button>
+      <button class="btn mob-only" id="findTowers" type="button" title="Search OpenStreetMap for mobile towers within 8 km of the selected test point">📶 Find towers (OSM)</button>
+      <span class="toolsave"><button class="btn" id="shareBtn" type="button" title="Copy a link that opens this exact scenario">🔗 Share link</button></span>
     </div>
+    <p class="modehint" id="modeHint" aria-live="polite">Click the map to add a receiver.</p>
+  </div>
+  <div class="mapbox">
+    <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
     <div class="map-tr">
       <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in">＋</button>
       <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out">－</button>
@@ -978,8 +1004,8 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
     </div>
     <div class="mapmsg" id="mapMsg" role="status" hidden></div>
   </div>
-  <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span style="color:#e8862a">○ Secondary edge (Deygout)</span><span>■ Buildings (zoom in)</span></div>
-  <p class="hint">Choose <b>+ Transmitter</b> or <b>+ Receiver</b> and click the map to add a site. To remove a pin, choose <b>✕ Remove</b> and click it, or right-click or double-click it. Use ↺ to reset. Drag to pan, scroll to zoom.</p>
+  <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span class="bcast-only" style="color:#1d8a8a">🔁 Relay (dashed = feed from main transmitter)</span><span>■ Buildings (zoom in)</span></div>
+  <p class="hint">Search a place or pick an action above, then click the map. Click a pin to select it; right-click or double-click removes it. Drag to pan, scroll or pinch to zoom. Your scenario is saved automatically on this device.</p>
 
   <div class="mapresult">
     <section class="panel card verdict" aria-live="polite" id="mapVerdict"></section>
@@ -989,15 +1015,82 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
   </div>
 
   <section class="panel card">
-    <div class="chart-head"><h2>Transmitters</h2></div>
+    <div class="chart-head"><h2 id="txTblH">Transmitters</h2></div>
     <div class="tablewrap"><table class="fs sites txtbl" id="txTable"></table></div>
-    <div class="chart-head" style="margin-top:6px"><h2>Receiver sites</h2>
+    <div class="bcast-only">
+      <div class="chart-head" style="margin-top:6px"><h2>Relay stations <span class="badge">VHF/UHF transposers</span></h2></div>
+      <p class="hint">A relay picks up the main transmitter off-air with a directional antenna (ITU-R P.1812 over the real feed path) and rebroadcasts on its own frequency. It is <b>fed</b> when its input is at least 10 dB above the minimum usable field of the main service. Receivers use whichever station gives the best margin.</p>
+      <div class="tablewrap"><table class="fs sites" id="relayTable"></table></div>
+    </div>
+    <div class="chart-head" style="margin-top:6px"><h2 id="rxTblH">Receiver sites</h2>
       <div class="row"><button class="btn" id="copyCsv" type="button">Copy table (CSV)</button><button class="btn" id="dlCsv" type="button" hidden>Download CSV</button><button class="btn ghost" id="clearRx" type="button">✕ Clear receivers (keep selected)</button></div></div>
-    <p class="hint">Paths are from the selected transmitter. Choose "+ Receiver" or "+ Transmitter" on the map and click anywhere in the world to add sites. Select a row to see its path below.</p>
+    <p class="hint">Each site is served by the best station (transmitter or relay, or the best tower in the Mobile tab). Select a row to see its path and terrain.</p>
     <div class="tablewrap"><table class="fs sites" id="sitesTable"></table></div>
   </section>
 
+</div>
+</div>
   <section class="panel card"><div class="row" style="justify-content:space-between"><p class="hint" style="margin:0">See the mountains, buildings and signal level along the selected path in the <b>Terrain profile</b> tab.</p><div class="row"><button class="btn primary" id="toTerrain" type="button">View terrain profile →</button><button class="btn" id="toLab" type="button">Open in Lab</button><button class="btn" id="toAnim" type="button">Animate it</button></div></div></section>
+</section>
+
+<!-- ======================= MOBILE PLANNER ======================= -->
+<section class="wrap" id="mobile-tab" role="tabpanel" aria-labelledby="tab-mobile" hidden>
+  <div class="intro"><div class="stack" style="gap:4px"><h2>Mobile coverage planner · 2G · 3G · 4G · 5G</h2><p>Plan cell sites separately from the broadcast lab. Set tower heights, antenna sectors and the link budget, then see each test point's serving cell and the coverage map. Methods: ITU-R P.529 (Hata), M.2412 (UMa), P.1812 beyond range, P.2108 clutter, P.2109 building entry, P.838 rain and P.1812/P.1546 location variability.</p></div></div>
+  <section class="panel card mobilecard" aria-labelledby="mcH">
+    <div class="chart-head"><h2 id="mcH">My coverage &amp; network settings</h2>
+      <div class="row"><span class="hint">📍 <b id="meName">not set</b></span><button class="btn primary" id="setMe" type="button">📍 Set my location</button><button class="btn" id="meTowers" type="button">📶 Towers near me (OSM)</button></div></div>
+    <div class="tiles mycov" id="myCov"></div>
+    <div class="covbar">
+      <div class="field"><span class="lbl">Technology</span>
+        <div class="seg" role="radiogroup" aria-label="Coverage map technology">
+          <input type="radio" name="covTech" id="cv2" value="2g"><label for="cv2">2G</label>
+          <input type="radio" name="covTech" id="cv3" value="3g"><label for="cv3">3G</label>
+          <input type="radio" name="covTech" id="cv4" value="4g" checked><label for="cv4">4G</label>
+          <input type="radio" name="covTech" id="cv5" value="5g"><label for="cv5">5G</label>
+          <input type="radio" name="covTech" id="cv6" value="5gmm"><label for="cv6">mmWave</label>
+        </div></div>
+      <div class="field"><label for="covEnv">Surroundings</label><select id="covEnv"><option value="industrial">Dense urban</option><option value="urban" selected>Urban</option><option value="suburban">Suburban</option><option value="rural">Rural / open</option></select></div>
+      <label class="check"><input type="checkbox" id="covIndoor"> Indoors (P.2109)</label>
+      <label class="check"><input type="checkbox" id="covHeat" checked> Show coverage heat map</label>
+      <span class="covstat" id="covStat" aria-live="polite"></span>
+    </div>
+    <div class="legend covlegend"><span><i style="border-top:8px solid rgba(0,140,70,.7);width:14px"></i>Excellent ≥ −80 dBm</span><span><i style="border-top:8px solid rgba(90,180,70,.7);width:14px"></i>Good ≥ −90</span><span><i style="border-top:8px solid rgba(235,200,40,.8);width:14px"></i>≥ −100</span><span><i style="border-top:8px solid rgba(240,130,40,.8);width:14px"></i>Fair (cell edge)</span><span><i style="border-top:8px solid rgba(220,50,40,.45);width:14px"></i>Gap / no coverage</span><span>● real cells: <b style="color:#7b8ba3">2G</b> <b style="color:#8a5cc7">3G</b> <b style="color:#2f6fdf">4G</b> <b style="color:#d0368a">5G</b></span></div>
+    <details class="acc plain"><summary>Real network data: OpenCelliD (towers measured by phones)</summary>
+      <div class="acc-body">
+        <p class="hint">OpenCelliD is an open database of real cell sites (2G GSM, 3G UMTS, 4G LTE, 5G NR) with their operator and measured range. Create a free account at opencellid.org, then either import the Sri Lanka file (MCC 413, CSV or .csv.gz) or use your API key to load the cells around your location.</p>
+        <div class="row"><label class="btn" for="ocidFile">⬆ Import OpenCelliD file…</label><input type="file" id="ocidFile" accept=".csv,.gz,text/csv" class="sr">
+          <input type="text" id="ocidKey" placeholder="OpenCelliD API key" aria-label="OpenCelliD API key" style="max-width:240px" autocomplete="off"><label class="check"><input type="checkbox" id="ocidRemember"> Remember on this device</label>
+          <button class="btn" id="ocidApi" type="button">Load cells around my location</button>
+          <label class="check"><input type="checkbox" id="useCells" checked> Use real cells in coverage</label></div>
+        <p class="hint"><b id="cellCount">No real cell data loaded yet</b></p>
+        <p class="hint" id="ocidMsg" role="status"></p>
+        <p class="hint">OpenCelliD positions are estimated from crowd-sourced measurements, so they can be off by tens to hundreds of metres. Antenna height, direction and power aren't in the data, so imported cells are modelled as 30 m omni sites at typical power. For your own sites, set these in the Transmitters table.</p>
+      </div></details>
+  </section>
+  <section class="panel card planner" aria-labelledby="plH">
+    <div class="chart-head"><h2 id="plH">Single-cell link budget</h2><button class="linkbtn" type="button" id="plCalc">Show the calculation →</button></div>
+    <div class="plgrid">
+      <div class="plin">
+        <div class="two">
+          <div class="field"><label for="plH1">Tower height (m)</label><input type="number" id="plH1" min="5" max="300" step="1"></div>
+          <div class="field"><label for="plEirp">EIRP (dBm)</label><input type="number" id="plEirp" min="20" max="90" step="1"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="plEdge">Cell edge (dBm) · <span id="plMeas">RSRP</span></label><input type="number" id="plEdge" min="-140" max="-60" step="1"></div>
+          <div class="field"><label for="plUl">Uplink max path loss (dB)</label><input type="number" id="plUl" min="100" max="180" step="1"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="plOff">Total → reference (dB)</label><input type="number" id="plOff" min="0" max="45" step="0.1"></div>
+          <div class="field"><label for="plPL">Locations covered</label><select id="plPL"><option value="50">50% (median)</option><option value="75">75%</option><option value="90">90%</option><option value="95">95%</option></select></div>
+        </div>
+        <div class="row"><button class="btn sm" id="plReset" type="button">Reset to typical values</button><span class="hint" id="plBw"></span></div>
+        <p class="hint">New towers you add on the map use this height. Each tower's own height, sectors, azimuth and tilt are in the Towers table below the map.</p>
+      </div>
+      <div class="plout"><div class="tiles" id="plTiles"></div>
+        <div class="chart-box plchart"><canvas id="plChart" aria-label="Reference signal level against distance"></canvas></div></div>
+    </div>
+  </section>
+  <div id="mobMapSlot"></div>
 </section>
 
 <!-- ======================= TERRAIN ======================= -->
@@ -1027,7 +1120,8 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 <section class="wrap" id="methods" role="tabpanel" aria-labelledby="tab-methods" hidden>
   <div class="intro"><div class="stack" style="gap:4px"><h2>Models &amp; equations</h2><p>Every number in this app comes from the equations below. Pick a model to see the calculation step by step, which checks pass, and where the model stops being valid. Lecturers can use this to discuss accuracy and limitations.</p></div></div>
   <section class="panel card mxcalc" aria-labelledby="mxH">
-    <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><button class="btn" id="mxCopy" type="button">Copy steps</button></div>
+    <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><div class="row"><button class="btn" id="mxCopy" type="button">Copy steps</button><button class="btn" id="mxPrint" type="button">🖨 Print / PDF report</button></div></div>
+    <div id="rptHead" class="rpthead"></div>
     <div class="mxctl">
       <label class="field"><span>Model</span><select id="mxModel"></select></label>
       <label class="field grow"><span>Distance <b id="mxDv"></b></span><input type="range" id="mxD" min="0" max="1000" step="1" aria-describedby="mxDv"></label>
@@ -1070,9 +1164,10 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
       </details>
       <details open>
         <summary>2. Ground constants and the Norton numerical distance</summary>
-        <p>Losses depend on ground conductivity σ and relative permittivity εr. The lab uses the Sommerfeld–Norton flat-earth approximation (Terman's form):</p>
-        <div class="eq">x = 1.8×10⁴·σ / f<sub>MHz</sub> &nbsp; b = atan((εr+1)/x) &nbsp; p = (π d / λ x)·cos b</div>
-        <div class="eq">A ≈ (2 + 0.3p) / (2 + p + 0.6p²) &nbsp;&nbsp; E = 300·√P · A / d &nbsp;[mV/m, kW, km]</div>
+        <p>Losses depend on ground conductivity σ and relative permittivity εr. The lab computes ITU-R P.368 the way the ITU's GRWAVE program does: the exact Sommerfeld–Norton solution for a flat earth, then the Fock/Wait residue series for the curved earth (see the Models tab for every step).</p>
+        <div class="eq">ε<sub>c</sub> = εr − j60λσ &nbsp; Δ = √(ε<sub>c</sub> − 1)/ε<sub>c</sub> &nbsp; w = −j(kd/2)Δ² &nbsp;(|w| ≈ Norton's numerical distance p)</div>
+        <div class="eq">F = 1 − j√(πw)·e<sup>−w</sup>·erfc(j√w) &nbsp;&nbsp; E = 300·√P · |W| / d &nbsp;[mV/m, kW, km]</div>
+        <div class="eq">Quick hand estimate (Terman): A ≈ (2 + 0.3p)/(2 + p + 0.6p²), p = (π d / λ x)·cos b, x = 1.8×10⁴σ/f<sub>MHz</sub></div>
         <p>Small p means little loss (sea water, low frequency). Large p means rapid attenuation (dry ground, high frequency).</p>
       </details>
       <details>
@@ -1227,11 +1322,12 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
   <a href="#" data-tab="more" aria-expanded="false" aria-controls="moreSheet"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>More</span></a>
 </nav>
 <div class="moresheet" id="moreSheet" hidden>
+  <button type="button" data-tab="mobile">📶 Mobile planner</button>
   <button type="button" data-tab="terrain">Terrain profile</button>
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v2.2</b> · Teaching model, not a planning tool. Ground wave: Sommerfeld–Norton attenuation with approximate curved-earth diffraction and Millington mixed paths. Sky wave: spherical multi-hop geometry, secant law, E-layer screening and a P.533-style absorption term. For real planning, use ITU-R P.368, P.527, P.1147, P.533 and P.372. Map: Natural Earth outlines (public domain).</footer></div>
+<footer><b>Groundwave Propagation Lab v3.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -1414,6 +1510,7 @@ function evalP(p,d,io){
       break;
     }
   }
+  if(p.calib&&t!==null){ t+=p.calib; if(g!==null) g+=p.calib; }
   return {g,s,t};
 }
 /* sky wave: ITU-R P.1147 for LF/MF (≤ 1.705 MHz), P.533-style teaching model for HF */
@@ -1509,23 +1606,25 @@ function cellParts(dkm,p){ const m=cellModelAt(dkm,p), ls=locStats(p), pl=pLoc(p
   return {m,base,r,cl,atm,ls,pl,var:var_,L:base+atm+ls.Lloc+var_}; }
 /* received power (dBm, isotropic receive antenna) and the equivalent field strength */
 /* reference-signal level and both link margins; the cell edge is where either the downlink or the uplink fails */
-function cellLevel(dkm,p,extraLoss=0){ const T=CELL_TECH[p.tech]||CELL_TECH["4g"], L=cellLoss(dkm,p)+extraLoss;
+/* technology parameters with the user's link-budget overrides (p.lb: thr, ul, off) */
+function techOf(p){ return Object.assign({},CELL_TECH[p.tech]||CELL_TECH["4g"],p.lb||{}); }
+function cellLevel(dkm,p,extraLoss=0){ const T=techOf(p), L=cellLoss(dkm,p)+extraLoss;
   const ref=dBm(p.P)-T.off-L, dlm=ref-(T.thr+burstNoise(p,0,7)), ulm=T.ul-burstNoise(p,17,3)-L;
   return {ref,L,dlm,ulm,m:Math.min(dlm,ulm),lim:ulm<dlm?"uplink":"downlink",eff:ref-Math.max(0,dlm-ulm)}; }
 /* effective level (dBm): the reference-signal level, lowered where the uplink runs out first */
 function cellRxdBm(dkm,p){ return cellLevel(dkm,p).eff; }
 /* verdict from the measured level (RSRP/RSCP/RxLev bands) and the uplink */
-function cellVerdict(c,tech){ const T=CELL_TECH[tech]||CELL_TECH["4g"], b=T.bands;
+function cellVerdict(c,tech){ const T=CELL_TECH[tech]||CELL_TECH["4g"], b=T.bands; // bands relative to the default edge
   if(c.dlm<0) return ["No service","bad"]; if(c.ulm<0) return ["No service · uplink fails","bad"];
   let q=c.ref>=b[0]?["Excellent","good"]:c.ref>=b[1]?["Good","good"]:c.ref>=b[2]?["Fair","warn"]:["Poor (cell edge)","warn"];
   if(c.ulm<3) q=["Poor · uplink weak","warn"]; return q; }
 function cellQuality(v,tech){ const T=CELL_TECH[tech]||CELL_TECH["4g"], b=T.bands; if(v===null||v<T.thr) return ["No service","bad"]; if(v>=b[0]) return ["Excellent","good"]; if(v>=b[1]) return ["Good","good"]; if(v>=b[2]) return ["Fair","warn"]; return ["Poor (cell edge)","warn"]; }
 /* single-cell radius: furthest distance where both links still work (and the GSM timing-advance limit) */
 function cellRange(p){ let dl=0,ul=0,both=0; for(let i=0;i<=500;i++){ const d=0.02*Math.pow(300/0.02,i/500), c=cellLevel(d,p); if(c.dlm>=0) dl=d; if(c.ulm>=0) ul=d; if(c.m>=0) both=d; }
-  const T=CELL_TECH[p.tech]||{}; if(T.ta) both=Math.min(both,T.ta); return {dl,ul,r:both,lim:dl<=ul?"downlink":"uplink",ta:T.ta&&both>=T.ta}; }
+  const T=techOf(p); if(T.ta) both=Math.min(both,T.ta); return {dl,ul,r:both,lim:dl<=ul?"downlink":"uplink",ta:T.ta&&both>=T.ta}; }
 const dBm2dBuV=(prx,fMHz)=>prx+20*Math.log10(fMHz)+77.2;
 const dBuV2dBm=(e,fMHz)=>e-20*Math.log10(fMHz)-77.2;
-function cellThrdBm(p){ const t=CELL_TECH[p.tech]; return t?t.thr:-105; }
+function cellThrdBm(p){ return techOf(p).thr; }
 function skyMethod(p){ return p.f<=1.705?"ITU-R P.1147 sky wave":"P.533-style HF sky wave (teaching approximation)"; }
 function methodOf(p){
   const loc=` · ${pLoc(p)}% locations`;
@@ -1726,7 +1825,7 @@ function pLoc(p){ return clamp(p.pL||50,1,99); }
 const FLARE={0:{x:0,name:"None"},1:{x:1e-5,name:"R1 · M1 flare",sfu:1e2},2:{x:5e-5,name:"R2 · M5 flare",sfu:1e3},3:{x:1e-4,name:"R3 · X1 flare",sfu:1e4},4:{x:1e-3,name:"R4 · X10 flare",sfu:1e5},5:{x:2e-3,name:"R5 · X20 flare",sfu:1e6}};
 function flareLevel(p){ const r=+p.flareR||0; return r>0?r:(p.flare?3:0); }
 /* NOAA D-RAP: HAF = 10·log F_X + 65 MHz at the sub-solar point, × (cos χ)^0.75; A(f) = (HAF/f)^1.5 dB per vertical round trip */
-function flareHAF(p){ const R=flareLevel(p), c=cosChiOf(p); if(!R||c<=0) return 0; return Math.max(0,(10*Math.log10(FLARE[R].x)+65)*Math.pow(c,0.75)); }
+function flareHAF(p){ const R=flareLevel(p), c=cosChiOf(p); if(!R||c<=0) return 0; return Math.max(0,(10*Math.log10(p.flareFlux&&+p.flareR===R?p.flareFlux:FLARE[R].x)+65)*Math.pow(c,0.75)); }
 function flareAbs(fMHz,p){ const H=flareHAF(p); return H>0?Math.pow(H/fMHz,1.5):0; }
 /* solar radio burst: noise rise ΔN = 10·log(1 + T_sun/T_sys), T_sun = S·A_e/(2k), A_e = G·λ²/4π (only with the sun in the antenna beam) */
 function burstNoise(p,GdBi,NFdB){ const R=flareLevel(p); if(!R||cosChiOf(p)<=0||!p.sunBeam||p.f<30) return 0;
@@ -1753,9 +1852,8 @@ const PRESETS=[
   {label:"Coastline",goal:"See what happens when a path crosses from land to sea.",look:"After the coast at 60 km, the mixed-path curve recovers toward the sea curve (Millington's recovery effect).",models:[["All land",{type:"gw",ground:"land"}],["Land → sea at 60 km",{type:"gw",ground:"land",path:"mixed",ground2:"sea",coast:60}],["All sea",{type:"gw",ground:"sea"}]]},
   {label:"HF skip zone",goal:"See the skip zone at HF.",look:"The ground wave dies near the transmitter. There is a gap before the sky wave lands hundreds of km away.",models:[["10 MHz · day",{f:10,P:1,time:"day"}],["10 MHz · night",{f:10,P:1,time:"night"}]],range:"3000"},
   {label:"Solar flare",goal:"See how a solar flare blacks out HF.",look:"With the flare, D-layer absorption jumps and the sky-wave curve drops sharply.",models:[["7 MHz · quiet sun",{f:7,P:1}],["7 MHz · R3 flare (X1)",{f:7,P:1,flareR:3}],["7 MHz · R5 flare (X20)",{f:7,P:1,flareR:5}]],range:"3000"},
-  {label:"Flare on every band",goal:"Compare what one R3 (X1) flare does to LF, MF, HF, VHF and mobile.",look:"Only HF collapses. LF/MF ground waves are unchanged, and VHF/UHF/mobile path loss is unchanged; with the sun in the antenna beam, VHF and mobile need more signal because of radio-burst noise (open Models → steps).",models:[["MW 1 MHz · R3",{f:1,P:10,type:"gw",flareR:3}],["HF 7 MHz · R3",{f:7,P:1,type:"combined",flareR:3}],["FM 100 MHz · R3 + sun in beam",{f:100,P:10,type:"gw",htx:300,hrx:10,flareR:3,sunBeam:true,time:"dusk"}],["4G 1800 · R3 + sun in beam",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,flareR:3,sunBeam:true,time:"dusk",env:"urban"}]],range:"1000"},
-  {label:"VHF & UHF",goal:"Compare line-of-sight VHF/UHF broadcasting with MW ground wave.",look:"FM (100 MHz) and TV (600 MHz) stay strong until the radio horizon set by the antenna heights, then drop fast. MW keeps going along the ground. The ducting model shows how warm, humid weather can stretch VHF range.",models:[["FM 100 MHz · 300 m mast",{type:"gw",f:100,P:10,htx:300,hrx:10}],["TV 600 MHz · 300 m mast",{type:"gw",f:600,P:50,htx:300,hrx:10}],["FM 100 MHz · ducting",{type:"gw",f:100,P:10,htx:300,hrx:10,refr:"super"}],["MW 1 MHz",{type:"gw",f:1,P:50}]],range:"300"},
-  {label:"2G · 3G · 4G · 5G",goal:"Compare mobile-network coverage from one tower (30 m mast, suburban, phone at 1.5 m).",look:"Lower frequencies reach further: 2G at 900 MHz covers the most ground and 5G mmWave at 28 GHz the least. Switch the weather to Thunderstorm to see rain attenuation (ITU-R P.838) hit mmWave hardest.",models:[["2G GSM 900",{type:"cell",tech:"2g",f:900,P:1,htx:30,hrx:1.5,env:"suburban"}],["3G UMTS 2100",{type:"cell",tech:"3g",f:2100,P:1,htx:30,hrx:1.5,env:"suburban"}],["4G LTE 1800",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,env:"suburban"}],["5G NR 3.5 GHz",{type:"cell",tech:"5g",f:3500,P:10,htx:30,hrx:1.5,env:"suburban"}],["5G mmWave 28 GHz",{type:"cell",tech:"5gmm",f:28000,P:3.16,htx:30,hrx:1.5,env:"suburban"}]],range:"30"},
+  {label:"Flare on every band",goal:"Compare what one R3 (X1) flare does to MF, HF and VHF broadcasting.",look:"Only HF collapses. The MF ground wave is unchanged and VHF path loss is unchanged; with the sun in the antenna beam, FM needs more signal because of radio-burst noise (open Models → steps).",models:[["MW 1 MHz · R3",{f:1,P:10,type:"gw",flareR:3}],["HF 7 MHz · R3",{f:7,P:1,type:"combined",flareR:3}],["FM 100 MHz · R3 + sun in beam",{f:100,P:10,type:"gw",htx:300,hrx:10,flareR:3,sunBeam:true,time:"dusk"}]],range:"1000"},
+  {label:"VHF & UHF",goal:"Compare line-of-sight VHF/UHF broadcasting with MW ground wave.",look:"FM (100 MHz) and TV (600 MHz) stay strong until the radio horizon set by the antenna heights, then drop fast. MW keeps going along the ground. The super-refraction model (k = 2) shows how warm, humid air stretches VHF range; true ducting (P.1812 §4.5) is not modelled.",models:[["FM 100 MHz · 300 m mast",{type:"gw",f:100,P:10,htx:300,hrx:10}],["TV 600 MHz · 300 m mast",{type:"gw",f:600,P:50,htx:300,hrx:10}],["FM 100 MHz · super-refraction (k = 2)",{type:"gw",f:100,P:10,htx:300,hrx:10,refr:"super"}],["MW 1 MHz",{type:"gw",f:1,P:50}]],range:"300"},
   {label:"Build your own",goal:"Write your own propagation formula and test it against the built-in model.",look:"Edit the formula in Settings. If your curve stays close to the Norton curve, your formula captures the ground losses.",models:[["Norton (built in)",{type:"gw"}],["My formula",{type:"custom",expr:"300*sqrt(P)/d*exp(-0.004*d*pow(f,0.7))"}]]}
 ];
 const FREQS=[["LF 200 kHz",0.2],["MW 1 MHz",1],["MW 1.5 MHz",1.5],["HF 7 MHz",7],["HF 15 MHz",15],["VHF 100 MHz",100],["UHF 600 MHz",600]];
@@ -1873,7 +1971,7 @@ function updateLabels(){
   renderPowChips("powChips",p,kW=>{ const m=sel(); m.p.P=kW; $("pow").value=Math.log10(kW); currentPreset=-1; updateLabels(); renderList(); redraw(); if(typeof syncAnimControls==="function"){ AN.gwKey=""; AN.anaKey=""; syncAnimControls(); } });
   $("coastV").textContent=`${p.coast} km`;
   $("exprBox").hidden=p.type!=="custom";
-  $("cellBox").hidden=p.type!=="cell"; $("indoor").checked=!!p.indoor;
+  $("cellBox").hidden=!(p.f>=30&&p.type!=="sky"); $("indoor").checked=!!p.indoor;
   document.querySelectorAll("#cellChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(p.type==="cell"&&b.dataset.k===p.tech)));
   $("methodV").textContent=methodOf(p);
   $("customGround").hidden=!(p.ground==="custom"||(p.ground2==="custom"&&p.path==="mixed"));
@@ -1914,7 +2012,8 @@ function bindLab(){
   $("storm").addEventListener("change",e=>set({storm:e.target.value}));
   document.querySelectorAll("input[name=time]").forEach(r=>r.addEventListener("change",e=>set({time:e.target.value,cosChi:null})));
   $("solar").addEventListener("change",e=>set({solar:e.target.value}));
-  $("flareR").addEventListener("change",e=>set({flareR:+e.target.value,flare:false}));
+  $("flareR").addEventListener("change",e=>set({flareR:+e.target.value,flare:false,flareFlux:null}));
+  $("liveFlare").addEventListener("click",liveFlare);
   $("sunBeam").addEventListener("change",e=>set({sunBeam:e.target.checked}));
   $("pL").addEventListener("change",e=>set({pL:+e.target.value}));
   $("stereo").addEventListener("change",e=>set({stereo:e.target.checked}));
@@ -2086,7 +2185,7 @@ function readouts(){
   // explanation
   const ex=[];
   ex.push({LF:"Low frequency (LF): long wavelength, small ground loss, so the ground wave travels very far.",MF:"Medium frequency (MF) is the AM broadcast band: steady ground-wave coverage by day and sky-wave signals at night.",HF:"At HF the ground wave fades within tens of km. Long-distance links rely on the sky wave.",VHF:"At VHF (FM radio, TV, aviation) there is practically no ground wave or sky wave. Coverage comes from the line-of-sight space wave, so antenna height decides the range and the signal drops quickly beyond the radio horizon.",UHF:"At UHF (TV, mobile networks) propagation is line of sight. The range is set by antenna heights and the radio horizon, and hills block the signal far more than at lower frequencies."}[band(p.f)]);
-  if(p.f>=30){ ex.push(`Radio horizon for a ${p.htx||30} m transmitting and ${p.hrx||10} m receiving antenna: about ${fmtD(radioHorizon(p))} km.`); if(p.refr==="super") ex.push("Super-refraction (ducting) in warm, humid layers bends VHF/UHF waves around the earth and can carry them far beyond the normal horizon."); }
+  if(p.f>=30){ ex.push(`Radio horizon for a ${p.htx||30} m transmitting and ${p.hrx||10} m receiving antenna: about ${fmtD(radioHorizon(p))} km.`); if(p.refr==="super") ex.push("Super-refraction (k = 2) in warm, humid layers bends VHF/UHF waves around the earth and can carry them far beyond the normal horizon."); }
   if(p.type!=="sky"&&p.type!=="inverse"){
     ex.push(`Over ${g.name.toLowerCase()} the ground wave is ${nt.p<1?"barely":nt.p<20?"moderately":"strongly"} weakened by ground losses, on top of normal spreading.`);
     if(g.kind==="land"){ if(p.frozen) ex.push("Frozen ground conducts poorly, so losses rise sharply."); else if(p.moisture==="saturated"||p.moisture==="wet") ex.push("Rain-soaked soil conducts better, so the ground wave reaches further."); else if(p.moisture==="dry") ex.push("Dry soil conducts poorly, so coverage shrinks."); }
@@ -2133,7 +2232,7 @@ function animModel(){ return models.find(m=>m.id===AN.id)||sel(); }
 function animParams(){ const m=animModel(); return Object.assign({},m.p,{cosChi:cosFromHour(AN.hour),hour:AN.hour}); }
 function resetView(){ const span=+$("animRange").value; AN.view={d0:-span*0.03,span}; syncRx(); }
 /* ---- quick settings: edit the animated model directly ---- */
-const A_FREQS=[["LF 200k",0.2],["MW 1M",1],["HF 7M",7],["HF 15M",15],["VHF 100M",100],["UHF 600M",600],["4G 1.8G",1800],["5G 3.5G",3500]];
+const A_FREQS=[["LF 200k",0.2],["MW 1M",1],["HF 7M",7],["HF 15M",15],["VHF 100M",100],["UHF 600M",600]];
 function syncAnimControls(){
   const m=animModel(); if(!m) return; const p=m.p;
   $("qsModel").textContent=m.name;
@@ -2537,8 +2636,12 @@ const FALLBACK=[
 ];
 const DEFAULT_TXS=()=>[{id:1,name:"Colombo (broadcast)",lat:6.93,lon:79.85,h:120,techs:[]}];
 const DEFAULT_RXS=()=>[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}];
-const MP={txs:DEFAULT_TXS(),ti:0,nextTx:2,rxs:[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"Kandy",lat:7.29,lon:80.63,h:10},{id:3,name:"Batticaloa",lat:7.72,lon:81.70,h:10}],ai:0,nextRx:4,
+/* mobile planner defaults: two 30 m macro sites in Colombo and two test points (a phone at 1.5 m) */
+const DEFAULT_TOWERS=()=>[{id:101,name:"Fort tower",lat:6.9355,lon:79.8450,h:30,techs:["2g","3g","4g","5g"],sector:"3sector",az:0,tilt:4},{id:102,name:"Borella tower",lat:6.9147,lon:79.8778,h:35,techs:["2g","3g","4g","5g"],sector:"3sector",az:30,tilt:4},{id:103,name:"Kollupitiya tower",lat:6.9010,lon:79.8560,h:30,techs:["2g","3g","4g","5g"],sector:"3sector",az:60,tilt:4}];
+const DEFAULT_POINTS=()=>[{id:101,name:"University of Colombo",lat:6.9020,lon:79.8607,h:1.5},{id:102,name:"Kelanimulla",lat:6.9550,lon:79.9300,h:1.5}];
+const MP={layer:"bcast",S:{bcast:{txs:DEFAULT_TXS(),ti:0,rxs:DEFAULT_RXS(),ai:0,relays:[]},mobile:{txs:DEFAULT_TOWERS(),ti:0,rxs:DEFAULT_POINTS(),ai:0,relays:[]}},nextTx:200,nextRx:200,nextRel:1,benv:"rural",
   view:null,mode:"add",polys:[],source:"loading",date:new Date(),path:null,lastModelId:null,useTerrain:true,useBuildings:true,showBulge:false,manual:{tx:0,rx:0},res:new Map(),cover:null,anim:{playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,t:0,last:0}};
+for(const k of ["txs","ti","rxs","ai","relays"]) Object.defineProperty(MP,k,{get(){ return MP.S[MP.layer][k]; }, set(v){ MP.S[MP.layer][k]=v; }, enumerable:true});
 Object.defineProperty(MP,"tx",{get(){ return MP.txs[MP.ti]; }, set(v){ MP.txs[MP.ti]=v; }});
 Object.defineProperty(MP,"txH",{get(){ return MP.tx.h; }, set(v){ MP.tx.h=v; }});
 Object.defineProperty(MP,"rx",{get(){ return MP.rxs[MP.ai]; }, set(v){ MP.rxs[MP.ai]=v; }});
@@ -2606,12 +2709,12 @@ function computePathFor(a,b){
 function computePath(){ MP.path=computePathFor(MP.tx,MP.rx); }
 function baseModel(){ return models.find(m=>String(m.id)===$("mapModel").value)||sel(); }
 /* technology used on the map: the coverage selector wins, otherwise the model's own technology */
-function mapCellTech(){ if(MP.cov&&MP.cov.tech&&MP.cov.tech!=="off") return MP.cov.tech; const b=baseModel().p; return b.type==="cell"?b.tech:null; }
+function mapCellTech(){ return MP.layer==="mobile"?MP.cov.tech:null; }
 function paramsFor(P,rx,T,tx){
   tx=tx||MP.tx;
   const p=JSON.parse(JSON.stringify(baseModel().p));
   const ct=mapCellTech();
-  if(ct){ const C=CELL_TECH[ct]; Object.assign(p,{type:"cell",tech:ct,f:C.f,P:p.type==="cell"&&p.tech===ct?p.P:C.P,env:MP.cov.env,indoor:MP.cov.indoor}); }
+  if(ct) Object.assign(p,cellParams(ct,tx.h)); else { if(p.type==="cell") p.type="gw"; p.env=MP.benv; }
   const phone=!!ct||p.type==="cell";
   const mid=gcPoint(tx,rx,0.5);
   return Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,rxDist:Math.max(P.dist,0.5),
@@ -2730,9 +2833,10 @@ async function terrainFor(P,rx,onTerrain){
   let elev=await fetchElev(pts), manual=false;
   if(!elev){ manual=true; const a=+MP.manual.tx||0, b=(rx.id===MP.rx.id?+MP.manual.rx:rx.manualElev)||0; elev=pts.map((_,i)=>a+(b-a)*i/(n-1)); }
   // show terrain straight away; buildings/peaks are added when the (sometimes slow) OSM servers answer
-  if(onTerrain){ const T0=terrainAnalyse(P,elev,MP.txH,rx.h,baseModel().p.f,manual,[]); T0.osmPending=MP.useBuildings&&!manual; onTerrain(T0); }
+  const fT=mapCellTech()?CELL_TECH[mapCellTech()].f:baseModel().p.f, hR=mapCellTech()?1.5:rx.h;
+  if(onTerrain){ const T0=terrainAnalyse(P,elev,MP.txH,hR,fT,manual,[]); T0.osmPending=MP.useBuildings&&!manual; onTerrain(T0); }
   let osm=null; if(MP.useBuildings&&!manual) osm=await fetchOSMFeatures(P,rx);
-  const T=terrainAnalyse(P,elev,MP.txH,rx.h,baseModel().p.f,manual,osm?osm.buildings:[]);
+  const T=terrainAnalyse(P,elev,MP.txH,hR,fT,manual,osm?osm.buildings:[]);
   T.osm=osm; T.osmTried=MP.useBuildings&&!manual;
   if(osm&&T.ob&&T.ob.kind==="terrain"){ let bp=null; for(const pk of osm.peaks){ const dd=Math.abs(pk.dm-T.ob.dm); if(dd<5000&&(!bp||dd<bp.dd)) bp={dd,pk}; } if(bp) T.peakName=bp.pk.name; }
   return T;
@@ -2743,7 +2847,29 @@ function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(thre
   if(p.type==="cell"){ const c=cellLevel(p.rxDist,p,(p.terrainLossDb&&cellModelAt(p.rxDist,p)!=="p1812")?p.terrainLossDb:0), q=cellVerdict(c,p.tech);
     return {...r,thr,ok:c.m>=0,fading:false,verdict:q[0],cls:q[1],cell:c}; }
   return {...r,thr,ok,fading,verdict:v,cls}; }
-/* every transmitter is evaluated; the receiver is served by the strongest one that carries the technology */
+/* ===== VHF/UHF relay (transposer) stations =====
+   A relay receives the main transmitter off-air (P.1812 over the real feed path) with a directional antenna,
+   and re-broadcasts on its own frequency, ERP and mast. It works only if its input field reaches the planning level. */
+const RELAY_MARGIN=10; // dB above the minimum usable field of the main service (planning practice for off-air pick-up)
+function relaySource(r){ return MP.S.bcast.txs[clamp(r.src|0,0,MP.S.bcast.txs.length-1)]; }
+function relayFeed(r){
+  const tx=relaySource(r), b=baseModel().p, P=computePathFor(tx,r);
+  const p=paramsFor(P,{lat:r.lat,lon:r.lon,h:r.h,name:r.name},r.T&&r.T.key===relayKey(r)?r.T:null,tx);
+  p.env="rural"; // pick-up antenna on the mast, above local clutter
+  const io=iono(p), e=evalRx(p,io).t, need=ituMinRef(p).v+RELAY_MARGIN;
+  const st=e===null?"none":e>=need?"fed":e>=ituMinRef(p).v?"weak":"none";
+  return {e,need,min:ituMinRef(p).v,st,dist:P.dist,f:p.f,terrain:!!(r.T&&r.T.key===relayKey(r)),P};
+}
+const relayKey=r=>{ const t=relaySource(r); return [t.lat,t.lon,t.h,r.lat,r.lon,r.h,baseModel().p.f].map(v=>+(+v).toFixed(4)).join(","); };
+async function relayTerrain(r){
+  const key=relayKey(r); if(r.T&&r.T.key===key) return; r.T={key,loading:true};
+  const tx=relaySource(r), P=computePathFor(tx,r), n=clamp(Math.round(P.dist)+1,61,161), pts=[];
+  for(let i=0;i<n;i++) pts.push(gcPoint(tx,r,i/(n-1)));
+  const elev=await fetchElev(pts); if(!elev){ r.T=null; return; }
+  const T=terrainAnalyse(P,elev,tx.h,r.h,baseModel().p.f,false,[]); T.key=key; r.T=T;
+  MP.res.clear(); if(currentTab==="map"||currentTab==="terrain") updateMap();
+}
+/* every transmitter (and every fed relay) is evaluated; the receiver is served by the one with the best margin */
 function predictMulti(rx,Tsel){
   const ct=mapCellTech(), all=[];
   MP.txs.forEach((tx,i)=>{
@@ -2752,13 +2878,19 @@ function predictMulti(rx,Tsel){
     let G=0; if(ct&&tx.sector&&tx.sector!=="omni"){ const el=toDeg(Math.atan(((tx.h||30)-1.5)/(Math.max(P.dist,0.02)*1000))); G=antGain(tx,bearing(tx,rx),el); p.P*=Math.pow(10,G/10); }
     const pr=predict(p); all.push({i,tx,P,p,pred:pr,G,dist:P.dist,terrain:!!T});
   });
-  const key=a=>a.pred.cell?a.pred.cell.m:a.pred.t; const cand=all.filter(a=>!a.skip&&a.pred.t!==null).sort((a,b)=>key(b)-key(a));
+  if(!ct) MP.relays.forEach((r,k)=>{
+    const fd=relayFeed(r); if(fd.st==="none"){ all.push({i:-1,k,tx:r,relay:true,skip:true,feed:fd}); return; }
+    const P=computePathFor(r,rx), p=paramsFor(P,rx,null,r); Object.assign(p,{f:r.f,P:r.P,htx:r.h});
+    all.push({i:-1,k,tx:r,relay:true,P,p,pred:predict(p),dist:P.dist,feed:fd});
+  });
+  const key=a=>a.pred.cell?a.pred.cell.m:(a.pred.t===null?-999:a.pred.t-a.pred.thr);
+  const cand=all.filter(a=>!a.skip&&a.pred.t!==null).sort((a,b)=>key(b)-key(a));
   if(!cand.length){ const any=all.find(a=>!a.skip);
     const base=any?any.pred:{t:null,g:null,s:null,thr:null};
     return {...base,ok:false,fading:false,verdict:ct?`No ${TECH_LABEL[ct]||ct} transmitter on the map`:"No reliable reception",cls:"bad",servers:all,server:null,noServer:!any}; }
   const b=cand[0]; return {...b.pred,servers:all,server:b,ranked:cand};
 }
-function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.txs.map(t=>[t.lat,t.lon,t.h,t.techs,t.sector,t.az,t.tilt]),MP.ti,MP.cov&&[MP.cov.tech,MP.cov.env,MP.cov.indoor],MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
+function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.txs.map(t=>[t.lat,t.lon,t.h,t.techs,t.sector,t.az,t.tilt]),MP.ti,MP.layer,MP.benv,MP.relays.map(r=>[r.lat,r.lon,r.h,r.P,r.f,r.src]),MP.cov&&[MP.cov.tech,MP.cov.env,MP.cov.indoor,MP.cov.pL,MP.cov.lb,MP.cov.eirp],MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
 let siteQueue=Promise.resolve();
 function refreshSites(){
   for(const rx of MP.rxs){
@@ -2881,7 +3013,7 @@ function drawMap(){
   drawCoverage(c,W,H);
   $("covStat").textContent=MP.covStat?`${TECH_LABEL[MP.covStat.tech]} covered in view: ${MP.covStat.pct}% · ${MP.covStat.towers} site${MP.covStat.towers===1?"":"s"}`:"";
   // coverage circle
-  const cov=coverage();
+  const cov=MP.layer==="mobile"?{}:coverage();
   if(cov.ring){ c.beginPath(); cov.ring.forEach((q,i)=>{ const [x,y]=proj(q.lon,q.lat); i?c.lineTo(x,y):c.moveTo(x,y); }); c.closePath();
     c.fillStyle="rgba(255,196,0,.10)"; c.fill(); c.setLineDash([7,5]); c.strokeStyle="rgba(176,120,0,.9)"; c.lineWidth=1.6; c.stroke(); c.setLineDash([]);
     const top=cov.ring[0]; const [lx,ly]=proj(top.lon,top.lat); c.font="600 11.5px "+cssVar("--font-body"); const s=`ground-wave service ≈ ${fmtD(cov.r)} km`; const tw=c.measureText(s).width+10; c.fillStyle="rgba(255,248,225,.95)"; c.fillRect(lx-tw/2,ly-9,tw,18); c.fillStyle="#6b4a00"; c.textAlign="center"; c.fillText(s,lx,ly+4); c.textAlign="left"; }
@@ -2929,16 +3061,23 @@ function drawMap(){
     c.fillStyle=col; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); c.moveTo(x,y); c.arc(x,y-20*s,11*s,Math.PI*0.72,Math.PI*0.28); c.closePath(); c.fill(); c.stroke();
     c.fillStyle="#fff"; c.font=`700 ${big?11:9.5}px `+cssVar("--font-body"); c.textAlign="center"; c.fillText(lt,x,y-16*s);
     if(label){ c.font=`${big?600:500} 12px `+cssVar("--font-body"); const tw=c.measureText(label).width+12; c.fillStyle="rgba(255,255,255,.95)"; c.strokeStyle="rgba(0,0,0,.15)"; c.lineWidth=1; c.fillRect(x+12,y-30*s,tw,20); c.strokeRect(x+12,y-30*s,tw,20); c.fillStyle="#16202e"; c.textAlign="left"; c.fillText(label,x+18,y-30*s+14); } };
-  MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9","R"+(i+1),false,v.z>4.5?rx.name:""); });
-  drawCellDots(c,W,H);
+  // relays: dashed feed line from the source transmitter (green = fed, amber = weak, red = not fed) and a teal pin
+  if(MP.layer==="bcast") MP.relays.forEach((r,k)=>{ const src=relaySource(r), fd=relayFeed(r), [x1,y1]=proj(src.lon,src.lat), [x2,y2]=proj(r.lon,r.lat);
+    c.setLineDash([8,6]); c.lineWidth=3; c.strokeStyle="rgba(255,255,255,.85)"; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
+    c.lineWidth=2; c.strokeStyle=fd.st==="fed"?"#1d8a5a":fd.st==="weak"?"#d18b14":"#c2413a"; c.stroke(); c.setLineDash([]);
+    pin(r,"#1d8a8a","Y"+(k+1),false,v.z>4.5?`${r.name} · ${fmtF(r.f)}${fd.st==="fed"?"":" · not fed"}`:""); });
+  if(MP.searchPt){ const [x,y]=proj(MP.searchPt.lon,MP.searchPt.lat); c.fillStyle="#7a3fd1"; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, R=i%2?5:12; i?c.lineTo(x+R*Math.cos(a),y+R*Math.sin(a)):c.moveTo(x+R*Math.cos(a),y+R*Math.sin(a)); } c.closePath(); c.fill(); c.stroke(); }
+  MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9",(MP.layer==="mobile"?"P":"R")+(i+1),false,v.z>4.5?rx.name:""); });
+  if(MP.layer==="mobile") drawCellDots(c,W,H);
   MP.txs.forEach((t,i)=>{ if(i!==MP.ti) pin(t,"#e0828f","T"+(i+1),false,v.z>4.5?t.name:""); });
-  pin(MP.tx,"#d13b4f","T"+(MP.ti+1),true,MP.tx.name); pin(MP.rx,"#1f5fd1","R"+(MP.ai+1),true,MP.rx.name);
-  drawMe(c);
+  pin(MP.tx,"#d13b4f","T"+(MP.ti+1),true,MP.tx.name); pin(MP.rx,"#1f5fd1",(MP.layer==="mobile"?"P":"R")+(MP.ai+1),true,MP.rx.name);
+  if(MP.layer==="mobile") drawMe(c);
   // floating rename/delete tools beside the selected pin
-  { const s=MP.lastSel&&((MP.lastSel.kind==="tx"&&MP.txs[MP.lastSel.i])||(MP.lastSel.kind==="rx"&&MP.rxs[MP.lastSel.i]))?MP.lastSel:{kind:"rx",i:MP.ai};
-    const pt=s.kind==="tx"?MP.txs[s.i]:MP.rxs[s.i], box=$("pinTools"), bt=$("pinDel");
+  { const arrOf=k=>k==="tx"?MP.txs:k==="relay"?MP.relays:MP.rxs;
+    const s=MP.lastSel&&arrOf(MP.lastSel.kind)[MP.lastSel.i]?MP.lastSel:{kind:"rx",i:MP.ai};
+    const pt=arrOf(s.kind)[s.i], box=$("pinTools"), bt=$("pinDel");
     if(pt){ const [x,y]=proj(pt.lon,pt.lat); box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+8)+"px";
-      const can=(s.kind==="tx"?MP.txs:MP.rxs).length>1; bt.hidden=!can; bt.textContent=`✕ Delete`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?"transmitter":"receiver"} ${pt.name}`);
+      const can=s.kind==="relay"||arrOf(s.kind).length>1; bt.hidden=!can; bt.textContent=`✕ Delete`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?(MP.layer==="mobile"?"tower":"transmitter"):s.kind==="relay"?"relay":(MP.layer==="mobile"?"test point":"receiver")} ${pt.name}`);
       $("pinRen").setAttribute("aria-label",`Rename ${pt.name}`); MP.toolSel=s; } }
   const msg=$("mapMsg");
   if(MP.source==="loading"){ msg.hidden=false; msg.textContent="Loading map data…"; }
@@ -3013,16 +3152,19 @@ function pathModel(){
 }
 function setPoint(which,pt){
   if(pt.auto){ delete pt.auto; pt.autoName=true; }
-  if(which==="tx") MP.tx={id:MP.tx.id,h:MP.tx.h,...pt};
-  else if(which==="addtx"){ MP.txs.push({id:MP.nextTx++,h:mapCellTech()?30:(+$("txH").value||120),techs:["2g","3g","4g","5g"],sector:"omni",az:0,tilt:2,...pt}); MP.ti=MP.txs.length-1; }
-  else if(which==="add"){ MP.rxs.push({id:MP.nextRx++,h:+$("rxH").value||10,...pt}); MP.ai=MP.rxs.length-1; }
+  const mob=MP.layer==="mobile";
+  if(which==="tx") MP.tx={...MP.tx,...pt,id:MP.tx.id,h:MP.tx.h};
+  else if(which==="addtx"){ if(!pt.autoName&&!/^(Site|Transmitter|Tower) /.test(pt.name||"")){} else pt.name=`${mob?"Tower":"Transmitter"} ${MP.txs.length+1}`;
+    MP.txs.push(mob?{id:MP.nextTx++,h:MP.cov.htx||30,techs:TECHS.slice(),sector:"3sector",az:0,tilt:4,...pt}:{id:MP.nextTx++,h:+$("txH").value||120,techs:[],...pt}); MP.ti=MP.txs.length-1; }
+  else if(which==="addrelay"){ addRelay(pt); return; }
+  else if(which==="add"){ MP.rxs.push({id:MP.nextRx++,h:mob?1.5:(+$("rxH").value||10),...pt}); MP.ai=MP.rxs.length-1; }
   else MP.rx={id:MP.rx.id,h:MP.rx.h,...pt};
   MP.path=null; updateMap();
   const obj=which==="addtx"||which==="tx"?MP.tx:MP.rx; if(obj&&obj.autoName) autoName(obj);
 }
 function updateMap(){
   if(MP.source==="loading"){ drawMap(); return; }
-  computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderActive(); renderMyCoverage();
+  computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderRelayTable(); renderActive(); renderMyCoverage(); saveState();
   $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
   $("rxH").value=MP.rx.h; $("txH").value=MP.txH;
   const ts=$("txCity"); ts.innerHTML=MP.txs.map((t,i)=>`<option value="tx:${i}">T${i+1} · ${esc(t.name)}</option>`).join("")+`<optgroup label="Move selected transmitter to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;
@@ -3042,13 +3184,14 @@ function renderActive(){
   const via=pr.g!==null&&(pr.s===null||pr.g>=pr.s)?"mostly by ground wave":"mostly by sky wave";
   const isCell=p.type==="cell"||!!mapCellTech(), ct=mapCellTech(), CT=ct?CELL_TECH[ct]:null;
   const lvl=(v,pp)=>v===null||v===undefined?"—":isCell?`${(pp&&pp.cell?pp.cell.ref:dBuV2dBm(v,CT?CT.f:p.f)).toFixed(0)} dBm`:fmtField(v);
-  const sv=pr.server, svTxt=sv?`Served by <b>T${sv.i+1} · ${esc(sv.tx.name)}</b>, ${fmtD(sv.dist)} km away${sv.i!==MP.ti?" (smooth-earth estimate: select it to load its terrain)":""}.`:(pr.noServer?`None of the ${MP.txs.length} transmitters carries ${TECH_LABEL[ct]||""}. Tick ${TECH_LABEL[ct]||""} under Networks in the Transmitters table, add a tower with + Transmitter, or use Find towers.`:"");
-  const rows=(pr.servers||[]).map(a=>`<tr${sv&&a.i===sv.i?' class="srv"':""}><td>T${a.i+1} · ${esc(a.tx.name)}</td><td class="mono">${a.skip?"—":fmtD(a.dist)+" km"}</td><td class="mono">${a.skip?`no ${TECH_LABEL[ct]||""}`:lvl(a.pred.t,a.pred)}</td><td>${a.skip?"":`<span class="pill ${a.pred.cls}">${esc(a.pred.verdict.split(" · ")[0])}</span>`}${sv&&a.i===sv.i?" ★ serving":""}</td></tr>`).join("");
+  const sv=pr.server, svTxt=sv?`Served by <b>${sv.relay?"relay Y"+(sv.k+1):"T"+(sv.i+1)} · ${esc(sv.tx.name)}</b>, ${fmtD(sv.dist)} km away${sv.relay?` on ${fmtF(sv.p.f)}`:""}${sv.i!==MP.ti?" (smooth-earth estimate: select it to load its terrain)":""}.`:(pr.noServer?`None of the ${MP.txs.length} transmitters carries ${TECH_LABEL[ct]||""}. Tick ${TECH_LABEL[ct]||""} under Networks in the Transmitters table, add a tower with + Transmitter, or use Find towers.`:"");
+  const isSv=a=>sv&&a.tx===sv.tx;
+  const rows=(pr.servers||[]).map(a=>`<tr${isSv(a)?' class="srv"':""}><td>${a.relay?"Y"+(a.k+1)+" relay":"T"+(a.i+1)} · ${esc(a.tx.name)}</td><td class="mono">${a.skip&&!a.relay?"—":fmtD(a.dist||a.feed&&a.feed.dist||0)+" km"}</td><td class="mono">${a.skip?(a.relay?"not fed":`no ${TECH_LABEL[ct]||""}`):lvl(a.pred.t,a.pred)}</td><td>${a.skip?"":`<span class="pill ${a.pred.cls}">${esc(a.pred.verdict.split(" · ")[0])}</span>`}${isSv(a)?" ★ serving":""}</td></tr>`).join("");
   $("mapVerdict").innerHTML=`<p class="eyebrow" style="margin:0">Prediction at R${MP.ai+1} · ${esc(MP.rx.name)}${ct?` · ${TECH_LABEL[ct]} ${CT.name.split(" ").slice(1).join(" ")}`:""}</p>
     <div class="big" style="color:var(--${pr.cls})">${pr.verdict}${r.loading?' <span class="muted" style="font-size:13px;font-weight:500">(terrain loading…)</span>':""}</div>
     <div class="val">${lvl(pr.t,pr)}${isCell?` <span class="muted" style="font-size:14px">${CT.meas}</span>`:""}</div>
     <p class="muted" style="font-size:14px">${svTxt} ${isCell?(sv&&sv.pred.cell?`Cell edge ${CT.thr} dBm · uplink margin ${sv.pred.cell.ulm.toFixed(0)} dB · this cell's radius ≈ ${fmtD(cellRange(sv.p).r)} km (phone at 1.5 m, ${MP.cov.env}${MP.cov.indoor?", indoors":""}).`:""):(pr.ok?"":`Below the ${fmtField(pr.thr)} needed.`)} ${fmtF(sv?sv.p.f:p.f)}, ${fmtP(sv?sv.p.P:p.P)}${isCell?" EIRP":""}, ${phTxt}.${T&&MP.useTerrain&&T.loss>0.5&&(!sv||sv.i===MP.ti)?` Terrain costs about ${T.loss.toFixed(1)} dB.`:""}</p>
-    ${MP.txs.length>1||pr.noServer?`<div class="tablewrap"><table class="fs srvtab"><tr><th>Transmitter</th><th>Distance</th><th>${isCell?CT.meas:"Field"}</th><th>Result</th></tr>${rows}</table></div>`:""}`;
+    ${MP.txs.length+MP.relays.length>1||pr.noServer?`<div class="tablewrap"><table class="fs srvtab"><tr><th>Transmitter</th><th>Distance</th><th>${isCell?CT.meas:"Field"}</th><th>Result</th></tr>${rows}</table></div>`:""}`;
   const tiles=[
     ["Distance",`${fmtD(P.dist)} km`,`bearing ${P.brg.toFixed(0)}° · ${P.landPct}% land`,"info"],
     ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
@@ -3064,7 +3207,7 @@ function renderActive(){
   $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
   const note=$("terrainNote");
   if(ELEV.ok===false){ note.innerHTML="Terrain data couldn't be downloaded right now (the free terrain service is busy, this page blocks outside data, or you are offline). The lab retries automatically in a minute. Type ground heights under <b>Coordinates &amp; manual ground height</b>, or open the lab from its public website for automatic worldwide terrain."; }
-  else note.innerHTML="Terrain: Copernicus DEM GLO-90 via Open-Meteo. Buildings and peak names: © OpenStreetMap contributors (Overpass API); buildings without a height tag are estimated from floors, or 7 m. Obstacle loss uses ITU-R P.526: a single knife-edge above the ground-level line for LF–HF, and the Deygout multiple knife-edge method (main edge plus secondary edges) for VHF and above. It is an estimate, not a planning-grade result.";
+  else note.innerHTML=MP.layer==="mobile"?"Terrain: Copernicus DEM GLO-90 via Open-Meteo. Towers and buildings: © OpenStreetMap contributors. Mobile paths use ITU-R P.529 / M.2412 within their range and P.1812 beyond it, with the P.1812 delta-Bullington terrain term on the selected tower's path.":"Terrain: Copernicus DEM GLO-90 via Open-Meteo. Buildings and peak names: © OpenStreetMap contributors (Overpass API); buildings without a height tag are estimated from floors, or 7 m. VHF/UHF uses the ITU-R P.1812 delta-Bullington method over the real profile; LF–HF ground waves (P.368) assume a smooth earth, with a P.526 single knife-edge estimate added for hills.";
   $("manualElevHint").textContent=ELEV.ok===false?"Terrain download unavailable, so these values are used.":"Only used when terrain data can't be downloaded.";
 }
 function drawTerrain(P,T){
@@ -3116,24 +3259,25 @@ function renderSites(){
       <td><input type="number" class="ah" min="0" max="500" step="1" value="${rx.h}" aria-label="Receiver ${i+1} antenna height" style="width:76px"></td>
       <td class="mono">${r?fmtD(r.P.dist)+" km":"…"}</td>
       <td class="mono">${T?(T.loss>0.05?"−"+T.loss.toFixed(1)+" dB":"0 dB"):"…"}</td>
-      <td class="mono">${pr?(mapCellTech()?(pr.cell?pr.cell.ref.toFixed(0)+" dBm":"—"):fmtField(pr.t))+(pr.server&&MP.txs.length>1?` <span class="muted">via T${pr.server.i+1}</span>`:""):"…"}</td>
+      <td class="mono">${pr?(mapCellTech()?(pr.cell?pr.cell.ref.toFixed(0)+" dBm":"—"):fmtField(pr.t))+(pr.server&&MP.txs.length+MP.relays.length>1?` <span class="muted">via ${pr.server.relay?"Y"+(pr.server.k+1):"T"+(pr.server.i+1)}</span>`:""):"…"}</td>
       <td>${pr?`<span class="pill ${pr.cls}">${pr.verdict}</span>`:"…"}</td>
       <td><button class="iconbtn del" type="button" aria-label="Remove receiver ${i+1}" ${MP.rxs.length===1?"disabled":""}>✕</button></td></tr>`; }).join("");
   $("sitesTable").innerHTML=`<tr><th></th><th>Site</th><th>Lat, lon</th><th>Ground</th><th>Antenna (m)</th><th>Distance</th><th>Terrain</th><th>Signal</th><th>Reception</th><th></th></tr>`+rows;
 }
 function renderTxTable(){
+  const mob=MP.layer==="mobile";
   const rows=MP.txs.map((t,i)=>`<tr data-t="${i}" class="${i===MP.ti?"selrow":""}">
       <td><span class="pin-n" style="background:#d13b4f">T${i+1}</span></td>
-      <td><input type="text" class="tnm" value="${esc(t.name)}" aria-label="Transmitter ${i+1} name"></td>
+      <td><input type="text" class="tnm" value="${esc(t.name)}" aria-label="${mob?"Tower":"Transmitter"} ${i+1} name"></td>
       <td class="mono">${t.lat.toFixed(3)}, ${t.lon.toFixed(3)}</td>
-      <td><input type="number" class="tah" min="1" max="1000" step="1" value="${t.h}" aria-label="Transmitter ${i+1} mast height" style="width:76px"></td>
-      <td><div class="netchips">${TECHS.map(k=>`<button type="button" class="chip tnet" data-k="${k}" aria-pressed="${(t.techs||["2g","3g","4g"]).includes(k)}" aria-label="${TECH_LABEL[k]} on ${esc(t.name)}">${TECH_LABEL[k]}</button>`).join("")}</div></td>
-      <td><select class="tsec" aria-label="Antenna type of ${esc(t.name)}"><option value="omni"${(t.sector||"omni")==="omni"?" selected":""}>Omni</option><option value="3sector"${t.sector==="3sector"?" selected":""}>3-sector</option></select></td>
+      <td><input type="number" class="tah" min="1" max="1000" step="1" value="${t.h}" aria-label="${mob?"Tower":"Transmitter"} ${i+1} mast height" style="width:76px"></td>
+      ${mob?`<td><div class="netchips">${TECHS.map(k=>`<button type="button" class="chip tnet" data-k="${k}" aria-pressed="${(t.techs||["2g","3g","4g"]).includes(k)}" aria-label="${TECH_LABEL[k]} on ${esc(t.name)}">${TECH_LABEL[k]}</button>`).join("")}</div></td>
+      <td><select class="tsec" aria-label="Antenna type of ${esc(t.name)}"><option value="omni"${(t.sector||"omni")==="omni"?" selected":""}>Omni</option><option value="3sector"${(t.sector||"omni")!=="omni"?" selected":""}>3-sector (3GPP)</option></select></td>
       <td><input type="number" class="taz" min="0" max="359" step="5" value="${t.az||0}" aria-label="Azimuth of first sector, degrees" style="width:64px" ${(t.sector||"omni")==="omni"?"disabled":""}></td>
-      <td><input type="number" class="ttilt" min="-5" max="15" step="1" value="${t.tilt??2}" aria-label="Downtilt, degrees" style="width:56px"></td>
+      <td><input type="number" class="ttilt" min="-5" max="15" step="1" value="${t.tilt??2}" aria-label="Downtilt, degrees" style="width:56px"></td>`:""}
       <td>${i===MP.ti?'<span class="pill info">paths shown</span>':'<button class="btn sm tsel" type="button">Show paths</button>'}</td>
-      <td><button class="iconbtn tdel" type="button" aria-label="Remove transmitter ${i+1}" title="Remove transmitter" ${MP.txs.length===1?"disabled":""}>✕</button></td></tr>`).join("");
-  $("txTable").innerHTML=`<tr><th></th><th>Transmitter</th><th>Lat, lon</th><th>Mast (m)</th><th>Networks</th><th>Antenna</th><th>Azimuth °</th><th>Tilt °</th><th></th><th></th></tr>`+rows;
+      <td><button class="iconbtn tdel" type="button" aria-label="Remove ${mob?"tower":"transmitter"} ${i+1}" title="Remove" ${MP.txs.length===1?"disabled":""}>✕</button></td></tr>`).join("");
+  $("txTable").innerHTML=`<tr><th></th><th>${mob?"Tower":"Transmitter"}</th><th>Lat, lon</th><th>${mob?"Height (m)":"Mast (m)"}</th>${mob?"<th>Networks</th><th>Antenna</th><th>Azimuth °</th><th>Tilt °</th>":""}<th></th><th></th></tr>`+rows;
 }
 function sitesCSV(){
   const head=["Site","Latitude","Longitude","Ground height (m)","Antenna height (m)","Distance (km)","Terrain loss (dB)","Signal (dBuV/m)","Signal","Reception"];
@@ -3142,6 +3286,59 @@ function sitesCSV(){
     lines.push([`"${rx.name.replace(/"/g,'""')}"`,rx.lat.toFixed(5),rx.lon.toFixed(5),T?Math.round(T.rxE):"",rx.h,r?r.P.dist.toFixed(1):"",T?T.loss.toFixed(1):"",pr&&pr.t!==null?pr.t.toFixed(1):"",pr?`"${fmtField(pr.t)}"`:"",pr?pr.verdict:""].join(",")); });
   return `# Transmitter: ${MP.tx.name} (${MP.tx.lat.toFixed(4)}, ${MP.tx.lon.toFixed(4)}), mast ${MP.txH} m, ${toLocalInput(MP.date)}\n`+lines.join("\n");
 }
+/* ---------- relays ---------- */
+function addRelay(pt){ const b=baseModel().p, f=b.f>=30?+(b.f*1.03).toFixed(1):600;
+  const r={id:MP.nextRel++,name:pt.autoName||/^Site /.test(pt.name||"")?`Relay ${MP.relays.length+1}`:pt.name,lat:pt.lat,lon:pt.lon,h:50,P:b.f>=30?Math.max(0.05,+(b.P*0.05).toFixed(2)):0.5,f,src:MP.ti};
+  MP.relays.push(r); if(b.f<30){ const m=$("mapMsg"); m.hidden=false; m.textContent="Relays (transposers) are a VHF/UHF technique. Pick a VHF/UHF station in “Station settings” to use them. (Click to hide)"; }
+  relayTerrain(r); MP.res.clear(); updateMap(); }
+function renderRelayTable(){ const el=$("relayTable"); if(!el) return;
+  if(!MP.relays.length){ el.innerHTML=`<tr><td class="hint">No relays yet. Choose <b>🔁 Add relay</b> and click a valley or town the main transmitter can't reach. Search a place first if you like.</td></tr>`; return; }
+  const txOpts=MP.S.bcast.txs.map((t,i)=>`<option value="${i}">T${i+1} · ${esc(t.name)}</option>`).join("");
+  el.innerHTML=`<tr><th></th><th>Relay</th><th>Fed from</th><th>Feed distance</th><th>Input field</th><th>Status</th><th>Mast (m)</th><th>ERP (kW)</th><th>Output (MHz)</th><th></th></tr>`+MP.relays.map((r,k)=>{ const fd=relayFeed(r);
+    const st=fd.st==="fed"?['good','Fed']:fd.st==="weak"?['warn','Weak input']:['bad','Not fed'];
+    return `<tr data-r="${k}"><td><span class="pin-n" style="background:#1d8a8a">Y${k+1}</span></td>
+    <td><input type="text" class="rnm" value="${esc(r.name)}" aria-label="Relay ${k+1} name"></td>
+    <td><select class="rsrc" aria-label="Source transmitter of relay ${k+1}">${txOpts.replace(`value="${r.src}"`,`value="${r.src}" selected`)}</select></td>
+    <td class="mono">${fmtD(fd.dist)} km${fd.terrain?"":" <span class='muted'>(smooth earth)</span>"}</td>
+    <td class="mono">${fd.e===null?"—":fd.e.toFixed(1)} dBµV/m <span class="muted">need ${fd.need.toFixed(0)}</span></td>
+    <td><span class="pill ${st[0]}">${st[1]}</span></td>
+    <td><input type="number" class="rh" min="5" max="400" step="1" value="${r.h}" style="width:70px" aria-label="Relay ${k+1} mast height"></td>
+    <td><input type="number" class="rp" min="0.001" max="100" step="0.01" value="${r.P}" style="width:80px" aria-label="Relay ${k+1} ERP in kW"></td>
+    <td><input type="number" class="rf" min="30" max="3000" step="0.1" value="${r.f}" style="width:86px" aria-label="Relay ${k+1} output frequency"></td>
+    <td><button class="iconbtn rdel" type="button" aria-label="Remove relay ${k+1}">✕</button></td></tr>`; }).join(""); }
+/* ---------- layers: broadcast (Map tab) and mobile (Mobile tab) share one map ---------- */
+function setLayer(l){
+  const slot=$(l==="mobile"?"mobMapSlot":"mapSlot"), core=$("mapCore"); if(core.parentNode!==slot) slot.appendChild(core);
+  document.body.dataset.layer=l; if(MP.layer===l&&MP.path) return;
+  MP.layer=l; MP.res.clear(); MP.path=null; MP.lastSel=null; MP.searchPt=null; $("searchAct").hidden=true;
+  $("lblAddTx").textContent=l==="mobile"?"Add tower":"Add transmitter"; $("lblAdd").textContent=l==="mobile"?"Add test point":"Add receiver";
+  $("lblMoveTx").textContent=l==="mobile"?"tower":"TX"; $("lblMoveRx").textContent=l==="mobile"?"point":"RX";
+  $("txTblH").textContent=l==="mobile"?"Towers (height, networks, sectors)":"Transmitters"; $("rxTblH").textContent=l==="mobile"?"Test points (phones at 1.5 m)":"Receiver sites";
+  if(MP.mode==="addrelay"&&l==="mobile") MP.setMode("add"); else MP.setMode(MP.mode);
+  if(MP.source!=="loading"){ updateMap(); MP.view=defaultView("sites"); drawMap(); }
+}
+const MODE_HINT={addtx:()=>MP.layer==="mobile"?"Click the map to place a new tower (it uses the planner's tower height).":"Click the map to add a broadcast transmitter.",
+  addrelay:()=>"Click the map to place a relay. It is fed off-air from the selected transmitter.",
+  add:()=>MP.layer==="mobile"?"Click the map to add a test point (a phone at 1.5 m).":"Click the map to add a receiver.",
+  tx:()=>MP.layer==="mobile"?"Click the map to move the selected tower.":"Click the map to move the selected transmitter.", rx:()=>"Click the map to move the selected "+(MP.layer==="mobile"?"test point.":"receiver."),
+  me:()=>"Click your home on the map.", del:()=>"Click a pin to remove it."};
+/* ---------- place search (OpenStreetMap Nominatim, max 1 request per second) ---------- */
+async function placeSearch(q){
+  const hits=$("mapHits"); hits.hidden=false; hits.innerHTML=`<li class="muted">Searching…</li>`;
+  try{ const v=MP.view||{lat:7.8,lon:80.7};
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=en&q=${encodeURIComponent(q)}&viewbox=${v.lon-3},${v.lat+3},${v.lon+3},${v.lat-3}`,{headers:{"Accept":"application/json"}});
+    const j=await r.json();
+    if(!j.length){ hits.innerHTML=`<li class="muted">No places found for “${esc(q)}”.</li>`; return; }
+    hits.innerHTML=j.map((h,i)=>`<li role="option" tabindex="0" data-i="${i}"><b>${esc(h.name||h.display_name.split(",")[0])}</b><span class="muted">${esc(h.display_name.split(",").slice(1,4).join(","))}</span></li>`).join("");
+    hits.querySelectorAll("li[data-i]").forEach(li=>{ const pick=()=>{ const h=j[+li.dataset.i]; showSearchPt({lat:+h.lat,lon:+h.lon,name:h.name||h.display_name.split(",")[0]}); hits.hidden=true; };
+      li.addEventListener("click",pick); li.addEventListener("keydown",e=>{ if(e.key==="Enter") pick(); }); });
+  }catch(e){ hits.innerHTML=`<li class="muted">Search is unavailable right now (offline, or the free OpenStreetMap search is busy).</li>`; }
+}
+function showSearchPt(pt){ MP.searchPt=pt; MP.view={lon:pt.lon,lat:pt.lat,z:Math.max(MP.view?MP.view.z:10,13)}; drawMap();
+  const a=$("searchAct"), mob=MP.layer==="mobile"; a.hidden=false;
+  a.innerHTML=`<span>📍 <b>${esc(pt.name)}</b></span><button class="btn primary sm" data-sa="addtx" type="button">${mob?"+ Tower here":"+ Transmitter here"}</button>${mob?"":'<button class="btn sm" data-sa="addrelay" type="button">+ Relay here</button>'}<button class="btn sm" data-sa="add" type="button">${mob?"+ Test point here":"+ Receiver here"}</button>${mob?'<button class="btn sm" data-sa="me" type="button">📍 This is me</button>':""}<button class="iconbtn" data-sa="x" type="button" aria-label="Clear search">✕</button>`;
+  a.querySelectorAll("[data-sa]").forEach(bt=>bt.addEventListener("click",()=>{ const k=bt.dataset.sa; if(k==="x"){ MP.searchPt=null; a.hidden=true; drawMap(); return; }
+    if(k==="me"){ MP.setMe(pt.lat,pt.lon,pt.name); } else setPoint(k,{name:pt.name,lat:pt.lat,lon:pt.lon}); MP.searchPt=null; a.hidden=true; drawMap(); })); }
 function bindMap(){
 
   $("attrib").innerHTML=PROVIDERS[TILE.base].attr; $("basemap").value=TILE.base;
@@ -3160,23 +3357,40 @@ function bindMap(){
   $("useBuildings").addEventListener("change",e=>{ MP.useBuildings=e.target.checked; updateMap(); });
   $("txElevM").addEventListener("change",e=>{ MP.manual.tx=+e.target.value||0; updateMap(); });
   $("rxElevM").addEventListener("change",e=>{ MP.manual.rx=+e.target.value||0; MP.rx.manualElev=MP.manual.rx; updateMap(); });
-  const setMode=m=>{ MP.mode=m; $("modeTx").checked=m==="tx"; $("modeRx").checked=m==="rx"; $("modeAdd").checked=m==="add"; $("modeAddTx").checked=m==="addtx"; $("modeDel").checked=m==="del"; $("modeMe").checked=m==="me"; mapC.style.cursor=m==="del"?"not-allowed":""; };
-  [["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeDel","del"],["modeMe","me"]].forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
+  const MODES=[["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeAddRelay","addrelay"],["modeDel","del"],["modeMe","me"]];
+  const setMode=m=>{ MP.mode=m; MODES.forEach(([id,k])=>$(id).checked=k===m); mapC.style.cursor=m==="del"?"not-allowed":"crosshair"; $("modeHint").textContent=(MODE_HINT[m]||MODE_HINT.add)(); };
+  MP.setMode=setMode;
+  MODES.forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
+  $("mapSearch").addEventListener("submit",e=>{ e.preventDefault(); const q=$("mapQ").value.trim(); if(q.length>1) placeSearch(q); });
+  $("mapQ").addEventListener("keydown",e=>{ if(e.key==="Escape") $("mapHits").hidden=true; });
+  $("mapEnv").addEventListener("change",e=>{ MP.benv=e.target.value; updateMap(); });
+  const rt=$("relayTable");
+  rt.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-r]"); if(!tr) return; const r=MP.relays[+tr.dataset.r];
+    if(e.target.classList.contains("rnm")) r.name=e.target.value.trim()||r.name;
+    if(e.target.classList.contains("rsrc")){ r.src=+e.target.value; r.T=null; relayTerrain(r); }
+    if(e.target.classList.contains("rh")){ r.h=clamp(+e.target.value||10,5,400); r.T=null; relayTerrain(r); }
+    if(e.target.classList.contains("rp")) r.P=clamp(+e.target.value||0.01,0.001,100);
+    if(e.target.classList.contains("rf")) r.f=clamp(+e.target.value||100,30,3000);
+    MP.res.clear(); updateMap(); });
+  rt.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-r]"); if(!tr) return; if(e.target.closest(".rdel")){ MP.relays.splice(+tr.dataset.r,1); MP.res.clear(); updateMap(); } });
   // pins: TX and RX hit-testing (the pin head sits ~20 px above the point)
-  const hitPin=(x,y)=>{ for(let i=MP.txs.length-1;i>=0;i--){ const [px,py]=proj(MP.txs[i].lon,MP.txs[i].lat); if(Math.hypot(px-x,py-18-y)<15) return {kind:"tx",i}; }
+  const hitPin=(x,y)=>{ if(MP.layer==="bcast") for(let k=MP.relays.length-1;k>=0;k--){ const [px,py]=proj(MP.relays[k].lon,MP.relays[k].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"relay",i:k}; }
+    for(let i=MP.txs.length-1;i>=0;i--){ const [px,py]=proj(MP.txs[i].lon,MP.txs[i].lat); if(Math.hypot(px-x,py-18-y)<15) return {kind:"tx",i}; }
     for(let i=MP.rxs.length-1;i>=0;i--){ const [px,py]=proj(MP.rxs[i].lon,MP.rxs[i].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"rx",i}; } return null; };
   const removePin=h=>{ const msg=$("mapMsg");
+    if(h.kind==="relay"){ MP.relays.splice(h.i,1); MP.res.clear(); updateMap(); return; }
     if(h.kind==="tx"){ if(MP.txs.length<2){ msg.hidden=false; msg.textContent="Keep at least one transmitter. Use Move TX to place it elsewhere. (Click to hide)"; return; } MP.txs.splice(h.i,1); MP.ti=Math.min(MP.ti>h.i?MP.ti-1:MP.ti,MP.txs.length-1); MP.res.clear(); }
     else { if(MP.rxs.length<2){ msg.hidden=false; msg.textContent="Keep at least one receiver. Use Move RX to place it elsewhere. (Click to hide)"; return; } const id=MP.rxs[h.i].id; MP.rxs.splice(h.i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>h.i?MP.ai-1:MP.ai,MP.rxs.length-1); }
     updateMap(); };
   MP.removePin=removePin;
-  const renOpen=()=>{ const s=MP.toolSel||{kind:"rx",i:MP.ai}; const pt=s.kind==="tx"?MP.txs[s.i]:MP.rxs[s.i]; if(!pt) return; const [x,y]=proj(pt.lon,pt.lat);
+  const arrOf=k=>k==="tx"?MP.txs:k==="relay"?MP.relays:MP.rxs;
+  const renOpen=()=>{ const s=MP.toolSel||{kind:"rx",i:MP.ai}; const pt=arrOf(s.kind)[s.i]; if(!pt) return; const [x,y]=proj(pt.lon,pt.lat);
     const box=$("renBox"); box.style.left=clamp(x,140,mapC.clientWidth-140)+"px"; box.style.top=Math.min(y+40,mapC.clientHeight-170)+"px"; box.hidden=false; box.dataset.kind=s.kind; box.dataset.i=s.i;
     $("renInput").value=pt.name; $("renInput").focus(); $("renInput").select();
     const sug=$("renSug"); sug.hidden=true;
     const show=nm=>{ if(nm&&nm!==pt.name){ sug.hidden=false; sug.textContent="Use map name: "+nm; sug.onclick=()=>{ $("renInput").value=nm; }; } };
     if(pt.suggest) show(pt.suggest); else reverseName(pt.lat,pt.lon).then(nm=>{ pt.suggest=nm; if(!$("renBox").hidden) show(nm); }); };
-  const renSave=()=>{ const box=$("renBox"); const arr=box.dataset.kind==="tx"?MP.txs:MP.rxs; const pt=arr[+box.dataset.i]; const v=$("renInput").value.trim(); if(pt&&v){ pt.name=v; pt.autoName=false; } box.hidden=true; updateMap(); };
+  const renSave=()=>{ const box=$("renBox"); const arr=arrOf(box.dataset.kind); const pt=arr[+box.dataset.i]; const v=$("renInput").value.trim(); if(pt&&v){ pt.name=v; pt.autoName=false; } box.hidden=true; updateMap(); };
   $("pinRen").addEventListener("click",e=>{ e.stopPropagation(); renOpen(); });
   $("renSave").addEventListener("click",renSave); $("renCancel").addEventListener("click",()=>$("renBox").hidden=true);
   $("renInput").addEventListener("keydown",e=>{ if(e.key==="Enter") renSave(); if(e.key==="Escape") $("renBox").hidden=true; });
@@ -3184,7 +3398,7 @@ function bindMap(){
   $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
   mapC.tabIndex=0;
   mapC.addEventListener("keydown",e=>{ if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removePin(MP.lastSel||{kind:"rx",i:MP.ai}); MP.lastSel={kind:"rx",i:MP.ai}; } });
-  $("mapReset").addEventListener("click",()=>{ MP.txs=DEFAULT_TXS(); MP.rxs=DEFAULT_RXS(); MP.ti=0; MP.ai=0; MP.nextTx=2; MP.nextRx=4; MP.res.clear(); setMode("add"); MP.view=null; updateMap(); MP.view=defaultView("sites"); drawMap(); });
+  $("mapReset").addEventListener("click",()=>{ if(MP.layer==="mobile"){ MP.txs=DEFAULT_TOWERS(); MP.rxs=DEFAULT_POINTS(); } else { MP.txs=DEFAULT_TXS(); MP.rxs=DEFAULT_RXS(); MP.relays=[]; } MP.ti=0; MP.ai=0; MP.res.clear(); setMode("add"); MP.view=null; updateMap(); MP.view=defaultView("sites"); drawMap(); });
   const zoom=(dz,x,y)=>{ const W=mapC.clientWidth,H=mapC.clientHeight; x=x??W/2; y=y??H/2; const before=unproj(x,y); MP.view.z=clamp(MP.view.z+dz,1,PROVIDERS[TILE.base]&&PROVIDERS[TILE.base].max?PROVIDERS[TILE.base].max:19); const after=unproj(x,y); MP.view.lon=clamp(MP.view.lon+before.lon-after.lon,-180,180); MP.view.lat=clamp(MP.view.lat+before.lat-after.lat,-80,80); drawMap(); };
   $("zoomIn").onclick=()=>zoom(1); $("zoomOut").onclick=()=>zoom(-1); $("fitBtn").onclick=fit;
   $("mapPlay").addEventListener("click",()=>setMapPlaying(!MP.anim.playing)); setMapPlaying(MP.anim.playing);
@@ -3201,12 +3415,11 @@ function bindMap(){
     // remove mode: clicking a pin deletes it
     if(MP.mode==="del"){ const h=hitPin(x,y); if(h) removePin(h); else { const m=$("mapMsg"); m.hidden=false; m.textContent="Click directly on a pin to remove it. (Click to hide)"; } return; }
     // clicking an existing pin selects it (double-click removes it)
-    const hp=hitPin(x,y); if(hp) MP.lastSel=hp; if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
+    const hp=hitPin(x,y); if(hp) MP.lastSel=hp; if(hp&&hp.kind==="relay"){ drawMap(); return; } if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
     let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
     const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(3)}°, ${q.lon.toFixed(3)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180,auto:true};
     if(MP.mode==="me"){ MP.setMe(pt.lat,pt.lon,best?best.c[0]:null); setMode("add"); return; }
-    if(MP.mode==="addtx"&&!best) pt.name=`Transmitter ${MP.nextTx}`;
-    setPoint(MP.mode,pt); if(MP.mode==="tx"||MP.mode==="addtx") setMode("add"); });
+    setPoint(MP.mode,pt); if(MP.mode==="tx"||MP.mode==="addtx"||MP.mode==="addrelay") setMode("add"); });
   // sites table
   const tb=$("sitesTable");
   tb.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const i=+tr.dataset.i;
@@ -3250,9 +3463,7 @@ function bindMap(){
     const pick=list.slice(0,5);
     pick.forEach(t=>MP.txs.push({id:MP.nextTx++,name:`${t.name} (OSM)`,lat:t.lat,lon:t.lon,h:t.h,op:t.op,techs:["2g","3g","4g"],sector:"omni",az:0,tilt:2}));
     MP.ti=MP.txs.length-pick.length; // nearest first
-    // use a 4G model for the station settings, creating one if needed
-    let m=models.find(x=>x.p.type==="cell"); if(!m){ m=mk("4G LTE 1800 · home",{type:"cell",tech:"4g",f:1800,P:1,htx:30,hrx:1.5,env:"suburban"}); models.push(m); refreshAll(); }
-    $("mapModel").value=String(m.id); MP.res.clear(); updateMap();
+    MP.res.clear(); updateMap();
     MP.view=defaultView("path"); MP.view.z=Math.max(MP.view.z,13); drawMap();
     renderMyCoverage(); msg.hidden=false; msg.textContent=`Added ${pick.length} tower${pick.length>1?"s":""} from OpenStreetMap. The nearest is ${fmtD(pick[0].dist)} km away (${pick[0].h} m). Switch towers in "Selected transmitter". (Click to hide)`;
   });
@@ -3269,13 +3480,13 @@ function bindMap(){
 }
 
 /* ===================== REAL CELL NETWORK, TOWER DESIGN, COVERAGE MAP, MY COVERAGE ===================== */
-const TECHS=["2g","3g","4g","5g"];
-const TECH_LABEL={"2g":"2G","3g":"3G","4g":"4G","5g":"5G"};
+const TECHS=["2g","3g","4g","5g","5gmm"];
+const TECH_LABEL={"2g":"2G","3g":"3G","4g":"4G","5g":"5G","5gmm":"mmWave"};
 const RADIO2TECH={GSM:"2g",UMTS:"3g",LTE:"4g",NR:"5g"};
-const TECH_COL={"2g":"#7b8ba3","3g":"#8a5cc7","4g":"#2f6fdf","5g":"#d0368a"};
-const TECH_MAXR={"2g":35,"3g":15,"4g":20,"5g":6};           // search radius (km) around a point
+const TECH_COL={"2g":"#7b8ba3","3g":"#8a5cc7","4g":"#2f6fdf","5g":"#d0368a","5gmm":"#c26a00"};
+const TECH_MAXR={"2g":35,"3g":15,"4g":20,"5g":6,"5gmm":2};           // search radius (km) around a point
 const OPERATORS={"413-1":"Mobitel","413-2":"Dialog","413-3":"Hutch","413-5":"Airtel","413-8":"Hutch"};
-Object.assign(MP,{cells:[],useCells:true,me:null,cov:{tech:"off",env:"urban",indoor:false},covStat:null,covCache:null});
+Object.assign(MP,{cells:[],useCells:true,me:null,cov:{tech:"4g",heat:true,env:"urban",indoor:false,pL:50,lb:{},eirp:{},htx:30},covStat:null,covCache:null});
 
 /* ---------- antenna patterns (3GPP TR 36.814 / ITU-R M.2412 sector model) ---------- */
 function antGain(t,brgDeg,elevDeg){
@@ -3292,7 +3503,8 @@ function towersFor(tech){
   if(MP.useCells) for(const c of MP.cells){ if(RADIO2TECH[c.radio]===tech) list.push({src:"ocid",c,name:`${c.op||"Cell"} ${TECH_LABEL[tech]} · ${c.cid}`,lat:c.lat,lon:c.lon,h:30,sector:"omni",az:0,tilt:2,op:c.op,range:c.range}); }
   return list;
 }
-function cellParams(tech,h){ const T=CELL_TECH[tech]; return {type:"cell",tech,f:T.f,P:T.P,htx:h,hrx:1.5,env:MP.cov.env,indoor:MP.cov.indoor,storm:"none",moisture:"normal"}; }
+/* parameters of one mobile link from the planner settings (standards: P.529/M.2412/P.1812, P.2108, P.2109, location variability) */
+function cellParams(tech,h){ const T=CELL_TECH[tech], e=MP.cov.eirp[tech]; return {type:"cell",tech,f:T.f,P:e!==undefined?Math.pow(10,(e-60)/10):T.P,htx:h,hrx:1.5,env:MP.cov.env,indoor:MP.cov.indoor,pL:MP.cov.pL,lb:MP.cov.lb[tech]||null,calib:MP.cov.calib||0,storm:"none",moisture:"normal",refr:"standard",cellModel:"auto"}; }
 function rxFrom(tw,tech,pt){
   const d=Math.max(hav(tw,pt),0.02), p=cellParams(tech,tw.h);
   const elev=toDeg(Math.atan((tw.h-1.5)/(d*1000)));
@@ -3348,7 +3560,7 @@ function analyseTowerPath(tech,tw){
 /* ---------- coverage heat map (best server) ---------- */
 function covFit(tech,h){ const p=cellParams(tech,h); const e1=cellRxdBm(0.5,p), e2=cellRxdBm(5,p), b=e1-e2; return {a:0,b,eirp:e1+b*Math.log10(0.5),rmax:cellRange(p).r}; }
 function drawCoverage(c,W,H){
-  const tech=MP.cov.tech; MP.covStat=null; if(tech==="off") return;
+  const tech=MP.cov.tech; MP.covStat=null; if(MP.layer!=="mobile"||!MP.cov.heat) return;
   const tl=unproj(0,0), br=unproj(W,H), mid=unproj(W/2,H/2), pad=TECH_MAXR[tech]/111;
   let tws=towersFor(tech).filter(t=>t.lat<tl.lat+pad&&t.lat>br.lat-pad&&t.lon>tl.lon-pad/Math.cos(toRad(mid.lat))&&t.lon<br.lon+pad/Math.cos(toRad(mid.lat)));
   if(tws.length>200){ tws.sort((a,b)=>hav(a,mid)-hav(b,mid)); tws=tws.slice(0,200); }
@@ -3369,7 +3581,7 @@ function drawCellDots(c,W,H){
   if(!MP.useCells||!MP.cells.length) return;
   const tl=unproj(0,0), br=unproj(W,H), r=MP.view.z>=13?4:MP.view.z>=10?3:2; let k=0;
   for(const cl of MP.cells){ if(cl.lat>tl.lat||cl.lat<br.lat||cl.lon<tl.lon||cl.lon>br.lon) continue; const t=RADIO2TECH[cl.radio]; if(!t) continue;
-    if(MP.cov.tech!=="off"&&t!==MP.cov.tech) continue;
+    if(t!==MP.cov.tech) continue;
     const [x,y]=proj(cl.lon,cl.lat); c.fillStyle=TECH_COL[t]; c.strokeStyle="#fff"; c.lineWidth=1; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); if(r>2) c.stroke(); if(++k>6000) break; }
 }
 function drawMe(c){
@@ -3433,9 +3645,10 @@ function bindCells(){
   try{ const k=localStorage.getItem("gwlab-ocid-key"); if(k){ $("ocidKey").value=k; $("ocidRemember").checked=true; } }catch(e){}
   $("ocidApi").addEventListener("click",()=>ocidApiAround(MP.me||MP.rx));
   $("useCells").addEventListener("change",e=>{ MP.useCells=e.target.checked; drawMap(); renderMyCoverage(); });
-  document.querySelectorAll('input[name="covTech"]').forEach(r=>r.addEventListener("change",e=>{ MP.cov.tech=e.target.value; updateMap(); }));
-  $("covEnv").addEventListener("change",e=>{ MP.cov.env=e.target.value; updateMap(); });
-  $("covIndoor").addEventListener("change",e=>{ MP.cov.indoor=e.target.checked; updateMap(); });
+  document.querySelectorAll('input[name="covTech"]').forEach(r=>r.addEventListener("change",e=>{ MP.cov.tech=e.target.value; updateMap(); renderPlanner(); }));
+  $("covHeat").addEventListener("change",e=>{ MP.cov.heat=e.target.checked; drawMap(); });
+  $("covEnv").addEventListener("change",e=>{ MP.cov.env=e.target.value; updateMap(); renderPlanner(); });
+  $("covIndoor").addEventListener("change",e=>{ MP.cov.indoor=e.target.checked; updateMap(); renderPlanner(); });
   const setMe=(lat,lon,name)=>{ MP.me={lat,lon,name:name||"My location",autoName:!name}; autoName(MP.me); renderMyCoverage(); MP.view={lon,lat,z:Math.max(MP.view?MP.view.z:12,13)}; drawMap(); };
   let topLevel=false; try{ topLevel=window.top===window.self; }catch(e){}
   $("setMe").addEventListener("click",()=>{
@@ -3446,6 +3659,100 @@ function bindCells(){
   });
   MP.setMe=setMe;
   $("meTowers").addEventListener("click",()=>{ if(!MP.me) return $("setMe").click(); const old=MP.rx; const tmp={...MP.rx}; $("findTowers").dataset.at="me"; $("findTowers").click(); });
+}
+
+/* ===================== MOBILE PLANNER (single-cell link budget) ===================== */
+function plannerParams(){ return cellParams(MP.cov.tech,MP.cov.htx||30); }
+function renderPlanner(){
+  if(!$("plTiles")) return;
+  const tech=MP.cov.tech, T=CELL_TECH[tech], lb=MP.cov.lb[tech]||{}, p=plannerParams(), TT=techOf(p);
+  const set=(id,v)=>{ const el=$(id); if(document.activeElement!==el) el.value=v; };
+  set("plH1",MP.cov.htx||30); set("plEirp",Math.round(dBm(p.P))); set("plEdge",TT.thr); set("plUl",TT.ul); set("plOff",TT.off); set("plPL",String(MP.cov.pL||50));
+  $("plMeas").textContent=T.meas; $("plBw").textContent=`${T.sys} · ${T.bw} · phone ${T.ueP} dBm`;
+  const cr=cellRange(p), rr=T.real[MP.cov.env==="industrial"?"urban":MP.cov.env]||T.real.urban, c1=cellLevel(1,p), q=cellVerdict(c1,tech);
+  const km=v=>v<1?`${Math.round(v*1000)} m`:`${fmtD(v)} km`;
+  const tiles=[
+    {k:"Single-cell radius",v:km(cr.r),s:`downlink ${km(cr.dl)} · uplink ${km(cr.ul)} · ${cr.lim}-limited${cr.ta?" · GSM timing advance 35 km":""}`,c:"info"},
+    {k:"Typical design radius",v:`${rr[0]}–${rr[1]} km`,s:`operator practice · ${MP.cov.env}`,c:"info"},
+    {k:`${T.meas} at 1 km`,v:`${c1.ref.toFixed(0)} dBm`,s:`${q[0]} · uplink margin ${c1.ulm.toFixed(0)} dB`,c:q[1]},
+    {k:"Radio horizon",v:km(cellHorizon(p)),s:`tower ${p.htx} m · phone 1.5 m`,c:"info"},
+    {k:"Method",v:p.f>2200?"M.2412 UMa":"P.529 Hata",s:`${p.f>2200?"≤ 5 km":"≤ 100 km"}, then P.1812 + P.2108${MP.cov.indoor?" · P.2109 indoor":""} · ${pLoc(p)}% locations`,c:"info"}];
+  $("plTiles").innerHTML=tiles.map(t=>`<div class="tile ${t.c}"><span class="k">${t.k}</span><span class="val">${t.v}</span><span class="sub">${t.s}</span></div>`).join("");
+  drawPlanner(p,TT,cr);
+}
+function drawPlanner(p,TT,cr){
+  const cv=$("plChart"), W=cv.clientWidth, H=cv.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const dmax=Math.max(1,Math.min(50,cr.r*3||5)), dmin=0.05, L=58,R=12,Tp=10,B=34,w=W-L-R,h=H-Tp-B, ymin=-140, ymax=-40;
+  const xs=d=>L+Math.log10(d/dmin)/Math.log10(dmax/dmin)*w, ys=v=>Tp+(ymax-clamp(v,ymin-10,ymax+10))/(ymax-ymin)*h;
+  const muted=cssVar("--muted"), line=cssVar("--line"); c.font="11px "+cssVar("--font-mono"); c.strokeStyle=line; c.fillStyle=muted; c.lineWidth=1;
+  c.textAlign="right"; c.textBaseline="middle"; for(let v=ymin;v<=ymax;v+=20){ c.beginPath(); c.moveTo(L,ys(v)); c.lineTo(L+w,ys(v)); c.stroke(); c.fillText(v+" dBm",L-5,ys(v)); }
+  c.textAlign="center"; c.textBaseline="top"; for(const d of [0.05,0.1,0.2,0.5,1,2,5,10,20,50].filter(d=>d<=dmax)){ c.beginPath(); c.moveTo(xs(d),Tp); c.lineTo(xs(d),Tp+h); c.stroke(); c.fillText(d<1?d*1000+" m":d+" km",xs(d),Tp+h+5); }
+  c.fillText("Distance from the tower",L+w/2,Tp+h+19);
+  const pts=[]; for(let i=0;i<=160;i++){ const d=dmin*Math.pow(dmax/dmin,i/160); pts.push([d,cellLevel(d,p)]); }
+  const col=TECH_COL[p.tech]||"#2f6fdf";
+  const plot=(key,dash,alpha,lw)=>{ c.setLineDash(dash); c.strokeStyle=hexA(col,alpha); c.lineWidth=lw; c.beginPath(); pts.forEach(([d,l],i)=>{ const x=xs(d),y=ys(l[key]); i?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke(); c.setLineDash([]); };
+  plot("ref",[5,4],0.6,1.6); plot("eff",[],1,2.6);
+  c.setLineDash([4,4]); c.strokeStyle=cssVar("--bad"); c.lineWidth=1.2; c.beginPath(); c.moveTo(L,ys(TT.thr)); c.lineTo(L+w,ys(TT.thr)); c.stroke(); c.setLineDash([]);
+  c.fillStyle=cssVar("--bad"); c.textAlign="right"; c.textBaseline="bottom"; c.font="600 11px "+cssVar("--font-body"); c.fillText(`cell edge ${TT.thr} dBm`,L+w-4,ys(TT.thr)-2);
+  if(cr.r>dmin&&cr.r<dmax){ const x=xs(cr.r); c.strokeStyle=cssVar("--ink"); c.beginPath(); c.moveTo(x,Tp); c.lineTo(x,Tp+h); c.stroke(); c.fillStyle=cssVar("--ink"); c.textAlign="left"; c.textBaseline="top"; c.fillText(`cell radius ${cr.r<1?Math.round(cr.r*1000)+" m":fmtD(cr.r)+" km"}`,x+4,Tp+2); }
+  c.font="11px "+cssVar("--font-body"); c.fillStyle=muted; c.textAlign="left"; c.textBaseline="bottom"; c.fillText(`— ${CELL_TECH[p.tech].meas} (solid: limited by the uplink, dashed: downlink only)`,L+6,Tp+h-4);
+}
+function bindPlanner(){
+  const lb=()=>MP.cov.lb[MP.cov.tech]||(MP.cov.lb[MP.cov.tech]={});
+  const upd=()=>{ MP.res.clear(); renderPlanner(); updateMap(); };
+  $("plH1").addEventListener("change",e=>{ MP.cov.htx=clamp(+e.target.value||30,5,300); upd(); });
+  $("plEirp").addEventListener("change",e=>{ MP.cov.eirp[MP.cov.tech]=clamp(+e.target.value||60,20,90); upd(); });
+  $("plEdge").addEventListener("change",e=>{ lb().thr=clamp(+e.target.value||-110,-140,-60); upd(); });
+  $("plUl").addEventListener("change",e=>{ lb().ul=clamp(+e.target.value||140,100,180); upd(); });
+  $("plOff").addEventListener("change",e=>{ lb().off=clamp(+e.target.value||0,0,45); upd(); });
+  $("plPL").addEventListener("change",e=>{ MP.cov.pL=+e.target.value; upd(); });
+  $("plReset").addEventListener("click",()=>{ delete MP.cov.lb[MP.cov.tech]; delete MP.cov.eirp[MP.cov.tech]; upd(); });
+  $("plCalc").addEventListener("click",()=>{ $("mxModel").value="mob"; $("mxD").dataset.d=Math.max(0.1,cellRange(plannerParams()).r||1); go("methods"); });
+  new ResizeObserver(()=>{ if(currentTab==="mobile") renderPlanner(); }).observe($("plChart"));
+}
+
+/* ===================== SAVE & SHARE ===================== */
+const STATE_KEY="gwlab-state-v2";
+function stateObj(){ const strip=L=>({txs:L.txs.map(t=>({...t,T:undefined})),rxs:L.rxs.map(r=>({...r})),ti:L.ti,ai:L.ai,relays:(L.relays||[]).map(r=>({...r,T:undefined}))});
+  return {v:2,S:{bcast:strip(MP.S.bcast),mobile:strip(MP.S.mobile)},cov:MP.cov,benv:MP.benv,nextTx:MP.nextTx,nextRx:MP.nextRx,nextRel:MP.nextRel}; }
+let saveTimer=null;
+function saveState(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ try{ localStorage.setItem(STATE_KEY,JSON.stringify(stateObj())); }catch(e){} },400); }
+function applyState(o){ if(!o||o.v!==2) return false;
+  for(const k of ["bcast","mobile"]){ const s=o.S&&o.S[k]; if(s&&s.txs&&s.txs.length&&s.rxs&&s.rxs.length){ MP.S[k]={txs:s.txs,rxs:s.rxs,ti:clamp(s.ti|0,0,s.txs.length-1),ai:clamp(s.ai|0,0,s.rxs.length-1),relays:s.relays||[]}; } }
+  if(o.cov) MP.cov=Object.assign(MP.cov,o.cov,{lb:o.cov.lb||{},eirp:o.cov.eirp||{}}); if(o.benv) MP.benv=o.benv;
+  MP.nextTx=Math.max(MP.nextTx,o.nextTx||0); MP.nextRx=Math.max(MP.nextRx,o.nextRx||0); MP.nextRel=Math.max(MP.nextRel,o.nextRel||0); return true; }
+const b64u={enc:s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""), dec:s=>decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))))};
+function loadState(){
+  let done=false;
+  try{ const u=new URL(location.href), s=u.searchParams.get("s"); if(s){ done=applyState(JSON.parse(b64u.dec(s))); u.searchParams.delete("s"); history.replaceState(null,"",u.pathname+u.search+u.hash); } }catch(e){}
+  if(!done){ try{ const j=localStorage.getItem(STATE_KEY); if(j) done=applyState(JSON.parse(j)); }catch(e){} }
+  // reflect in controls
+  const r=document.querySelector(`input[name="covTech"][value="${MP.cov.tech}"]`); if(r) r.checked=true;
+  $("covEnv").value=MP.cov.env; $("covIndoor").checked=!!MP.cov.indoor; $("covHeat").checked=MP.cov.heat!==false; $("mapEnv").value=MP.benv;
+  return done;
+}
+function shareLink(){ const u=new URL(location.href); u.hash=currentTab==="mobile"?"mobile":"map"; u.searchParams.set("s",b64u.enc(JSON.stringify(stateObj()))); return u.toString(); }
+function bindShare(){ $("shareBtn").addEventListener("click",async()=>{ const b=$("shareBtn"), link=shareLink();
+  try{ await navigator.clipboard.writeText(link); b.textContent="✓ Link copied"; }catch(e){ prompt("Copy this link:",link); } setTimeout(()=>b.textContent="🔗 Share link",1800); }); }
+
+/* ===================== LIVE SPACE WEATHER (NOAA SWPC, GOES 0.1–0.8 nm X-ray flux) ===================== */
+function fluxClass(F){ const c=F>=1e-4?"X":F>=1e-5?"M":F>=1e-6?"C":F>=1e-7?"B":"A", base={X:1e-4,M:1e-5,C:1e-6,B:1e-7,A:1e-8}[c]; return c+(F/base).toFixed(1); }
+function fluxToR(F){ return F>=2e-3?5:F>=1e-3?4:F>=1e-4?3:F>=5e-5?2:F>=1e-5?1:0; }
+async function liveFlare(){
+  const msg=$("liveMsg"); msg.textContent="Asking NOAA SWPC…";
+  try{ const r=await fetch("https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json",{cache:"no-store"}); const j=await r.json();
+    const long=j.filter(x=>x.energy==="0.1-0.8nm"&&x.flux>0); const last=long[long.length-1]; if(!last) throw new Error("no data");
+    const R=fluxToR(last.flux), m=sel(); m.p.flareR=R; m.p.flareFlux=last.flux; m.p.flare=false;
+    msg.textContent=`NOAA GOES now: ${fluxClass(last.flux)} (${last.flux.toExponential(1)} W/m², ${last.time_tag.replace("T"," ").replace("Z"," UTC")}) → ${R?FLARE[R].name:"no radio blackout (below R1)"}. Applied to “${m.name}”.`;
+    syncControls(); redraw();
+  }catch(e){ msg.textContent="NOAA's live feed couldn't be reached from this page (offline or blocked). Choose a level by hand."; }
+}
+
+/* ===================== PRINT REPORT ===================== */
+function printReport(){
+  const m=$("mxModel").value==="mob"?{name:"Mobile planner",p:plannerParams()}:(models.find(x=>String(x.id)===$("mxModel").value)||sel());
+  $("rptHead").innerHTML=`<h1>Groundwave Propagation Lab · calculation report</h1><p>${esc(m.name)} · ${esc(methodOf(m.p))}</p><p>Distance ${$("mxDv").textContent} · ${fmtF(m.p.f)} · ${fmtP(m.p.P)} · printed ${new Date().toLocaleString()}</p>`;
+  document.body.classList.add("print-report"); setTimeout(()=>{ window.print(); setTimeout(()=>document.body.classList.remove("print-report"),500); },50);
 }
 
 /* ===================== MODELS & EQUATIONS · VERIFICATION · MEASURED DATA ===================== */
@@ -3703,7 +4010,7 @@ function parseMeas(txt,unit){ const out=[];
   for(const line of txt.split(/\r?\n/)){ const t=line.trim(); if(!t||/^[#a-z]/i.test(t)) continue; const c=t.split(/[,;\t ]+/).map(Number); if(c.length<2||!isFinite(c[0])||!isFinite(c[1])||c[0]<=0) continue; out.push({d:c[0],v:c[1]}); }
   return out; }
 function runCompare(){
-  const m=models.find(x=>String(x.id)===$("mxModel").value)||sel(); const p=m.p, unit=$("cmpUnit").value, io=iono(p);
+  const mob=$("mxModel").value==="mob", m=mob?{id:"mob",name:"Mobile planner",p:plannerParams()}:(models.find(x=>String(x.id)===$("mxModel").value)||sel()); const p=Object.assign({},m.p,{calib:0}), unit=$("cmpUnit").value, io=iono(p);
   const pts=parseMeas($("cmpData").value,unit);
   if(!pts.length){ $("cmpOut").innerHTML=`<p class="hint">Paste at least one row: distance (km), value.</p>`; MEAS.pts=[]; redraw(); return; }
   const toDB=v=>unit==="mv"?dBuV(v):unit==="dbm"?dBm2dBuV(v,p.f):v;
@@ -3718,15 +4025,18 @@ function runCompare(){
     <div class="tile info"><span class="k">RMS error</span><span class="val">${rms.toFixed(1)} ${u}</span><span class="sub">max |error| ${mx.toFixed(1)} ${u}</span></div>
     <div class="tile ${verdict[0]}"><span class="k">Verdict</span><span class="val" style="font-size:16px">${verdict[1]}</span><span class="sub">ITU-R P.1148-style statistics</span></div></div>
     <div class="tablewrap"><table class="fs mxsteps"><tr><th>Distance</th><th>Measured</th><th>Predicted</th><th>Error</th></tr>${rows.map(r=>`<tr><td class="mono">${fmtD(r.d)} km</td><td class="mono">${r.meas.toFixed(1)} dBµV/m</td><td class="mono">${r.pr===null?"—":r.pr.toFixed(1)+" dBµV/m"}</td><td class="mono">${isFinite(r.e)?(r.e>=0?"+":"")+r.e.toFixed(1)+" dB":"—"}</td></tr>`).join("")}</table></div>
-    <p class="hint">The points are also drawn on the Lab chart. A median model is usually judged good when the bias is within ±3 dB and the standard deviation is below 6–9 dB.</p>`;
+    <div class="row" style="margin-top:8px"><button class="btn primary sm" id="cmpCal" type="button">Calibrate: apply ${(-mean>=0?"+":"")+(-mean).toFixed(1)} dB to “${esc(m.name)}”</button><button class="btn sm" id="cmpUncal" type="button">Remove calibration</button><span class="hint">Current offset: ${((mob?MP.cov.calib:m.p.calib)||0).toFixed(1)} dB</span></div>
+    <p class="hint">Calibration removes the measured bias (a single offset, the usual first step of model tuning). The spread (σ) stays: it is the location variability the model already allows for. The points are also drawn on the Lab chart.</p>`;
+  $("cmpCal").onclick=()=>{ if(mob){ MP.cov.calib=-mean; MP.res.clear(); renderPlanner(); } else { m.p.calib=-mean; } redraw(); runCompare(); };
+  $("cmpUncal").onclick=()=>{ if(mob){ MP.cov.calib=0; MP.res.clear(); renderPlanner(); } else { m.p.calib=0; } redraw(); runCompare(); };
   redraw();
 }
 const CMP_SAMPLE="# distance_km, field (dBµV/m)\n# example: reference values you read from an ITU-R P.368 curve or your own drive test\n10, 67\n25, 56\n50, 47\n100, 37\n200, 24";
 
 function renderMethods(){
   const sel2=$("mxModel"); if(!sel2) return;
-  const v=sel2.value; sel2.innerHTML=models.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join(""); if(models.some(m=>String(m.id)===v)) sel2.value=v; else sel2.value=String(selId);
-  const m=models.find(x=>String(x.id)===sel2.value)||sel(); const p=m.p;
+  const v=sel2.value; sel2.innerHTML=models.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join("")+`<option value="mob">📶 Mobile planner (${TECH_LABEL[MP.cov.tech]}, current settings)</option>`; if(v==="mob"||models.some(m=>String(m.id)===v)) sel2.value=v; else sel2.value=String(selId);
+  const m=sel2.value==="mob"?{name:"Mobile planner",p:plannerParams()}:(models.find(x=>String(x.id)===sel2.value)||sel()); const p=m.p;
   const dmax=p.type==="cell"?300:3000, dmin=p.type==="cell"?0.05:1;
   const s=$("mxD"); s.dataset.min=dmin; s.dataset.max=dmax;
   let d=+s.dataset.d||(p.rxDist||(p.type==="cell"?2:100)); d=clamp(d,dmin,dmax); s.dataset.d=d; s.value=Math.log10(d/dmin)/Math.log10(dmax/dmin)*1000;
@@ -3743,7 +4053,7 @@ function bindMethods(){
   $("mxD").addEventListener("input",e=>{ const s=e.target, lo=+s.dataset.min, hi=+s.dataset.max; s.dataset.d=lo*Math.pow(hi/lo,+s.value/1000); renderMethods(); });
   $("mxCopy").addEventListener("click",async()=>{ const rows=[...$("mxSteps").querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>td.textContent).join("\t")).join("\n"); try{ await navigator.clipboard.writeText($("mxMethod").textContent+"\n"+rows); $("mxCopy").textContent="Copied ✓"; }catch(e){ $("mxCopy").textContent="Copy blocked"; } setTimeout(()=>$("mxCopy").textContent="Copy steps",1600); });
   $("mxRunVer").addEventListener("click",renderVerify);
-  $("cmpData").value=CMP_SAMPLE;
+  $("cmpData").value=CMP_SAMPLE; $("mxPrint").addEventListener("click",printReport);
   $("cmpRun").addEventListener("click",runCompare);
   $("cmpClear").addEventListener("click",()=>{ MEAS.pts=[]; $("cmpOut").innerHTML=""; redraw(); });
   document.addEventListener("click",e=>{ const b=e.target.closest("[data-show-calc]"); if(!b) return; $("mxModel").value=String(selId); const m=sel(); const A=analyse(m); $("mxD").dataset.d=m.p.rxDist||(A.r&&A.r<3000?A.r:(m.p.type==="cell"?2:100)); go("methods"); });
@@ -3838,15 +4148,17 @@ function bindQuiz(){ const topics=[...new Set(QUIZ.map(q=>q.topic))]; $("qTopic"
   $("qMode").addEventListener("change",renderQuiz); $("qTopic").addEventListener("change",renderQuiz); $("qSubmit").addEventListener("click",submitQuiz); $("qExport").addEventListener("click",exportQuiz); $("qPrint").addEventListener("click",()=>window.print()); }
 
 /* ================= TABS ================= */
-const TABS=["lab","animation","map","terrain","methods","learn","quiz"];
+const TABS=["lab","animation","map","terrain","mobile","methods","learn","quiz"];
 let currentTab="lab";
 function go(t,noHash){
   if(!TABS.includes(t)) t="lab"; currentTab=t;
   document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
-  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz";
+  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz"; $("mobile-tab").hidden=t!=="mobile";
   if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
   if(t==="lab") redraw();
-  if(t==="map"||t==="terrain") updateMap();
+  if(t==="map"||t==="terrain") setLayer("bcast");
+  if(t==="mobile"){ setLayer("mobile"); renderPlanner(); }
+  if(t==="map"||t==="terrain"||t==="mobile") updateMap();
   if(t==="animation"){ syncRx(); }
   if(t==="methods") renderMethods();
   document.querySelectorAll(".bnav a").forEach(a=>a.setAttribute("aria-current",a.dataset.tab===t?"page":"false"));
@@ -3897,13 +4209,14 @@ function bindHelp(){
 
 /* ================= INIT ================= */
 function init(){
-  fillGroundSelects(); bindLab(); bindAnim(); bindMap(); bindCells(); bindMethods(); bindBottomNav(); bindTabs(); bindQuiz(); renderQuiz();
+  fillGroundSelects(); bindLab(); bindAnim(); loadState(); bindMap(); bindCells(); bindPlanner(); bindShare(); bindMethods(); bindBottomNav(); bindTabs(); bindQuiz(); renderQuiz();
+  document.addEventListener("click",e=>{ const g=e.target.closest("[data-goto]"); if(g) go(g.dataset.goto); });
   $("quizReset").addEventListener("click",renderQuiz);
   loadPreset(0);
   go(location.hash.slice(1)||"lab",true);
   bindTheme();
   bindHelp();
-  new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map"||currentTab==="terrain") { drawMap(); renderActive(); } }).observe(document.body);
+  new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map"||currentTab==="terrain"||currentTab==="mobile") { drawMap(); renderActive(); } }).observe(document.body);
   const mo=new MutationObserver(()=>{ if(currentTab==="lab") redraw(); }); mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
   requestAnimationFrame(animTick);
   loadLand();

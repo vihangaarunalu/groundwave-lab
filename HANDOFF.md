@@ -99,3 +99,32 @@ The bottom nav exists because phone users hold the device one-handed and seven t
 - **Focus order on Models:** Copy steps → Model → Distance → library cards (each summary is focusable, and Enter/Space toggles it).
 - **Touch targets:** at least 44 × 44 px on phones.
 - **Contrast:** body text and `--muted` meet 4.5:1 on `--panel` in both themes.
+
+---
+
+## v3.0 additions
+
+### Information architecture
+| Tab | Purpose |
+|---|---|
+| Lab · Animation · Map · Terrain | Ground wave, sky wave and VHF/UHF **broadcasting** (no mobile models here) |
+| **Mobile** (new) | 2G–5G planning: towers, test points, link budget, coverage heat map, My coverage, OpenCelliD |
+| Models | Equations, step-by-step calculation (incl. "Mobile planner"), verification tests, measured-data comparison with **Calibrate**, **Print / PDF report** |
+
+The Map and Mobile tabs share one map component (`#mapCore`), moved into `#mapSlot` or `#mobMapSlot`. Each layer keeps its own state (`MP.S.bcast`, `MP.S.mobile`). Elements marked `.bcast-only` or `.mob-only` show only in their layer (`body[data-layer]`).
+
+### New components
+| Component | Behaviour | Notes |
+|---|---|---|
+| Place search (`#mapSearch`) | Nominatim forward search (6 results, biased to the current view), list of places → action bar | Actions: + Transmitter / + Relay / + Receiver here (broadcast), + Tower / + Test point / This is me (mobile). Esc closes the list |
+| Map toolbar (`.toolrow`) | Segmented actions with icons and a live hint line (`#modeHint`) | 40–44 px targets; the cursor is a crosshair while placing |
+| Relay table (`#relayTable`) | Name, source TX, feed distance, input field and needed level, status pill (Fed / Weak input / Not fed), mast, ERP, output frequency, delete | A dashed feed line on the map: green = fed, amber = weak, red = not fed |
+| Best-server table (`.srvtab`) | Every transmitter, relay or tower with its level and result; ★ marks the serving one | Ranking by margin (field − minimum, or the mobile link margin) |
+| Planner (`.planner`) | Tower height, EIRP, cell edge, uplink MAPL, total→reference offset, % locations; tiles and a reference-level chart | "Reset to typical values" removes the overrides |
+| Share link (`#shareBtn`) | Copies `?s=<base64url state>`; autosave to `localStorage` key `gwlab-state-v2` | — |
+| Live NOAA (`#liveFlare`) | GOES 0.1–0.8 nm flux → class and R-level, applied to the selected model | Fails gracefully offline |
+
+### Standards used
+- **Propagation:** ITU-R P.368, P.1147, P.1812, P.526, P.2108, P.2109, P.838, P.529, M.2412; reception levels from BS.703, BS.412 and BT.417.
+- **Relay feed:** input ≥ minimum usable field + 10 dB (planning practice for off-air pick-up).
+- **UI:** WCAG 2.1 AA (focus rings, 44 px targets on phones, labelled controls, `aria-live` hints, reduced motion).
