@@ -709,6 +709,9 @@ input[type=range]{min-height:28px}
 .aimrow input[type=number]{min-height:34px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:2px 6px;font:inherit;background:var(--panel);color:var(--ink);width:100%}
 .aimrow input[type=range]{min-height:26px}
 @media (max-width:760px), (pointer:coarse){ .aimrow input[type=number]{min-height:44px} .aimrow{grid-template-columns:76px minmax(0,1fr) 68px auto} }
+.aimrow{grid-template-columns:98px minmax(0,1fr) 62px auto}
+.aimrow label{line-height:1.25}
+@media (max-width:760px), (pointer:coarse){ .aimrow{grid-template-columns:86px minmax(0,1fr) 68px auto} }
 
 </style>
 </head>
@@ -1485,7 +1488,7 @@ input[type=range]{min-height:28px}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v3.4</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v3.5</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4152,7 +4155,7 @@ function beamsOf(sel){
   if(MP.layer==="mobile"){ if((st.sector||"omni")==="omni") return [];
     return sectorAzs(st).map((az,k)=>({az,label:"S"+(k+1),name:`Sector ${k+1}`,set:v=>setSectorAz(st,k,v),col:TECH_COL[MP.cov.tech]||"#2f6fdf"})); }
   const a=st.ant; if(!a||a.az===undefined) return [];
-  return [{az:((a.az%360)+360)%360,label:"↻",name:ANT_TYPES[a.type]?ANT_TYPES[a.type].name:"Beam",set:v=>{ a.az=((Math.round(v)%360)+360)%360; },col:sel.kind==="relay"?"#1d8a8a":"#d13b4f"}];
+  return [{az:((a.az%360)+360)%360,label:"↻",name:"Beam direction",set:v=>{ a.az=((Math.round(v)%360)+360)%360; },col:sel.kind==="relay"?"#1d8a8a":"#d13b4f"}];
 }
 function selStation(){ const s=MP.lastSel&&MP.lastSel.kind!=="rx"?MP.lastSel:{kind:"tx",i:MP.ti}; return stationOf(s)?s:null; }
 function drawBeamHandles(c,W,H){
@@ -4208,7 +4211,9 @@ function renderAimBox(valuesOnly){
   const rows=bs.length?bs.map((b,k)=>`<div class="aimrow"><label for="bz${k}">${esc(b.name)}</label>
       <input type="range" id="bz${k}" data-bz="${k}" min="0" max="359" step="1" value="${Math.round(b.az)}" aria-label="${esc(b.name)} azimuth in degrees from north">
       <input type="number" data-bn="${k}" min="0" max="359" step="1" value="${Math.round(b.az)}" aria-label="${esc(b.name)} azimuth value"><span>°</span></div>`).join("")
-    : `<p class="hint">This antenna radiates the same in every direction, so there is nothing to aim. Choose a directional antenna (${mob?"3 sectors":"array of masts, panel array or Yagi"}) in the panel.</p>`;
+    : (()=>{ const dir=mob?[["3sector","3 sectors"]]:types.filter(([k])=>antDefault(k).az!==undefined).map(([k])=>[k,ANT_TYPES[k].name.replace(/\s*\(.*\)$/,"")]);
+        return `<p class="hint">This antenna sends the same signal all round, so there is no beam to aim.${dir.length?` Pick a directional type above: ${dir.map(d=>esc(d[1])).join(" or ")}.`:""}</p>`+
+          (dir.length?`<div class="row">${dir.map(d=>`<button class="btn sm primary" type="button" data-mkdir="${d[0]}">Use ${esc(d[1].toLowerCase())}</button>`).join("")}</div>`:""); })();
   box.innerHTML=`<div class="aimhead"><b>🧭 Aim ${esc(st.name)}</b><button class="iconbtn" id="aimClose" type="button" aria-label="Close aiming" data-tip="Close aiming">✕</button></div>
     ${typeSel}
     ${rows}
@@ -4224,6 +4229,9 @@ function renderAimBox(valuesOnly){
   const retype=()=>{ MP.res.clear(); box.dataset.key=""; renderAimBox(true); drawMap(); renderTxTable(); renderActive(); updateMap(); if(mob) renderPlanner(); if(!$("auiPanel").hidden) renderAui(); };
   if($("aimType")) $("aimType").addEventListener("change",e=>{ st.ant=antDefault(e.target.value); if(st.ant.az!==undefined&&MP.rxs[MP.ai]) st.ant.az=Math.round(bearing(st,MP.rxs[MP.ai])); retype(); });
   if($("aimSec")) $("aimSec").addEventListener("change",e=>{ st.sector=e.target.value; retype(); });
+  box.querySelectorAll("[data-mkdir]").forEach(bt=>bt.addEventListener("click",()=>{ const k=bt.dataset.mkdir;
+    if(k==="3sector") st.sector="3sector"; else { st.ant=antDefault(k); if(MP.rxs[MP.ai]) st.ant.az=Math.round(bearing(st,MP.rxs[MP.ai])); }
+    BEAM.lastK=0; retype(); }));
   const tr=$("aimTilt"), tn=$("aimTiltN");
   if(tr) { const putT=v=>{ v=+v; if(mob) st.tilt=v; else st.ant[tiltP.k]=v; tr.value=v; tn.value=v; live(false); };
     tr.addEventListener("input",e=>putT(e.target.value)); tn.addEventListener("input",e=>putT(e.target.value)); }
