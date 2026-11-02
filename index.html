@@ -582,6 +582,32 @@ body:not([data-layer="mobile"]) .mob-only{display:none!important}
 @media (min-width:761px) and (max-width:1180px){ .brand small{display:none} }
 .panel.card > *, #mapCore > *, .bcast-only, .mob-only{min-width:0}
 
+/* ===== full-screen map with details panel ===== */
+#mapCore.fs{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;grid-template-columns:minmax(0,1fr) min(460px,38vw);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"tools panel" "map panel";gap:10px;padding:10px;overflow:hidden}
+#mapCore.fs:fullscreen{width:100vw;height:100vh}
+#mapCore.fs > .maptools{grid-area:tools;margin:0}
+#mapCore.fs > .mapbox{grid-area:map;height:100%;min-height:0}
+#mapCore.fs > .mapbox #map{height:100%!important}
+#mapCore.fs > .fspanel{grid-area:panel;display:flex;flex-direction:column;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-1)}
+#mapCore.fs > :not(.maptools):not(.mapbox):not(.fspanel){display:none}
+.fspanel[hidden]{display:none!important}
+.fshead{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.fstabs{display:flex;gap:4px;flex-wrap:wrap}
+.fstabs button{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-weight:600;font-size:13px;padding:8px 12px;border-radius:999px;cursor:pointer;min-height:40px}
+.fstabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.fsbody{overflow:auto;padding:10px;display:grid;gap:10px;align-content:start}
+.fsbody .mapresult{grid-template-columns:1fr}
+.fsbody .panel{box-shadow:none}
+.fsbody #terrain{height:260px}
+.fsbtn{font-size:18px}
+.obline{margin:6px 0 0;padding:8px 10px;border-radius:var(--radius-sm);background:color-mix(in srgb,var(--bad) 10%,transparent);border:1px solid color-mix(in srgb,var(--bad) 35%,var(--line));font-size:13.5px}
+body.map-fs{overflow:hidden}
+@media (max-width:900px){
+  #mapCore.fs{grid-template-columns:1fr;grid-template-rows:auto minmax(260px,52vh) minmax(0,1fr);grid-template-areas:"tools" "map" "panel";overflow:hidden}
+  #mapCore.fs .maptools .modehint{display:none}
+}
+@media (max-width:900px){ #mapCore.fs #gpsBtn,#mapCore.fs .toolsave,#mapCore.fs #findTowers{display:none} #mapCore.fs .toolrow .mapseg label{min-height:36px;padding:6px 10px;font-size:13px} #mapCore.fs .mapsearch input{min-height:40px} }
+
 </style>
 </head>
 <body>
@@ -953,6 +979,14 @@ body:not([data-layer="mobile"]) .mob-only{display:none!important}
 
 <div id="mapSlot">
 <div id="mapCore">
+  <aside class="fspanel" id="fsPanel" hidden aria-label="Map details">
+    <div class="fshead"><div class="fstabs" role="tablist" aria-label="Details shown beside the map">
+      <button role="tab" type="button" data-fs="pred" aria-selected="true">Prediction</button>
+      <button role="tab" type="button" data-fs="terr" aria-selected="false">Terrain</button>
+      <button role="tab" type="button" data-fs="sites" aria-selected="false" id="fsSitesTab">Sites &amp; relays</button>
+    </div><button class="btn sm" id="mapFsExit" type="button">✕ Exit full screen</button></div>
+    <div class="fsbody" id="fsBody"></div>
+  </aside>
   <div class="maptools">
     <form class="mapsearch" id="mapSearch" role="search">
       <input type="search" id="mapQ" placeholder="Search a place, e.g. Kandy, Galle Face, University of Peradeniya" aria-label="Search a place on the map" autocomplete="off">
@@ -979,6 +1013,7 @@ body:not([data-layer="mobile"]) .mob-only{display:none!important}
   <div class="mapbox">
     <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
     <div class="map-tr">
+      <button class="iconbtn mapbtn fsbtn" id="mapFs" type="button" aria-label="Full screen map" title="Full screen (F)">⛶</button>
       <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in">＋</button>
       <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out">－</button>
       <button class="iconbtn mapbtn" id="zoomRx" type="button" aria-label="Zoom to the selected receiver (street level)" title="Zoom to the selected receiver">⌖</button>
@@ -1007,14 +1042,14 @@ body:not([data-layer="mobile"]) .mob-only{display:none!important}
   <div class="legend maplegend"><span><i style="border-top:4px solid #9a6b12;width:18px"></i>Path over land</span><span><i style="border-top:4px solid #1f57b8;width:18px"></i>over sea</span><span><i style="border-top:4px dotted #d6302a;width:18px"></i>Line of sight blocked by terrain</span><span>▲ Named peak</span><span style="color:#d6302a">✕ Main obstacle</span><span class="bcast-only" style="color:#1d8a8a">🔁 Relay (dashed = feed from main transmitter)</span><span>■ Buildings (zoom in)</span></div>
   <p class="hint">Search a place or pick an action above, then click the map. Click a pin to select it; right-click or double-click removes it. Drag to pan, scroll or pinch to zoom. Your scenario is saved automatically on this device.</p>
 
-  <div class="mapresult">
+  <div class="mapresult" id="mapResult">
     <section class="panel card verdict" aria-live="polite" id="mapVerdict"></section>
     <section class="panel card">
       <div class="tiles" id="mapTiles"></div>
     </section>
   </div>
 
-  <section class="panel card">
+  <section class="panel card" id="sitesCard">
     <div class="chart-head"><h2 id="txTblH">Transmitters</h2></div>
     <div class="tablewrap"><table class="fs sites txtbl" id="txTable"></table></div>
     <div class="bcast-only">
@@ -1103,7 +1138,7 @@ body:not([data-layer="mobile"]) .mob-only{display:none!important}
       <div class="tsum" id="tSum" aria-live="polite"></div>
     </div>
   </section>
-  <section class="panel card">
+  <section class="panel card" id="terrCard">
     <div class="chart-head"><h2>Terrain profile: <span id="profName" class="muted"></span></h2>
       <div class="row"><span class="legend"><span><i style="border-top:8px solid rgba(40,50,70,.9);width:6px"></i>Building (OSM)</span><span>▲ Named peak</span><span style="color:#c2413a">▼ Main obstacle</span></span><label class="check"><input type="checkbox" id="showBulge"> Show earth curvature</label></div></div>
     <canvas id="terrain" aria-label="Terrain height along the path"></canvas>
@@ -1327,7 +1362,7 @@ body:not([data-layer="mobile"]) .mob-only{display:none!important}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v3.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v3.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -2823,7 +2858,7 @@ async function fetchOSMFeatures(P,rx){
       const {at,xt}=alongTrack(MP.tx,rx,{lat,lon}); if(at<0||at>D) continue;
       const t=el.tags||{};
       if(t.natural==="peak"){ res.peaks.push({dm:at*1000,xt,lat,lon,name:t.name||t["name:en"]||"Peak",ele:parseFloat(t.ele)}); }
-      else if(t.building){ const bh=buildingHeight(t); res.buildings.push({dm:at*1000,lat,lon,h:bh.h,est:bh.est,name:t.name||""}); }
+      else if(t.building){ const bh=buildingHeight(t); res.buildings.push({dm:at*1000,lat,lon,h:bh.h,est:bh.est,name:t.name||t["name:en"]||"",type:t.building,levels:t["building:levels"]||"",addr:t["addr:street"]||""}); }
     }
     OSMF.ok=true; OSMF.cache.set(key,res); return res;
   }catch(e){ return null; }
@@ -2841,6 +2876,22 @@ async function terrainFor(P,rx,onTerrain){
   if(osm&&T.ob&&T.ob.kind==="terrain"){ let bp=null; for(const pk of osm.peaks){ const dd=Math.abs(pk.dm-T.ob.dm); if(dd<5000&&(!bp||dd<bp.dd)) bp={dd,pk}; } if(bp) T.peakName=bp.pk.name; }
   return T;
 }
+/* ===== main obstacle: what it is (mountain, hill, ridge or building) and what it is called ===== */
+const BUILDING_TYPES={apartments:"apartment block",commercial:"commercial building",office:"office building",hotel:"hotel",industrial:"industrial building",retail:"shop / mall",church:"church",temple:"temple",mosque:"mosque",school:"school",university:"university building",hospital:"hospital",house:"house",residential:"residential building",warehouse:"warehouse",tower:"tower",yes:"building"};
+const OBN=new Map();
+function obstacleInfo(T,tx,rx){
+  if(!T||!T.ob||!(T.loss>0.05)) return null;
+  const n=T.e.length, D=T.d[n-1]||1, o=T.ob, q=gcPoint(tx,rx,clamp(o.dm/D,0,1)), km=o.dm/1000;
+  if(o.kind==="building"){ const b=o.b||{}, type=BUILDING_TYPES[b.type]||(b.type?String(b.type).replace(/_/g," ")+" building":"building");
+    return {kind:"Building",icon:"🏢",name:b.name||type.charAt(0).toUpperCase()+type.slice(1),detail:`${Math.round(b.h||0)} m tall${b.est?" (height estimated from "+(b.levels?b.levels+" floors":"OSM default")+")":""}${b.name?" · "+type:""}`,height:Math.round(b.h||0),km,lat:q.lat,lon:q.lon,loss:T.loss}; }
+  const top=Math.round(o.top), rise=top-Math.min(T.e[0],T.e[n-1]);
+  const kind=top>=600||rise>=450?"Mountain":top>=150||rise>=100?"Hill":"Ridge";
+  const key=q.lat.toFixed(3)+","+q.lon.toFixed(3);
+  let name=T.peakName||null;
+  if(!name){ if(OBN.has(key)) name=OBN.get(key); else { OBN.set(key,null); reverseName(q.lat,q.lon).then(nm=>{ OBN.set(key,nm?("near "+nm):null); if(nm&&(currentTab==="map"||currentTab==="terrain"||currentTab==="mobile")){ drawMap(); renderActive(); } }); } }
+  return {kind,icon:kind==="Mountain"?"⛰":kind==="Hill"?"⛰":"〰",name:name||`${kind.toLowerCase()} at ${fmtD(km)} km`,detail:`${top} m above sea level · ${Math.round(rise)} m above the lower site${T.peakName?" · named peak (OSM)":""}`,height:top,km,lat:q.lat,lon:q.lon,loss:T.loss};
+}
+function obstacleLine(oi){ return oi?`${oi.icon} ${oi.kind}: ${oi.name} · ${oi.height} m · ${fmtD(oi.km)} km from the transmitter · −${oi.loss.toFixed(1)} dB`:"No obstacle blocks this path"; }
 function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(threshold(p));
   const ok=r.t!==null&&r.t>=thr, fading=r.g!==null&&r.s!==null&&Math.abs(r.g-r.s)<6&&Math.max(r.g,r.s)>thr-6;
   let v,cls; if(!ok){v="No reliable reception";cls="bad";} else if(fading){v="Receivable, with fading";cls="warn";} else if(r.t>=thr+20){v="Excellent";cls="good";} else {v="Good";cls="good";}
@@ -3051,11 +3102,11 @@ function drawMap(){
     // secondary Deygout edges
     (T.edges||[]).filter(ed=>ed.role==="secondary").forEach(ed=>{ const q=gcPoint(MP.tx,MP.rx,clamp(ed.o.dm/D,0,1)); const [x,y]=proj(q.lon,q.lat); c.strokeStyle="#fff"; c.lineWidth=3.5; c.beginPath(); c.arc(x,y,6,0,7); c.stroke(); c.strokeStyle="#e8862a"; c.lineWidth=2.2; c.beginPath(); c.arc(x,y,6,0,7); c.stroke(); });
     // main obstacle
-    if(T.ob&&T.loss>0.05){ const q=gcPoint(MP.tx,MP.rx,clamp(T.ob.dm/D,0,1)); const [x,y]=proj(q.lon,q.lat);
+    const oi=obstacleInfo(T,MP.tx,MP.rx);
+    if(oi){ const [x,y]=proj(oi.lon,oi.lat);
       c.strokeStyle="#fff"; c.lineWidth=4; c.beginPath(); c.moveTo(x-7,y-7); c.lineTo(x+7,y+7); c.moveTo(x+7,y-7); c.lineTo(x-7,y+7); c.stroke();
       c.strokeStyle="#d6302a"; c.lineWidth=2.5; c.beginPath(); c.moveTo(x-7,y-7); c.lineTo(x+7,y+7); c.moveTo(x+7,y-7); c.lineTo(x-7,y+7); c.stroke();
-      const what=T.ob.kind==="building"?`building ${Math.round(T.ob.b.h)} m`:(T.peakName?`${T.peakName} ${Math.round(T.ob.top)} m`:`ridge ${Math.round(T.ob.top)} m`);
-      tag(x,y-8,`Main obstacle: ${what} · −${T.loss.toFixed(1)} dB`,"rgba(214,48,40,.95)","#fff"); }
+      tag(x,y-8,`${oi.icon} ${oi.kind}: ${oi.name} · ${oi.height} m · −${oi.loss.toFixed(1)} dB`,"rgba(214,48,40,.95)","#fff"); }
   }
   const pin=(pt,col,lt,big,label)=>{ const [x,y]=proj(pt.lon,pt.lat), s=big?1:0.8;
     c.fillStyle=col; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); c.moveTo(x,y); c.arc(x,y-20*s,11*s,Math.PI*0.72,Math.PI*0.28); c.closePath(); c.fill(); c.stroke();
@@ -3139,7 +3190,7 @@ function terrainSnapshot(T){
   if(!T) return null; const n=T.e.length, step=Math.max(1,Math.floor(n/160)), d=[], e=[];
   for(let i=0;i<n;i+=step){ d.push(+(T.d[i]/1000).toFixed(3)); e.push(Math.round(T.e[i])); }
   if((n-1)%step){ d.push(+(T.d[n-1]/1000).toFixed(3)); e.push(Math.round(T.e[n-1])); }
-  const ob=T.ob&&T.loss>0.05?{d:T.ob.dm/1000,top:Math.round(T.ob.top),loss:+T.loss.toFixed(1),what:T.ob.kind==="building"?`building ${Math.round(T.ob.b.h)} m tall`:(T.peakName||`ridge ${Math.round(T.ob.top)} m`)}:null;
+  const ob=T.ob&&T.loss>0.05?{d:T.ob.dm/1000,top:Math.round(T.ob.top),loss:+T.loss.toFixed(1),what:(oi=>oi?`${oi.kind.toLowerCase()} ${oi.name}, ${oi.height} m`:"")(obstacleInfo(T,MP.tx,MP.rx))}:null;
   return {d,e,b:(T.buildings||[]).slice(0,500).map(b=>[+(b.dm/1000).toFixed(4),Math.round(b.h)]),pk:(T.osm?T.osm.peaks:[]).filter(p=>p.xt<3000).slice(0,12).map(p=>[+(p.dm/1000).toFixed(2),p.name,isFinite(p.ele)?Math.round(p.ele):null]),ob,manual:T.manual,txH:T.txH,rxH:T.rxH};
 }
 function toLocalInput(d){ const z=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
@@ -3191,12 +3242,14 @@ function renderActive(){
     <div class="big" style="color:var(--${pr.cls})">${pr.verdict}${r.loading?' <span class="muted" style="font-size:13px;font-weight:500">(terrain loading…)</span>':""}</div>
     <div class="val">${lvl(pr.t,pr)}${isCell?` <span class="muted" style="font-size:14px">${CT.meas}</span>`:""}</div>
     <p class="muted" style="font-size:14px">${svTxt} ${isCell?(sv&&sv.pred.cell?`Cell edge ${CT.thr} dBm · uplink margin ${sv.pred.cell.ulm.toFixed(0)} dB · this cell's radius ≈ ${fmtD(cellRange(sv.p).r)} km (phone at 1.5 m, ${MP.cov.env}${MP.cov.indoor?", indoors":""}).`:""):(pr.ok?"":`Below the ${fmtField(pr.thr)} needed.`)} ${fmtF(sv?sv.p.f:p.f)}, ${fmtP(sv?sv.p.P:p.P)}${isCell?" EIRP":""}, ${phTxt}.${T&&MP.useTerrain&&T.loss>0.5&&(!sv||sv.i===MP.ti)?` Terrain costs about ${T.loss.toFixed(1)} dB.`:""}</p>
+    ${(oi=>oi?`<p class="obline"><b>Main obstacle:</b> ${oi.icon} ${oi.kind} · ${esc(oi.name)} · ${oi.height} m · ${fmtD(oi.km)} km from T${MP.ti+1} · −${oi.loss.toFixed(1)} dB</p>`:"")(T&&MP.useTerrain?obstacleInfo(T,MP.tx,MP.rx):null)}
     ${MP.txs.length+MP.relays.length>1||pr.noServer?`<div class="tablewrap"><table class="fs srvtab"><tr><th>Transmitter</th><th>Distance</th><th>${isCell?CT.meas:"Field"}</th><th>Result</th></tr>${rows}</table></div>`:""}`;
   const tiles=[
     ["Distance",`${fmtD(P.dist)} km`,`bearing ${P.brg.toFixed(0)}° · ${P.landPct}% land`,"info"],
     ["Ground height",T?`${Math.round(T.txE)} / ${Math.round(T.rxE)} m`:"…",T?(T.manual?"TX / RX · typed by hand":"TX / RX · Copernicus DEM"):"loading","info"],
     ["Obstacle method",T?(T.dbx?`delta-Bullington · ${T.dbx.Ld.toFixed(1)} dB`:"single knife-edge"):"…",T?(T.dbx?`${T.method} · Bullington ${T.dbx.Lbulla.toFixed(1)} dB, smooth ${T.dbx.Lsmooth.toFixed(1)} dB`:T.method):"","info"],
-    ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?(T.ob&&T.loss>0.05?(T.ob.kind==="building"?"caused by a building":(T.peakName?`at ${T.peakName}`:`ridge at ${fmtD(T.ob.dm/1000)} km`)):`highest ${Math.round(T.maxE)} m`)+` · Δh ${Math.round(T.dh)} m`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"],
+    ...(oi=>[["Main obstacle",T?(oi?`${oi.icon} ${oi.kind}`:"none"):"…",T?(oi?`<b>${esc(oi.name)}</b> · ${esc(oi.detail)} · ${fmtD(oi.km)} km from T${MP.ti+1}`:`clear path · highest point ${Math.round(T.maxE)} m`):"",oi?(oi.kind==="Building"?"warn":"bad"):"good"],
+      ["Terrain shadowing",T?(T.loss>0.05?`−${T.loss.toFixed(1)} dB`:"none"):"…",T?`Δh ${Math.round(T.dh)} m along the path`:"",T&&T.loss>6?"bad":T&&T.loss>1?"warn":"good"]])(obstacleInfo(T,MP.tx,MP.rx)),
     ["Line of sight",T?(T.los?"Yes":"No"):"…",T?(isCell?`T${MP.ti+1} mast ${T.txH} m / phone 1.5 m`:`masts ${T.txH} m / ${T.rxH} m`):"","info"],
     ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmPending?"loading…":T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
     ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
@@ -3245,7 +3298,7 @@ function drawTerrain(P,T){
       c.fillStyle="#3d2f1a"; c.beginPath(); c.moveTo(x,y-3); c.lineTo(x-4,y-10); c.lineTo(x+4,y-10); c.closePath(); c.fill(); c.fillStyle=cssVar("--ink"); c.fillText(`${pk.name}${isFinite(pk.ele)?" "+Math.round(pk.ele)+" m":""}`,x,y-12); }); }
   (T.edges||[]).filter(ed=>ed.role==="secondary").forEach(ed=>{ const x=xd(ed.o.dm), y=ys(ed.o.top+bulD(ed.o.dm)); c.strokeStyle="#e8862a"; c.lineWidth=2; c.beginPath(); c.arc(x,y-6,5,0,7); c.stroke(); c.font="10.5px "+cssVar("--font-body"); c.fillStyle="#b35f12"; c.textAlign="center"; c.textBaseline="bottom"; c.fillText("2nd edge",x,y-13); });
   if(T.ob&&T.loss>0.05){ const x=xd(T.ob.dm), y=ys(T.ob.top+bulD(T.ob.dm)); c.fillStyle="#c2413a"; c.beginPath(); c.moveTo(x,y-2); c.lineTo(x-6,y-13); c.lineTo(x+6,y-13); c.closePath(); c.fill();
-    const what=T.ob.kind==="building"?`building${T.ob.b.name?" "+T.ob.b.name:""} ${Math.round(T.ob.b.h)} m tall`:(T.peakName?`${T.peakName}, ${Math.round(T.ob.top)} m`:`ridge ${Math.round(T.ob.top)} m`);
+    const oi=obstacleInfo(T,MP.tx,MP.rx), what=oi?`${oi.kind.toLowerCase()} ${oi.name}, ${oi.height} m`:"";
     c.font="600 11px "+cssVar("--font-body"); c.textAlign=x>W*0.7?"right":"left"; c.textBaseline="bottom"; c.fillStyle=cssVar("--ink"); c.fillText(`main obstacle: ${what} · −${T.loss.toFixed(1)} dB`,x+(x>W*0.7?-8:8),y-14); }
   c.textAlign="left"; c.textBaseline="top"; c.font="11px "+cssVar("--font-body"); c.fillStyle=muted; c.textBaseline="bottom"; c.fillText(T.los?"Line of sight: clear":"Line of sight: blocked"+(baseModel().p.f<30?" (the ground wave still bends around terrain)":""),L+6,Tp+h-4);
 }
@@ -3339,6 +3392,24 @@ function showSearchPt(pt){ MP.searchPt=pt; MP.view={lon:pt.lon,lat:pt.lat,z:Math
   a.innerHTML=`<span>📍 <b>${esc(pt.name)}</b></span><button class="btn primary sm" data-sa="addtx" type="button">${mob?"+ Tower here":"+ Transmitter here"}</button>${mob?"":'<button class="btn sm" data-sa="addrelay" type="button">+ Relay here</button>'}<button class="btn sm" data-sa="add" type="button">${mob?"+ Test point here":"+ Receiver here"}</button>${mob?'<button class="btn sm" data-sa="me" type="button">📍 This is me</button>':""}<button class="iconbtn" data-sa="x" type="button" aria-label="Clear search">✕</button>`;
   a.querySelectorAll("[data-sa]").forEach(bt=>bt.addEventListener("click",()=>{ const k=bt.dataset.sa; if(k==="x"){ MP.searchPt=null; a.hidden=true; drawMap(); return; }
     if(k==="me"){ MP.setMe(pt.lat,pt.lon,pt.name); } else setPoint(k,{name:pt.name,lat:pt.lat,lon:pt.lon}); MP.searchPt=null; a.hidden=true; drawMap(); })); }
+/* ---------- full-screen map with the details beside it ---------- */
+const FS={on:false,saved:[],tab:"pred"};
+function fsShow(tab){ FS.tab=tab; const body=$("fsBody");
+  FS.saved.forEach(s=>{ if(s.el.parentNode===body) s.anchor.parentNode.insertBefore(s.el,s.anchor); }); FS.saved=FS.saved.filter(s=>s.el.parentNode!==body);
+  const el=$({pred:"mapResult",terr:"terrCard",sites:"sitesCard"}[tab]);
+  if(el){ const anchor=document.createComment("fs-anchor"); el.parentNode.insertBefore(anchor,el); FS.saved.push({el,anchor}); body.appendChild(el); }
+  document.querySelectorAll("#fsPanel [data-fs]").forEach(bt=>bt.setAttribute("aria-selected",String(bt.dataset.fs===tab)));
+  if(tab==="terr"){ $("terrain-tab").hidden=false; } setTimeout(()=>{ renderActive(); drawMap(); },30); }
+function fsRestore(){ FS.saved.forEach(s=>{ if(s.anchor.parentNode){ s.anchor.parentNode.insertBefore(s.el,s.anchor); s.anchor.remove(); } }); FS.saved=[]; $("terrain-tab").hidden=currentTab!=="terrain"; }
+function setMapFs(on){
+  const core=$("mapCore"); if(on===FS.on) return; FS.on=on;
+  core.classList.toggle("fs",on); $("fsPanel").hidden=!on; document.body.classList.toggle("map-fs",on);
+  $("mapFs").textContent=on?"✕":"⛶"; $("mapFs").setAttribute("aria-label",on?"Exit full screen":"Full screen map");
+  $("fsSitesTab").textContent=MP.layer==="mobile"?"Towers & points":"Sites & relays";
+  if(on){ if(core.requestFullscreen&&!document.fullscreenElement) core.requestFullscreen().catch(()=>{}); fsShow(FS.tab); }
+  else { if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); fsRestore(); }
+  setTimeout(()=>{ drawMap(); renderActive(); },60);
+}
 function bindMap(){
 
   $("attrib").innerHTML=PROVIDERS[TILE.base].attr; $("basemap").value=TILE.base;
@@ -3476,6 +3547,10 @@ function bindMap(){
   $("toLab").addEventListener("click",()=>{ pathModel(); const d=MP.path.dist; $("range").value=d>900?"3000":d>280?"1000":"300"; refreshAll(); go("lab"); });
   $("toAnim").addEventListener("click",()=>{ const m=pathModel(); refreshAll(); setAnimModel(m.id); $("animModel").value=String(m.id); go("animation"); });
   $("mapMsg").addEventListener("click",()=>{ $("mapMsg").hidden=true; TILE.blockedMsg=false; });
+  $("mapFs").addEventListener("click",()=>setMapFs(!FS.on)); $("mapFsExit").addEventListener("click",()=>setMapFs(false));
+  document.querySelectorAll("#fsPanel [data-fs]").forEach(bt=>bt.addEventListener("click",()=>fsShow(bt.dataset.fs)));
+  document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement&&FS.on) setMapFs(false); else setTimeout(()=>{ drawMap(); renderActive(); },60); });
+  document.addEventListener("keydown",e=>{ if(e.target.closest&&e.target.closest("input,textarea,select")) return; if((currentTab==="map"||currentTab==="mobile")&&(e.key==="f"||e.key==="F")&&!e.ctrlKey&&!e.metaKey){ setMapFs(!FS.on); } if(e.key==="Escape"&&FS.on) setMapFs(false); });
   requestAnimationFrame(mapTick);
 }
 
@@ -4151,7 +4226,7 @@ function bindQuiz(){ const topics=[...new Set(QUIZ.map(q=>q.topic))]; $("qTopic"
 const TABS=["lab","animation","map","terrain","mobile","methods","learn","quiz"];
 let currentTab="lab";
 function go(t,noHash){
-  if(!TABS.includes(t)) t="lab"; currentTab=t;
+  if(!TABS.includes(t)) t="lab"; if(typeof FS!=="undefined"&&FS.on) setMapFs(false); currentTab=t;
   document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
   $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz"; $("mobile-tab").hidden=t!=="mobile";
   if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
