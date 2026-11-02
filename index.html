@@ -608,6 +608,70 @@ body.map-fs{overflow:hidden}
 }
 @media (max-width:900px){ #mapCore.fs #gpsBtn,#mapCore.fs .toolsave,#mapCore.fs #findTowers{display:none} #mapCore.fs .toolrow .mapseg label{min-height:36px;padding:6px 10px;font-size:13px} #mapCore.fs .mapsearch input{min-height:40px} }
 
+/* ===== v3.2 · UX audit fixes ===== */
+/* type: three weights (400 / 500 / 600), nothing below 12 px */
+h1,h2,h3,h4,b,strong,th,.brand h1,.big,.val,.tab,.btn,.chip,.pill,.badge,.eyebrow,.k,.mxname,.score,.pin-n,.field > label,.lbl,summary,.step .num,.step-h .num,.seg label{font-weight:600}
+[style*="font-weight:700"],[style*="font-weight:800"],[style*="font-weight:900"]{font-weight:600!important}
+.qi,.tag,.badge,.tile .k,.map-br,.map-br a,.hud-foot,.zoominfo,.bnav a,.bnav span,.meter .mono,.mrow .mono,.mxband,.legend,.hint,.note,small,.brand small,.covstat,.qm,.pill,.eyebrow,.modehint,.dlg-b .hint,.keyrow span,.mapmsg,.fstabs button{font-size:max(12px,1em)}
+.qi{font-size:12px}.tag,.badge,.tile .k,.map-br,.map-br a,.hud-foot,.zoominfo,.bnav a,.pill,.eyebrow{font-size:12px}
+/* motion: only transform / opacity animate */
+.btn,.tab,.chip,select,input{transition:none}
+/* tooltips on icon buttons: hover and keyboard focus, verb-first, same text as aria-label */
+[data-tip].iconbtn{position:relative}
+[data-tip].iconbtn::after{content:attr(data-tip);position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);white-space:nowrap;background:#16202e;color:#fff;font:500 12px/1.3 var(--font-body);padding:6px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .1s var(--ease);z-index:5}
+@media (hover:hover){[data-tip].iconbtn:hover::after{opacity:1}}
+[data-tip].iconbtn:focus-visible::after{opacity:1}
+/* search: visible label on medium/wide, aria name on narrow */
+.searchlbl{align-self:center;font-weight:600;font-size:14px;white-space:nowrap}
+@media (max-width:760px){.searchlbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+/* brand: short name on phones so it is never cut off */
+.bshort{display:none}
+@media (max-width:520px){.bfull{display:none}.bshort{display:inline}}
+/* confirmation dialog */
+.cfm{border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;max-width:420px;width:calc(100% - 32px);background:var(--panel);color:var(--ink);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.cfm::backdrop{background:rgba(10,16,28,.45)}
+.cfm h2{font-size:18px;margin:0 0 6px}.cfm p{margin:0 0 16px;color:var(--muted)}
+.cfmrow{justify-content:flex-end}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+/* touch targets: 44 px on phones and touch screens (WCAG 2.5.5 / profile floor) */
+@media (max-width:760px), (pointer:coarse){
+  .btn,.iconbtn,select,input[type=text],input[type=number],input[type=search],input[type=datetime-local],.chip,.seg label,.tab,.linkbtn,.fstabs button,.pinbtn,.hits li,summary,.bnav a{min-height:44px}
+  .iconbtn{min-width:44px}
+  label.check{min-height:44px;display:flex;align-items:center}
+  .linkbtn{display:inline-flex;align-items:center}
+  .qi{position:relative}.qi::before{content:"";position:absolute;inset:-14px}
+  .sites input{min-height:44px}
+}
+/* phones: map first, long settings folded under it */
+@media (max-width:760px){
+  #map-tab{display:flex;flex-direction:column}
+  #map-tab > .routebar{order:3}
+  #map-tab > #mapSlot{order:2}
+  #map-tab > .intro{order:1}
+  #map-tab > :not(.routebar):not(#mapSlot):not(.intro){order:4}
+  #mobile-tab{display:flex;flex-direction:column}
+  #mobile-tab > .intro{order:1}
+  #mobile-tab > .mobilecard{order:2}
+  #mobile-tab > #mobMapSlot{order:3}
+  #mobile-tab > .planner{order:4}
+  #mobile-tab .intro .hint{display:none}
+}
+.qi,summary,.tile .k,.hud-q,.quality,.pinbtn,.big,.mxsteps tr.mxhead td,.mxsteps td:nth-child(2),.pin-n,.brand h1,h1,h2,h3{font-weight:600!important}
+.model-row .tag,.tag,.pin-n,.chip.tnet,.netchips .chip,.meter .mono,.mrow .mono,.mrow span,.hud .mono{font-size:12px!important}
+input[type=range]{min-height:28px}
+.mxchecks li span{font-weight:600}
+#rxHud .mono,.rxhud .mono,[id^=hv]{font-size:12px!important}
+@media (max-width:760px), (pointer:coarse){
+  .skip{min-height:44px;display:inline-flex;align-items:center}
+  .chips .chip,#aFreqChips .chip,.toolrow .mapseg label,.planner .plin input,.planner .plin select,#mapCore.fs .toolrow .mapseg label{min-height:44px!important}
+}
+[data-tip].iconbtn:focus::after{opacity:1}
+@media (max-width:760px), (pointer:coarse){
+  table.sites input,table.sites select,.sites .chip,.netchips .chip,.txtbl input,.txtbl select{min-height:44px!important}
+  .netchips .chip{min-width:44px}
+}
+@media (max-width:760px){ .toolrow .mapseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%} .toolrow .mapseg label{justify-content:center;text-align:center;white-space:normal;padding:6px 4px;font-size:13px;line-height:1.2} }
+
 </style>
 </head>
 <body>
@@ -616,7 +680,7 @@ body.map-fs{overflow:hidden}
   <div class="appbar-in">
     <div class="brand">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 28 L15 8" stroke="currentColor" stroke-width="2"/><path d="M11 28 L15 8 L19 28" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 7 a9 9 0 0 1 14 0 M5 4 a13 13 0 0 1 20 0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>
-      <h1>Groundwave Propagation Lab<small>Radio propagation simulator · LF to UHF</small></h1>
+      <h1><span class="bfull">Groundwave Propagation Lab</span><span class="bshort">Groundwave Lab</span><small>Radio propagation simulator · LF to UHF</small></h1>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button class="tab" role="tab" id="tab-lab" aria-controls="lab" data-tab="lab"><span class="n">1</span>Lab</button>
@@ -654,7 +718,7 @@ body.map-fs{overflow:hidden}
         <ul class="model-list" id="modelList"></ul>
         <div class="row">
           <button class="btn" id="addModel" type="button">+ Copy selected</button>
-          <button class="btn ghost" id="addBlank" type="button">+ New</button>
+          <button class="btn ghost" id="addBlank" type="button">+ Add blank model</button>
         </div>
       </section>
 
@@ -860,8 +924,8 @@ body.map-fs{overflow:hidden}
         <div class="stage-tr">
           <button class="iconbtn mapbtn" id="aZoomIn" type="button" aria-label="Zoom in">＋</button>
           <button class="iconbtn mapbtn" id="aZoomOut" type="button" aria-label="Zoom out">－</button>
-          <button class="iconbtn mapbtn" id="aReset" type="button" aria-label="Reset view" title="Reset view">⟲</button>
-          <button class="iconbtn mapbtn" id="aFull" type="button" aria-label="Full screen" title="Full screen (F)">⛶</button>
+          <button class="iconbtn mapbtn" id="aReset" type="button" aria-label="Reset view" data-tip="Reset view">⟲</button>
+          <button class="iconbtn mapbtn" id="aFull" type="button" aria-label="Full screen" data-tip="Full screen (F)">⛶</button>
         </div>
         <div class="tourbox" id="tourBox" hidden>
           <p class="eyebrow" id="tourStep" style="margin:0"></p>
@@ -952,7 +1016,7 @@ body.map-fs{overflow:hidden}
       <div class="field"><label for="txCity"><span class="dot tx"></span>Selected transmitter</label><select id="txCity"></select></div>
       <button class="iconbtn swap" id="swapBtn" type="button" title="Swap transmitter and selected receiver" aria-label="Swap transmitter and selected receiver">⇄</button>
       <div class="field"><label for="rxCity"><span class="dot rx"></span>Selected receiver</label><select id="rxCity"></select></div>
-      <div class="field"><label for="when">Date &amp; time</label><div class="row nowrap"><input type="datetime-local" id="when"><button class="btn" id="nowBtn" type="button">Now</button></div></div>
+      <div class="field"><label for="when">Date &amp; time</label><div class="row nowrap"><input type="datetime-local" id="when"><button class="btn" id="nowBtn" type="button">Use now</button></div></div>
       <div class="field"><label for="mapModel">Station settings</label><select id="mapModel"></select></div>
     </div>
     <div class="route2">
@@ -989,7 +1053,8 @@ body.map-fs{overflow:hidden}
   </aside>
   <div class="maptools">
     <form class="mapsearch" id="mapSearch" role="search">
-      <input type="search" id="mapQ" placeholder="Search a place, e.g. Kandy, Galle Face, University of Peradeniya" aria-label="Search a place on the map" autocomplete="off">
+      <label for="mapQ" class="searchlbl">Find a place</label>
+      <input type="search" id="mapQ" placeholder="e.g. Kandy, Galle Face, University of Peradeniya" autocomplete="off">
       <button class="btn primary" type="submit">Search</button>
       <ul class="hits" id="mapHits" role="listbox" hidden></ul>
     </form>
@@ -1001,7 +1066,7 @@ body.map-fs{overflow:hidden}
         <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd"><span aria-hidden="true">📻</span> <span id="lblAdd">Add receiver</span></label>
         <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move <span id="lblMoveTx">TX</span></label>
         <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move <span id="lblMoveRx">RX</span></label>
-        <input type="radio" name="clickset" id="modeMe" value="me" class="mob-only"><label for="modeMe" class="mob-only">📍 Me</label>
+        <input type="radio" name="clickset" id="modeMe" value="me" class="mob-only"><label for="modeMe" class="mob-only">📍 Mark me</label>
         <input type="radio" name="clickset" id="modeDel" value="del"><label for="modeDel" class="dellbl">✕ Remove</label>
       </div>
       <button class="btn" id="gpsBtn" type="button" hidden>◎ My location</button>
@@ -1013,13 +1078,13 @@ body.map-fs{overflow:hidden}
   <div class="mapbox">
     <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
     <div class="map-tr">
-      <button class="iconbtn mapbtn fsbtn" id="mapFs" type="button" aria-label="Full screen map" title="Full screen (F)">⛶</button>
-      <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in">＋</button>
-      <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out">－</button>
-      <button class="iconbtn mapbtn" id="zoomRx" type="button" aria-label="Zoom to the selected receiver (street level)" title="Zoom to the selected receiver">⌖</button>
-      <button class="iconbtn mapbtn" id="fitBtn" type="button" aria-label="Fit all sites" title="Fit all sites">⤢</button>
-      <button class="iconbtn mapbtn" id="mapReset" type="button" aria-label="Reset all sites" title="Reset all sites">↺</button>
-      <button class="iconbtn mapbtn" id="mapPlay" type="button" aria-label="Pause map animation" title="Pause map animation">❚❚</button>
+      <button class="iconbtn mapbtn fsbtn" id="mapFs" type="button" aria-label="Full screen map" data-tip="Full screen (F)">⛶</button>
+      <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in" data-tip="Zoom in">＋</button>
+      <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out" data-tip="Zoom out">－</button>
+      <button class="iconbtn mapbtn" id="zoomRx" type="button" aria-label="Zoom to the selected receiver (street level)" data-tip="Zoom to the selected receiver">⌖</button>
+      <button class="iconbtn mapbtn" id="fitBtn" type="button" aria-label="Fit all sites" data-tip="Fit all sites">⤢</button>
+      <button class="iconbtn mapbtn" id="mapReset" type="button" aria-label="Reset all sites" data-tip="Reset all sites">↺</button>
+      <button class="iconbtn mapbtn" id="mapPlay" type="button" aria-label="Pause map animation" data-tip="Pause map animation">❚❚</button>
     </div>
     <div class="map-bl">
       <select id="basemap" aria-label="Map style" class="mapbtn">
@@ -1070,7 +1135,7 @@ body.map-fs{overflow:hidden}
 
 <!-- ======================= MOBILE PLANNER ======================= -->
 <section class="wrap" id="mobile-tab" role="tabpanel" aria-labelledby="tab-mobile" hidden>
-  <div class="intro"><div class="stack" style="gap:4px"><h2>Mobile coverage planner · 2G · 3G · 4G · 5G</h2><p>Plan cell sites separately from the broadcast lab. Set tower heights, antenna sectors and the link budget, then see each test point's serving cell and the coverage map. Methods: ITU-R P.529 (Hata), M.2412 (UMa), P.1812 beyond range, P.2108 clutter, P.2109 building entry, P.838 rain and P.1812/P.1546 location variability.</p></div></div>
+  <div class="intro"><div class="stack" style="gap:4px"><h2>Mobile coverage planner</h2><p>Plan 2G–5G cell sites: tower heights, sectors and the link budget, then each test point's serving cell and the coverage map.</p><p class="hint">Methods: ITU-R P.529 (Hata), M.2412 (UMa), P.1812 beyond range, P.2108 clutter, P.2109 building entry, P.838 rain, P.1812/P.1546 location variability.</p></div></div>
   <section class="panel card mobilecard" aria-labelledby="mcH">
     <div class="chart-head"><h2 id="mcH">My coverage &amp; network settings</h2>
       <div class="row"><span class="hint">📍 <b id="meName">not set</b></span><button class="btn primary" id="setMe" type="button">📍 Set my location</button><button class="btn" id="meTowers" type="button">📶 Towers near me (OSM)</button></div></div>
@@ -1291,11 +1356,15 @@ body.map-fs{overflow:hidden}
     <div class="row"><button class="btn" id="qExport" type="button">Export results (CSV)</button><button class="btn" id="qPrint" type="button">Print</button></div>
   </section>
   <div class="quiz" id="quizBox"></div>
-  <div class="row" style="margin-top:12px"><button class="btn primary" id="qSubmit" type="button" hidden>Submit for marking</button></div>
+  <div class="row" style="margin-top:12px"><button class="btn primary" id="qSubmit" type="button" hidden>Mark my answers</button></div>
   <div id="qResult" style="margin-top:12px"></div>
 </section>
 
 
+<dialog id="cfmDlg" class="cfm" aria-labelledby="cfmTitle" aria-describedby="cfmBody">
+  <h2 id="cfmTitle"></h2><p id="cfmBody"></p>
+  <div class="row cfmrow"><button class="btn" id="cfmCancel" type="button">Cancel</button><button class="btn danger" id="cfmOk" type="button"></button></div>
+</dialog>
 <dialog id="helpDlg" aria-labelledby="helpTitle">
   <div class="dlg">
     <div class="dlg-h"><h2 id="helpTitle">Welcome to the Groundwave Propagation Lab</h2><button class="iconbtn" id="helpClose" type="button" aria-label="Close help">✕</button></div>
@@ -1319,7 +1388,7 @@ body.map-fs{overflow:hidden}
     </div>
     <div class="dlg-b" data-hp="build" hidden>
       <ol class="steps-list">
-        <li><b>Start a model.</b> In <b>Lab → Models</b>, choose <b>+ New</b>, or select a model and choose <b>+ Copy selected</b>. Rename it by clicking its name.</li>
+        <li><b>Start a model.</b> In <b>Lab → Models</b>, choose <b>+ Add blank model</b>, or select a model and choose <b>+ Copy selected</b>. Rename it by clicking its name.</li>
         <li><b>Choose what to calculate.</b> Under <b>Settings → Signal</b>, pick <i>Ground wave + sky wave</i> (most realistic), <i>Ground wave only</i>, <i>Sky wave only</i>, or <i>My own formula</i>.</li>
         <li><b>Set the station.</b> Set the frequency (buttons or slider), transmitter power and antenna heights.</li>
         <li><b>Set the path.</b> Under <b>Ground &amp; path</b>, choose the ground type or a land-to-sea boundary. For a real path, place the sites on the <b>Map</b> and choose <b>Open in Lab</b>.</li>
@@ -1362,7 +1431,7 @@ body.map-fs{overflow:hidden}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v3.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v3.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -1981,7 +2050,7 @@ function renderList(){
     inp.addEventListener("focus",()=>{ if(selId!==m.id){ selId=m.id; [...ul.children].forEach((x,i)=>x.classList.toggle("sel",models[i].id===selId)); syncControls(); redraw(); }});
     const [eye,del]=li.querySelectorAll("button");
     eye.addEventListener("click",ev=>{ev.stopPropagation(); m.visible=!m.visible; renderList(); redraw();});
-    del.addEventListener("click",ev=>{ev.stopPropagation(); if(models.length===1) return;
+    del.addEventListener("click",async ev=>{ev.stopPropagation(); if(models.length===1) return; if(!await confirmAction(`Delete model “${m.name}”?`,"Its curve and settings are removed from the Lab.","Delete model")) return;
       models=models.filter(x=>x!==m); if(selId===m.id) selId=models[0].id; currentPreset=-1; refreshAll();});
     li.addEventListener("click",()=>{ if(selId!==m.id){ selId=m.id; renderList(); syncControls(); redraw(); }});
     ul.appendChild(li);
@@ -2021,7 +2090,7 @@ function updateLabels(){
   document.querySelectorAll("#freqChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(Math.abs(+b.dataset.f-p.f)<1e-6)));
   const wk=weatherKey(p);
   document.querySelectorAll("#wxChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===wk)));
-  if(p.type==="custom"){ const c=compileExpr(p.expr); $("exprErr").textContent=c.err||""; }
+  if(p.type==="custom"&&document.activeElement!==$("expr")){ const c=compileExpr(p.expr); $("exprErr").textContent=c.err||""; }
 }
 function bindLab(){
   const set=(obj)=>{ const m=sel(); if(!m) return; Object.assign(m.p,obj); currentPreset=-1; renderPresets(); renderGuide(); updateLabels(); renderList(); redraw(); syncModelSelects(); if(typeof syncAnimControls==="function"){ AN.gwKey=""; AN.anaKey=""; syncAnimControls(); } };
@@ -2030,7 +2099,8 @@ function bindLab(){
   $("indoor").addEventListener("change",e=>set({indoor:e.target.checked}));
   const wc=$("wxChips"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>{ set(Object.assign({},w.set)); syncControls(); }; wc.appendChild(b); });
   $("type").addEventListener("change",e=>set({type:e.target.value}));
-  $("expr").addEventListener("input",e=>set({expr:e.target.value.trim()||"0"}));
+  $("expr").addEventListener("input",e=>{ $("exprErr").textContent=""; set({expr:e.target.value.trim()||"0"}); });
+  $("expr").addEventListener("blur",()=>{ const c=compileExpr(sel().p.expr); $("exprErr").textContent=c.err||""; });
   $("freq").addEventListener("input",e=>set({f:+Math.pow(10,+e.target.value).toPrecision(3)}));
   $("pow").addEventListener("input",e=>set({P:+Math.pow(10,+e.target.value).toPrecision(3)}));
   $("htx").addEventListener("change",e=>set({htx:clamp(+e.target.value||1,1,2000)}));
@@ -2343,6 +2413,7 @@ function bindAnim(){
   $("cycle").addEventListener("change",e=>{ AN.cycle=e.target.checked; if(AN.cycle&&!AN.playing) setPlaying(true); });
   $("rxSlider").addEventListener("input",e=>{ AN.rx=+e.target.value; $("rxSlider2").value=AN.rx; AN.scope=[]; AN.meterT=999; });
   $("rxSlider2").addEventListener("input",e=>{ AN.rx=+e.target.value; $("rxSlider").value=AN.rx; AN.scope=[]; AN.meterT=999; });
+  if(window.innerWidth<520){ AN.labels=false; $("explainT").checked=false; } // labels overlap on phones: start with them off
   $("explainT").addEventListener("change",e=>AN.labels=e.target.checked);
   $("tourBtn").addEventListener("click",()=>showTour(0));
   $("tourNext").addEventListener("click",()=>showTour(AN.tour+1>=TOUR.length?null:AN.tour+1));
@@ -3443,12 +3514,15 @@ function bindMap(){
     if(e.target.classList.contains("rp")) r.P=clamp(+e.target.value||0.01,0.001,100);
     if(e.target.classList.contains("rf")) r.f=clamp(+e.target.value||100,30,3000);
     MP.res.clear(); updateMap(); });
-  rt.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-r]"); if(!tr) return; if(e.target.closest(".rdel")){ MP.relays.splice(+tr.dataset.r,1); MP.res.clear(); updateMap(); } });
+  rt.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-r]"); if(!tr) return; if(e.target.closest(".rdel")) MP.removePin({kind:"relay",i:+tr.dataset.r}); });
   // pins: TX and RX hit-testing (the pin head sits ~20 px above the point)
   const hitPin=(x,y)=>{ if(MP.layer==="bcast") for(let k=MP.relays.length-1;k>=0;k--){ const [px,py]=proj(MP.relays[k].lon,MP.relays[k].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"relay",i:k}; }
     for(let i=MP.txs.length-1;i>=0;i--){ const [px,py]=proj(MP.txs[i].lon,MP.txs[i].lat); if(Math.hypot(px-x,py-18-y)<15) return {kind:"tx",i}; }
     for(let i=MP.rxs.length-1;i>=0;i--){ const [px,py]=proj(MP.rxs[i].lon,MP.rxs[i].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"rx",i}; } return null; };
-  const removePin=h=>{ const msg=$("mapMsg");
+  const removePin=async h=>{ const msg=$("mapMsg");
+    const arr=h.kind==="tx"?MP.txs:h.kind==="relay"?MP.relays:MP.rxs, it=arr[h.i]; if(!it) return;
+    const what=h.kind==="tx"?(MP.layer==="mobile"?"tower":"transmitter"):h.kind==="relay"?"relay":(MP.layer==="mobile"?"test point":"receiver");
+    if(!(h.kind==="tx"&&MP.txs.length<2)&&!(h.kind==="rx"&&MP.rxs.length<2)&&!await confirmAction(`Delete ${what} “${it.name}”?`,`It is removed from the map and from every result that uses it.`,`Delete ${what}`)) return;
     if(h.kind==="relay"){ MP.relays.splice(h.i,1); MP.res.clear(); updateMap(); return; }
     if(h.kind==="tx"){ if(MP.txs.length<2){ msg.hidden=false; msg.textContent="Keep at least one transmitter. Use Move TX to place it elsewhere. (Click to hide)"; return; } MP.txs.splice(h.i,1); MP.ti=Math.min(MP.ti>h.i?MP.ti-1:MP.ti,MP.txs.length-1); MP.res.clear(); }
     else { if(MP.rxs.length<2){ msg.hidden=false; msg.textContent="Keep at least one receiver. Use Move RX to place it elsewhere. (Click to hide)"; return; } const id=MP.rxs[h.i].id; MP.rxs.splice(h.i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>h.i?MP.ai-1:MP.ai,MP.rxs.length-1); }
@@ -3469,7 +3543,8 @@ function bindMap(){
   $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
   mapC.tabIndex=0;
   mapC.addEventListener("keydown",e=>{ if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removePin(MP.lastSel||{kind:"rx",i:MP.ai}); MP.lastSel={kind:"rx",i:MP.ai}; } });
-  $("mapReset").addEventListener("click",()=>{ if(MP.layer==="mobile"){ MP.txs=DEFAULT_TOWERS(); MP.rxs=DEFAULT_POINTS(); } else { MP.txs=DEFAULT_TXS(); MP.rxs=DEFAULT_RXS(); MP.relays=[]; } MP.ti=0; MP.ai=0; MP.res.clear(); setMode("add"); MP.view=null; updateMap(); MP.view=defaultView("sites"); drawMap(); });
+  $("mapReset").addEventListener("click",async()=>{ const n=`${MP.txs.length} ${MP.layer==="mobile"?"tower":"transmitter"}${MP.txs.length>1?"s":""}, ${MP.rxs.length} ${MP.layer==="mobile"?"test point":"receiver"}${MP.rxs.length>1?"s":""}${MP.layer==="bcast"&&MP.relays.length?` and ${MP.relays.length} relay${MP.relays.length>1?"s":""}`:""}`;
+    if(!await confirmAction("Reset all sites on this map?",`This removes your ${n} and restores the example sites.`,"Reset sites")) return; if(MP.layer==="mobile"){ MP.txs=DEFAULT_TOWERS(); MP.rxs=DEFAULT_POINTS(); } else { MP.txs=DEFAULT_TXS(); MP.rxs=DEFAULT_RXS(); MP.relays=[]; } MP.ti=0; MP.ai=0; MP.res.clear(); setMode("add"); MP.view=null; updateMap(); MP.view=defaultView("sites"); drawMap(); });
   const zoom=(dz,x,y)=>{ const W=mapC.clientWidth,H=mapC.clientHeight; x=x??W/2; y=y??H/2; const before=unproj(x,y); MP.view.z=clamp(MP.view.z+dz,1,PROVIDERS[TILE.base]&&PROVIDERS[TILE.base].max?PROVIDERS[TILE.base].max:19); const after=unproj(x,y); MP.view.lon=clamp(MP.view.lon+before.lon-after.lon,-180,180); MP.view.lat=clamp(MP.view.lat+before.lat-after.lat,-80,80); drawMap(); };
   $("zoomIn").onclick=()=>zoom(1); $("zoomOut").onclick=()=>zoom(-1); $("fitBtn").onclick=fit;
   $("mapPlay").addEventListener("click",()=>setMapPlaying(!MP.anim.playing)); setMapPlaying(MP.anim.playing);
@@ -3494,7 +3569,7 @@ function bindMap(){
   // sites table
   const tb=$("sitesTable");
   tb.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const i=+tr.dataset.i;
-    if(e.target.closest(".del")){ if(MP.rxs.length<2) return; const id=MP.rxs[i].id; MP.rxs.splice(i,1); MP.res.delete(id); MP.ai=Math.min(MP.ai>i?MP.ai-1:MP.ai,MP.rxs.length-1); updateMap(); return; }
+    if(e.target.closest(".del")){ if(MP.rxs.length<2) return; removePin({kind:"rx",i}); return; }
     if(e.target.closest("input")) return; if(MP.ai!==i){ MP.ai=i; updateMap(); MP.view=defaultView("path"); drawMap(); $("map").scrollIntoView({behavior:"smooth",block:"center"}); } });
   tb.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const rx=MP.rxs[+tr.dataset.i];
     if(e.target.classList.contains("nm")){ rx.name=e.target.value.trim()||rx.name; updateMap(); }
@@ -3511,7 +3586,7 @@ function bindMap(){
     if(e.target.classList.contains("tsec")){ t.sector=e.target.value; renderTxTable(); drawMap(); renderMyCoverage(); }
     if(e.target.classList.contains("taz")){ t.az=((+e.target.value||0)%360+360)%360; drawMap(); renderMyCoverage(); }
     if(e.target.classList.contains("ttilt")){ t.tilt=clamp(+e.target.value||0,-5,15); drawMap(); renderMyCoverage(); } });
-  $("clearRx").addEventListener("click",()=>{ const keep=MP.rx; MP.rxs=[keep]; MP.ai=0; MP.res=new Map([...MP.res].filter(([k])=>k===keep.id)); updateMap(); });
+  $("clearRx").addEventListener("click",async()=>{ const keep=MP.rx; if(MP.rxs.length<2) return; if(!await confirmAction(`Remove ${MP.rxs.length-1} ${MP.layer==="mobile"?"test point":"receiver"}${MP.rxs.length>2?"s":""}?`,`Only “${keep.name}” is kept.`,"Remove sites")) return; MP.rxs=[keep]; MP.ai=0; MP.res=new Map([...MP.res].filter(([k])=>k===keep.id)); updateMap(); });
   $("copyCsv").addEventListener("click",async()=>{ const b=$("copyCsv"); try{ await navigator.clipboard.writeText(sitesCSV()); b.textContent="Copied ✓"; }catch(e){ b.textContent="Copy blocked"; } setTimeout(()=>b.textContent="Copy table (CSV)",1800); });
   let topLevel=false; try{ topLevel=window.top===window.self; }catch(e){}
   if(topLevel){
@@ -4239,6 +4314,12 @@ function go(t,noHash){
   document.querySelectorAll(".bnav a").forEach(a=>a.setAttribute("aria-current",a.dataset.tab===t?"page":"false"));
   window.scrollTo({top:0});
 }
+/* destructive actions: named confirmation, Cancel focused by default, Escape cancels, focus returns to the trigger */
+function confirmAction(title,body,verb){ return new Promise(res=>{ const d=$("cfmDlg"), back=document.activeElement;
+  $("cfmTitle").textContent=title; $("cfmBody").textContent=body; $("cfmOk").textContent=verb;
+  const done=v=>{ d.close(); $("cfmOk").onclick=$("cfmCancel").onclick=null; d.oncancel=null; if(back&&back.focus) back.focus(); res(v); };
+  $("cfmOk").onclick=()=>done(true); $("cfmCancel").onclick=()=>done(false); d.oncancel=e=>{ e.preventDefault(); done(false); };
+  d.showModal(); $("cfmCancel").focus(); }); }
 function bindBottomNav(){
   document.querySelectorAll(".bnav a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); if(a.dataset.tab==="more"){ const sh=$("moreSheet"); sh.hidden=!sh.hidden; a.setAttribute("aria-expanded",String(!sh.hidden)); return; } $("moreSheet").hidden=true; go(a.dataset.tab); }));
   document.querySelectorAll("#moreSheet [data-tab]").forEach(b=>b.addEventListener("click",()=>{ $("moreSheet").hidden=true; go(b.dataset.tab); }));
@@ -4286,7 +4367,7 @@ function bindHelp(){
 function init(){
   fillGroundSelects(); bindLab(); bindAnim(); loadState(); bindMap(); bindCells(); bindPlanner(); bindShare(); bindMethods(); bindBottomNav(); bindTabs(); bindQuiz(); renderQuiz();
   document.addEventListener("click",e=>{ const g=e.target.closest("[data-goto]"); if(g) go(g.dataset.goto); });
-  $("quizReset").addEventListener("click",renderQuiz);
+  $("quizReset").addEventListener("click",async()=>{ const n=Object.keys(QZ.ans).length; if(n&&!await confirmAction("Start the quiz again?",`Your ${n} answer${n>1?"s":""} and marks will be cleared.`,"Clear answers")) return; renderQuiz(); });
   loadPreset(0);
   go(location.hash.slice(1)||"lab",true);
   bindTheme();
