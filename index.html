@@ -672,6 +672,34 @@ input[type=range]{min-height:28px}
 }
 @media (max-width:760px){ .toolrow .mapseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%} .toolrow .mapseg label{justify-content:center;text-align:center;white-space:normal;padding:6px 4px;font-size:13px;line-height:1.2} }
 
+/* ===== transmitter panel (slide-over) ===== */
+.aui{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);z-index:80;background:var(--panel);border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(0,0,0,.16);display:flex;flex-direction:column}
+.aui[hidden]{display:none}
+.auitop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.auitop h2{font-size:18px;margin:2px 0 0}
+.auibody{overflow:auto;padding:12px 16px 24px;display:grid;gap:14px;align-content:start}
+.auisec{border:1px solid var(--line);border-radius:var(--radius-md);padding:12px;display:grid;gap:10px}
+.auisec h3{margin:0;font-size:15px}
+.auihead{display:flex;align-items:center;gap:10px}
+.led{width:12px;height:12px;border-radius:50%;background:#2fbf71;box-shadow:0 0 0 3px color-mix(in srgb,#2fbf71 25%,transparent)}
+.led.off{background:#9aa6ba;box-shadow:none}
+.auimeters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.aum{border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px;display:grid;gap:2px;background:color-mix(in srgb,var(--accent-soft) 40%,transparent)}
+.aum .k{font-size:12px;color:var(--muted);font-weight:600}.aum .val{font-family:var(--font-mono);font-size:16px}.aum .sub{font-size:12px;color:var(--muted)}
+.auialarms{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.auialarms li{padding:8px 10px;border-radius:var(--radius-sm);font-size:13.5px;border:1px solid var(--line)}
+.auialarms li.bad{background:color-mix(in srgb,var(--bad) 12%,transparent);border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
+.auialarms li.warn{background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.auialarms li.good{background:color-mix(in srgb,var(--good) 10%,transparent)}
+.antparams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.auiplots{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auiplots canvas{width:100%;height:220px;display:block}
+.auiplots > div:only-child{grid-column:1 / -1}
+@media (max-width:520px){.auimeters{grid-template-columns:repeat(2,minmax(0,1fr))}.antparams,.auiplots{grid-template-columns:1fr}}
+#labAnt .antparams{grid-template-columns:1fr}
+.brand h1 small,.brand small{font-size:12.5px!important;font-weight:400!important}
+#nowBtn{white-space:nowrap;min-width:max-content;flex:none}
+
 </style>
 </head>
 <body>
@@ -829,6 +857,16 @@ input[type=range]{min-height:28px}
             <label class="check"><input type="checkbox" id="gstorm"> Geomagnetic storm</label>
             <div class="field"><label for="env">Listener's surroundings</label>
               <select id="env"><option value="rural">Rural (quiet)</option><option value="suburban">Suburban</option><option value="urban">Urban</option><option value="industrial">Industrial / city centre (noisy)</option></select></div>
+          </div>
+        </details>
+
+        <details class="acc" name="settings" id="antBox">
+          <summary>Transmitting antenna</summary>
+          <div class="acc-body">
+            <label class="check"><input type="checkbox" id="labAntOn"> Use a real antenna pattern (otherwise the ITU reference antenna)</label>
+            <div id="labAnt"></div>
+            <div class="field" id="labAzF"><label for="labAz">Direction of the listeners (° from N) <span class="v" id="labAzV"></span></label><input type="range" id="labAz" min="0" max="359" step="1"></div>
+            <p class="hint" id="labAntInfo"></p>
           </div>
         </details>
 
@@ -1071,6 +1109,7 @@ input[type=range]{min-height:28px}
       </div>
       <button class="btn" id="gpsBtn" type="button" hidden>◎ My location</button>
       <button class="btn mob-only" id="findTowers" type="button" title="Search OpenStreetMap for mobile towers within 8 km of the selected test point">📶 Find towers (OSM)</button>
+      <label class="check bcast-only"><input type="checkbox" id="bcHeat"> Coverage heat map</label>
       <span class="toolsave"><button class="btn" id="shareBtn" type="button" title="Copy a link that opens this exact scenario">🔗 Share link</button></span>
     </div>
     <p class="modehint" id="modeHint" aria-live="polite">Click the map to add a receiver.</p>
@@ -1095,7 +1134,7 @@ input[type=range]{min-height:28px}
       </select>
     </div>
     <div class="map-br" id="attrib"></div>
-    <div class="pintools" id="pinTools" hidden><button class="pinbtn" id="pinRen" type="button">✎ Rename</button><button class="pinbtn del" id="pinDel" type="button">✕ Delete</button></div>
+    <div class="pintools" id="pinTools" hidden><button class="pinbtn" id="pinPanel" type="button">⚙ Panel</button><button class="pinbtn" id="pinRen" type="button">✎ Rename</button><button class="pinbtn del" id="pinDel" type="button">✕ Delete</button></div>
     <div class="renbox" id="renBox" hidden role="dialog" aria-label="Rename pin">
       <label for="renInput" class="lbl">Pin name</label>
       <input type="text" id="renInput" maxlength="60">
@@ -1361,6 +1400,10 @@ input[type=range]{min-height:28px}
 </section>
 
 
+<aside class="aui" id="auiPanel" hidden role="dialog" aria-labelledby="auiTitle">
+  <div class="auitop"><div><p class="eyebrow" style="margin:0">Transmitter panel</p><h2 id="auiTitle">Transmitter</h2></div><button class="iconbtn" id="auiClose" type="button" aria-label="Close panel" data-tip="Close panel">✕</button></div>
+  <div class="auibody" id="auiBody"></div>
+</aside>
 <dialog id="cfmDlg" class="cfm" aria-labelledby="cfmTitle" aria-describedby="cfmBody">
   <h2 id="cfmTitle"></h2><p id="cfmBody"></p>
   <div class="row cfmrow"><button class="btn" id="cfmCancel" type="button">Cancel</button><button class="btn danger" id="cfmOk" type="button"></button></div>
@@ -1431,7 +1474,7 @@ input[type=range]{min-height:28px}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<footer><b>Groundwave Propagation Lab v3.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v3.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -1544,7 +1587,8 @@ function skyField(d,p,io){
     const a1=absdB(f,io.I,secAt(layer.del,100));
     const fa=n*flareAbs(f,p)*secAt(layer.del,80);
     const loss=n*a1+(n-1)*reflLoss+6+fa;
-    const E=300*Math.sqrt(p.P)*Math.cos(layer.del)/slant*Math.pow(10,-loss/20);
+    const ga=(p.ant||p.feeder||p.mism)?antCorr(p,toDeg(layer.del)):0;
+    const E=300*Math.sqrt(p.P)*Math.cos(layer.del)/slant*Math.pow(10,(ga-loss)/20);
     sumsq+=E*E;
     if(!best||E>best.E) best={n,E,layer:layer.name,del:layer.del,abs:a1,flare:fa};
   }
@@ -1593,12 +1637,12 @@ function vhfField(d,p){ return 199.36+20*Math.log10(p.f/1000)-vhfLoss(d,p).Lb+10
 function evalP(p,d,io){
   let g=null,s=null,t=null;
   switch(p.type){
-    case "gwflat": g=p.f>=30?vhfField(d,p):gwdB(d,p,false); t=g; break;
-    case "gw": g=p.f>=30?vhfField(d,p):gwdB(d,p,true); t=g; break;
-    case "inverse": g=dBuV(300*Math.sqrt(p.P)/d); t=g; break;
+    case "gwflat": g=(p.f>=30?vhfField(d,p):gwdB(d,p,false))+antGround(p,d); t=g; break;
+    case "gw": g=(p.f>=30?vhfField(d,p):gwdB(d,p,true))+antGround(p,d); t=g; break;
+    case "inverse": g=dBuV(300*Math.sqrt(p.P)/d)+antGround(p,d); t=g; break;
     case "sky": { s=skyDB(d,p,io); t=s; break; }
     case "combined": {
-      g=p.f>=30?vhfField(d,p):gwdB(d,p,true);
+      g=(p.f>=30?vhfField(d,p):gwdB(d,p,true))+antGround(p,d);
       s=p.f>=30?null:skyDB(d,p,io);
       const eg=mVfromdB(g), es=s===null?0:mVfromdB(s);
       t=dBuV(Math.sqrt(eg*eg+es*es)); break;
@@ -1840,9 +1884,11 @@ const P1147={
 function solarHourOf(p){ if(p.hour!==undefined&&p.hour!==null) return p.hour; if(p.cosChi!==undefined&&p.cosChi!==null) return 12+Math.acos(clamp(p.cosChi,-1,1))*12/Math.PI; return {day:12,dusk:18,night:24}[p.time]??12; }
 function p1147(d,p){
   const f=p.f, pk=P1147.slant(d), phi=p.gmlat??20, k=P1147.k(phi), dip=p.dip??toDeg(Math.atan(2*Math.tan(toRad(phi)))), Lp=2*P1147.Lp(f,dip,p.azi??0), Lt=P1147.Lt(solarHourOf(p));
-  const V=10*Math.log10(p.P); // short monopole: G_V = 0 dB (cymomotive force 300 V for 1 kW)
+  // V = P + G_V + G_H (P.1147 §2.2): antenna gain toward the take-off angle and azimuth, relative to a short monopole
+  const th=(d/2)/6371, del=Math.atan((Math.cos(th)-6371/(6371+100))/Math.sin(th)), ga=(p.ant||p.feeder||p.mism)?antCorr(p,toDeg(del)):0;
+  const V=10*Math.log10(p.P)+ga;
   const E=V+P1147.A(f)-20*Math.log10(pk)-k*pk/1000-Lp-Lt;   // G_S (sea gain) = 0, L_r = 0 for |Φ| ≤ 45°
-  return {E,pk,k,Lp,Lt,V,A:P1147.A(f),phi,dip,h:solarHourOf(p)};
+  return {E,pk,k,Lp,Lt,V,A:P1147.A(f),phi,dip,h:solarHourOf(p),ga,del:toDeg(del)};
 }
 
 /* ---------- ITU-R P.526 / P.1812 diffraction ---------- */
@@ -1935,6 +1981,139 @@ function flareAbs(fMHz,p){ const H=flareHAF(p); return H>0?Math.pow(H/fMHz,1.5):
 function burstNoise(p,GdBi,NFdB){ const R=flareLevel(p); if(!R||cosChiOf(p)<=0||!p.sunBeam||p.f<30) return 0;
   const lam=C_LIGHT/p.f, Ae=Math.pow(10,GdBi/10)*lam*lam/(4*Math.PI), Ts=FLARE[R].sfu*1e-22*Ae/(2*1.380649e-23), Tsys=290*Math.pow(10,NFdB/10);
   return 10*Math.log10(1+Ts/Tsys); }
+
+/* =====================================================================
+   TRANSMITTING ANTENNAS
+   LF/MF: ITU-R BS.1386 (vertical monopoles with sinusoidal current, arrays of active vertical elements)
+   VHF/UHF: ITU-R BS.1195 (dipoles, stacked bays with beam tilt and null fill, panel arrays, Yagi, log-periodic)
+   Mobile: 3GPP TR 36.814 / 38.901 sector antenna (see antGain in map_cells.js)
+   Gain is computed by integrating the 3-D pattern (directivity), times radiation efficiency.
+   ===================================================================== */
+const ANT_TYPES={
+  mono:{name:"Vertical monopole (mast radiator)",band:"lf",std:"ITU-R BS.1386 §3.5.1",
+    params:[{k:"hl",label:"Electrical height (λ)",min:0.05,max:0.7,step:0.005,def:0.25,hint:"0.25 λ quarter-wave · 0.53 λ anti-fading · 0.625 λ maximum ground wave"},
+            {k:"eff",label:"Radiation efficiency (%)",min:20,max:100,step:1,def:90,hint:"Set by the earth system: 120 × λ/4 radials ≈ 90–95%"}]},
+  tant:{name:"Top-loaded T / umbrella antenna",band:"lf",std:"ITU-R BS.1386 §3.5.2",
+    params:[{k:"hl",label:"Mast height (λ)",min:0.03,max:0.25,step:0.005,def:0.1,hint:"Short mast; top loading raises the current and the efficiency"},
+            {k:"eff",label:"Radiation efficiency (%)",min:10,max:100,step:1,def:70}]},
+  darr:{name:"Directional array of masts (2–4 towers)",band:"lf",std:"ITU-R BS.1386 §3.6.1 (active vertical elements)",
+    params:[{k:"n",label:"Number of towers",min:2,max:4,step:1,def:2},
+            {k:"sp",label:"Tower spacing (λ)",min:0.1,max:1,step:0.01,def:0.25},
+            {k:"ph",label:"Phase step (°)",min:-180,max:180,step:1,def:-90,hint:"−90° with 0.25 λ spacing gives a cardioid: beam along the array line, null behind"},
+            {k:"az",label:"Beam / array-line azimuth (° from N)",min:0,max:359,step:1,def:0},
+            {k:"hl",label:"Tower height (λ)",min:0.05,max:0.7,step:0.005,def:0.25},
+            {k:"eff",label:"Radiation efficiency (%)",min:20,max:100,step:1,def:90}]},
+  dip:{name:"Half-wave dipole (single bay)",band:"vu",std:"ITU-R BS.1195 §4.3",params:[]},
+  bays:{name:"Multi-bay omnidirectional array (FM/TV)",band:"vu",std:"ITU-R BS.1195 §6 (vertical stacking)",
+    params:[{k:"n",label:"Number of bays",min:1,max:16,step:1,def:4},
+            {k:"sp",label:"Bay spacing (λ)",min:0.5,max:1.2,step:0.05,def:1},
+            {k:"tilt",label:"Electrical beam tilt (° down)",min:0,max:5,step:0.1,def:0.5,hint:"Points the main beam at the horizon seen from the mast top"},
+            {k:"nf",label:"Null fill (% of peak field)",min:0,max:30,step:1,def:10,hint:"Fills the nulls below the beam so nearby listeners are not in a hole"}]},
+  panel:{name:"Panel array (directional FM/TV)",band:"vu",std:"ITU-R BS.1195 §6.4.1",
+    params:[{k:"n",label:"Panels stacked vertically",min:1,max:16,step:1,def:4},
+            {k:"hbw",label:"Horizontal beamwidth (°, −3 dB)",min:30,max:180,step:5,def:90},
+            {k:"fb",label:"Front-to-back ratio (dB)",min:10,max:35,step:1,def:20},
+            {k:"az",label:"Beam azimuth (° from N)",min:0,max:359,step:1,def:0},
+            {k:"tilt",label:"Electrical beam tilt (° down)",min:0,max:5,step:0.1,def:0.5},
+            {k:"nf",label:"Null fill (%)",min:0,max:30,step:1,def:10}]},
+  yagi:{name:"Yagi–Uda (relay / link)",band:"vu",std:"ITU-R BS.1195 §6.4.2",
+    params:[{k:"el",label:"Number of elements",min:3,max:24,step:1,def:6},
+            {k:"az",label:"Beam azimuth (° from N)",min:0,max:359,step:1,def:0},
+            {k:"tilt",label:"Tilt (° down)",min:-10,max:10,step:0.5,def:0}]},
+  lpda:{name:"Log-periodic dipole array",band:"vu",std:"ITU-R BS.1195 §6.4.3",
+    params:[{k:"g",label:"Gain (dBi)",min:5,max:11,step:0.5,def:7},
+            {k:"az",label:"Beam azimuth (° from N)",min:0,max:359,step:1,def:0},
+            {k:"tilt",label:"Tilt (° down)",min:-10,max:10,step:0.5,def:0}]}
+};
+function antBand(f){ return f<30?"lf":"vu"; }
+function antDefault(type){ const T=ANT_TYPES[type], a={type}; (T?T.params:[]).forEach(q=>a[q.k]=q.def); return a; }
+function antFor(f){ return antDefault(f<30?"mono":"dip"); }
+const rad=d=>d*Math.PI/180;
+/* ---- element and array patterns: field (linear, ≥ 0) toward azimuth φ (° from N) and elevation Δ (°) ---- */
+function monoF(hl,D){ const G=2*Math.PI*hl, s=Math.sin(rad(D)), c=Math.cos(rad(D)); if(c<1e-6) return 0;
+  if(hl<0.06) return c; return Math.abs((Math.cos(G*s)-Math.cos(G))/((1-Math.cos(G))*c)); }
+function dipF(D){ const c=Math.cos(rad(D)); return c<1e-6?0:Math.abs(Math.cos(Math.PI/2*Math.sin(rad(D)))/c); }
+function stackAF(n,sp,tilt,D,nf){ const u=Math.PI*sp*(Math.sin(rad(D))+Math.sin(rad(tilt))); let af=Math.abs(u)<1e-9?1:Math.abs(Math.sin(n*u)/(n*Math.sin(u)));
+  return Math.max(af,(nf||0)/100); }
+function antField(a,az,D){
+  switch(a.type){
+    case "mono": return monoF(a.hl,D);
+    case "tant": return Math.cos(rad(D));
+    case "darr": { const ps=2*Math.PI*a.sp*Math.cos(rad(az-a.az))*Math.cos(rad(D)); let re=0,im=0; for(let k=0;k<a.n;k++){ const ph=k*(ps+rad(a.ph)); re+=Math.cos(ph); im+=Math.sin(ph); } return Math.hypot(re,im)/a.n*monoF(a.hl,D); }
+    case "dip": return dipF(D);
+    case "bays": return dipF(D)*stackAF(a.n,a.sp,a.tilt,D,a.nf);
+    case "panel": { const dp=((az-a.az)%360+540)%360-180, Ah=-Math.min(12*Math.pow(dp/a.hbw,2),a.fb); return Math.pow(10,Ah/20)*dipF(D)*stackAF(a.n,1,a.tilt,D,a.nf); }
+    case "yagi": case "lpda": { const G=antPeakFormula(a), bw=Math.sqrt(41253/Math.pow(10,G/10)), dp=((az-a.az)%360+540)%360-180, dv=D+(a.tilt||0);
+      return Math.pow(10,-Math.min(12*(dp*dp+dv*dv)/(bw*bw),20)/20); }
+  }
+  return 1;
+}
+function antPeakFormula(a){ return a.type==="yagi"?8.6*Math.log10(a.el)+3.5:a.g; } // Yagi: 3 el ≈ 7.6, 6 ≈ 10.2, 10 ≈ 12.1 dBi
+/* directivity by numerical integration: LF/MF antennas radiate into the upper half-space over a perfect ground, VHF/UHF into the full sphere */
+const ANT_CACHE=new Map();
+function antStats(a){
+  const key=JSON.stringify(a); if(ANT_CACHE.has(key)) return ANT_CACHE.get(key);
+  const lf=ANT_TYPES[a.type]&&ANT_TYPES[a.type].band==="lf", NA=72, NE=lf?45:90, e0=lf?0:-90, e1=90;
+  let sum=0, max=0, best={az:0,el:0};
+  for(let j=0;j<NE;j++){ const D=e0+(j+0.5)*(e1-e0)/NE, w=Math.cos(rad(D))*rad((e1-e0)/NE)*rad(360/NA);
+    for(let i=0;i<NA;i++){ const az=i*360/NA, F=antField(a,az,D), U=F*F; sum+=U*w; if(U>max){ max=U; best={az,el:D}; } } }
+  // peak can sit between grid points: refine along azimuth at the best elevation
+  for(let i=0;i<360;i++){ const F=antField(a,i,best.el); if(F*F>max){ max=F*F; best={az:i,el:best.el}; } }
+  const eff=(a.eff??100)/100, Dmax=4*Math.PI*max/sum;
+  let Gmax=10*Math.log10(Dmax*eff); if(a.type==="yagi"||a.type==="lpda") Gmax=antPeakFormula(a);
+  const st={sum,max,Dmax,eff,Gmax,best,lf}; if(ANT_CACHE.size>300) ANT_CACHE.clear(); ANT_CACHE.set(key,st); return st;
+}
+/* gain (dBi) toward a direction */
+function antGainDbi(a,az,D){ const st=antStats(a), F=antField(a,az,D); if(F<=1e-6) return -60; return st.Gmax+20*Math.log10(F/Math.sqrt(st.max)); }
+/* correction applied to the propagation model: relative to the model's reference antenna
+   (LF/MF/HF: short vertical monopole, 4.77 dBi = cymomotive force 300 V for 1 kW; VHF/UHF: half-wave dipole 2.15 dBi, i.e. ERP) */
+function antRef(f){ return f<30?10*Math.log10(3):2.15; }
+function antCorr(p,elDeg){ if(!p.ant) return -(p.feeder||0)-(p.mism||0); const a=p.ant; const ok=ANT_TYPES[a.type]&&ANT_TYPES[a.type].band===antBand(p.f);
+  const aa=ok?a:antFor(p.f); return antGainDbi(aa,p.antAz??0,elDeg)-antRef(p.f)-(p.feeder||0)-(p.mism||0); }
+/* elevation from the transmitting antenna toward a ground receiver at d km (negative = below the horizon) */
+function depressionDeg(p,d){ let ht=p.htx||30, hr=p.hrx||10; if(p.profile&&p.profile.h&&p.profile.h.length){ ht+=p.profile.h[0]; hr+=p.profile.h[p.profile.h.length-1]; }
+  return toDeg(Math.atan((hr-ht)/(d*1000))-d*1000/(2*kFac(p)*6371e3)); }
+function antGround(p,d){ if(!p.ant&&!p.feeder&&!p.mism) return 0; return antCorr(p,p.f>=30?depressionDeg(p,d):0); }
+/* physical size of the antenna at frequency f */
+function antSize(a,f){ const lam=299.792458/f;
+  switch(a.type){
+    case "mono": return `mast ${Math.round(a.hl*lam)} m tall (${a.hl} λ, λ = ${lam.toFixed(0)} m)`;
+    case "tant": return `mast ${Math.round(a.hl*lam)} m with top-loading wires (λ = ${lam.toFixed(0)} m)`;
+    case "darr": return `${a.n} masts ${Math.round(a.hl*lam)} m tall, ${Math.round(a.sp*lam)} m apart; array length ${Math.round((a.n-1)*a.sp*lam)} m`;
+    case "dip": return `dipole ${(lam/2).toFixed(2)} m long`;
+    case "bays": return `${a.n} bays over ${(Math.max(a.n-1,0)*a.sp*lam+lam/2).toFixed(1)} m of mast (bay spacing ${(a.sp*lam).toFixed(2)} m)`;
+    case "panel": return `${a.n} panels, about ${(lam*0.9).toFixed(2)} × ${(lam*0.6).toFixed(2)} m each, ${(a.n*lam).toFixed(1)} m of mast`;
+    case "yagi": return `boom about ${((a.el-1)*0.22*lam).toFixed(2)} m, elements up to ${(lam/2).toFixed(2)} m`;
+    case "lpda": return `longest element ${(lam/2).toFixed(2)} m, boom about ${(0.8*lam).toFixed(2)} m`;
+  }
+  return "";
+}
+/* half-power beamwidths (°) read from the pattern */
+function antBeamwidths(a){ const st=antStats(a), pk=Math.sqrt(st.max), half=pk/Math.SQRT2;
+  let h=360; { const v=[]; for(let i=0;i<720;i++) v.push(antField(a,st.best.az+(i-360)/2,st.best.el)); let lo=360,hi=360; while(lo>0&&v[lo]>=half) lo--; while(hi<719&&v[hi]>=half) hi++; h=lo===0&&hi===719?360:(hi-lo)/2; }
+  let v=180; { const s=[]; for(let i=-180;i<=180;i++) s.push(antField(a,st.best.az,clamp(st.best.el+i/2,-90,90))); let c=180,lo=c,hi=c; while(lo>0&&s[lo]>=half) lo--; while(hi<s.length-1&&s[hi]>=half) hi++; v=(hi-lo)/2; }
+  return {h,v}; }
+
+/* ===== feeder line, matching and the transmitter (simulated Nautel-AUI-style panel values) ===== */
+const FEEDERS={ldf4:{name:"1/2\" foam coax (LDF4-50A class)",a100:2.17},ldf5:{name:"7/8\" foam coax (LDF5-50A class)",a100:1.2},ldf7:{name:"1-5/8\" foam coax (LDF7-50A class)",a100:0.72},
+  rig3:{name:"3-1/8\" rigid line",a100:0.33},rig6:{name:"6-1/8\" rigid line",a100:0.2},open:{name:"Open-wire / short strap (MF)",a100:0.05}};
+/* attenuation in dB per 100 m from typical datasheet values at 100 MHz, scaled with √f (conductor loss) */
+function feederLoss(t,f){ const F=FEEDERS[t.feeder||(f<30?"open":"ldf7")]||FEEDERS.ldf7, L=t.flen??((t.h||30)+20); return F.a100*Math.sqrt(Math.max(f,0.1)/100)*L/100; }
+function vswrGamma(s){ s=Math.max(1,s||1.1); return (s-1)/(s+1); }
+function txPanelValues(t,p){
+  const f=p.f, tpo=t.tpo??p.P, G=vswrGamma(t.vswr), refl=tpo*G*G, fl=feederLoss(t,f), mm=-10*Math.log10(1-G*G);
+  const ant=t.ant||antFor(f), st=antStats(ant), gdb=st.Gmax, gref=gdb-antRef(f);
+  const toAnt=tpo*(1-G*G)*Math.pow(10,-fl/10), erp=toAnt*Math.pow(10,(gdb-2.15)/10), eirp=toAnt*Math.pow(10,gdb/10);
+  const eff=t.paeff??(f<30?86:f<300?72:38), ac=tpo/(eff/100);
+  const alarms=[]; const S=t.vswr||1.1;
+  if(S>=2) alarms.push({lvl:"bad",t:`VSWR ${S.toFixed(2)}:1 — transmitter would fold back power to protect the PA`});
+  else if(S>=1.5) alarms.push({lvl:"warn",t:`High VSWR ${S.toFixed(2)}:1 — check the antenna and feeder`});
+  if(fl>3) alarms.push({lvl:"warn",t:`Feeder loss ${fl.toFixed(1)} dB — more than half the power is lost in the line; use a larger line`});
+  if(t.erpLic&&erp>t.erpLic*1.0001) alarms.push({lvl:"bad",t:`ERP ${erp.toFixed(2)} kW exceeds the licensed ${t.erpLic} kW`});
+  if(ANT_TYPES[ant.type]&&ANT_TYPES[ant.type].band!==antBand(f)) alarms.push({lvl:"bad",t:`${ANT_TYPES[ant.type].name} does not suit ${fmtF(f)}; choose an ${f<30?"LF/MF":"VHF/UHF"} antenna`});
+  if(t.on===false) alarms.push({lvl:"warn",t:"Transmitter is OFF — it is left out of every prediction"});
+  return {tpo,refl,G,fl,mm,gdb,gref,toAnt,erp,eirp,eff,ac,heat:ac-tpo,alarms,st};
+}
 
 /* ================= STATE ================= */
 const COLORS=["#2f6fdf","#e0662f","#1f9e74","#b0429c","#c99a10","#6a5bd6","#d13b4f","#2a9bb5"];
@@ -2066,7 +2245,7 @@ function syncControls(){
   $("moisture").value=p.moisture; $("frozen").checked=p.frozen; $("refr").value=p.refr; $("storm").value=p.storm;
   document.querySelectorAll("input[name=time]").forEach(r=>r.checked=(p.cosChi===null && r.value===p.time));
   $("solar").value=p.solar; $("flareR").value=String(flareLevel(p)); $("sunBeam").checked=!!p.sunBeam; $("pL").value=String(p.pL||50); $("stereo").checked=!!p.stereo; $("thermal").checked=!!p.thermal; $("cellModel").value=p.cellModel||"auto"; $("gmlat").value=p.gmlat??20; $("azi").value=p.azi??0; $("gstorm").checked=p.gstorm; $("env").value=p.env;
-  updateLabels();
+  updateLabels(); if(typeof renderLabAnt==="function") renderLabAnt();
 }
 function updateLabels(){
   const m=sel(); if(!m) return; const p=m.p;
@@ -2815,6 +2994,12 @@ function computePathFor(a,b){
 function computePath(){ MP.path=computePathFor(MP.tx,MP.rx); }
 function baseModel(){ return models.find(m=>String(m.id)===$("mapModel").value)||sel(); }
 /* technology used on the map: the coverage selector wins, otherwise the model's own technology */
+/* a station's own transmitter-panel settings: power, frequency, antenna pattern toward the receiver, feeder and mismatch losses */
+function applyStation(p,tx,rx){
+  if(tx.f) p.f=tx.f; if(tx.tpo) p.P=tx.tpo;
+  if(tx.ant){ p.ant=JSON.parse(JSON.stringify(tx.ant)); p.antAz=bearing(tx,rx); }
+  if(tx.aui){ p.feeder=feederLoss(tx,p.f); const G=vswrGamma(tx.vswr); p.mism=-10*Math.log10(1-G*G); }
+  return p; }
 function mapCellTech(){ return MP.layer==="mobile"?MP.cov.tech:null; }
 function paramsFor(P,rx,T,tx){
   tx=tx||MP.tx;
@@ -2823,10 +3008,12 @@ function paramsFor(P,rx,T,tx){
   if(ct) Object.assign(p,cellParams(ct,tx.h)); else { if(p.type==="cell") p.type="gw"; p.env=MP.benv; }
   const phone=!!ct||p.type==="cell";
   const mid=gcPoint(tx,rx,0.5);
-  return Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,rxDist:Math.max(P.dist,0.5),
+  Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,rxDist:Math.max(P.dist,0.5),
     htx:tx.h,hrx:phone?1.5:rx.h,terrainLossDb:(MP.useTerrain&&T)?T.loss:0,profile:(MP.useTerrain&&T&&T.prof)?T.prof:null,
     gmlat:+geomagLat(mid.lat,mid.lon).toFixed(1),azi:+bearing(tx,rx).toFixed(0),seaFrac:clamp(1-P.landPct/100,0,1),
     pathLabel:`${tx.name} → ${rx.name}, ${P.landPct}% land`});
+  if(!ct) applyStation(p,tx,rx);
+  return p;
 }
 /* dipole geomagnetic latitude (IGRF-13 pole 80.65° N, 72.68° W) */
 function geomagLat(lat,lon){ const a=toRad(80.65), b=toRad(-72.68), f=toRad(lat), l=toRad(lon); return toDeg(Math.asin(Math.sin(f)*Math.sin(a)+Math.cos(f)*Math.cos(a)*Math.cos(l-b))); }
@@ -2956,6 +3143,7 @@ function obstacleInfo(T,tx,rx){
   if(o.kind==="building"){ const b=o.b||{}, type=BUILDING_TYPES[b.type]||(b.type?String(b.type).replace(/_/g," ")+" building":"building");
     return {kind:"Building",icon:"🏢",name:b.name||type.charAt(0).toUpperCase()+type.slice(1),detail:`${Math.round(b.h||0)} m tall${b.est?" (height estimated from "+(b.levels?b.levels+" floors":"OSM default")+")":""}${b.name?" · "+type:""}`,height:Math.round(b.h||0),km,lat:q.lat,lon:q.lon,loss:T.loss}; }
   const top=Math.round(o.top), rise=top-Math.min(T.e[0],T.e[n-1]);
+  if(rise<15&&!T.peakName) return {kind:"Earth bulge",icon:"◠",name:"curvature of the earth (no hill)",detail:`ground only ${Math.round(Math.max(rise,0))} m above the lower site; the curved earth itself blocks part of the path`,height:top,km,lat:q.lat,lon:q.lon,loss:T.loss};
   const kind=top>=600||rise>=450?"Mountain":top>=150||rise>=100?"Hill":"Ridge";
   const key=q.lat.toFixed(3)+","+q.lon.toFixed(3);
   let name=T.peakName||null;
@@ -2996,13 +3184,16 @@ function predictMulti(rx,Tsel){
   const ct=mapCellTech(), all=[];
   MP.txs.forEach((tx,i)=>{
     if(ct&&!(tx.techs||["2g","3g","4g"]).includes(ct)){ all.push({i,tx,skip:true}); return; }
+    if(tx.on===false){ all.push({i,tx,skip:true,off:true}); return; }
     const P=computePathFor(tx,rx), T=i===MP.ti?Tsel:null, p=paramsFor(P,rx,T,tx);
+    if(ct&&tx.eirp!==undefined) p.P=Math.pow(10,(tx.eirp-60)/10);
     let G=0; if(ct&&tx.sector&&tx.sector!=="omni"){ const el=toDeg(Math.atan(((tx.h||30)-1.5)/(Math.max(P.dist,0.02)*1000))); G=antGain(tx,bearing(tx,rx),el); p.P*=Math.pow(10,G/10); }
     const pr=predict(p); all.push({i,tx,P,p,pred:pr,G,dist:P.dist,terrain:!!T});
   });
   if(!ct) MP.relays.forEach((r,k)=>{
     const fd=relayFeed(r); if(fd.st==="none"){ all.push({i:-1,k,tx:r,relay:true,skip:true,feed:fd}); return; }
-    const P=computePathFor(r,rx), p=paramsFor(P,rx,null,r); Object.assign(p,{f:r.f,P:r.P,htx:r.h});
+    if(r.on===false){ all.push({i:-1,k,tx:r,relay:true,skip:true,off:true,feed:fd}); return; }
+    const P=computePathFor(r,rx), p=paramsFor(P,rx,null,r); Object.assign(p,{f:r.f,P:r.tpo||r.P,htx:r.h});
     all.push({i:-1,k,tx:r,relay:true,P,p,pred:predict(p),dist:P.dist,feed:fd});
   });
   const key=a=>a.pred.cell?a.pred.cell.m:(a.pred.t===null?-999:a.pred.t-a.pred.thr);
@@ -3132,7 +3323,7 @@ function drawMap(){
   // night
   const sp=sunPos(MP.date), cell=10, nightA=vec?0.34:0.24;
   for(let y=0;y<H;y+=cell){ for(let x=0;x<W;x+=cell){ const q=unproj(x+cell/2,y+cell/2); const cz=cosZen(q.lat,q.lon,sp); const a=cz< -0.1?nightA:cz<0.1?nightA*(0.1-cz)/0.2:0; if(a>0){ c.fillStyle=`rgba(10,18,52,${a})`; c.fillRect(x,y,cell,cell);} } }
-  drawCoverage(c,W,H);
+  drawCoverage(c,W,H); if(MP.layer==="bcast"&&MP.bcHeat) drawBcCoverage(c,W,H);
   $("covStat").textContent=MP.covStat?`${TECH_LABEL[MP.covStat.tech]} covered in view: ${MP.covStat.pct}% · ${MP.covStat.towers} site${MP.covStat.towers===1?"":"s"}`:"";
   // coverage circle
   const cov=MP.layer==="mobile"?{}:coverage();
@@ -3189,6 +3380,12 @@ function drawMap(){
     c.lineWidth=2; c.strokeStyle=fd.st==="fed"?"#1d8a5a":fd.st==="weak"?"#d18b14":"#c2413a"; c.stroke(); c.setLineDash([]);
     pin(r,"#1d8a8a","Y"+(k+1),false,v.z>4.5?`${r.name} · ${fmtF(r.f)}${fd.st==="fed"?"":" · not fed"}`:""); });
   if(MP.searchPt){ const [x,y]=proj(MP.searchPt.lon,MP.searchPt.lat); c.fillStyle="#7a3fd1"; c.strokeStyle="#fff"; c.lineWidth=2.5; c.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, R=i%2?5:12; i?c.lineTo(x+R*Math.cos(a),y+R*Math.sin(a)):c.moveTo(x+R*Math.cos(a),y+R*Math.sin(a)); } c.closePath(); c.fill(); c.stroke(); }
+  // antenna patterns: horizontal pattern drawn around each station that has an antenna set
+  const lobe=(st,col)=>{ const a=st.ant; if(!a) return; const s=antStats(a), pk=Math.sqrt(s.max), el=s.lf?0:s.best.el, [x,y]=proj(st.lon,st.lat), R=46;
+    c.beginPath(); for(let i=0;i<=360;i+=4){ const F=antField(a,i,el)/pk, db=F>1e-6?20*Math.log10(F):-40, r=R*Math.max(0.04,1+db/30); const px=x+r*Math.sin(rad(i)), py=y-r*Math.cos(rad(i)); i?c.lineTo(px,py):c.moveTo(px,py); }
+    c.closePath(); c.fillStyle=col+"26"; c.fill(); c.strokeStyle=col; c.lineWidth=1.6; c.stroke();
+    if(antBeamwidths(a).h<300){ const b=s.best.az; c.strokeStyle=col; c.lineWidth=2.5; c.beginPath(); c.moveTo(x,y); c.lineTo(x+(R+14)*Math.sin(rad(b)),y-(R+14)*Math.cos(rad(b))); c.stroke(); } };
+  if(MP.layer==="bcast"){ MP.txs.forEach(t=>lobe(t,"#d13b4f")); MP.relays.forEach(r=>lobe(r,"#1d8a8a")); }
   MP.rxs.forEach((rx,i)=>{ if(i!==MP.ai) pin(rx,"#5b7fc9",(MP.layer==="mobile"?"P":"R")+(i+1),false,v.z>4.5?rx.name:""); });
   if(MP.layer==="mobile") drawCellDots(c,W,H);
   MP.txs.forEach((t,i)=>{ if(i!==MP.ti) pin(t,"#e0828f","T"+(i+1),false,v.z>4.5?t.name:""); });
@@ -3199,6 +3396,7 @@ function drawMap(){
     const s=MP.lastSel&&arrOf(MP.lastSel.kind)[MP.lastSel.i]?MP.lastSel:{kind:"rx",i:MP.ai};
     const pt=arrOf(s.kind)[s.i], box=$("pinTools"), bt=$("pinDel");
     if(pt){ const [x,y]=proj(pt.lon,pt.lat); box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+8)+"px";
+      $("pinPanel").textContent=s.kind==="rx"?`⚙ T${MP.ti+1} panel`:"⚙ Panel";
       const can=s.kind==="relay"||arrOf(s.kind).length>1; bt.hidden=!can; bt.textContent=`✕ Delete`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?(MP.layer==="mobile"?"tower":"transmitter"):s.kind==="relay"?"relay":(MP.layer==="mobile"?"test point":"receiver")} ${pt.name}`);
       $("pinRen").setAttribute("aria-label",`Rename ${pt.name}`); MP.toolSel=s; } }
   const msg=$("mapMsg");
@@ -3399,9 +3597,10 @@ function renderTxTable(){
       <td><select class="tsec" aria-label="Antenna type of ${esc(t.name)}"><option value="omni"${(t.sector||"omni")==="omni"?" selected":""}>Omni</option><option value="3sector"${(t.sector||"omni")!=="omni"?" selected":""}>3-sector (3GPP)</option></select></td>
       <td><input type="number" class="taz" min="0" max="359" step="5" value="${t.az||0}" aria-label="Azimuth of first sector, degrees" style="width:64px" ${(t.sector||"omni")==="omni"?"disabled":""}></td>
       <td><input type="number" class="ttilt" min="-5" max="15" step="1" value="${t.tilt??2}" aria-label="Downtilt, degrees" style="width:56px"></td>`:""}
+      <td><button class="btn sm" type="button" data-aui="tx:${i}">⚙ Panel</button></td>
       <td>${i===MP.ti?'<span class="pill info">paths shown</span>':'<button class="btn sm tsel" type="button">Show paths</button>'}</td>
       <td><button class="iconbtn tdel" type="button" aria-label="Remove ${mob?"tower":"transmitter"} ${i+1}" title="Remove" ${MP.txs.length===1?"disabled":""}>✕</button></td></tr>`).join("");
-  $("txTable").innerHTML=`<tr><th></th><th>${mob?"Tower":"Transmitter"}</th><th>Lat, lon</th><th>${mob?"Height (m)":"Mast (m)"}</th>${mob?"<th>Networks</th><th>Antenna</th><th>Azimuth °</th><th>Tilt °</th>":""}<th></th><th></th></tr>`+rows;
+  $("txTable").innerHTML=`<tr><th></th><th>${mob?"Tower":"Transmitter"}</th><th>Lat, lon</th><th>${mob?"Height (m)":"Mast (m)"}</th>${mob?"<th>Networks</th><th>Antenna</th><th>Azimuth °</th><th>Tilt °</th>":""}<th>Panel</th><th></th><th></th></tr>`+rows;
 }
 function sitesCSV(){
   const head=["Site","Latitude","Longitude","Ground height (m)","Antenna height (m)","Distance (km)","Terrain loss (dB)","Signal (dBuV/m)","Signal","Reception"];
@@ -3418,7 +3617,7 @@ function addRelay(pt){ const b=baseModel().p, f=b.f>=30?+(b.f*1.03).toFixed(1):6
 function renderRelayTable(){ const el=$("relayTable"); if(!el) return;
   if(!MP.relays.length){ el.innerHTML=`<tr><td class="hint">No relays yet. Choose <b>🔁 Add relay</b> and click a valley or town the main transmitter can't reach. Search a place first if you like.</td></tr>`; return; }
   const txOpts=MP.S.bcast.txs.map((t,i)=>`<option value="${i}">T${i+1} · ${esc(t.name)}</option>`).join("");
-  el.innerHTML=`<tr><th></th><th>Relay</th><th>Fed from</th><th>Feed distance</th><th>Input field</th><th>Status</th><th>Mast (m)</th><th>ERP (kW)</th><th>Output (MHz)</th><th></th></tr>`+MP.relays.map((r,k)=>{ const fd=relayFeed(r);
+  el.innerHTML=`<tr><th></th><th>Relay</th><th>Fed from</th><th>Feed distance</th><th>Input field</th><th>Status</th><th>Mast (m)</th><th>ERP (kW)</th><th>Output (MHz)</th><th>Panel</th><th></th></tr>`+MP.relays.map((r,k)=>{ const fd=relayFeed(r);
     const st=fd.st==="fed"?['good','Fed']:fd.st==="weak"?['warn','Weak input']:['bad','Not fed'];
     return `<tr data-r="${k}"><td><span class="pin-n" style="background:#1d8a8a">Y${k+1}</span></td>
     <td><input type="text" class="rnm" value="${esc(r.name)}" aria-label="Relay ${k+1} name"></td>
@@ -3429,6 +3628,7 @@ function renderRelayTable(){ const el=$("relayTable"); if(!el) return;
     <td><input type="number" class="rh" min="5" max="400" step="1" value="${r.h}" style="width:70px" aria-label="Relay ${k+1} mast height"></td>
     <td><input type="number" class="rp" min="0.001" max="100" step="0.01" value="${r.P}" style="width:80px" aria-label="Relay ${k+1} ERP in kW"></td>
     <td><input type="number" class="rf" min="30" max="3000" step="0.1" value="${r.f}" style="width:86px" aria-label="Relay ${k+1} output frequency"></td>
+    <td><button class="btn sm" type="button" data-aui="relay:${k}">⚙ Panel</button></td>
     <td><button class="iconbtn rdel" type="button" aria-label="Remove relay ${k+1}">✕</button></td></tr>`; }).join(""); }
 /* ---------- layers: broadcast (Map tab) and mobile (Mobile tab) share one map ---------- */
 function setLayer(l){
@@ -3506,6 +3706,7 @@ function bindMap(){
   $("mapSearch").addEventListener("submit",e=>{ e.preventDefault(); const q=$("mapQ").value.trim(); if(q.length>1) placeSearch(q); });
   $("mapQ").addEventListener("keydown",e=>{ if(e.key==="Escape") $("mapHits").hidden=true; });
   $("mapEnv").addEventListener("change",e=>{ MP.benv=e.target.value; updateMap(); });
+  $("bcHeat").addEventListener("change",e=>{ MP.bcHeat=e.target.checked; drawMap(); });
   const rt=$("relayTable");
   rt.addEventListener("change",e=>{ const tr=e.target.closest("tr[data-r]"); if(!tr) return; const r=MP.relays[+tr.dataset.r];
     if(e.target.classList.contains("rnm")) r.name=e.target.value.trim()||r.name;
@@ -3537,6 +3738,7 @@ function bindMap(){
     if(pt.suggest) show(pt.suggest); else reverseName(pt.lat,pt.lon).then(nm=>{ pt.suggest=nm; if(!$("renBox").hidden) show(nm); }); };
   const renSave=()=>{ const box=$("renBox"); const arr=arrOf(box.dataset.kind); const pt=arr[+box.dataset.i]; const v=$("renInput").value.trim(); if(pt&&v){ pt.name=v; pt.autoName=false; } box.hidden=true; updateMap(); };
   $("pinRen").addEventListener("click",e=>{ e.stopPropagation(); renOpen(); });
+  $("pinPanel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx"){ openAui("tx",MP.ti); } else openAui(s.kind,s.i); });
   $("renSave").addEventListener("click",renSave); $("renCancel").addEventListener("click",()=>$("renBox").hidden=true);
   $("renInput").addEventListener("keydown",e=>{ if(e.key==="Enter") renSave(); if(e.key==="Escape") $("renBox").hidden=true; });
   mapC.addEventListener("keydown",e=>{ if(e.key==="F2"){ e.preventDefault(); renOpen(); } });
@@ -3640,10 +3842,10 @@ Object.assign(MP,{cells:[],useCells:true,me:null,cov:{tech:"4g",heat:true,env:"u
 
 /* ---------- antenna patterns (3GPP TR 36.814 / ITU-R M.2412 sector model) ---------- */
 function antGain(t,brgDeg,elevDeg){
-  const tilt=t.tilt??2, Av=-Math.min(12*Math.pow((elevDeg-tilt)/10,2),20);
+  const tilt=(t.tilt??2)+(t.etilt||0), hbw=t.hbw||65, vbw=t.vbw||10, Av=-Math.min(12*Math.pow((elevDeg-tilt)/vbw,2),20);
   if((t.sector||"omni")==="omni") return Math.max(Av,-30);
   let best=-99;
-  for(const off of [0,120,240]){ let phi=Math.abs(((brgDeg-(t.az||0)-off)%360+540)%360-180); const Ah=-Math.min(12*Math.pow(phi/65,2),30); best=Math.max(best,-Math.min(-(Ah+Av),30)); }
+  for(const off of [0,120,240]){ let phi=Math.abs(((brgDeg-(t.az||0)-off)%360+540)%360-180); const Ah=-Math.min(12*Math.pow(phi/hbw,2),30); best=Math.max(best,-Math.min(-(Ah+Av),30)); }
   return best;
 }
 /* tower list for one technology: user/OSM transmitters that carry it + imported real cells */
@@ -3905,6 +4107,183 @@ function printReport(){
   document.body.classList.add("print-report"); setTimeout(()=>{ window.print(); setTimeout(()=>document.body.classList.remove("print-report"),500); },50);
 }
 
+/* ===================== TRANSMITTER PANEL (Nautel-AUI-style, simulated) ===================== */
+const AUI={kind:null,i:-1,back:null};
+const MODES_BY_BAND={lf:["AM","DRM"],hf:["AM","DRM"],vu:["FM","FM + HD Radio","DAB+","DVB-T2","Analogue TV"]};
+function auiStation(){ if(AUI.kind==="relay") return MP.relays[AUI.i]; return MP.txs[AUI.i]; }
+function auiParams(t){ const b=baseModel().p; const f=AUI.kind==="relay"?t.f:(t.f||b.f); return {f,P:AUI.kind==="relay"?(t.tpo||t.P):(t.tpo||b.P)}; }
+/* antenna form (shared by the panel and the Lab) */
+function antFormHTML(a,f,idp){
+  const band=antBand(f), types=Object.entries(ANT_TYPES).filter(([,v])=>v.band===band);
+  const T=ANT_TYPES[a.type]||ANT_TYPES[types[0][0]];
+  return `<div class="field"><label for="${idp}type">Antenna type</label><select id="${idp}type" data-ak="type">${types.map(([k,v])=>`<option value="${k}"${k===a.type?" selected":""}>${esc(v.name)}</option>`).join("")}</select><span class="hint">${esc(T.std)}</span></div>
+  <div class="antparams">${T.params.map(q=>`<div class="field"><label for="${idp}${q.k}">${esc(q.label)} <span class="v">${a[q.k]??q.def}</span></label><input type="${q.max-q.min>40||q.step<1?"range":"number"}" id="${idp}${q.k}" data-ak="${q.k}" min="${q.min}" max="${q.max}" step="${q.step}" value="${a[q.k]??q.def}">${q.hint?`<span class="hint">${esc(q.hint)}</span>`:""}</div>`).join("")}</div>`;
+}
+function bindAntForm(root,getAnt,setAnt,f){
+  root.querySelectorAll("[data-ak]").forEach(el=>{
+    const h=()=>{ const k=el.dataset.ak; let a=getAnt();
+      if(k==="type"){ a=antDefault(el.value); setAnt(a,true); return; }
+      a[k]=+el.value; const lab=root.querySelector(`label[for="${el.id}"] .v`); if(lab) lab.textContent=el.value; setAnt(a,false); };
+    el.addEventListener(el.tagName==="SELECT"?"change":"input",h); });
+}
+/* polar (azimuth) and elevation pattern plots */
+function drawPolar(cv,a,beamAz){
+  const W=cv.clientWidth,H=cv.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, R=Math.min(W,H)/2-18, st=antStats(a), el=st.lf?0:st.best.el, pk=Math.sqrt(st.max);
+  c.strokeStyle=cssVar("--line"); c.fillStyle=cssVar("--muted"); c.font="12px "+cssVar("--font-mono"); c.textAlign="center"; c.textBaseline="middle";
+  for(const db of [0,-10,-20,-30]){ const r=R*(1+db/30); c.beginPath(); c.arc(cx,cy,Math.max(r,1),0,7); c.stroke(); }
+  for(let k=0;k<12;k++){ const t=rad(k*30); c.beginPath(); c.moveTo(cx,cy); c.lineTo(cx+R*Math.sin(t),cy-R*Math.cos(t)); c.stroke(); }
+  [["N",0],["E",90],["S",180],["W",270]].forEach(([s,d])=>c.fillText(s,cx+(R+10)*Math.sin(rad(d)),cy-(R+10)*Math.cos(rad(d))));
+  c.beginPath(); for(let i=0;i<=360;i+=2){ const F=antField(a,i,el)/pk, db=F>1e-6?20*Math.log10(F):-40, r=R*Math.max(0,1+db/30); const x=cx+r*Math.sin(rad(i)), y=cy-r*Math.cos(rad(i)); i?c.lineTo(x,y):c.moveTo(x,y); }
+  c.closePath(); c.fillStyle=hexA(cssVar("--accent")||"#1f5fd1",0.18); c.fill(); c.strokeStyle=cssVar("--accent"); c.lineWidth=2; c.stroke();
+  c.fillStyle=cssVar("--muted"); c.textAlign="left"; c.fillText("0 / −10 / −20 / −30 dB · azimuth",4,H-8);
+}
+function drawElev(cv,a){
+  const W=cv.clientWidth,H=cv.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const st=antStats(a), pk=Math.sqrt(st.max), L=40,R=8,T=8,B=22,w=W-L-R,h=H-T-B, e0=st.lf?0:-30, e1=st.lf?90:30;
+  const xs=e=>L+(e-e0)/(e1-e0)*w, ys=db=>T+(-db)/40*h;
+  c.strokeStyle=cssVar("--line"); c.fillStyle=cssVar("--muted"); c.font="12px "+cssVar("--font-mono"); c.textAlign="right"; c.textBaseline="middle";
+  for(const db of [0,-10,-20,-30,-40]){ c.beginPath(); c.moveTo(L,ys(db)); c.lineTo(L+w,ys(db)); c.stroke(); c.fillText(db,L-4,ys(db)); }
+  c.textAlign="center"; c.textBaseline="top"; for(let e=e0;e<=e1;e+=st.lf?15:10){ c.fillText(e+"°",xs(e),T+h+4); }
+  c.beginPath(); for(let i=0;i<=200;i++){ const e=e0+(e1-e0)*i/200, F=antField(a,st.best.az,e)/pk, db=Math.max(-40,F>1e-6?20*Math.log10(F):-40); const x=xs(e),y=ys(db); i?c.lineTo(x,y):c.moveTo(x,y); }
+  c.strokeStyle=cssVar("--accent"); c.lineWidth=2; c.stroke();
+  c.fillStyle=cssVar("--muted"); c.textAlign="left"; c.textBaseline="top"; c.fillText(st.lf?"elevation (sky-wave take-off angles)":"elevation (below 0° = toward listeners)",L+4,T);
+}
+function openAui(kind,i){
+  AUI.kind=kind; AUI.i=i; AUI.back=document.activeElement; const t=auiStation(); if(!t) return;
+  const {f}=auiParams(t); if(MP.layer!=="mobile"&&!t.ant){ t.ant=antFor(f); }
+  $("auiPanel").hidden=false; document.body.classList.add("aui-open"); renderAui(); $("auiClose").focus();
+}
+function closeAui(){ $("auiPanel").hidden=true; document.body.classList.remove("aui-open"); if(AUI.back&&AUI.back.focus) AUI.back.focus(); AUI.kind=null; }
+function auiChanged(full){ const t=auiStation(); if(!t) return; t.aui=true; MP.res.clear(); if(full) renderAui(); else renderAuiLive(); updateMap(); }
+function renderAui(){
+  const t=auiStation(); if(!t) return; const mob=MP.layer==="mobile";
+  $("auiTitle").textContent=`${AUI.kind==="relay"?"Relay Y"+(AUI.i+1):(mob?"Tower T":"Transmitter T")+(AUI.i+1)} · ${t.name}`;
+  if(mob){ renderAuiTower(t); return; }
+  const {f,P}=auiParams(t), band=f<30?(f<3?"lf":"hf"):"vu", a=t.ant||antFor(f);
+  const modes=MODES_BY_BAND[band]; if(!t.mode) t.mode=modes[0];
+  $("auiBody").innerHTML=`
+  <section class="auisec"><div class="auihead"><span class="led ${t.on===false?"off":"on"}" aria-hidden="true"></span><b id="auiState">${t.on===false?"Off air":"On air"}</b>
+    <label class="check"><input type="checkbox" id="auiOn" ${t.on===false?"":"checked"}> RF on</label></div>
+    <div class="auimeters" id="auiMeters"></div><ul class="auialarms" id="auiAlarms"></ul></section>
+  <section class="auisec"><h3>Transmitter</h3><div class="two">
+    <div class="field"><label for="auiF">Frequency (MHz)</label><input type="number" id="auiF" min="0.03" max="3000" step="0.001" value="${f}"></div>
+    <div class="field"><label for="auiMode">Mode</label><select id="auiMode">${modes.map(m=>`<option${m===t.mode?" selected":""}>${m}</option>`).join("")}</select></div>
+    <div class="field"><label for="auiTpo">Transmitter output power (kW)</label><input type="number" id="auiTpo" min="0.001" max="2000" step="0.01" value="${+(t.tpo||P).toFixed(3)}"></div>
+    <div class="field"><label for="auiEff">PA efficiency (%)</label><input type="number" id="auiEff" min="10" max="95" step="1" value="${t.paeff??(f<30?86:f<300?72:38)}"></div>
+    <div class="field"><label for="auiLic">Licensed ERP (kW, optional)</label><input type="number" id="auiLic" min="0" step="0.1" value="${t.erpLic||""}"></div>
+    <div class="field"><label for="auiH">Antenna height on mast (m)</label><input type="number" id="auiH" min="1" max="600" step="1" value="${t.h}"></div></div></section>
+  <section class="auisec"><h3>Feeder &amp; match</h3><div class="two">
+    <div class="field"><label for="auiFeed">Transmission line</label><select id="auiFeed">${Object.entries(FEEDERS).map(([k,v])=>`<option value="${k}"${(t.feeder||(f<30?"open":"ldf7"))===k?" selected":""}>${esc(v.name)}</option>`).join("")}</select></div>
+    <div class="field"><label for="auiLen">Line length (m)</label><input type="number" id="auiLen" min="1" max="1000" step="1" value="${t.flen??((t.h||30)+20)}"></div>
+    <div class="field"><label for="auiVswr">Antenna VSWR</label><input type="number" id="auiVswr" min="1" max="5" step="0.01" value="${t.vswr||1.1}"></div></div>
+    <p class="hint">Line loss from typical datasheet values at 100 MHz, scaled with √f.</p></section>
+  <section class="auisec"><h3>Antenna</h3><div id="auiAnt">${antFormHTML(a,f,"aa")}</div>
+    <p class="hint" id="auiSize"></p>
+    <div class="auiplots"><div><canvas id="auiPolar" aria-label="Horizontal radiation pattern"></canvas></div><div><canvas id="auiElev" aria-label="Vertical radiation pattern"></canvas></div></div></section>
+  <p class="hint">Simulated panel. A real Nautel AUI reads these values from the transmitter; here they are computed from your settings: patterns per ITU-R BS.1386 (LF/MF) and BS.1195 (VHF/UHF), reflected power from the VSWR, and ERP = power at the antenna × gain over a half-wave dipole.</p>`;
+  const num=(id,fn)=>$(id).addEventListener("change",e=>{ fn(+e.target.value); auiChanged(true); });
+  $("auiOn").addEventListener("change",e=>{ t.on=e.target.checked; auiChanged(true); });
+  num("auiF",v=>{ if(AUI.kind==="relay") t.f=clamp(v,30,3000); else t.f=clamp(v,0.03,3000); const fn=AUI.kind==="relay"?t.f:t.f; if(ANT_TYPES[(t.ant||{}).type]&&ANT_TYPES[t.ant.type].band!==antBand(fn)) t.ant=antFor(fn); });
+  $("auiMode").addEventListener("change",e=>{ t.mode=e.target.value; });
+  num("auiTpo",v=>{ t.tpo=clamp(v,0.001,2000); if(AUI.kind==="relay") t.P=t.tpo; });
+  num("auiEff",v=>{ t.paeff=clamp(v,10,95); });
+  num("auiLic",v=>{ t.erpLic=v>0?v:undefined; });
+  num("auiH",v=>{ t.h=clamp(v,1,600); });
+  $("auiFeed").addEventListener("change",e=>{ t.feeder=e.target.value; auiChanged(true); });
+  num("auiLen",v=>{ t.flen=clamp(v,1,1000); });
+  num("auiVswr",v=>{ t.vswr=clamp(v,1,5); });
+  bindAntForm($("auiAnt"),()=>t.ant||antFor(f),(na,full)=>{ t.ant=na; auiChanged(full); },f);
+  renderAuiLive();
+}
+function renderAuiLive(){
+  const t=auiStation(); if(!t||MP.layer==="mobile") return; const {f,P}=auiParams(t), v=txPanelValues(t,{f,P}), a=t.ant||antFor(f), bw=antBeamwidths(a);
+  const kw=x=>x>=1?x.toFixed(2)+" kW":(x*1000).toFixed(0)+" W", dbk=x=>(10*Math.log10(x)).toFixed(1)+" dBk";
+  const m=[["Forward power",kw(v.tpo),""],["Reflected power",kw(v.refl),`return loss ${(-20*Math.log10(Math.max(v.G,1e-6))).toFixed(1)} dB`],["VSWR",(t.vswr||1.1).toFixed(2)+":1",`mismatch loss ${v.mm.toFixed(2)} dB`],
+    ["Feeder loss",v.fl.toFixed(2)+" dB",`${(FEEDERS[t.feeder||(f<30?"open":"ldf7")]||{}).name||""}`],["Power at antenna",kw(v.toAnt),""],["Antenna gain",`${v.gdb.toFixed(2)} dBi`,`${(v.gdb-2.15).toFixed(2)} dBd · HPBW ${bw.h>=359?"omni":bw.h.toFixed(0)+"°"} × ${bw.v.toFixed(0)}°`],
+    ...(f<30?[["Cymomotive force (peak)",`${(300*Math.sqrt(v.toAnt*Math.pow(10,(v.gdb-10*Math.log10(3))/10))).toFixed(0)} V`,"field × distance; 300 V = 1 kW short monopole"],["EMRP (peak)",kw(v.toAnt*Math.pow(10,(v.gdb-10*Math.log10(3))/10)),"effective monopole radiated power (ITU-R BS.561)"]]
+      :[["ERP (peak)",kw(v.erp),dbk(v.erp)],["EIRP (peak)",kw(v.eirp),dbk(v.eirp)]]),["PA efficiency",v.eff+" %",`AC input ${kw(v.ac)} · heat ${kw(v.heat)}`]];
+  $("auiMeters").innerHTML=m.map(r=>`<div class="aum"><span class="k">${r[0]}</span><span class="val">${r[1]}</span><span class="sub">${esc(r[2])}</span></div>`).join("");
+  $("auiAlarms").innerHTML=v.alarms.length?v.alarms.map(x=>`<li class="${x.lvl}">${esc(x.t)}</li>`).join(""):`<li class="good">No alarms</li>`;
+  $("auiSize").textContent=`Size at ${fmtF(f)}: ${antSize(a,f)}.`;
+  requestAnimationFrame(()=>{ drawPolar($("auiPolar"),a); drawElev($("auiElev"),a); });
+}
+function renderAuiTower(t){
+  const tech=MP.cov.tech, T=CELL_TECH[tech], eirp=t.eirp??Math.round(dBm(cellParams(tech,t.h).P));
+  const a={type:"sector",hbw:t.hbw||65};
+  $("auiBody").innerHTML=`
+  <section class="auisec"><div class="auihead"><span class="led ${t.on===false?"off":"on"}" aria-hidden="true"></span><b>${t.on===false?"Off":"On air"}</b><label class="check"><input type="checkbox" id="auiOn" ${t.on===false?"":"checked"}> Radios on</label></div>
+    <div class="auimeters"><div class="aum"><span class="k">EIRP per sector (${T.sys})</span><span class="val">${eirp} dBm</span><span class="sub">${(Math.pow(10,(eirp-30)/10)).toFixed(0)} W</span></div>
+      <div class="aum"><span class="k">Reference signal</span><span class="val">${(eirp-techOf(cellParams(tech,t.h)).off).toFixed(1)} dBm</span><span class="sub">${T.meas} per ${tech==="2g"?"carrier":"resource element"}</span></div>
+      <div class="aum"><span class="k">Single-cell radius</span><span class="val">${(r=>r<1?Math.round(r*1000)+" m":fmtD(r)+" km")(cellRange(Object.assign(cellParams(tech,t.h),{P:Math.pow(10,(eirp-60)/10)})).r)}</span><span class="sub">${MP.cov.env} · ${MP.cov.indoor?"indoor":"outdoor"}</span></div></div></section>
+  <section class="auisec"><h3>Sector antenna (3GPP TR 36.814 / 38.901)</h3><div class="two">
+    <div class="field"><label for="auiSec">Antenna</label><select id="auiSec"><option value="omni"${(t.sector||"omni")==="omni"?" selected":""}>Omni</option><option value="3sector"${(t.sector||"omni")!=="omni"?" selected":""}>3 sectors</option></select></div>
+    <div class="field"><label for="auiHbw">Horizontal beamwidth</label><select id="auiHbw">${[33,65,90].map(b=>`<option value="${b}"${(t.hbw||65)===b?" selected":""}>${b}° (${b===33?"≈ 21 dBi":b===65?"≈ 18 dBi":"≈ 16 dBi"})</option>`).join("")}</select></div>
+    <div class="field"><label for="auiAz">Azimuth of sector 1 (° from N)</label><input type="number" id="auiAz" min="0" max="359" step="5" value="${t.az||0}"></div>
+    <div class="field"><label for="auiMt">Mechanical tilt (°)</label><input type="number" id="auiMt" min="-5" max="15" step="1" value="${t.tilt??2}"></div>
+    <div class="field"><label for="auiEt">Electrical tilt (°)</label><input type="number" id="auiEt" min="0" max="12" step="1" value="${t.etilt||0}"></div>
+    <div class="field"><label for="auiH">Antenna height (m)</label><input type="number" id="auiH" min="5" max="300" step="1" value="${t.h}"></div>
+    <div class="field"><label for="auiEirp">EIRP per sector (dBm)</label><input type="number" id="auiEirp" min="20" max="90" step="1" value="${eirp}"></div></div>
+    <div class="auiplots"><div><canvas id="auiPolar" aria-label="Sector pattern"></canvas></div></div></section>
+  <p class="hint">Sector pattern A_h = −min(12(φ/φ3dB)², 30 dB), vertical −min(12((θ − tilt)/10°)², 20 dB), combined −min(−(A_h + A_v), 30 dB).</p>`;
+  const set=(id,fn,ev="change")=>$(id).addEventListener(ev,e=>{ fn(e.target); MP.res.clear(); renderAui(); updateMap(); renderPlanner(); });
+  set("auiOn",e=>t.on=e.checked); set("auiSec",e=>t.sector=e.value); set("auiHbw",e=>t.hbw=+e.value); set("auiAz",e=>t.az=((+e.value||0)%360+360)%360);
+  set("auiMt",e=>t.tilt=clamp(+e.value||0,-5,15)); set("auiEt",e=>t.etilt=clamp(+e.value||0,0,12)); set("auiH",e=>t.h=clamp(+e.value||30,5,300)); set("auiEirp",e=>t.eirp=clamp(+e.value||60,20,90));
+  requestAnimationFrame(()=>{ const cv=$("auiPolar"), W=cv.clientWidth,H=cv.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+    const cx=W/2,cy=H/2,R=Math.min(W,H)/2-18; c.strokeStyle=cssVar("--line"); for(const db of [0,-10,-20,-30]){ c.beginPath(); c.arc(cx,cy,R*(1+db/30),0,7); c.stroke(); }
+    c.beginPath(); for(let i=0;i<=360;i+=2){ const g=antGain(t,i,(t.tilt??2)+(t.etilt||0)), r=R*Math.max(0,1+g/30); const x=cx+r*Math.sin(rad(i)),y=cy-r*Math.cos(rad(i)); i?c.lineTo(x,y):c.moveTo(x,y); }
+    c.closePath(); c.fillStyle=hexA(TECH_COL[tech]||"#2f6fdf",0.2); c.fill(); c.strokeStyle=TECH_COL[tech]||"#2f6fdf"; c.lineWidth=2; c.stroke(); });
+}
+function bindAui(){
+  $("auiClose").addEventListener("click",closeAui);
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("auiPanel").hidden&&!$("cfmDlg").open){ e.stopPropagation(); closeAui(); } },true);
+  document.addEventListener("click",e=>{ const b=e.target.closest("[data-aui]"); if(!b) return; const [k,i]=b.dataset.aui.split(":"); openAui(k,+i); });
+}
+
+/* ===================== BROADCAST COVERAGE HEAT MAP (best station incl. relays, antenna patterns) =====================
+   Each station gets a radial table of the omnidirectional field over a smooth path (station settings, P.368 / P.1147 / P.1812),
+   then every map cell adds the antenna gain toward it and keeps the best margin above the ITU minimum. */
+const BCH={key:"",tables:[]};
+function bcStations(){ const out=[]; MP.S.bcast.txs.forEach((t,i)=>{ if(t.on!==false) out.push({st:t,kind:"tx",i}); });
+  MP.S.bcast.relays.forEach((r,k)=>{ if(r.on!==false&&relayFeed(r).st!=="none") out.push({st:r,kind:"relay",i:k}); }); return out; }
+function bcTables(){
+  const sts=bcStations(), b=baseModel().p, key=JSON.stringify([sts.map(s=>[s.st.lat,s.st.lon,s.st.h,s.st.f,s.st.tpo,s.st.P,s.st.ant,s.st.vswr,s.st.feeder,s.st.flen,s.st.aui]),b,MP.benv,$("mapLand").value,MP.date.getTime()]);
+  if(key===BCH.key) return BCH.tables; BCH.key=key;
+  BCH.tables=sts.map(s=>{ const t=s.st, far=destPoint(t,100,90), P=computePathFor(t,far), p=paramsFor(P,far,null,t);
+    if(s.kind==="relay") Object.assign(p,{f:t.f,P:t.tpo||t.P,htx:t.h});
+    p.path="uniform"; p.ground=$("mapLand").value; p.terrainLossDb=0; p.profile=null; const ant=p.ant; delete p.ant; const io=iono(p);
+    const ds=[], vs=[]; for(let i=0;i<=56;i++){ const d=0.3*Math.pow(2000/0.3,i/56); const r=evalP(Object.assign({},p,{rxDist:d}),d,io); ds.push(d); vs.push(r.t===null?-999:r.t); }
+    return {s,p,ant,ds,vs,thr:dBuV(threshold(p))}; });
+  return BCH.tables;
+}
+function drawBcCoverage(c,W,H){
+  const tabs=bcTables(); if(!tabs.length) return; const cell=12; let n=0,ok=0;
+  for(let y=0;y<H;y+=cell) for(let x=0;x<W;x+=cell){ const q=unproj(x+cell/2,y+cell/2); let best=-999;
+    for(const T of tabs){ const d=Math.max(hav(T.s.st,q),0.3); if(d>2000) continue; let k=0; while(k<T.ds.length-2&&T.ds[k+1]<d) k++;
+      const u=(Math.log(d)-Math.log(T.ds[k]))/(Math.log(T.ds[k+1])-Math.log(T.ds[k])); let e=T.vs[k]+(T.vs[k+1]-T.vs[k])*clamp(u,0,1);
+      if(T.ant){ const pp={f:T.p.f,ant:T.ant,antAz:bearing(T.s.st,q),htx:T.p.htx,hrx:T.p.hrx,refr:T.p.refr}; e+=antCorr(pp,T.p.f>=30?depressionDeg(pp,d):0)+(T.p.feeder||0)+(T.p.mism||0); }
+      best=Math.max(best,e-T.thr); }
+    n++; if(best>=0) ok++;
+    const col=best>=20?"rgba(0,140,70,.38)":best>=10?"rgba(90,180,70,.34)":best>=0?"rgba(235,200,40,.34)":best>=-10?"rgba(240,130,40,.22)":null;
+    if(col){ c.fillStyle=col; c.fillRect(x,y,cell,cell); } }
+  MP.bcStat={pct:Math.round(ok/n*100)};
+}
+/* ===================== LAB: antenna on a model ===================== */
+function renderLabAnt(){
+  const m=sel(); if(!m||!$("labAnt")) return; const p=m.p, on=!!p.ant; $("labAntOn").checked=on;
+  $("labAnt").innerHTML=on?antFormHTML(p.ant,p.f,"la"):""; $("labAzF").hidden=!on;
+  if(on){ bindAntForm($("labAnt"),()=>m.p.ant,(na,full)=>{ m.p.ant=na; if(full) renderLabAnt(); else labAntInfo(); redraw(); syncModelSelects(); },p.f);
+    $("labAz").value=p.antAz??0; $("labAzV").textContent=`${Math.round(p.antAz??0)}°`; }
+  labAntInfo();
+}
+function labAntInfo(){ const m=sel(), p=m.p; if(!p.ant){ $("labAntInfo").textContent=p.f<30?"Reference: short vertical monopole (cymomotive force 300 V for 1 kW), as in ITU-R P.368 and P.1147.":"Reference: half-wave dipole, so the power is the ERP (ITU-R P.1812)."; return; }
+  const s=antStats(p.ant), bw=antBeamwidths(p.ant), g=antCorr(Object.assign({},p,{feeder:0,mism:0}),0);
+  $("labAntInfo").textContent=`${ANT_TYPES[p.ant.type].name}: peak gain ${s.Gmax.toFixed(2)} dBi, beamwidth ${bw.h>=359?"omni":bw.h.toFixed(0)+"°"} × ${bw.v.toFixed(0)}°. Toward the listeners: ${g>=0?"+":""}${g.toFixed(1)} dB versus the reference antenna. Size: ${antSize(p.ant,p.f)}.`; }
+function bindLabAnt(){
+  $("labAntOn").addEventListener("change",e=>{ const m=sel(); if(e.target.checked){ m.p.ant=antFor(m.p.f); m.p.antAz=m.p.antAz??0; } else delete m.p.ant; renderLabAnt(); redraw(); });
+  $("labAz").addEventListener("input",e=>{ const m=sel(); m.p.antAz=+e.target.value; $("labAzV").textContent=`${e.target.value}°`; labAntInfo(); redraw(); });
+}
+
 /* ===================== MODELS & EQUATIONS · VERIFICATION · MEASURED DATA ===================== */
 const f2=v=>isFinite(v)?(Math.abs(v)>=1e4||(Math.abs(v)<0.01&&v!==0)?v.toExponential(2):(+v.toFixed(2)).toString()):"—";
 const lg=Math.log10;
@@ -3985,6 +4364,22 @@ function explainCalc(p,d){
     return {S,W};
   }
   if(p.type==="custom"){ step("Your formula",p.expr,null); const r=evalP(p,d,io); step("Result","E(d)",r.t===null?NaN:mVfromdB(r.t),"mV/m"); warn("A custom formula has no validity range: compare it with the built-in models below."); return {S,W}; }
+  /* ---------- transmitting antenna ---------- */
+  if(p.ant||p.feeder||p.mism){
+    head("Transmitting antenna and feeder");
+    const a=p.ant&&ANT_TYPES[p.ant.type]&&ANT_TYPES[p.ant.type].band===antBand(p.f)?p.ant:(p.ant?antFor(p.f):null);
+    if(a){ const s=antStats(a), bw=antBeamwidths(a), el=p.f>=30?depressionDeg(p,d):0;
+      step(`Antenna (${ANT_TYPES[a.type].std})`,ANT_TYPES[a.type].name,null,antSize(a,p.f));
+      step("Directivity (numerical pattern integration)",s.lf?"D = 4π·U_max / ∫ U dΩ over the half-space above a perfect ground":"D = 4π·U_max / ∮ U dΩ",10*Math.log10(s.Dmax),"dBi");
+      if(s.lf) step("Radiation efficiency","earth system and conductor losses",s.eff*100,"%");
+      step("Peak gain","10·log(D·η)",s.Gmax,"dBi");
+      step("Beamwidth (−3 dB), horizontal × vertical","read from the pattern",null,`${bw.h>=359?"omni":bw.h.toFixed(0)+"°"} × ${bw.v.toFixed(0)}°`);
+      step(`Gain toward the receiver (azimuth ${Math.round(p.antAz??0)}°, elevation ${el.toFixed(2)}°)`,"G(φ, Δ) = G_peak + 20·log(F(φ, Δ)/F_peak)",antGainDbi(a,p.antAz??0,el),"dBi");
+      step("Reference antenna of the method",p.f<30?"short vertical monopole (P.368 / P.1147: 300 V for 1 kW)":"half-wave dipole (P.1812: ERP)",antRef(p.f),"dBi"); }
+    if(p.feeder) step("Feeder loss","typical datasheet attenuation × length, scaled with √f",p.feeder,"dB");
+    if(p.mism) step("Mismatch loss","−10·log(1 − Γ²), Γ = (VSWR − 1)/(VSWR + 1)",p.mism,"dB");
+    step("Correction applied to the field","G − G_ref − feeder − mismatch",antGround(p,d),"dB");
+  }
   /* ---------- ground / space wave ---------- */
   if(p.type!=="sky"&&p.type!=="inverse"){
     if(p.f>=30){
@@ -4029,10 +4424,11 @@ function explainCalc(p,d){
       step("Local solar time at midpoint",p.hour!==undefined&&p.hour!==null?"from the clock":"Day = 12 h, Dawn/dusk = 18 h, Night = 24 h",r.h,"h");
       step("Hourly loss factor Lt","sunset: 12.40 − 9.248t + 2.892t² − 0.3343t³; sunrise: 9.6 + 12.2t + 5.62t² + 0.86t³; day 30; night 0",r.Lt,"dB");
       step("Constant A",p.f<0.3?"LF":"MF",r.A,"dB");
-      step("Cymomotive force V","10·log P[kW] + G_V (short monopole, G_V = 0)",r.V,"dB(300 V)");
+      step(`Take-off angle (one hop, reflection at 100 km)`,"tan Δ = (cos θ − a/(a + h))/sin θ, θ = d/2a",r.del,"°");
+      step("Cymomotive force V","P + G_V + G_H (antenna gain toward Δ and the path azimuth, relative to a short monopole)",r.V,"dB(300 V)");
       step("Sky-wave field","E = V + A − 20·log p − k·p/1000 − Lp − Lt  (G_S = 0, L_r = 0)",r.E,"dBµV/m");
       if(d<50||d>12000) warn("P.1147 is defined for 50–12 000 km."); else ok("Distance inside 50–12 000 km.");
-      warn("Sea gain G_S and the transmitting antenna's vertical gain are set to 0. P.1147 adds them from Figs. 1–2.");
+      warn(p.ant?"Sea gain G_S is set to 0. The antenna's vertical and horizontal gain come from its pattern (BS.1386).":"Sea gain G_S is set to 0, and the antenna is the short-monopole reference (G_V = 0). Set an antenna to include G_V and G_H.");
       if(Math.abs(r.phi)>45) warn("|Φ| > 45°: the solar-activity loss L_r is not applied."); else ok("|Φ| ≤ 45°, so L_r = 0 (P.1147 §2.8).");
     } else {
       head("HF sky wave (P.533-style teaching approximation)");
@@ -4099,6 +4495,9 @@ const MODEL_LIB=[
  {id:"atm",name:"Rain · gases · building entry",band:"Above 1 GHz (P.2109: 80 MHz – 100 GHz)",ref:"ITU-R P.838-3, P.676 (approx.), P.2109-2",
   eq:["γ_R = k·R^α dB/km (P.838 coefficients, horizontal)","L_BEL(P) = 10·log(10^(0.1A) + 10^(0.1B) + 10^(0.1C)), A = F⁻¹(P)σ1 + μ1, B = F⁻¹(P)σ2 + μ2, C = −3","μ1 = r + s·log f + t·(log f)², μ2 = w + x·log f, σ1 = u + v·log f, σ2 = y + z·log f"],
   valid:"Horizontal incidence; traditional or thermally-efficient building.",lim:["Gas loss is an approximate curve, not the P.676 line-by-line model.","Rain path reduction factor is a simple d₀ model."]},
+ {id:"ant",name:"Transmitting antennas · ITU-R BS.1386 / BS.1195 / 3GPP",band:"All",ref:"ITU-R BS.1386-1 (LF/MF), BS.1195 (VHF/UHF), BS.705 (HF), 3GPP TR 36.814",
+  eq:["Monopole: F(Δ) = [cos(G·sin Δ) − cos G] / [(1 − cos G)·cos Δ],  G = 2πH/λ","Array of N towers: AF = |Σ e^(jn(2πs·cos(φ − α)·cos Δ + ψ))|","Stacked bays: AF = |sin(Nπs(sin Δ + sin t)) / (N·sin(πs(sin Δ + sin t)))|, floor = null fill","D = 4π·U_max / ∫U dΩ;  G = 10·log(D·η);  E(1 km, 1 kW) = 173.2·√(D·η) mV/m","Correction to the field = G(φ, Δ) − G_ref − feeder − mismatch (G_ref: 4.77 dBi short monopole, 2.15 dBi dipole)"],
+  valid:"Patterns over a perfect ground (LF/MF) or free space (VHF/UHF).",lim:["Ground-system losses are entered as an efficiency, not modelled.","Mast, guy-wire and site reflections (BS.1386 Part 2) are not included."]},
  {id:"thr",name:"Minimum usable field strength",band:"All",ref:"ITU-R BS.703, BS.412-9, BT.417-5",
   eq:["LF 66, MF 60, HF 40 dB(µV/m) (BS.703)","FM mono 48 / 60 / 70, stereo 54 / 66 / 74 dB(µV/m): rural / urban / large city (BS.412)","TV bands I / III / IV / V: 48 / 55 / 65 / 70 dB(µV/m) (BT.417)","Mobile: cell-edge −100 to −105 dBm (industry practice)"],
   valid:"Planning levels at 10 m height.",lim:["Atmospheric noise (P.372) is not added on top of BS.703."]},
@@ -4145,6 +4544,10 @@ function verificationTests(){
   t("NOAA D-RAP: M1 flare, sun overhead","SWPC table: M1.0 → 15 MHz",15,flareHAF({flareR:1,cosChi:1}),0.01,"MHz");
   t("dBm → dB(µV/m) at 1000 MHz, −100 dBm","E = P + 20·log f + 77.2",37.2,dBm2dBuV(-100,1000),0.01,"dBµV/m");
   { const r=p1812(5,Object.assign({},base,{f:600,htx:300,hrx:300}),null); t("Delta-Bullington, clear line of sight","Ld = 0 when the first Fresnel zone is clear",0,r.Ld,0.05,"dB"); }
+  { const s=antStats({type:"mono",hl:0.05,eff:100}); t("Short monopole, 1 kW: field at 1 km","Cymomotive force 300 V (ITU-R P.368)",300,173.2*Math.sqrt(s.Dmax),1,"mV/m"); }
+  { const s=antStats({type:"mono",hl:0.25,eff:100}); t("Quarter-wave monopole, 1 kW: field at 1 km","Classical value 313.6 mV/m (sinusoidal current, perfect ground)",313.6,173.2*Math.sqrt(s.Dmax),1,"mV/m"); }
+  t("Half-wave dipole gain","Textbook: 2.15 dBi (D = 1.64)",2.15,antStats({type:"dip"}).Gmax,0.03,"dBi");
+  t("Two-tower cardioid (λ/4, −90°): gain over one tower","Array theory: +3.0 dB along the array line",3.0,antGainDbi({type:"darr",n:2,sp:0.25,ph:-90,az:0,hl:0.25,eff:100},0,0)-antStats({type:"mono",hl:0.25,eff:100}).Gmax,0.1,"dB");
   return T;
 }
 function renderVerify(){
@@ -4365,7 +4768,7 @@ function bindHelp(){
 
 /* ================= INIT ================= */
 function init(){
-  fillGroundSelects(); bindLab(); bindAnim(); loadState(); bindMap(); bindCells(); bindPlanner(); bindShare(); bindMethods(); bindBottomNav(); bindTabs(); bindQuiz(); renderQuiz();
+  fillGroundSelects(); bindLab(); bindAnim(); loadState(); bindMap(); bindCells(); bindPlanner(); bindShare(); bindAui(); bindLabAnt(); bindMethods(); bindBottomNav(); bindTabs(); bindQuiz(); renderQuiz();
   document.addEventListener("click",e=>{ const g=e.target.closest("[data-goto]"); if(g) go(g.dataset.goto); });
   $("quizReset").addEventListener("click",async()=>{ const n=Object.keys(QZ.ans).length; if(n&&!await confirmAction("Start the quiz again?",`Your ${n} answer${n>1?"s":""} and marks will be cleared.`,"Clear answers")) return; renderQuiz(); });
   loadPreset(0);
