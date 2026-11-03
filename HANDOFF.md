@@ -128,3 +128,68 @@ The Map and Mobile tabs share one map component (`#mapCore`), moved into `#mapSl
 - **Propagation:** ITU-R P.368, P.1147, P.1812, P.526, P.2108, P.2109, P.838, P.529, M.2412; reception levels from BS.703, BS.412 and BT.417.
 - **Relay feed:** input ≥ minimum usable field + 10 dB (planning practice for off-air pick-up).
 - **UI:** WCAG 2.1 AA (focus rings, 44 px targets on phones, labelled controls, `aria-live` hints, reduced motion).
+
+---
+
+## v4.0 — professional UI pass + antenna-pattern coverage
+
+### Design system (replaces the v3.2 `!important` patch layer)
+Tokens live in one block at the head of the v4 layer in `src/style.css`:
+
+| Group | Tokens |
+|---|---|
+| Spacing (4pt) | `--sp-1`…`--sp-6` = 4/8/12/16/24/32 px |
+| Type | `--fs-meta` 12, `--fs-dense` 14, `--fs-ui` 15, `--fs-body` 16, `--fs-h3` 17, `--fs-h2` 20, `--fs-h1` 24 |
+| Weights | 400 / 500 / 600 only — no 700+ anywhere |
+| Radius | `--r-sm` 6, `--r-md` 10, `--r-lg` 14, `--r-pill` 999 |
+| Elevation | border first, then `--shadow-1` / `--shadow-2` |
+| Motion | `--ease-out: cubic-bezier(.23,1,.32,1)`, `--ease-in-out: cubic-bezier(.77,0,.175,1)`, `--dur-1/2/3` = 120/160/200 ms |
+| Layout | `--rail: 380px`, `--field: #eef1f5` |
+
+Only `transform` and `opacity` animate. `prefers-reduced-motion: reduce` drops
+transform-based motion and keeps opacity.
+
+### Map workspace (≥1280px)
+`#mapCore` is a grid: `"tools tools" / "map rail" / "legend rail" / "hint rail" / "sites sites"`.
+The result rail is `position: sticky; top: 76px`. Below 1280 it stacks; on phones
+the order is map → tools → result.
+
+- `#setupBox` (`details.setup`) is **closed by default** at every width; `#setupSum`
+  carries the one-line summary (TX → RX · f · power · heights · time).
+- `#legendBox` (`details.legend-d`) opens at ≥1024, closed below.
+- `.scrollrow` gets `.ovf` from `markOverflow()` (`src/lab.js`), which applies a
+  right-edge mask so a clipped chip reads as scrollable.
+
+### Antenna-pattern coverage (`src/aui.js`)
+`#covMode` replaces the old two checkboxes: `contour` (default) / `heat` / `off`.
+
+- `contourFromTable(T)` — solves, per 4° azimuth, the distance at which the field
+  falls to the minimum usable level. Interpolates the omni ds/vs table and refines
+  with `depressionDeg` for f ≥ 30 MHz. The result **is** the antenna pattern at
+  true map scale.
+- `bcContours()` caches on `BCH.key`; `cellContours()` uses
+  `d = 10^((EIRP + G(az) − threshold)/b)` clamped to `F.rmax`.
+- `drawContours()` — skips below 6 px span, draws a normalised `drawRosette()`
+  between 6 and 34 px, otherwise a filled polygon with a white halo and a coloured stroke.
+- The old fixed-radius service circle is suppressed whenever contours are on.
+
+### Accessibility (WCAG 2.1 AA, verified by `a11y.js` / `a11y2.js`)
+0 contrast failures · 0 unlabelled controls · 1 `h1` · no heading skips ·
+no duplicate ids · no positive `tabindex` · every `role="tab"` has `aria-controls` ·
+every canvas has an accessible name · skip link present · `lang="en"`.
+Checkbox/radio hit areas are ≥24 px via their wrapping or `for=` label
+(`.seg` inputs stay visually hidden — the segment label is the target).
+
+### LMS embedding
+Inside an iframe (`window.top !== window.self`) downloads are blocked, so:
+`#dlCsv` and the GPS button stay hidden, and `#qExport` relabels to
+**Copy results (CSV)** and writes to the clipboard instead.
+Map tiles are also blocked by the host CSP; the app falls back to the vector
+outline and says so. The standalone file and the hosted site are unaffected.
+
+### Regression suite
+`audit.js` (375 + 1280: overflow / <12px text / weights) · `shot19` (console errors)
+· `shot24` (share link, flare, mobile steps) · `shot26` (obstacle naming, full screen)
+· `shot27` (**24/24 verification tests**, antenna panel, heat map) · `shot30` (sectors,
+downtilt) · `shot31` (beam drag) · `shot32` (contour extents) · `shot33` (phone
+defaults) · `a11y.js`, `a11y2.js`.
