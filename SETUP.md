@@ -21,10 +21,11 @@ upload the folder again. Old deployments stay available to roll back to.
 
 ---
 
-## 2. Switch the visit counter on
+## 2. Switch on the counter AND the feedback form
 
-The counter is already wired to `/api/visits`, answered by
-`functions/api/visits.js` in this folder. Cloudflare Pages runs that file by
+Both are already wired: `/api/visits` and `/api/feedback`, answered by the
+two files in `functions/api/`. They share one KV namespace, so **one binding
+switches both on**. Cloudflare Pages runs that file by
 itself, so there is no Worker to deploy and no address to paste anywhere.
 
 One binding has to be added by hand, once:
@@ -46,27 +47,33 @@ rather than a number it cannot stand behind.
 - If `/api/visits` cannot be reached the line hides rather than showing a
   stale number.
 
+### Reading the feedback
+
+Cloudflare dashboard -> **Workers & Pages -> KV -> groundwave-visits**. Every
+response is a key beginning `fb:`, holding JSON with the date, which activity
+the student had just finished, their rating, what confused them, what they
+would add, and their year or course if they gave it. `fb:count` is the running
+total.
+
+The form asks for **no name, no email and no address**, so there is nothing
+identifying to protect and nothing to declare beyond the answers themselves.
+
 An alternative standalone Worker (`visit-counter-worker.js`) is included if
-you would rather host the counter apart from the site. You do not need it for
-the setup above.
+you would rather host the counter apart from the site. You do not need it.
 
 ---
 
-## 3. Switch the feedback survey on
+## 3. If you would rather use Google Forms
 
-1. Make the form (Google Forms, Microsoft Forms, anything with a link). Worth
-   asking: which activity, what confused them, what is missing, their year or
-   course. Under two minutes or people stop halfway.
-2. Open `index.html`, search for `var ENGAGE`, and set the url:
+The built-in form needs nothing extra, but if your lecturer wants responses in
+a spreadsheet, open `index.html`, find `var ENGAGE`, and point it at a form:
 
 ```js
-feedback: { url: "https://forms.gle/YOURFORMID", label: "Tell us how it went (2 minutes)" }
+feedback: { mode: "external", url: "https://forms.gle/YOURFORMID", label: "Tell us how it went (2 minutes)" }
 ```
 
-3. Upload again.
-
-**When it appears:** after a student moves on from a guided experiment, or
-submits the quiz. Once only, dismissible, never blocking. A permanent
+**When the prompt appears:** after a student moves on from a guided experiment,
+or submits the quiz. Once only, dismissible, never blocking. A permanent
 "Give feedback" link also sits above the footer.
 
 ---

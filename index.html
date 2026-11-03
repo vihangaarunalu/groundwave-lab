@@ -1049,6 +1049,60 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
 .sitestat a{color:var(--accent)}
 @media (max-width:760px){.sitestat{padding:var(--sp-4) var(--sp-4) 0}}
 
+/* ---- map grid: every child needs its area, or auto-placement collides ----
+   The legend became <details class="legend-d"> in the G pass and the old
+   .maplegend selector stopped matching, so it and the hidden full-screen
+   panel were auto-placed on top of the rail and the sites table. */
+@media (min-width:1280px){
+  #mapCore:not(.fs) > .legend-d,
+  #mapCore:not(.fs) > .maplegend{grid-area:legend}
+  #mapCore:not(.fs) > .fspanel{grid-area:tools}
+}
+.fspanel[hidden]{display:none !important}
+/* a sticky rail must occlude what scrolls under it, never blend with it */
+#mapCore:not(.fs) > .mapresult{background:var(--bg);z-index:2}
+
+/* The rail is sticky inside its grid area, so it must never be taller than
+   that area or it spills into the sites table below. Tie it to the map's
+   own height rather than the viewport. */
+@media (min-width:1280px){
+  #mapCore:not(.fs) > .mapresult{
+    align-self:start;
+    max-height:min(70vh,720px);
+    overflow:auto;overscroll-behavior:contain}
+}
+
+/* Sticky escaped its grid area and drew over the sites table. The rail sits
+   beside the map; by the time you reach the tables you are reading tables.
+   Nothing floats in this design, so it does not stick. */
+@media (min-width:1280px){
+  #mapCore:not(.fs) > .mapresult{position:static;max-height:none;overflow:visible;z-index:auto}
+}
+
+/* ---- the transmitter panel works in full screen ----
+   Full screen hides every child of #mapCore that is not the toolbar, the map
+   or the details panel. The slide-over is moved in here by openAui (native
+   full screen paints only this subtree), so it has to be allowed through. */
+/* The hiding rule carries three :not() classes, so it outweighs a plain
+   class selector here. Match on the id to win cleanly. */
+#mapCore.fs > #auiPanel{display:flex;z-index:90}
+#mapCore.fs > #auiPanel[hidden]{display:none}
+#mapCore.fs > #cfmDlg[open]{display:block;z-index:95}
+
+/* ---- the feedback form ---- */
+.fbdlg{max-width:min(560px,94vw);width:100%}
+.fbdlg .dlg-b{display:grid;gap:var(--sp-4);padding:var(--sp-4) var(--sp-5)}
+.fbdlg .field{display:grid;gap:var(--sp-2)}
+.fbdlg .lbl{font-size:var(--fs-dense);font-weight:500;color:var(--ink)}
+.fbdlg .chips{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.fbdlg textarea{font:inherit;font-size:var(--fs-ui);padding:var(--sp-2) var(--sp-3);
+  border:1px solid var(--control);border-radius:var(--r-sm);background:var(--panel);color:var(--ink);
+  resize:vertical;min-height:44px;width:100%}
+.fbdlg input[type=text]{width:100%}
+.fbdlg .err{color:var(--bad-ink);font-size:var(--fs-dense);min-height:1.2em;margin:0}
+.fbdlg .dlg-f{display:flex;justify-content:flex-end;gap:var(--sp-2);
+  padding:var(--sp-3) var(--sp-5) var(--sp-4);border-top:1px solid var(--line)}
+
 </style>
 </head>
 <body>
@@ -1118,7 +1172,7 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
   <div class="screenhead"><h2>Signal reach</h2><p>Set up a transmission and read how far it is usable. Each model is one set of conditions; change one setting at a time to see what it does.</p></div>
   <aside class="fbprompt" id="fbPrompt" hidden>
     <p class="fb-t"></p>
-    <div class="row"><a class="btn primary sm fb-go" href="#" target="_blank" rel="noopener">Open the survey</a><button class="btn sm fb-no" type="button">Not now</button></div>
+    <div class="row"><button class="btn primary sm fb-go" type="button">Give feedback</button><button class="btn sm fb-no" type="button">Not now</button></div>
   </aside>
   <aside class="firstrun" id="firstRun" hidden>
     <p><b>New here?</b> Pick an experiment below and change one setting at a time. The quick start walks through all eight tabs.</p>
@@ -1810,6 +1864,30 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
   <h2 id="cfmTitle"></h2><p id="cfmBody"></p>
   <div class="row cfmrow"><button class="btn" id="cfmCancel" type="button">Cancel</button><button class="btn danger" id="cfmOk" type="button"></button></div>
 </dialog>
+<dialog id="fbDlg" class="cfm fbdlg" aria-labelledby="fbTitle">
+  <form method="dialog" id="fbForm">
+    <div class="dlg-h"><h2 id="fbTitle">How did that go?</h2><button class="iconbtn" id="fbClose" type="button" aria-label="Close">&#10005;</button></div>
+    <div class="dlg-b">
+      <p class="hint" style="margin-top:0">Two minutes, no name asked. It goes to the people building this lab.</p>
+      <div class="field">
+        <span class="lbl" id="fbRateL">Did it help you understand the topic?</span>
+        <div class="chips" role="group" aria-labelledby="fbRateL" id="fbRate">
+          <button class="chip" type="button" data-v="a lot">A lot</button>
+          <button class="chip" type="button" data-v="somewhat">Somewhat</button>
+          <button class="chip" type="button" data-v="not really">Not really</button>
+        </div>
+      </div>
+      <label class="field"><span class="lbl">What was confusing, if anything?</span>
+        <textarea id="fbConf" rows="3" placeholder="A control you could not find, a number you did not trust, a word you did not know&#8230;"></textarea></label>
+      <label class="field"><span class="lbl">What would you add?</span>
+        <textarea id="fbMiss" rows="2" placeholder="Anything you expected and did not find"></textarea></label>
+      <label class="field"><span class="lbl">Year or course <span class="muted">(optional)</span></span>
+        <input id="fbCourse" type="text" maxlength="60" placeholder="e.g. 3rd year ECE"></label>
+      <p class="err" id="fbErr" role="status"></p>
+    </div>
+    <div class="dlg-f"><button class="btn" type="button" id="fbCancel">Cancel</button><button class="btn primary" type="button" id="fbSend">Send feedback</button></div>
+  </form>
+</dialog>
 <dialog id="helpDlg" aria-labelledby="helpTitle">
   <div class="dlg">
     <div class="dlg-h"><h2 id="helpTitle">Welcome to the Groundwave Propagation Lab</h2><button class="iconbtn" id="helpClose" type="button" aria-label="Close help"><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></div>
@@ -1876,8 +1954,8 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" target="_blank" rel="noopener" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v5.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
+<footer><b>Groundwave Propagation Lab v5.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -3165,10 +3243,13 @@ var ENGAGE = {
      It hides itself until the KV binding is added (see deploy/SETUP.md). */
   counter: { mode: "worker", code: "", url: "/api/visits" },
 
-  /* --- feedback survey -------------------------------------------------
-     Paste the form link (Google Forms, Microsoft Forms, anything). Empty
-     means no prompt is ever shown.                                       */
-  feedback: { url: "", label: "Tell us how it went (2 minutes)" }
+  /* --- feedback --------------------------------------------------------
+     "built-in": the form inside the app posts to /api/feedback, answered by
+                 functions/api/feedback.js. Shares the counter's KV binding,
+                 so one binding switches both on. No third-party form needed.
+     url:        set this to a Google/Microsoft Forms link to send people
+                 there instead of using the built-in form.                 */
+  feedback: { mode: "built-in", url: "", label: "Tell us how it went (2 minutes)" }
 };
 
 var PROG_KEY = "gwlab-progress";
@@ -3235,7 +3316,7 @@ function renderVisits(){
 /* ---- the feedback prompt ---- */
 function offerFeedback(reason){
   var f = ENGAGE.feedback;
-  if(!f || !f.url) return;
+  if(!f || (f.mode !== "built-in" && !f.url)) return;
   var p = progRead();
   if(p.fbDone || p.fbHidden) return;
   if(activityCount() < 1) return;
@@ -3247,7 +3328,6 @@ function offerFeedback(reason){
   var line = box.querySelector(".fb-t");
   var link = box.querySelector(".fb-go");
   if(line) line.textContent = "You finished " + what + ". " + f.label;
-  if(link){ link.href = f.url; link.textContent = "Open the survey"; }
   box.hidden = false;
 }
 
@@ -3262,17 +3342,84 @@ function bindEngage(){
       var p = progRead(); p.fbHidden = true; progWrite(p); box.hidden = true;
     });
     var go = box.querySelector(".fb-go");
-    if(go) go.addEventListener("click", function(){
-      var p = progRead(); p.fbDone = true; progWrite(p);
-    });
+    if(go) go.addEventListener("click", function(){ openFeedback(); box.hidden = true; });
   }
 
-  /* the footer link is always available, whether or not the prompt showed */
+  /* always reachable, whether or not the prompt was shown */
   var foot = document.getElementById("fbFoot");
   if(foot){
-    if(ENGAGE.feedback && ENGAGE.feedback.url){ foot.href = ENGAGE.feedback.url; foot.hidden = false; }
-    else foot.hidden = true;
+    foot.hidden = false;
+    foot.removeAttribute("target");
+    foot.addEventListener("click", function(e){ e.preventDefault(); openFeedback(); });
   }
+
+  bindFeedbackForm();
+}
+
+/* ---- the built-in form ---- */
+var FB = { rating: "" };
+
+function openFeedback(){
+  var f = ENGAGE.feedback || {};
+  if(f.mode !== "built-in" && f.url){ window.open(f.url, "_blank", "noopener"); return; }
+  var d = document.getElementById("fbDlg");
+  if(!d){ if(f.url) window.open(f.url, "_blank", "noopener"); return; }
+  var err = document.getElementById("fbErr"); if(err) err.textContent = "";
+  try { d.showModal(); } catch(e){ d.setAttribute("open",""); }
+}
+function closeFeedback(){
+  var d = document.getElementById("fbDlg"); if(!d) return;
+  if(d.close) d.close(); else d.removeAttribute("open");
+}
+
+function bindFeedbackForm(){
+  var d = document.getElementById("fbDlg"); if(!d) return;
+
+  var rate = document.getElementById("fbRate");
+  if(rate) rate.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-v]"); if(!b) return;
+    FB.rating = b.dataset.v;
+    [].forEach.call(rate.querySelectorAll("button"), function(x){
+      x.setAttribute("aria-pressed", String(x === b));
+    });
+  });
+
+  ["fbClose","fbCancel"].forEach(function(id){
+    var b = document.getElementById(id);
+    if(b) b.addEventListener("click", closeFeedback);
+  });
+
+  var send = document.getElementById("fbSend");
+  if(send) send.addEventListener("click", function(){
+    var err = document.getElementById("fbErr");
+    var conf = (document.getElementById("fbConf")||{}).value || "";
+    var miss = (document.getElementById("fbMiss")||{}).value || "";
+    var course = (document.getElementById("fbCourse")||{}).value || "";
+    if(!FB.rating && !conf.trim() && !miss.trim()){
+      if(err) err.textContent = "Pick an answer or write a line first.";
+      return;
+    }
+    send.disabled = true; send.textContent = "Sending\u2026";
+    var p = progRead();
+    var last = Object.keys(p.done || {}).pop() || "";
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activity: last, rating: FB.rating, confusing: conf, missing: miss, course: course })
+    })
+    .then(function(r){ return r.ok ? r.json() : r.json().then(function(j){ throw new Error(j.error || "failed"); }); })
+    .then(function(){
+      var q = progRead(); q.fbDone = true; progWrite(q);
+      send.textContent = "Thank you";
+      setTimeout(function(){ closeFeedback(); send.disabled = false; send.textContent = "Send feedback"; }, 900);
+    })
+    .catch(function(ex){
+      send.disabled = false; send.textContent = "Send feedback";
+      if(err) err.textContent = /VISITS/.test(String(ex.message))
+        ? "Feedback storage is not switched on yet for this site."
+        : "Could not send that. Check your connection and try again.";
+    });
+  });
 }
 
 /* ================= ANIMATION TAB ================= */
@@ -5037,9 +5184,26 @@ function drawElev(cv,a){
   c.strokeStyle=cssVar("--accent"); c.lineWidth=2; c.stroke();
   c.fillStyle=cssVar("--muted"); c.textAlign="left"; c.textBaseline="top"; c.fillText(st.lf?"elevation (sky-wave take-off angles)":"elevation (below 0° = toward listeners)",L+4,T);
 }
+
+/* Keep the slide-over inside whatever is currently full-screened. */
+function auiHost(){
+  const panel=document.getElementById("auiPanel"); if(!panel) return;
+  const host=document.fullscreenElement||document.body;
+  if(panel.parentNode!==host) host.appendChild(panel);
+}
+document.addEventListener("fullscreenchange",function(){
+  auiHost();
+  const d=document.getElementById("cfmDlg");
+  const host=document.fullscreenElement||document.body;
+  if(d&&d.parentNode!==host) host.appendChild(d);
+});
+
 function openAui(kind,i){
   AUI.kind=kind; AUI.i=i; AUI.back=document.activeElement; const t=auiStation(); if(!t) return;
   const {f}=auiParams(t); if(MP.layer!=="mobile"&&!t.ant){ t.ant=antFor(f); }
+  // Native full screen paints only the full-screened element's subtree, and
+  // the panel lives outside #mapCore, so it has to move in to be visible.
+  auiHost();
   $("auiPanel").hidden=false; document.body.classList.add("aui-open"); renderAui(); $("auiClose").focus();
 }
 function closeAui(){ $("auiPanel").hidden=true; document.body.classList.remove("aui-open"); if(AUI.back&&AUI.back.focus) AUI.back.focus(); AUI.kind=null; }
