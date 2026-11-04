@@ -1103,6 +1103,27 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
 .fbdlg .dlg-f{display:flex;justify-content:flex-end;gap:var(--sp-2);
   padding:var(--sp-3) var(--sp-5) var(--sp-4);border-top:1px solid var(--line)}
 
+/* ---- station editor ---- */
+.staedit{padding:var(--sp-3) 0 var(--sp-4);display:grid;gap:var(--sp-3)}
+.staedit h3{margin:0;font-size:var(--fs-dense);font-weight:600;color:var(--muted)}
+.stlgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--sp-3)}
+.stlgrid .field{display:grid;gap:var(--sp-1)}
+.stlgrid .lbl{font-size:var(--fs-meta);color:var(--muted)}
+.stlgrid input{width:100%}
+table.svctbl{width:100%;border-collapse:collapse;font-size:var(--fs-dense)}
+table.svctbl th{font-size:var(--fs-meta);color:var(--muted);font-weight:400;text-align:left;padding:var(--sp-2) var(--sp-3) var(--sp-2) 0;border-bottom:1px solid var(--line)}
+table.svctbl td{padding:var(--sp-2) var(--sp-3) var(--sp-2) 0;border-bottom:1px solid var(--line);vertical-align:middle}
+table.svctbl .check{white-space:nowrap}
+.svcrow > td{background:var(--field)}
+.btn.rsvc{white-space:nowrap}
+
+/* ---- station report ---- */
+.starep{padding:var(--sp-4) 0;border-top:1px solid var(--line);display:grid;gap:var(--sp-2)}
+.starep h3{margin:0;font-size:var(--fs-h3);font-weight:600}
+.starep p{margin:0;font-size:var(--fs-meta)}
+.starep table.kv th{font-size:var(--fs-meta);color:var(--muted);font-weight:400;text-align:left}
+.starep table.kv td:last-child{text-align:left}
+
 </style>
 </head>
 <body>
@@ -1614,9 +1635,10 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
     <div class="chart-head"><h2 id="txTblH">Transmitters</h2></div>
     <div class="tablewrap"><table class="fs sites txtbl" id="txTable"></table></div>
     <div class="bcast-only">
-      <div class="chart-head" style="margin-top:6px"><h2>Relay stations <span class="badge">VHF/UHF transposers</span></h2></div>
-      <p class="hint">A relay picks up the main transmitter off-air with a directional antenna (ITU-R P.1812 over the real feed path) and rebroadcasts on its own frequency. It is <b>fed</b> when its input is at least 10 dB above the minimum usable field of the main service. Receivers use whichever station gives the best margin.</p>
+      <div class="chart-head" style="margin-top:6px"><h2>Stations <span class="badge">VHF/UHF</span></h2><button class="btn sm" type="button" id="staReport">Station report</button></div>
+      <p class="hint">A station is a site, not a frequency: one tower carrying several services, fed by a <b>studio line</b>, by an <b>STL</b> (a point-to-point link on its own frequency, judged on fade margin and Fresnel clearance) or <b>off-air</b> as a transposer (fed when its input is 10 dB above the minimum usable field). Receivers use whichever service gives the best margin.</p>
       <div class="tablewrap"><table class="fs sites" id="relayTable"></table></div>
+      <div id="staReportOut" hidden></div>
     </div>
     <div class="chart-head" style="margin-top:6px"><h2 id="rxTblH">Receiver sites</h2>
       <div class="row"><button class="btn" id="copyCsv" type="button">Copy table (CSV)</button><button class="btn" id="dlCsv" type="button" hidden>Download CSV</button><button class="btn ghost" id="clearRx" type="button"><svg class=ic aria-hidden=true><use href=#i-close /></svg> Clear receivers (keep selected)</button></div></div>
@@ -1961,7 +1983,7 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v5.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v6.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -2080,6 +2102,46 @@ function alphaOf(col, a){
 }
 
 refreshTheme();
+
+/* =====================================================================
+   Map label placement.
+
+   Canvas labels were drawn wherever their anchor fell, so a long obstacle
+   tag would sit across a pin's name and a label near the right edge ran off
+   the canvas. placeLabel keeps each one inside the frame and off the ones
+   already drawn: it nudges upward in small steps, and gives up rather than
+   stack two labels on the same pixels — an absent label is recoverable by
+   zooming, an unreadable pile is not.
+   ===================================================================== */
+
+var LABELS = [];
+
+function resetLabels(){ LABELS = []; }
+
+function _hits(a, b){
+  return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+}
+
+function placeLabel(x, y, w, h, W, H, opts){
+  var pad = 2, step = (opts && opts.step) || 22, tries = (opts && opts.tries) || 5;
+  for(var k = 0; k <= tries; k++){
+    // alternate above and below the anchor, further each time
+    var dy = (k === 0) ? 0 : (k % 2 ? -1 : 1) * Math.ceil(k / 2) * step;
+    var box = { x: x, y: y + dy, w: w, h: h };
+
+    // keep it inside the canvas
+    if(box.x < pad) box.x = pad;
+    if(box.x + box.w > W - pad) box.x = W - pad - box.w;
+    if(box.y < pad) box.y = pad;
+    if(box.y + box.h > H - pad) box.y = H - pad - box.h;
+    if(box.w > W - pad * 2) return null;          // wider than the map
+
+    var clash = false;
+    for(var i = 0; i < LABELS.length; i++){ if(_hits(box, LABELS[i])){ clash = true; break; } }
+    if(!clash){ LABELS.push(box); return box; }
+  }
+  return null;
+}
 
 /* icon helper: authored SVG sprite, one stroke, currentColor */
 function icn(n){ return n?"<svg class=ic aria-hidden=true><use href=#i-"+n+" /></svg>":""; }
@@ -2718,6 +2780,41 @@ function txPanelValues(t,p){
   if(ANT_TYPES[ant.type]&&ANT_TYPES[ant.type].band!==antBand(f)) alarms.push({lvl:"bad",t:`${ANT_TYPES[ant.type].name} does not suit ${fmtF(f)}; choose an ${f<30?"LF/MF":"VHF/UHF"} antenna`});
   if(t.on===false) alarms.push({lvl:"warn",t:"Transmitter is OFF — it is left out of every prediction"});
   return {tpo,refl,G,fl,mm,gdb,gref,toAnt,erp,eirp,eff,ac,heat:ac-tpo,alarms,st};
+}
+
+
+/* =====================================================================
+   Presets drawn from how Sri Lankan broadcast sites are actually built.
+
+   A coastal transmitter at Colombo radiates roughly half its pattern over
+   the Indian Ocean. A directional array aimed inland puts that power where
+   the listeners are, which is worth several dB of useful coverage for no
+   extra transmitter power.
+   ===================================================================== */
+var ANT_PRESETS = [
+  { id:"fm3", name:"3-bay FM, omni", band:"vu",
+    why:"The common small-site FM array: three bays, slight downtilt, a little null fill so the town under the mast is not in a hole.",
+    make:function(){ return Object.assign(antDefault("bays"),{n:3,sp:1,tilt:0.5,nf:10}); } },
+  { id:"fm4", name:"4-bay FM, omni", band:"vu",
+    why:"Four bays for a main station: about 1.2 dB more gain than three, with the beam held on the horizon.",
+    make:function(){ return Object.assign(antDefault("bays"),{n:4,sp:1,tilt:0.5,nf:10}); } },
+  { id:"sea", name:"Coastal, null toward the sea", band:"vu",
+    why:"A coastal site wastes half its pattern over water. A panel array aimed inland recovers it. Set the azimuth to the inland bearing.",
+    make:function(az){ return Object.assign(antDefault("panel"),{n:4,hbw:140,fb:22,az:(az===undefined?90:az),tilt:0.5}); } },
+  { id:"hill", name:"Hilltop, valley fill", band:"vu",
+    why:"A site high above the area it serves needs real downtilt and generous null fill, or the valley sits below the beam.",
+    make:function(){ return Object.assign(antDefault("bays"),{n:4,sp:1,tilt:2.5,nf:25}); } },
+  { id:"stl", name:"STL pick-up Yagi", band:"vu",
+    why:"A directional pick-up for a point-to-point feed: high gain, narrow beam, aimed back at the parent station.",
+    make:function(az){ var a=antDefault("yagi"); a.n=10; if(az!==undefined) a.az=az; return a; } },
+  { id:"mast", name:"MF mast radiator", band:"lm",
+    why:"The standard medium-wave transmitting antenna: a quarter-wave mast against a buried ground screen.",
+    make:function(){ return Object.assign(antDefault("mono"),{hm:0.25}); } }
+];
+
+function presetsFor(f){
+  var band = antBand(f);
+  return ANT_PRESETS.filter(function(p){ return p.band === band; });
 }
 
 /* ================= STATE ================= */
@@ -4073,7 +4170,7 @@ function obstacleInfo(T,tx,rx){
   const key=q.lat.toFixed(3)+","+q.lon.toFixed(3);
   let name=T.peakName||null;
   if(!name){ if(OBN.has(key)) name=OBN.get(key); else { OBN.set(key,null); reverseName(q.lat,q.lon).then(nm=>{ OBN.set(key,nm?("near "+nm):null); if(nm&&(currentTab==="map"||currentTab==="terrain"||currentTab==="mobile")){ drawMap(); renderActive(); } }); } }
-  return {kind,icon:kind==="Ridge"?"wave":"mountain",name:name||`${kind.toLowerCase()} at ${fmtD(km)} km`,detail:`${top} m above sea level · ${Math.round(rise)} m above the lower site${T.peakName?" · named peak (OSM)":""}`,height:top,km,lat:q.lat,lon:q.lon,loss:T.loss};
+  return {kind,icon:kind==="Ridge"?"wave":"mountain",name:name||`unnamed, ${fmtD(km)} km out`,detail:`${top} m above sea level · ${Math.round(rise)} m above the lower site${T.peakName?" · named peak (OSM)":""}`,height:top,km,lat:q.lat,lon:q.lon,loss:T.loss};
 }
 function obstacleLine(oi){ return oi?`${icn(oi.icon)} ${oi.kind}: ${oi.name} · ${oi.height} m · ${fmtD(oi.km)} km from the transmitter · −${oi.loss.toFixed(1)} dB`:"No obstacle blocks this path"; }
 function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(threshold(p));
@@ -4088,12 +4185,15 @@ function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(thre
 const RELAY_MARGIN=10; // dB above the minimum usable field of the main service (planning practice for off-air pick-up)
 function relaySource(r){ return MP.S.bcast.txs[clamp(r.src|0,0,MP.S.bcast.txs.length-1)]; }
 function relayFeed(r){
+  const kind=(r.feed&&r.feed.kind)||"offair";
+  if(kind==="studio") return {kind:"studio",st:"fed",e:null,dist:0,terrain:true};
+  if(kind==="stl") return stlFeed(r);
   const tx=relaySource(r), b=baseModel().p, P=computePathFor(tx,r);
   const p=paramsFor(P,{lat:r.lat,lon:r.lon,h:r.h,name:r.name},r.T&&r.T.key===relayKey(r)?r.T:null,tx);
   p.env="rural"; // pick-up antenna on the mast, above local clutter
   const io=iono(p), e=evalRx(p,io).t, need=ituMinRef(p).v+RELAY_MARGIN;
   const st=e===null?"none":e>=need?"fed":e>=ituMinRef(p).v?"weak":"none";
-  return {e,need,min:ituMinRef(p).v,st,dist:P.dist,f:p.f,terrain:!!(r.T&&r.T.key===relayKey(r)),P};
+  return {kind:"offair",e,need,min:ituMinRef(p).v,st,dist:P.dist,f:p.f,terrain:!!(r.T&&r.T.key===relayKey(r)),P};
 }
 const relayKey=r=>{ const t=relaySource(r); return [t.lat,t.lon,t.h,r.lat,r.lon,r.h,baseModel().p.f].map(v=>+(+v).toFixed(4)).join(","); };
 async function relayTerrain(r){
@@ -4118,8 +4218,12 @@ function predictMulti(rx,Tsel){
   if(!ct) MP.relays.forEach((r,k)=>{
     const fd=relayFeed(r); if(fd.st==="none"){ all.push({i:-1,k,tx:r,relay:true,skip:true,feed:fd}); return; }
     if(r.on===false){ all.push({i:-1,k,tx:r,relay:true,skip:true,off:true,feed:fd}); return; }
-    const P=computePathFor(r,rx), p=paramsFor(P,rx,null,r); Object.assign(p,{f:r.f,P:r.tpo||r.P,htx:r.h});
-    all.push({i:-1,k,tx:r,relay:true,P,p,pred:predict(p),dist:P.dist,feed:fd});
+    const P=computePathFor(r,rx);
+    stationServices(r).forEach(sv=>{
+      if(!sv.on||!(sv.f>0)) return;
+      const p=paramsFor(P,rx,null,r); Object.assign(p,{f:sv.f,P:sv.P,htx:r.h});
+      all.push({i:-1,k,sv:sv.idx,svName:sv.name,tx:r,relay:true,P,p,pred:predict(p),dist:P.dist,feed:fd});
+    });
   });
   const key=a=>a.pred.cell?a.pred.cell.m:(a.pred.t===null?-999:a.pred.t-a.pred.thr);
   const cand=all.filter(a=>!a.skip&&a.pred.t!==null).sort((a,b)=>key(b)-key(a));
@@ -4128,7 +4232,7 @@ function predictMulti(rx,Tsel){
     return {...base,ok:false,fading:false,verdict:ct?`No ${TECH_LABEL[ct]||ct} transmitter on the map`:"No reliable reception",cls:"bad",servers:all,server:null,noServer:!any}; }
   const b=cand[0]; return {...b.pred,servers:all,server:b,ranked:cand};
 }
-function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.txs.map(t=>[t.lat,t.lon,t.h,t.techs,t.sector,t.az,t.tilt]),MP.ti,MP.layer,MP.benv,MP.relays.map(r=>[r.lat,r.lon,r.h,r.P,r.f,r.src]),MP.cov&&[MP.cov.tech,MP.cov.env,MP.cov.indoor,MP.cov.pL,MP.cov.lb,MP.cov.eirp],MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
+function siteSig(rx){ const b=baseModel(); return JSON.stringify([MP.txs.map(t=>[t.lat,t.lon,t.h,t.techs,t.sector,t.az,t.tilt]),MP.ti,MP.layer,MP.benv,MP.relays.map(r=>[r.lat,r.lon,r.h,r.P,r.f,r.src,r.feed&&[r.feed.kind,r.feed.f,r.feed.erp,r.feed.gRx],(r.services||[]).map(v=>[v.f,v.P,v.share,v.on])]),MP.cov&&[MP.cov.tech,MP.cov.env,MP.cov.indoor,MP.cov.pL,MP.cov.lb,MP.cov.eirp],MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
 let siteQueue=Promise.resolve();
 function refreshSites(){
   for(const rx of MP.rxs){
@@ -4220,6 +4324,7 @@ function getTile(z,x,y){
 }
 
 function drawMap(){
+  resetLabels();   // label collision state is per frame
   const W=mapC.clientWidth,H=mapC.clientHeight; if(!W) return; if(!MP.view) MP.view=defaultView("sites");
   const dpr=window.devicePixelRatio||1;
   for(const cv of [mapC,mapBase]) if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){ cv.width=W*dpr; cv.height=H*dpr; }
@@ -4277,7 +4382,14 @@ function drawMap(){
     c.stroke(); c.setLineDash([]); c.lineCap="butt";
     // highest point on the path
     let hi=1; for(let i=1;i<n-1;i++) if(T.e[i]>T.e[hi]) hi=i;
-    const tag=(x,y,txt,bg,fg)=>{ c.font="600 11.5px "+cssVar("--font-body"); const tw=c.measureText(txt).width+12; c.fillStyle=bg; c.strokeStyle="rgba(0,0,0,.2)"; c.lineWidth=1; c.fillRect(x-tw/2,y-26,tw,19); c.strokeRect(x-tw/2,y-26,tw,19); c.fillStyle=fg; c.textAlign="center"; c.fillText(txt,x,y-12); c.textAlign="left"; };
+    const tag=(x,y,txt,bg,fg)=>{
+      c.font="600 11.5px "+cssVar("--font-body");
+      const tw=c.measureText(txt).width+12, th=19;
+      const put=placeLabel(x-tw/2,y-26,tw,th,W,H);
+      if(!put) return;                       // no room: better absent than stacked
+      c.fillStyle=bg; c.strokeStyle="rgba(0,0,0,.2)"; c.lineWidth=1;
+      c.fillRect(put.x,put.y,tw,th); c.strokeRect(put.x,put.y,tw,th);
+      c.fillStyle=fg; c.textAlign="center"; c.fillText(txt,put.x+tw/2,put.y+13); c.textAlign="left"; };
     const tri=(x,y,col,s)=>{ col=lift(col); c.fillStyle=col; c.strokeStyle=PAL.halo; c.lineWidth=1.5; c.beginPath(); c.moveTo(x,y-s); c.lineTo(x-s*0.9,y+s*0.6); c.lineTo(x+s*0.9,y+s*0.6); c.closePath(); c.fill(); c.stroke(); };
     // named peaks near the path (skip the one already labelled as the main obstacle)
     const obXY=T.ob&&T.loss>0.05?(q=>proj(q.lon,q.lat))(gcPoint(MP.tx,MP.rx,clamp(T.ob.dm/D,0,1))):null;
@@ -4293,12 +4405,20 @@ function drawMap(){
     if(oi){ const [x,y]=proj(oi.lon,oi.lat);
       c.strokeStyle=PAL.halo; c.lineWidth=4; c.beginPath(); c.moveTo(x-7,y-7); c.lineTo(x+7,y+7); c.moveTo(x+7,y-7); c.lineTo(x-7,y+7); c.stroke();
       c.strokeStyle=lift("#d6302a"); c.lineWidth=2.5; c.beginPath(); c.moveTo(x-7,y-7); c.lineTo(x+7,y+7); c.moveTo(x+7,y-7); c.lineTo(x-7,y+7); c.stroke();
-      tag(x,y-8,`${oi.icon} ${oi.kind}: ${oi.name} · ${oi.height} m · −${oi.loss.toFixed(1)} dB`,"rgba(214,48,40,.95)","#fff"); }
+      tag(x,y-8,`${oi.kind}: ${oi.name} · ${oi.height} m · −${oi.loss.toFixed(1)} dB`,"rgba(214,48,40,.95)","#fff"); }
   }
   const pin=(pt,col,lt,big,label)=>{ const [x,y]=proj(pt.lon,pt.lat), s=big?1:0.8;
     col=lift(col); c.fillStyle=col; c.strokeStyle=PAL.halo; c.lineWidth=2.5; c.beginPath(); c.moveTo(x,y); c.arc(x,y-20*s,11*s,Math.PI*0.72,Math.PI*0.28); c.closePath(); c.fill(); c.stroke();
     c.fillStyle=inkOn(col); c.font=`700 ${big?11:9.5}px `+cssVar("--font-body"); c.textAlign="center"; c.fillText(lt,x,y-16*s);
-    if(label){ c.font=`${big?600:500} 12px `+cssVar("--font-body"); const tw=c.measureText(label).width+12; c.fillStyle=PAL.tag; c.strokeStyle=PAL.line; c.lineWidth=1; c.fillRect(x+12,y-30*s,tw,20); c.strokeRect(x+12,y-30*s,tw,20); c.fillStyle="#16202e"; c.textAlign="left"; c.fillText(label,x+18,y-30*s+14); } };
+    if(label){
+      c.font=`${big?600:500} 12px `+cssVar("--font-body");
+      const tw=c.measureText(label).width+12, th=20;
+      let put=placeLabel(x+12,y-30*s,tw,th,W,H);
+      if(!put) put=placeLabel(x-12-tw,y-30*s,tw,th,W,H);   // try the other side of the pin
+      if(!put) return;
+      c.fillStyle=PAL.tag; c.strokeStyle=PAL.line; c.lineWidth=1;
+      c.fillRect(put.x,put.y,tw,th); c.strokeRect(put.x,put.y,tw,th);
+      c.fillStyle=PAL.tagInk; c.textAlign="left"; c.fillText(label,put.x+6,put.y+14); } };
   // relays: dashed feed line from the source transmitter (green = fed, amber = weak, red = not fed) and a teal pin
   if(MP.layer==="bcast") MP.relays.forEach((r,k)=>{ const src=relaySource(r), fd=relayFeed(r), [x1,y1]=proj(src.lon,src.lat), [x2,y2]=proj(r.lon,r.lat);
     c.setLineDash([8,6]); c.lineWidth=3; c.strokeStyle=alphaOf(PAL.halo,.85); c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
@@ -4478,6 +4598,120 @@ function clearanceVerdict(L){
   return "Grazing: only " + pc + "% of the first Fresnel zone is free "
        + L.worst.dKm.toFixed(1) + " km out, against the 60% a link wants. "
        + "Raise the mast to " + Math.ceil(L.txHeightNeeded) + " m.";
+}
+
+/* =====================================================================
+   Stations: a site, not a frequency.
+
+   A real broadcast site carries several services off one tower, and it is
+   fed in one of three ways. The lab used to model a relay as exactly one
+   frequency picked up off-air, which cannot express either.
+
+     studio   the programme arrives by line or fibre; nothing to check
+     stl      a dedicated point-to-point link on its own frequency
+     offair   a transposer: it receives the broadcast like everyone else
+
+   An STL is judged on fade margin against a receiver threshold and on
+   Fresnel clearance, not on a broadcast field-strength threshold. Applying
+   the transposer test to an STL gives a number that means nothing.
+   ===================================================================== */
+
+var STL_DEFAULT = {
+  f: 413.4,      /* MHz, the UHF STL band                        */
+  erp: 20,       /* W ERP from the studio end                    */
+  gRx: 14,       /* dBi, Yagi or small dish at the station       */
+  thr: -90,      /* dBm, receiver threshold for broadcast quality */
+  want: 20       /* dB fade margin wanted for a broadcast feed   */
+};
+
+/* Loss when several services share one antenna through a combiner.
+   Roughly 1 dB for two, rising with the number of inputs; real figures
+   depend on the combiner, so this is a planning estimate. */
+function combinerLoss(n){
+  if(!(n > 1)) return 0;
+  return +(10 * Math.log10(n) * 0.72 + 0.4).toFixed(2);
+}
+
+/* Every station has at least one service. A site that predates this
+   feature has its single frequency promoted to service 0. */
+function stationServices(r){
+  var list = (r && r.services && r.services.length) ? r.services : null;
+  if(!list){
+    return [{ idx: 0, name: (r && r.name) || "Service",
+              f: r ? r.f : 0, P: r ? (r.tpo || r.P) : 0,
+              ant: r ? r.ant : null, share: false, on: true }];
+  }
+  var shared = list.filter(function(s){ return s.share && s.on !== false; }).length;
+  var loss = combinerLoss(shared);
+  return list.map(function(s, i){
+    var P = +s.P || 0;
+    if(s.share && shared > 1) P = P / Math.pow(10, loss / 10);   /* combiner loss */
+    return { idx: i, name: s.name || ("Service " + (i + 1)), f: +s.f || 0,
+             P: P, Praw: +s.P || 0, ant: s.ant || r.ant, share: !!s.share,
+             on: s.on !== false, combiner: (s.share && shared > 1) ? loss : 0 };
+  });
+}
+
+/* Field strength to received power.
+   P(dBm) = E(dBuV/m) + G(dBi) - 20 log10(f MHz) - 77.2  */
+function fieldToPower(EdBuV, fMHz, gRxdBi){
+  if(EdBuV === null || !isFinite(EdBuV) || !(fMHz > 0)) return null;
+  return EdBuV + (gRxdBi || 0) - 20 * Math.log10(fMHz) - 77.2;
+}
+
+/* The STL hop, judged as a radio link. */
+function stlFeed(r){
+  var cfg = Object.assign({}, STL_DEFAULT, r.feed || {});
+  var tx = relaySource(r);
+  var P = computePathFor(tx, r);
+  var T = (r.T && r.T.key === relayKey(r)) ? r.T : null;
+  var p = paramsFor(P, { lat: r.lat, lon: r.lon, h: r.h, name: r.name }, T, tx);
+
+  /* a point-to-point link on its own frequency, dish or Yagi both ends */
+  p.f = cfg.f;
+  p.P = (+cfg.erp || 1) / 1000;      /* kW, as the engine expects */
+  p.env = "rural";
+  p.hrx = r.h;
+
+  var E = evalRx(p, iono(p)).t;
+  var rx = fieldToPower(E, cfg.f, cfg.gRx);
+  var margin = rx === null ? null : rx - cfg.thr;
+
+  var clear = T ? linkClearance(T, cfg.f, (tx.h || 30), r.h) : null;
+
+  var st;
+  if(margin === null) st = "none";
+  else if(margin >= cfg.want && (!clear || clear.ok)) st = "fed";
+  else if(margin >= cfg.want * 0.5) st = "weak";
+  else st = "none";
+
+  /* a path that clears on power but not on Fresnel is not a sound link */
+  if(st === "fed" && clear && !clear.ok) st = "weak";
+
+  return { kind: "stl", st: st, e: E, rx: rx, margin: margin,
+           want: cfg.want, thr: cfg.thr, f: cfg.f, erp: cfg.erp, gRx: cfg.gRx,
+           dist: P.dist, terrain: !!T, clear: clear, P: P };
+}
+
+/* What to say about a feed, in one line. */
+function feedVerdict(fd){
+  if(!fd) return "";
+  if(fd.kind === "studio") return "Fed by line from the studio.";
+  if(fd.kind === "stl"){
+    if(fd.margin === null) return "No STL path could be computed.";
+    var m = Math.round(fd.margin);
+    if(fd.st === "fed") return "STL healthy: " + m + " dB of fade margin at " + fmtF(fd.f) + ".";
+    if(fd.clear && !fd.clear.ok && m >= fd.want)
+      return "STL has " + m + " dB of margin but the path is not clear: "
+           + Math.round(fd.clear.percentF1) + "% of the Fresnel zone against the 60% a link wants.";
+    if(fd.st === "weak")
+      return "STL marginal: " + m + " dB of fade margin against the " + fd.want + " dB a broadcast feed wants.";
+    return "STL will not carry: " + m + " dB of fade margin, " + fd.want + " dB wanted. "
+         + "Raise the mast, use higher-gain antennas at both ends, or put a repeater in between.";
+  }
+  if(fd.st === "fed") return "Fed off-air with " + Math.round(fd.e - fd.min) + " dB over the minimum field.";
+  if(fd.st === "weak") return "Off-air input is receivable but under the 10 dB a transposer wants.";
+  return "Off-air input is below the minimum usable field: this site cannot rebroadcast.";
 }
 
 function drawProfile(p){
@@ -4670,19 +4904,65 @@ function addRelay(pt){ const b=baseModel().p, f=b.f>=30?+(b.f*1.03).toFixed(1):6
 function renderRelayTable(){ const el=$("relayTable"); if(!el) return;
   if(!MP.relays.length){ el.innerHTML=`<tr><td class="hint">No relays yet. Choose <b><svg class=ic aria-hidden=true><use href=#i-relay /></svg> Add relay</b> and click a valley or town the main transmitter can't reach. Search a place first if you like.</td></tr>`; return; }
   const txOpts=MP.S.bcast.txs.map((t,i)=>`<option value="${i}">T${i+1} · ${esc(t.name)}</option>`).join("");
-  el.innerHTML=`<tr><th></th><th>Relay</th><th>Fed from</th><th>Feed distance</th><th>Input field</th><th>Status</th><th>Mast (m)</th><th>ERP (kW)</th><th>Output (MHz)</th><th>Panel</th><th></th></tr>`+MP.relays.map((r,k)=>{ const fd=relayFeed(r);
+  el.innerHTML=`<tr><th></th><th>Station</th><th>Fed from</th><th>Feed</th><th>Feed health</th><th>Status</th><th>Mast (m)</th><th>Services</th><th>Panel</th><th></th></tr>`+MP.relays.map((r,k)=>{ const fd=relayFeed(r);
     const st=fd.st==="fed"?['good','Fed']:fd.st==="weak"?['warn','Weak input']:['bad','Not fed'];
+    const kind=(r.feed&&r.feed.kind)||"offair";
+    const kOpt=[["offair","Off-air (transposer)"],["stl","STL link"],["studio","Studio line"]]
+      .map(([v,l])=>`<option value="${v}"${v===kind?" selected":""}>${l}</option>`).join("");
+    const health = kind==="studio" ? '<span class="muted">line fed</span>'
+      : kind==="stl" ? `${fd.margin===null?"—":Math.round(fd.margin)+" dB margin"} <span class="muted">want ${fd.want}</span>`
+      : `${fd.e===null?"—":fd.e.toFixed(1)} dBµV/m <span class="muted">need ${fd.need.toFixed(0)}</span>`;
+    const svs=stationServices(r), nOn=svs.filter(v=>v.on&&v.f>0).length;
     return `<tr data-r="${k}"><td><span class="pin-n" style="background:#1d8a8a">Y${k+1}</span></td>
-    <td><input type="text" class="rnm" value="${esc(r.name)}" aria-label="Relay ${k+1} name"></td>
-    <td><select class="rsrc" aria-label="Source transmitter of relay ${k+1}">${txOpts.replace(`value="${r.src}"`,`value="${r.src}" selected`)}</select></td>
-    <td class="mono">${fmtD(fd.dist)} km${fd.terrain?"":" <span class='muted'>(smooth earth)</span>"}</td>
-    <td class="mono">${fd.e===null?"—":fd.e.toFixed(1)} dBµV/m <span class="muted">need ${fd.need.toFixed(0)}</span></td>
+    <td><input type="text" class="rnm" value="${esc(r.name)}" aria-label="Station ${k+1} name"></td>
+    <td><select class="rsrc" aria-label="Source transmitter of station ${k+1}">${txOpts.replace(`value="${r.src}"`,`value="${r.src}" selected`)}</select></td>
+    <td><select class="rfk" aria-label="Feed type of station ${k+1}">${kOpt}</select><div class="muted mono" style="font-size:var(--fs-meta)">${fmtD(fd.dist||0)} km${fd.terrain===false?" (smooth earth)":""}</div></td>
+    <td class="mono">${health}</td>
     <td><span class="pill ${st[0]}">${st[1]}</span></td>
-    <td><input type="number" class="rh" min="5" max="400" step="1" value="${r.h}" style="width:70px" aria-label="Relay ${k+1} mast height"></td>
-    <td><input type="number" class="rp" min="0.001" max="100" step="0.01" value="${r.P}" style="width:80px" aria-label="Relay ${k+1} ERP in kW"></td>
-    <td><input type="number" class="rf" min="30" max="3000" step="0.1" value="${r.f}" style="width:86px" aria-label="Relay ${k+1} output frequency"></td>
+    <td><input type="number" class="rh" min="5" max="400" step="1" value="${r.h}" style="width:70px" aria-label="Station ${k+1} mast height"></td>
+    <td><button class="btn sm rsvc" type="button" data-k="${k}">${nOn} service${nOn===1?"":"s"} &#9662;</button></td>
     <td><button class="btn sm" type="button" data-aui="relay:${k}"><svg class=ic aria-hidden=true><use href=#i-gear /></svg> Panel</button></td>
-    <td><button class="iconbtn rdel" type="button" aria-label="Remove relay ${k+1}"><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></td></tr>`; }).join(""); }
+    <td><button class="iconbtn rdel" type="button" aria-label="Remove station ${k+1}"><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></td></tr>
+    <tr class="svcrow" data-sv="${k}"${STA.open===k?"":" hidden"}><td></td><td colspan="9">${stationEditor(r,k,fd)}</td></tr>`; }).join(""); }
+
+var STA={open:null};
+
+function stationEditor(r,k,fd){
+  const kind=(r.feed&&r.feed.kind)||"offair";
+  const cfg=Object.assign({},STL_DEFAULT,r.feed||{});
+  const svs=(r.services&&r.services.length)?r.services:[{name:r.name,f:r.f,P:r.P,share:false,on:true}];
+  const shared=stationServices(r);
+  let feedBox="";
+  if(kind==="stl"){
+    const cl=fd&&fd.clear;
+    feedBox=`<div class="stlgrid">
+      <label class="field"><span class="lbl">STL frequency (MHz)</span><input type="number" class="sf" step="0.1" min="30" max="20000" value="${cfg.f}"></label>
+      <label class="field"><span class="lbl">Studio ERP (W)</span><input type="number" class="se" step="1" min="0.1" max="10000" value="${cfg.erp}"></label>
+      <label class="field"><span class="lbl">Receive antenna (dBi)</span><input type="number" class="sg" step="0.5" min="0" max="40" value="${cfg.gRx}"></label>
+      <label class="field"><span class="lbl">Receiver threshold (dBm)</span><input type="number" class="st" step="1" min="-130" max="-40" value="${cfg.thr}"></label>
+    </div>
+    <p class="hint" style="margin:6px 0 0">${esc(feedVerdict(fd))}${cl?` Fresnel: ${Math.round(cl.percentF1)}% clear at the worst point, ${cl.worst.dKm.toFixed(1)} km out.`:""}</p>`;
+  } else {
+    feedBox=`<p class="hint" style="margin:0">${esc(feedVerdict(fd))}</p>`;
+  }
+  const rows=svs.map((v,i)=>{
+    const eff=shared[i];
+    return `<tr data-sv-i="${i}">
+      <td><input type="text" class="vn" value="${esc(v.name||("Service "+(i+1)))}" aria-label="Service ${i+1} name"></td>
+      <td><input type="number" class="vf" step="0.1" min="30" max="3000" value="${v.f}" style="width:92px" aria-label="Service ${i+1} frequency"></td>
+      <td><input type="number" class="vp" step="0.01" min="0.001" max="100" value="${v.P}" style="width:88px" aria-label="Service ${i+1} ERP"></td>
+      <td><label class="check"><input type="checkbox" class="vs"${v.share?" checked":""}> share antenna</label></td>
+      <td class="mono muted">${eff&&eff.combiner?("−"+eff.combiner+" dB → "+eff.P.toFixed(2)+" kW"):"—"}</td>
+      <td><label class="check"><input type="checkbox" class="vo"${v.on!==false?" checked":""}> on air</label></td>
+      <td><button class="iconbtn vdel" type="button" aria-label="Remove service ${i+1}">&#10005;</button></td></tr>`;
+  }).join("");
+  return `<div class="staedit">
+    <h3>Feed</h3>${feedBox}
+    <h3>Services on this tower</h3>
+    <div class="tablewrap"><table class="svctbl"><tr><th>Name</th><th>MHz</th><th>ERP (kW)</th><th>Antenna</th><th>After combiner</th><th></th><th></th></tr>${rows}</table></div>
+    <button class="btn sm vadd" type="button">+ Add a service</button>
+  </div>`;
+}
 /* ---------- layers: broadcast (Map tab) and mobile (Mobile tab) share one map ---------- */
 function setLayer(l){
   const slot=$(l==="mobile"?"mobMapSlot":"mapSlot"), core=$("mapCore"); if(core.parentNode!==slot) slot.appendChild(core);
@@ -4768,8 +5048,55 @@ function bindMap(){
     if(e.target.classList.contains("rh")){ r.h=clamp(+e.target.value||10,5,400); r.T=null; relayTerrain(r); }
     if(e.target.classList.contains("rp")) r.P=clamp(+e.target.value||0.01,0.001,100);
     if(e.target.classList.contains("rf")) r.f=clamp(+e.target.value||100,30,3000);
+    if(e.target.classList.contains("rfk")){ r.feed=Object.assign({},STL_DEFAULT,r.feed||{},{kind:e.target.value}); r.T=null; relayTerrain(r); }
     MP.res.clear(); updateMap(); });
-  rt.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-r]"); if(!tr) return; if(e.target.closest(".rdel")) MP.removePin({kind:"relay",i:+tr.dataset.r}); });
+
+  /* the station editor: feed settings and the services on the tower */
+  rt.addEventListener("change",e=>{
+    const sr=e.target.closest("tr[data-sv]"); if(!sr) return;
+    const k=+sr.dataset.sv, r=MP.relays[k]; if(!r) return;
+    const t=e.target, cls=n=>t.classList.contains(n);
+    if(cls("sf")||cls("se")||cls("sg")||cls("st")){
+      r.feed=Object.assign({},STL_DEFAULT,r.feed||{},{kind:"stl"});
+      if(cls("sf")) r.feed.f=clamp(+t.value||413.4,30,20000);
+      if(cls("se")) r.feed.erp=clamp(+t.value||20,0.1,10000);
+      if(cls("sg")) r.feed.gRx=clamp(+t.value||14,0,40);
+      if(cls("st")) r.feed.thr=clamp(+t.value||-90,-130,-40);
+      r.T=null; relayTerrain(r);
+    }
+    const vr=t.closest("tr[data-sv-i]");
+    if(vr){
+      ensureServices(r);
+      const v=r.services[+vr.dataset.svI]; if(v){
+        if(cls("vn")) v.name=t.value.trim()||v.name;
+        if(cls("vf")) v.f=clamp(+t.value||100,30,3000);
+        if(cls("vp")) v.P=clamp(+t.value||0.01,0.001,100);
+        if(cls("vs")) v.share=t.checked;
+        if(cls("vo")) v.on=t.checked;
+        r.f=r.services[0].f; r.P=r.services[0].P;   /* keep the pin label honest */
+      }
+    }
+    MP.res.clear(); updateMap(); });
+
+  const srp=$("staReport");
+  if(srp) srp.addEventListener("click",()=>{ const o=$("staReportOut"); if(o&&!o.hidden){ o.hidden=true; return; } stationReport(); });
+
+  rt.addEventListener("click",e=>{
+    const tr=e.target.closest("tr[data-r]");
+    if(tr && e.target.closest(".rdel")){ MP.removePin({kind:"relay",i:+tr.dataset.r}); return; }
+    const sv=e.target.closest(".rsvc");
+    if(sv){ const k=+sv.dataset.k; STA.open = STA.open===k ? null : k; renderRelayTable(); return; }
+    const sr=e.target.closest("tr[data-sv]"); if(!sr) return;
+    const k=+sr.dataset.sv, r=MP.relays[k]; if(!r) return;
+    if(e.target.closest(".vadd")){
+      ensureServices(r);
+      r.services.push({name:"Service "+(r.services.length+1),f:r.services[0].f+0.4,P:r.services[0].P,share:true,on:true});
+      MP.res.clear(); updateMap(); return;
+    }
+    const del=e.target.closest(".vdel");
+    if(del){ const vr=del.closest("tr[data-sv-i]"); ensureServices(r);
+      if(r.services.length>1){ r.services.splice(+vr.dataset.svI,1); r.f=r.services[0].f; r.P=r.services[0].P; MP.res.clear(); updateMap(); } }
+  });
   // pins: TX and RX hit-testing (the pin head sits ~20 px above the point)
   const hitPin=(x,y)=>{ if(MP.layer==="bcast") for(let k=MP.relays.length-1;k>=0;k--){ const [px,py]=proj(MP.relays[k].lon,MP.relays[k].lat); if(Math.hypot(px-x,py-16-y)<14) return {kind:"relay",i:k}; }
     for(let i=MP.txs.length-1;i>=0;i--){ const [px,py]=proj(MP.txs[i].lon,MP.txs[i].lat); if(Math.hypot(px-x,py-18-y)<15) return {kind:"tx",i}; }
@@ -4931,6 +5258,44 @@ function renderClearance(P,T,p){
     ["Earth bulge", Math.round(L.worst.bulge)+" m", "at the worst point, k = 4/3", "info"]
   ];
   $("clearTiles").innerHTML=rows.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
+}
+
+
+/* A station that predates the services feature gets its single frequency
+   promoted, so nothing is lost when it is edited for the first time. */
+function ensureServices(r){
+  if(!r.services||!r.services.length)
+    r.services=[{name:r.name,f:r.f,P:r.P,share:false,on:true}];
+  return r.services;
+}
+
+
+/* ---- one page per site: what you would hand to a reviewer ---- */
+function stationReport(){
+  const out=$("staReportOut"); if(!out) return;
+  if(!MP.relays.length){ out.hidden=false; out.innerHTML='<p class="hint">No stations yet.</p>'; return; }
+  const esc2=esc;
+  out.hidden=false;
+  out.innerHTML=MP.relays.map((r,k)=>{
+    const fd=relayFeed(r), svs=stationServices(r);
+    const kind=(r.feed&&r.feed.kind)||"offair";
+    const feedName={studio:"Studio line",stl:"STL link",offair:"Off-air transposer"}[kind];
+    const cl=fd&&fd.clear;
+    const svRows=svs.map(v=>`<tr><td>${esc2(v.name)}</td><td class="mono">${v.f} MHz</td>`+
+      `<td class="mono">${v.Praw} kW</td><td class="mono">${v.combiner?("−"+v.combiner+" dB"):"—"}</td>`+
+      `<td class="mono">${v.P.toFixed(2)} kW</td><td>${v.on?"on air":"off"}</td></tr>`).join("");
+    return `<section class="starep">
+      <h3>Y${k+1} · ${esc2(r.name)}</h3>
+      <p class="mono muted">${r.lat.toFixed(4)}, ${r.lon.toFixed(4)} · mast ${r.h} m</p>
+      <table class="kv"><tbody>
+        <tr><td>Feed</td><td>${feedName}${kind==="stl"?` at ${fd.f} MHz, ${fd.erp} W ERP, ${fd.gRx} dBi receive`:""}</td></tr>
+        <tr><td>Fed from</td><td>${esc2((relaySource(r)||{}).name||"—")}, ${fmtD(fd.dist||0)} km</td></tr>
+        <tr><td>Feed health</td><td>${esc2(feedVerdict(fd))}</td></tr>
+        ${cl?`<tr><td>Path clearance</td><td>${Math.round(cl.percentF1)}% of the first Fresnel zone at the worst point, ${cl.worst.dKm.toFixed(1)} km out${cl.ok?"":" — under the 60% a link wants"}</td></tr>`:""}
+      </tbody></table>
+      <table class="kv"><tr><th>Service</th><th>Frequency</th><th>ERP</th><th>Combiner</th><th>Radiated</th><th></th></tr>${svRows}</table>
+    </section>`;
+  }).join("");
 }
 
 /* ===================== REAL CELL NETWORK, TOWER DESIGN, COVERAGE MAP, MY COVERAGE ===================== */
@@ -5319,10 +5684,20 @@ function auiParams(t){ const b=baseModel().p; const f=AUI.kind==="relay"?t.f:(t.
 function antFormHTML(a,f,idp){
   const band=antBand(f), types=Object.entries(ANT_TYPES).filter(([,v])=>v.band===band);
   const T=ANT_TYPES[a.type]||ANT_TYPES[types[0][0]];
-  return `<div class="field"><label for="${idp}type">Antenna type</label><select id="${idp}type" data-ak="type">${types.map(([k,v])=>`<option value="${k}"${k===a.type?" selected":""}>${esc(v.name)}</option>`).join("")}</select><span class="hint">${esc(T.std)}</span></div>
+  const pre=presetsFor(f);
+  const preHTML=pre.length?`<div class="field"><label>Start from a typical build</label>
+    <div class="chips antpre">${pre.map(q=>`<button class="chip" type="button" data-preset="${q.id}" title="${esc(q.why)}">${esc(q.name)}</button>`).join("")}</div></div>`:"";
+  return preHTML+`<div class="field"><label for="${idp}type">Antenna type</label><select id="${idp}type" data-ak="type">${types.map(([k,v])=>`<option value="${k}"${k===a.type?" selected":""}>${esc(v.name)}</option>`).join("")}</select><span class="hint">${esc(T.std)}</span></div>
   <div class="antparams">${T.params.map(q=>`<div class="field"><label for="${idp}${q.k}">${esc(q.label)} <span class="v">${a[q.k]??q.def}</span></label><input type="${q.max-q.min>40||q.step<1?"range":"number"}" id="${idp}${q.k}" data-ak="${q.k}" min="${q.min}" max="${q.max}" step="${q.step}" value="${a[q.k]??q.def}">${q.hint?`<span class="hint">${esc(q.hint)}</span>`:""}</div>`).join("")}</div>`;
 }
 function bindAntForm(root,getAnt,setAnt,f){
+  root.querySelectorAll("[data-preset]").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const q=ANT_PRESETS.find(x=>x.id===b.dataset.preset); if(!q) return;
+      const cur=getAnt()||{};
+      setAnt(q.make(cur.az),true);
+    });
+  });
   root.querySelectorAll("[data-ak]").forEach(el=>{
     const h=()=>{ const k=el.dataset.ak; let a=getAnt();
       if(k==="type"){ a=antDefault(el.value); setAnt(a,true); return; }
