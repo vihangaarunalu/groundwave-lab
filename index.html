@@ -1698,6 +1698,12 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
       <div class="tsum" id="tSum" aria-live="polite"></div>
     </div>
   </section>
+  <section class="panel card" id="clearCard" hidden>
+    <div class="chart-head"><h2>Mast clearance</h2><span class="muted" id="clearRule">60% of the first Fresnel zone, earth bulge at k = 4/3</span></div>
+    <p class="big" id="clearVerdict"></p>
+    <div class="tiles" id="clearTiles"></div>
+  </section>
+
   <section class="panel card" id="terrCard">
     <div class="chart-head"><h2>Terrain profile: <span id="profName" class="muted"></span></h2>
       <div class="row"><span class="legend"><span><i style="border-top:8px solid rgba(40,50,70,.9);width:6px"></i>Building (OSM)</span><span>▲ Named peak</span><span style="color:#c2413a">▼ Main obstacle</span></span><label class="check"><input type="checkbox" id="showBulge"> Show earth curvature</label></div></div>
@@ -1955,7 +1961,7 @@ html,body{max-width:100%;overflow-x:clip;background:var(--bg)}
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v5.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v5.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4355,6 +4361,125 @@ function mapTick(now){
 }
 function setMapPlaying(on){ MP.anim.playing=on; const b=$("mapPlay"); b.innerHTML=on?"<svg class=ic aria-hidden=true><use href=#i-pause /></svg>":"<svg class=ic aria-hidden=true><use href=#i-play /></svg>"; b.title=on?"Pause map animation":"Play map animation"; b.setAttribute("aria-label",b.title); composite(); }
 
+/* =====================================================================
+   Link clearance: Fresnel zone and the mast height a path actually needs.
+
+   Line of sight is not the engineering test. A path can be visually clear
+   and still lose many dB, because the wave needs room around the straight
+   line, not just a sight of it. The usual planning rule is 60% of the first
+   Fresnel zone clear over every obstruction, with the earth bulge included
+   at k = 4/3.
+
+   F1 = sqrt(lambda * d1 * d2 / D)          (all lengths in metres)
+   bulge = d1 * d2 / (2 * k * Re)           k = 4/3
+
+   Distances in T.d are metres, elevations in T.e are metres above sea level.
+   ===================================================================== */
+
+var FRESNEL_RULE = 0.6;     /* the fraction of F1 that must stay clear */
+
+function fresnelRadius(d1, d2, D, fMHz){
+  if(!(fMHz > 0) || !(D > 0)) return 0;
+  var lam = 300 / fMHz;                 /* metres */
+  return Math.sqrt(lam * d1 * d2 / D);
+}
+
+/* Returns null when there is no terrain yet. */
+function linkClearance(T, fMHz, txH, rxH){
+  if(!T || !T.e || T.e.length < 3) return null;
+  var e = T.e, d = T.d, n = e.length;
+  var D = d[n - 1];
+  if(!(D > 0) || !(fMHz > 0)) return null;
+
+  var kRe = (4 / 3) * RE * 1000;        /* effective earth radius, metres */
+
+  /* The DEM can return null for a sample, and isFinite(null) is true in JS,
+     so test the type too. The endpoints carry their own elevations. */
+  var num = function(x){ return typeof x === "number" && isFinite(x); };
+  var firstFinite = function(arr, from, step){
+    for(var i = from; i >= 0 && i < arr.length; i += step) if(num(arr[i])) return arr[i];
+    return 0;
+  };
+  var gTx = num(T.txE) ? T.txE : firstFinite(e, 0, 1);
+  var gRx = num(T.rxE) ? T.rxE : firstFinite(e, n - 1, -1);
+
+  /* T does not always carry the mast heights, so never trust them blind. */
+  txH = num(txH) ? txH : 0;
+  rxH = num(rxH) ? rxH : 0;
+  var hA = gTx + txH;                   /* antenna tops, above sea level */
+  var hB = gRx + rxH;
+
+  var worst = null;          /* smallest clearance measured in F1 units */
+  var needA = -Infinity;     /* tx antenna top needed, above sea level  */
+  var needB = -Infinity;
+  var blockedLos = false;
+
+  for(var i = 1; i < n - 1; i++){
+    var d1 = d[i], d2 = D - d[i];
+    if(!num(d1) || !num(e[i]) || d1 <= 0 || d2 <= 0) continue;
+
+    var bulge = d1 * d2 / (2 * kRe);
+    var top = e[i] + bulge;                        /* what is in the way */
+    var f1 = fresnelRadius(d1, d2, D, fMHz);
+    var need = top + FRESNEL_RULE * f1;            /* the line must clear this */
+
+    var t = d1 / D;
+    var line = hA + (hB - hA) * t;
+    var clear = line - top;
+    if(clear < 0) blockedLos = true;
+
+    var ratio = f1 > 0 ? clear / f1 : (clear >= 0 ? 9 : -9);
+    if(!worst || ratio < worst.ratio){
+      worst = { i: i, dKm: d1 / 1000, ground: e[i], bulge: bulge,
+                f1: f1, clear: clear, ratio: ratio };
+    }
+
+    /* Hold one end, solve the other. Very near a mast the division is
+       ill-conditioned and an obstruction there is a siting problem, not a
+       height problem, so the outer 2% of the path is left out. */
+    if(t <= 0.98) needA = Math.max(needA, (need - hB * t) / (1 - t));
+    if(t >= 0.02) needB = Math.max(needB, (need - hA * (1 - t)) / t);
+  }
+  if(!worst) return null;
+
+  var txNeed = isFinite(needA) ? Math.max(0, needA - gTx) : 0;
+  var rxNeed = isFinite(needB) ? Math.max(0, needB - gRx) : 0;
+  var ok = worst.ratio >= FRESNEL_RULE;
+
+  return {
+    ok: ok,
+    losBlocked: blockedLos,
+    worst: worst,
+    f1: worst.f1,
+    clearance: worst.clear,
+    percentF1: worst.f1 > 0 ? (worst.clear / worst.f1) * 100 : null,
+    txHeightNeeded: txNeed,
+    rxHeightNeeded: rxNeed,
+    txHave: txH,
+    rxHave: rxH,
+    txSpare: txH - txNeed,
+    groundTx: gTx,
+    groundRx: gRx
+  };
+}
+
+/* One sentence an engineer can act on. */
+function clearanceVerdict(L){
+  if(!L) return "";
+  var pc = L.percentF1 == null ? null : Math.round(L.percentF1);
+  if(L.ok){
+    return "Clear: " + pc + "% of the first Fresnel zone is free at the worst point, "
+         + (Math.round(L.txSpare) > 0 ? Math.round(L.txSpare) + " m of mast to spare." : "just.");
+  }
+  if(L.losBlocked){
+    return "Blocked: the ground cuts the straight line " + L.worst.dKm.toFixed(1)
+         + " km out. Raise the mast to " + Math.ceil(L.txHeightNeeded) + " m, or move the site.";
+  }
+  return "Grazing: only " + pc + "% of the first Fresnel zone is free "
+       + L.worst.dKm.toFixed(1) + " km out, against the 60% a link wants. "
+       + "Raise the mast to " + Math.ceil(L.txHeightNeeded) + " m.";
+}
+
 function drawProfile(p){
   const W=prof.clientWidth,H=prof.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; prof.width=W*dpr; prof.height=H*dpr; const c=pctx; c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
   const P=MP.path, dist=Math.max(P.dist,1), io=iono(p), thr=dBuV(threshold(p));
@@ -4451,6 +4576,7 @@ function renderActive(){
     ...(isCell?[["Cell edge",`${CT.thr} dBm`,`${CT.meas} · uplink ≤ ${CT.ul} dB`,"info"],["Typical real cell radius",`${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][0]}–${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][1]} km`,`${CT.sys} · ${MP.cov.env}`,"info"]]
       :[["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],["Needed",fmtField(pr.thr),"minimum usable","info"]])];
   $("tSum").innerHTML=`<span class="pill ${pr.cls}">${pr.verdict}</span><span class="mono">${lvl(pr.t,pr)}</span><span class="muted">${fmtD(P.dist)} km · ${T?(T.loss>0.05?"terrain −"+T.loss.toFixed(1)+" dB":"no terrain loss"):"terrain loading…"} · ${T?(T.los?"line of sight clear":"line of sight blocked"):""}</span>`;
+  renderClearance(P,T,p);
   $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
   $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
   const note=$("terrainNote");
@@ -4763,6 +4889,48 @@ function bindMap(){
   document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement&&FS.on) setMapFs(false); else setTimeout(()=>{ drawMap(); renderActive(); },60); });
   document.addEventListener("keydown",e=>{ if(e.target.closest&&e.target.closest("input,textarea,select")) return; if((currentTab==="map"||currentTab==="mobile")&&(e.key==="f"||e.key==="F")&&!e.ctrlKey&&!e.metaKey){ setMapFs(!FS.on); } if(e.key==="Escape"&&FS.on) setMapFs(false); });
   requestAnimationFrame(mapTick);
+}
+
+
+/* ---- mast clearance: the number a tower plan actually turns on ---- */
+function renderClearance(P,T,p){
+  const card=$("clearCard"); if(!card) return;
+  const f=(p&&p.f)||(MP.cov&&MP.cov.f)||null;
+  const fin=x=>typeof x==="number"&&isFinite(x);
+  const txH=fin(p&&p.htx)?p.htx:(fin(T&&T.txH)?T.txH:0);
+  const rxH=fin(p&&p.hrx)?p.hrx:(fin(T&&T.rxH)?T.rxH:0);
+  /* Fresnel clearance is the test for a line-of-sight link. Below 30 MHz the
+     ground wave diffracts around the earth by design, so demanding 60% of a
+     4 km Fresnel zone over a 305 km MF path is arithmetic, not engineering. */
+  const losBand = f >= 30;
+  const L=(T&&f&&losBand)?linkClearance(T,f,txH,rxH):null;
+  if(!L){
+    if(T&&f&&!losBand){
+      card.hidden=false;
+      $("clearVerdict").textContent="Not the governing test at "+fmtF(f)+".";
+      $("clearVerdict").style.color="var(--muted)";
+      $("clearRule").textContent="line-of-sight links only, 30 MHz and above";
+      $("clearTiles").innerHTML='<div class="tile info" style="grid-column:1/-1"><span class="k">Why</span>'+
+        '<span class="sub" style="font-size:var(--fs-dense)">Below 30 MHz the ground wave follows the curve of the earth instead of needing a clear sight line, '+
+        'so Fresnel clearance and mast height do not decide whether the path works. Read the coverage prediction on the Map tab instead. '+
+        'Switch to VHF or UHF and this becomes the number that matters.</span></div>';
+    } else card.hidden=true;
+    return;
+  }
+  card.hidden=false;
+  $("clearRule").textContent="60% of the first Fresnel zone, earth bulge at k = 4/3";
+  const v=$("clearVerdict");
+  v.textContent=clearanceVerdict(L);
+  v.style.color=L.ok?"var(--good-ink)":(L.losBlocked?"var(--bad-ink)":"var(--warn-ink)");
+  const pct=L.percentF1==null?"—":Math.round(L.percentF1)+"%";
+  const rows=[
+    ["First Fresnel zone", Math.round(L.f1)+" m", "radius at the worst point, "+L.worst.dKm.toFixed(1)+" km out", "info"],
+    ["Clear now", Math.round(L.clearance)+" m", pct+" of the zone (want 60%)", L.ok?"good":(L.losBlocked?"bad":"warn")],
+    ["Mast needed here", Math.ceil(L.txHeightNeeded)+" m", "on ground at "+Math.round(L.groundTx)+" m, holding the far end", L.txHave>=L.txHeightNeeded?"good":"warn"],
+    ["Or at the far end", Math.ceil(L.rxHeightNeeded)+" m", "on ground at "+Math.round(L.groundRx)+" m, holding this end", L.rxHave>=L.rxHeightNeeded?"good":"warn"],
+    ["Earth bulge", Math.round(L.worst.bulge)+" m", "at the worst point, k = 4/3", "info"]
+  ];
+  $("clearTiles").innerHTML=rows.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
 }
 
 /* ===================== REAL CELL NETWORK, TOWER DESIGN, COVERAGE MAP, MY COVERAGE ===================== */
