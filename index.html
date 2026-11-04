@@ -1138,6 +1138,7 @@ table.svctbl .check{white-space:nowrap}
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19.2 8.8a2.4 2.4 0 1 0-3.4-3.4L4.6 16.6Z"/><path d="m14.8 6.6 3.4 3.4"/></symbol>
 <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m2.5 19 6-11 3.6 6 2.4-4 7 9Z"/></symbol>
 <symbol id="i-satellite" viewBox="0 0 24 24"><path d="m6 10 4-4 3.5 3.5-4 4Z"/><path d="m2.5 13.5 4 4M13.5 9.5 17 6M15 13a5 5 0 0 1-5 5"/><path d="M19 13a9 9 0 0 1-9 9"/></symbol>
+<symbol id="i-cursor" viewBox="0 0 24 24"><path d="M5.5 3.2l6 15.4 2.1-5.9 5.9-2.1z"/></symbol>
 <symbol id="i-dish" viewBox="0 0 24 24"><path d="M4 20a11 11 0 0 1 11-11"/><circle cx="4.5" cy="19.5" r="1.6"/><path d="M8 15.5 15 9M13.5 4.5 19.5 10.5"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M4 4.5 20 19.5"/><path d="M9.5 6.1A9.9 9.9 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.2 3.9"/><path d="M15.2 15.2A9.7 9.7 0 0 1 12 18.5C6 18.5 2.5 12 2.5 12A17.4 17.4 0 0 1 6.4 7.4"/></symbol>
@@ -1576,9 +1577,10 @@ table.svctbl .check{white-space:nowrap}
     <div class="searchact" id="searchAct" hidden></div>
     <div class="toolrow">
       <div class="seg mapseg" role="radiogroup" aria-label="What a click on the map does">
+        <input type="radio" name="clickset" id="modeSel" value="select" checked><label for="modeSel"><span aria-hidden="true"><svg class=ic aria-hidden=true><use href=#i-cursor /></svg></span> Select</label>
         <input type="radio" name="clickset" id="modeAddTx" value="addtx"><label for="modeAddTx"><span aria-hidden="true"><svg class=ic aria-hidden=true><use href=#i-dish /></svg></span> <span id="lblAddTx">Add transmitter</span></label>
         <input type="radio" name="clickset" id="modeAddRelay" value="addrelay" class="bcast-only"><label for="modeAddRelay" class="bcast-only"><span aria-hidden="true"><svg class=ic aria-hidden=true><use href=#i-relay /></svg></span> Add relay</label>
-        <input type="radio" name="clickset" id="modeAdd" value="add" checked><label for="modeAdd"><span aria-hidden="true"><svg class=ic aria-hidden=true><use href=#i-radio /></svg></span> <span id="lblAdd">Add receiver</span></label>
+        <input type="radio" name="clickset" id="modeAdd" value="add"><label for="modeAdd"><span aria-hidden="true"><svg class=ic aria-hidden=true><use href=#i-radio /></svg></span> <span id="lblAdd">Add receiver</span></label>
         <input type="radio" name="clickset" id="modeTx" value="tx"><label for="modeTx">Move <span id="lblMoveTx">TX</span></label>
         <input type="radio" name="clickset" id="modeRx" value="rx"><label for="modeRx">Move <span id="lblMoveRx">RX</span></label>
         <input type="radio" name="clickset" id="modeMe" value="me" class="mob-only"><label for="modeMe" class="mob-only"><svg class=ic aria-hidden=true><use href=#i-pin /></svg> Mark me</label>
@@ -1587,7 +1589,7 @@ table.svctbl .check{white-space:nowrap}
       <button class="btn" id="gpsBtn" type="button" hidden><svg class=ic aria-hidden=true><use href=#i-target /></svg> My location</button>
       <button class="btn mob-only" id="findTowers" type="button" title="Search OpenStreetMap for mobile towers within 8 km of the selected test point"><svg class=ic aria-hidden=true><use href=#i-signal /></svg> Find towers (OSM)</button>
       <label class="covsel"><span>Coverage</span><select id="covMode"><option value="contour">Antenna contour</option><option value="heat">Contour + heat map</option><option value="off">Off</option></select></label>
-      <span class="toolsave"><button class="btn" id="shareBtn" type="button" title="Copy a link that opens this exact scenario"><svg class=ic aria-hidden=true><use href=#i-link /></svg> Share link</button></span>
+      <span class="toolsave"><button class="btn" id="scnBtn" type="button" title="Load a worked SLBC example">Example: City FM</button><button class="btn" id="shareBtn" type="button" title="Copy a link that opens this exact scenario"><svg class=ic aria-hidden=true><use href=#i-link /></svg> Share link</button></span>
     </div>
     <p class="modehint" id="modeHint" aria-live="polite">Click the map to add a receiver.</p>
   </div>
@@ -1983,7 +1985,7 @@ table.svctbl .check{white-space:nowrap}
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v6.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v6.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -3947,7 +3949,7 @@ const DEFAULT_RXS=()=>[{id:1,name:"Jaffna",lat:9.66,lon:80.02,h:10},{id:2,name:"
 const DEFAULT_TOWERS=()=>[{id:101,name:"Fort tower",lat:6.9355,lon:79.8450,h:30,techs:["2g","3g","4g","5g"],sector:"3sector",az:0,tilt:4},{id:102,name:"Borella tower",lat:6.9147,lon:79.8778,h:35,techs:["2g","3g","4g","5g"],sector:"3sector",az:30,tilt:4},{id:103,name:"Kollupitiya tower",lat:6.9010,lon:79.8560,h:30,techs:["2g","3g","4g","5g"],sector:"3sector",az:60,tilt:4}];
 const DEFAULT_POINTS=()=>[{id:101,name:"University of Colombo",lat:6.9020,lon:79.8607,h:1.5},{id:102,name:"Kelanimulla",lat:6.9550,lon:79.9300,h:1.5}];
 const MP={layer:"bcast",S:{bcast:{txs:DEFAULT_TXS(),ti:0,rxs:DEFAULT_RXS(),ai:0,relays:[]},mobile:{txs:DEFAULT_TOWERS(),ti:0,rxs:DEFAULT_POINTS(),ai:0,relays:[]}},nextTx:200,nextRx:200,nextRel:1,benv:"rural",
-  view:null,mode:"add",polys:[],source:"loading",date:new Date(),path:null,lastModelId:null,useTerrain:true,useBuildings:true,showBulge:false,manual:{tx:0,rx:0},res:new Map(),cover:null,anim:{playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,t:0,last:0}};
+  view:null,mode:"select",polys:[],source:"loading",date:new Date(),path:null,lastModelId:null,useTerrain:true,useBuildings:true,showBulge:false,manual:{tx:0,rx:0},res:new Map(),cover:null,anim:{playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,t:0,last:0}};
 for(const k of ["txs","ti","rxs","ai","relays"]) Object.defineProperty(MP,k,{get(){ return MP.S[MP.layer][k]; }, set(v){ MP.S[MP.layer][k]=v; }, enumerable:true});
 Object.defineProperty(MP,"tx",{get(){ return MP.txs[MP.ti]; }, set(v){ MP.txs[MP.ti]=v; }});
 Object.defineProperty(MP,"txH",{get(){ return MP.tx.h; }, set(v){ MP.tx.h=v; }});
@@ -4974,11 +4976,12 @@ function setLayer(l){
   if(MP.mode==="addrelay"&&l==="mobile") MP.setMode("add"); else MP.setMode(MP.mode);
   if(MP.source!=="loading"){ updateMap(); MP.view=defaultView("sites"); drawMap(); }
 }
-const MODE_HINT={addtx:()=>MP.layer==="mobile"?"Click the map to place a new tower (it uses the planner's tower height).":"Click the map to add a broadcast transmitter.",
-  addrelay:()=>"Click the map to place a relay. It is fed off-air from the selected transmitter.",
-  add:()=>MP.layer==="mobile"?"Click the map to add a test point (a phone at 1.5 m).":"Click the map to add a receiver.",
+const MODE_HINT={addtx:()=>MP.layer==="mobile"?"Click the map to place a new tower (it uses the planner's tower height).":"Click the map to add a broadcast transmitter. One click, then back to Select.",
+  addrelay:()=>"Click the map to place a station. One click, then back to Select.",
+  add:()=>MP.layer==="mobile"?"Click the map to add a test point (a phone at 1.5 m).":"Click the map to add a receiver. One click, then back to Select.",
   tx:()=>MP.layer==="mobile"?"Click the map to move the selected tower.":"Click the map to move the selected transmitter.", rx:()=>"Click the map to move the selected "+(MP.layer==="mobile"?"test point.":"receiver."),
-  me:()=>"Click your home on the map.", del:()=>"Click a pin to remove it."};
+  me:()=>"Click your home on the map.", del:()=>"Click a pin to remove it.",
+  select:()=>"Click a pin to select it, drag to pan, scroll to zoom. Nothing is placed until you choose a button above."};
 /* ---------- place search (OpenStreetMap Nominatim, max 1 request per second) ---------- */
 async function placeSearch(q){
   const hits=$("mapHits"); hits.hidden=false; hits.innerHTML=`<li class="muted">Searching…</li>`;
@@ -5032,9 +5035,9 @@ function bindMap(){
   $("useBuildings").addEventListener("change",e=>{ MP.useBuildings=e.target.checked; updateMap(); });
   $("txElevM").addEventListener("change",e=>{ MP.manual.tx=+e.target.value||0; updateMap(); });
   $("rxElevM").addEventListener("change",e=>{ MP.manual.rx=+e.target.value||0; MP.rx.manualElev=MP.manual.rx; updateMap(); });
-  const MODES=[["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeAddRelay","addrelay"],["modeDel","del"],["modeMe","me"]];
+  const MODES=[["modeSel","select"],["modeTx","tx"],["modeRx","rx"],["modeAdd","add"],["modeAddTx","addtx"],["modeAddRelay","addrelay"],["modeDel","del"],["modeMe","me"]];
   MODE_HINT.moverelay=()=>"Click the map to move the selected relay.";
-  const setMode=m=>{ MP.mode=m; MODES.forEach(([id,k])=>$(id).checked=(k===m||(m==="moverelay"&&k==="tx"))); mapC.style.cursor=m==="del"?"not-allowed":"crosshair"; $("modeHint").textContent=(MODE_HINT[m]||MODE_HINT.add)(); };
+  const setMode=m=>{ MP.mode=m; MODES.forEach(([id,k])=>$(id).checked=(k===m||(m==="moverelay"&&k==="tx"))); mapC.style.cursor=m==="del"?"not-allowed":(m==="select"?"default":"crosshair"); $("modeHint").textContent=(MODE_HINT[m]||MODE_HINT.add)(); };
   MP.setMode=setMode;
   MODES.forEach(([id,m])=>$(id).addEventListener("change",()=>setMode(m)));
   $("mapSearch").addEventListener("submit",e=>{ e.preventDefault(); const q=$("mapQ").value.trim(); if(q.length>1) placeSearch(q); });
@@ -5077,6 +5080,9 @@ function bindMap(){
       }
     }
     MP.res.clear(); updateMap(); });
+
+  const scn=$("scnBtn");
+  if(scn) scn.addEventListener("click",()=>{ if(MP.layer!=="bcast") setLayer("bcast"); loadCityFM(); });
 
   const srp=$("staReport");
   if(srp) srp.addEventListener("click",()=>{ const o=$("staReportOut"); if(o&&!o.hidden){ o.hidden=true; return; } stationReport(); });
@@ -5136,7 +5142,13 @@ function bindMap(){
   $("mapPlay").addEventListener("click",()=>setMapPlaying(!MP.anim.playing)); setMapPlaying(MP.anim.playing);
   $("basemap").addEventListener("change",e=>{ TILE.blockedMsg=false; setBase(e.target.value); });
   mapC.addEventListener("wheel",e=>{ e.preventDefault(); const r=mapC.getBoundingClientRect(); zoom(e.deltaY<0?0.5:-0.5,e.clientX-r.left,e.clientY-r.top); },{passive:false});
-  mapC.addEventListener("contextmenu",e=>{ const r=mapC.getBoundingClientRect(); const h=hitPin(e.clientX-r.left,e.clientY-r.top); if(h){ e.preventDefault(); removePin(h); } });
+  mapC.addEventListener("contextmenu",e=>{
+    e.preventDefault();                       /* no "Save image as…" over the map */
+    const r=mapC.getBoundingClientRect(), h=hitPin(e.clientX-r.left,e.clientY-r.top);
+    if(h){ removePin(h); return; }
+    const m=$("mapMsg"); m.hidden=false;
+    m.textContent="Right-click a pin to remove it. Use the buttons above to add one. (Click to hide)";
+  });
   mapC.addEventListener("dblclick",e=>{ const r=mapC.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; const h=hitPin(x,y); if(h){ removePin(h); return; } zoom(1,x,y); });
   let down=null;
   mapC.addEventListener("pointerdown",e=>{ const r0=mapC.getBoundingClientRect(), hb=hitBeam(e.clientX-r0.left,e.clientY-r0.top);
@@ -5153,8 +5165,11 @@ function bindMap(){
     const hp=hitPin(x,y); if(hp) MP.lastSel=hp; if(hp&&hp.kind==="relay"){ drawMap(); return; } if(hp){ if(hp.kind==="tx"){ if(MP.ti!==hp.i){ MP.ti=hp.i; updateMap(); } } else if(MP.ai!==hp.i){ MP.ai=hp.i; updateMap(); } return; }
     let best=null; for(const c of CITIES){ const [cx,cy]=proj(c[2],c[1]); const dd=Math.hypot(cx-x,cy-y); if(dd<10&&(!best||dd<best.dd)) best={dd,c}; }
     const pt=best?{name:best.c[0],lat:best.c[1],lon:best.c[2]}:{name:`Site ${q.lat.toFixed(3)}°, ${q.lon.toFixed(3)}°`,lat:clamp(q.lat,-85,85),lon:((q.lon+540)%360)-180,auto:true};
-    if(MP.mode==="me"){ MP.setMe(pt.lat,pt.lon,best?best.c[0]:null); setMode("add"); return; }
-    setPoint(MP.mode,pt); if(MP.mode==="tx"||MP.mode==="addtx"||MP.mode==="addrelay"||MP.mode==="moverelay") setMode("add"); });
+    if(MP.mode==="me"){ MP.setMe(pt.lat,pt.lon,best?best.c[0]:null); setMode("select"); return; }
+    if(MP.mode==="select"){ MP.lastSel=null; drawMap(); return; }   /* resting mode places nothing */
+    setPoint(MP.mode,pt);
+    setMode("select");   /* one-shot: placing a pin does not arm the next click */
+  });
   // sites table
   const tb=$("sitesTable");
   tb.addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(!tr) return; const i=+tr.dataset.i;
@@ -5296,6 +5311,41 @@ function stationReport(){
       <table class="kv"><tr><th>Service</th><th>Frequency</th><th>ERP</th><th>Combiner</th><th>Radiated</th><th></th></tr>${svRows}</table>
     </section>`;
   }).join("");
+}
+
+
+/* =====================================================================
+   A worked SLBC example: City FM.
+
+   0.8 kW from Colombo does not cover the district it is named after. The
+   studio audio goes up to Yatiyantota on a 413.4 MHz STL, and the hill
+   site radiates 10 kW from a 100 m mast back over the city. A transmitter
+   outside the city, high up, beats a small one sitting inside it.
+   ===================================================================== */
+function loadCityFM(){
+  const m=sel(); if(m){ m.name="City FM"; Object.assign(m.p,{type:"gw",f:88.3,P:0.8,htx:60,hrx:10}); }
+  MP.txs=[{id:MP.nextTx++,name:"Colombo (City FM)",lat:6.9271,lon:79.8612,h:60}];
+  MP.ti=0;
+  MP.relays=[{
+    id:MP.nextRel++, name:"Yatiyantota", lat:7.0167, lon:80.2833, h:100,
+    P:10, f:88.3, src:0,
+    feed:{kind:"stl", f:413.4, erp:50, gRx:18, thr:-90, want:20},
+    services:[{name:"City FM", f:88.3, P:10, share:false, on:true}]
+  }];
+  /* spread across Colombo district, from the coast to the eastern edge
+     where 0.8 kW runs out and the hill site takes over */
+  MP.rxs=[
+    {id:MP.nextRx++,name:"Colombo Fort",lat:6.9344,lon:79.8428,h:10},
+    {id:MP.nextRx++,name:"Maharagama",lat:6.8482,lon:79.9267,h:10},
+    {id:MP.nextRx++,name:"Homagama",lat:6.8410,lon:80.0024,h:10},
+    {id:MP.nextRx++,name:"Hanwella",lat:6.8990,lon:80.0820,h:10},
+    {id:MP.nextRx++,name:"Avissawella",lat:6.9544,lon:80.2098,h:10}
+  ];
+  MP.ai=0; MP.lastSel=null; MP.setMode("select");
+  MP.relays.forEach(relayTerrain);
+  MP.res.clear(); updateMap(); MP.view=defaultView("sites"); drawMap();
+  const msg=$("mapMsg"); if(msg){ msg.hidden=false;
+    msg.textContent="City FM: 0.8 kW from Colombo, and 10 kW from Yatiyantota on a 100 m mast fed by a 413.4 MHz STL. Compare what each covers. (Click to hide)"; }
 }
 
 /* ===================== REAL CELL NETWORK, TOWER DESIGN, COVERAGE MAP, MY COVERAGE ===================== */
