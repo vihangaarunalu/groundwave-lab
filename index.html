@@ -382,6 +382,8 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .stage.is-expanded{position:fixed;inset:0;z-index:200;border-radius:0;border:0}
 .stage.is-expanded #anim{height:100vh}
 .stage:fullscreen .tourbox,.stage.is-expanded .tourbox{top:60px}
+.tourbox{z-index:8}
+.stage:has(.tourbox:not([hidden])) .rxhud:not(.moved){top:auto;bottom:12px}
 .learn-build ol{padding-left:22px;display:grid;gap:8px}
 
 .fsbar{display:none;position:absolute;left:50%;bottom:16px;transform:translateX(-50%);gap:10px;align-items:center;background:rgba(12,20,36,.88);color:#fff;padding:8px 12px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);flex-wrap:wrap;max-width:calc(100% - 24px)}
@@ -1707,14 +1709,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
    content rises in as you reach it, numbers count. Off with reduced motion.
    ======================================================================= */
 @keyframes lv-drift{0%{transform:scale(1.04) translate3d(0,0,0)}100%{transform:scale(1.1) translate3d(-1.5%,-1%,0)}}
-@keyframes lv-ring{0%{transform:translate(-50%,-50%) scale(.2);opacity:.9}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
 @keyframes lv-glow{0%,100%{opacity:.55}50%{opacity:1}}
 .hero-bg{animation:gw-zoom 2.4s cubic-bezier(.23,1,.32,1) both,lv-drift 28s ease-in-out 2.4s infinite alternate}
-.hero-rings{position:absolute;left:79%;top:47%;width:0;height:0;z-index:-1;pointer-events:none}
-.hero-rings i{position:absolute;left:0;top:0;width:340px;height:340px;border-radius:50%;border:2px solid rgba(205,242,58,.55);
-  box-shadow:0 0 24px rgba(205,242,58,.25) inset;animation:lv-ring 4.2s cubic-bezier(.2,.6,.3,1) infinite}
-.hero-rings i:nth-child(2){animation-delay:1.4s}.hero-rings i:nth-child(3){animation-delay:2.8s}
-@media (max-width:760px){.hero-rings{left:78%;top:58%}.hero-rings i{width:220px;height:220px}}
 .hero-words dt b{display:inline-block;animation:lv-glow 2.6s ease-in-out 1.2s infinite}
 /* scroll reveal: only applied by script, so content is never hidden without it */
 .rv{opacity:0;transform:translateY(18px);transition:opacity .5s var(--ease-out),transform .6s var(--ease-out)}
@@ -1727,8 +1723,66 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
 .widget{transition:border-color .2s var(--ease-out),box-shadow .25s var(--ease-out)}
 .widget:focus-within{box-shadow:0 0 0 4px color-mix(in srgb,var(--mark) 35%,transparent)}
 @media (hover:hover) and (pointer:fine){.keyfacts li,.gloss-grid > div,.lc-refs section{transition:transform .2s var(--ease-out),border-color .2s var(--ease-out)}.keyfacts li:hover,.gloss-grid > div:hover{transform:translateY(-2px);border-color:var(--control)}}
-@media print{.rv{opacity:1!important;transform:none!important}.hero-rings{display:none}}
-@media (prefers-reduced-motion: reduce){.hero-bg,.hero-rings i,.hero-words dt b,.bandruler .bands button{animation:none!important}.hero-rings{display:none}.rv{opacity:1!important;transform:none!important;transition:none!important}}
+@media print{.rv{opacity:1!important;transform:none!important}}
+@media (prefers-reduced-motion: reduce){.hero-bg,.hero-words dt b,.bandruler .bands button{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}}
+
+/* =======================================================================
+   v7.9 TAB MOTION · each tab arrives: its line-drawn icon draws itself,
+   then the content rises in, one block after another. Icons replay on hover.
+   ======================================================================= */
+@keyframes tab-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes ti-draw{to{stroke-dashoffset:0}}
+@keyframes ti-pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes ti-fade{from{opacity:0}to{opacity:1}}
+@keyframes ti-arc{0%,100%{opacity:.25}35%{opacity:1}}
+@keyframes ti-drop{0%{transform:translateY(-16px);opacity:0}60%{transform:translateY(2px);opacity:1}100%{transform:none}}
+@keyframes ti-rip{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.4);opacity:0}}
+@keyframes ti-bar{0%{transform:scaleY(.15)}100%{transform:scaleY(1)}}
+@keyframes ti-bob{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.72)}}
+@keyframes ti-tw{0%,100%{opacity:.3;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(45deg)}}
+@keyframes ti-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.45)}}
+h2.th{display:flex;align-items:center;gap:var(--sp-4)}
+.ti{flex:0 0 auto;width:56px;height:56px;border-radius:16px;background:var(--navy);display:grid;place-items:center;
+  box-shadow:0 8px 22px rgba(16,44,64,.22),inset 0 0 0 1px rgba(205,242,58,.18);cursor:default}
+.ti svg{width:40px;height:40px;fill:none;stroke:var(--lime);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.ti .d{stroke-dasharray:1;stroke-dashoffset:1;animation:ti-draw .9s cubic-bezier(.65,0,.35,1) var(--d,0s) forwards}
+.ti .dash{stroke-dasharray:3 4;opacity:0;animation:ti-fade .4s ease-out .7s forwards}
+.ti .dot{fill:var(--lime);stroke:none;transform-box:fill-box;transform-origin:center;transform:scale(0);animation:ti-pop .4s var(--ease-out) .9s forwards,ti-pulse 2.4s ease-in-out 1.6s infinite}
+.ti-anim .arc{opacity:.25;animation:ti-arc 2.1s ease-in-out infinite}
+.ti-anim .a2{animation-delay:.25s}.ti-anim .a3{animation-delay:.5s}
+.ti-map .pin{animation:ti-drop .6s var(--ease-out) both}
+.ti-map .rip{stroke-width:2;transform-box:fill-box;transform-origin:center;animation:ti-rip 1.8s ease-out .6s infinite}
+.ti-cell .bars rect{fill:var(--lime);stroke:none;transform-box:fill-box;transform-origin:bottom;animation:ti-bar .5s var(--ease-out) both,ti-bob 2.4s ease-in-out 1.2s infinite}
+.ti-cell .bars rect:nth-child(2){animation-delay:.1s,1.35s}.ti-cell .bars rect:nth-child(3){animation-delay:.2s,1.5s}.ti-cell .bars rect:nth-child(4){animation-delay:.3s,1.65s}
+.ti-learn .spark{transform-box:fill-box;transform-origin:center;animation:ti-tw 2.2s ease-in-out .9s infinite}
+.lc-head .ti{background:rgba(247,250,252,.08);box-shadow:inset 0 0 0 1px rgba(205,242,58,.35)}
+@media (max-width:760px){.ti{width:46px;height:46px;border-radius:13px}.ti svg{width:32px;height:32px}h2.th{gap:var(--sp-3)}}
+/* content rises in, one block after another, every time a tab opens */
+.wrap:not([hidden]) > *{animation:tab-in .55s var(--ease-out) both}
+.wrap:not([hidden]) > :nth-child(2){animation-delay:.06s}.wrap:not([hidden]) > :nth-child(3){animation-delay:.12s}
+.wrap:not([hidden]) > :nth-child(4){animation-delay:.18s}.wrap:not([hidden]) > :nth-child(5){animation-delay:.24s}
+.wrap:not([hidden]) > :nth-child(n+6){animation-delay:.3s}
+@media (prefers-reduced-motion: reduce){
+  .wrap:not([hidden]) > *,.ti *{animation:none!important}
+  .ti .d{stroke-dashoffset:0}.ti .dash{opacity:1}.ti .dot{transform:none}
+}
+
+/* ---- v7.9 user-satisfaction pass ---- */
+/* quiz answers: full-width cards with A/B/C letters; one column on phones */
+.q .opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;counter-reset:opt}
+.q .opts button{counter-increment:opt;display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 14px;border-radius:var(--r-md);text-align:left;line-height:1.35;white-space:normal}
+.q .opts button::before{content:counter(opt,upper-alpha);flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--field);color:var(--ink);font:600 12px/1 var(--font-display);transition:background-color var(--dur-2) var(--ease-out),color var(--dur-2) var(--ease-out)}
+.q .opts button[aria-pressed="true"]::before{background:var(--ink);color:var(--bg)}
+.q .opts button.right::before{content:"✓";background:var(--good);color:#fff}
+.q .opts button.wrong::before{content:"✕";background:var(--bad);color:#fff}
+.q .opts button.right,.q .opts button.wrong{animation:mo-pop .26s var(--ease-out)}
+@media (max-width:760px){.q .opts{grid-template-columns:1fr}}
+.q .opts button.wrong,.q .opts button.wrong[aria-pressed="true"]{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--panel))}
+.q .opts button.right,.q .opts button.right[aria-pressed="true"]{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--panel))}
+/* feedback is one tap away from every screen */
+.appbar .fbtop svg{width:16px;height:16px}
+.appbar .fbtop{gap:6px}
+@media (max-width:760px){.appbar .fbtop .lbl-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.appbar .fbtop{width:44px;justify-content:center;padding:0}}
 </style>
 </head>
 <body data-tab="lab">
@@ -1787,12 +1841,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
       <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">8</span>Quiz</button>
     </nav>
     <button class="scope" id="scopeChip" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>&#8212;</b></button>
+    <button class="iconbtn themebtn fbtop" id="fbTop" type="button" aria-haspopup="dialog" aria-label="Give feedback" title="Tell us how it went"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg><span class="lbl-t">Feedback</span></button>
     <button class="iconbtn themebtn" id="helpBtn" type="button" aria-haspopup="dialog" title="Help and quick start">? Help</button>
     <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
   </div>
 </header>
 <section class="hero" aria-label="Introduction">
-  <div class="hero-rings" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="hero-bg" role="img" aria-label="Two lattice transmission masts with microwave dishes on a green hilltop under a blue sky"></div>
   <div class="hero-in">
     <dl class="hero-words">
@@ -1811,7 +1865,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
 <!-- ======================= LAB ======================= -->
 <span id="main-content" tabindex="-1"></span>
 <section class="wrap" id="lab" role="tabpanel" aria-labelledby="tab-lab">
-  <div class="screenhead"><h2>Signal reach</h2><p>Set up a transmission and read how far it is usable. Each model is one set of conditions; change one setting at a time to see what it does.</p></div>
+  <div class="screenhead"><h2 class="th"><span class="ti ti-lab" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M12 50H54M12 50V12"/><path class="d" pathLength="1" style="--d:0.25s" d="M14 16C22 18 26 30 34 36S48 44 54 45"/><path class="dash" d="M12 36H54"/><circle class="dot" cx="34" cy="36" r="3.4"/></svg></span>Signal reach</h2><p>Set up a transmission and read how far it is usable. Each model is one set of conditions; change one setting at a time to see what it does.</p></div>
   <aside class="fbprompt" id="fbPrompt" hidden>
     <p class="fb-t"></p>
     <div class="row"><button class="btn primary sm fb-go" type="button">Give feedback</button><button class="btn sm fb-no" type="button">Not now</button></div>
@@ -2035,7 +2089,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
 
 <!-- ======================= ANIMATION ======================= -->
 <section class="wrap" id="animation" role="tabpanel" aria-labelledby="tab-animation" hidden>
-  <div class="screenhead"><h2>What the wave does</h2><p>The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere.</p></div>
+  <div class="screenhead"><h2 class="th"><span class="ti ti-anim" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M32 54V30M26 54L32 30L38 54M28.5 44H35.5"/><path class="arc a1" d="M25 24a10 10 0 0 1 14 0"/><path class="arc a2" d="M20 18a17 17 0 0 1 24 0"/><path class="arc a3" d="M15 12a24 24 0 0 1 34 0"/><circle class="dot" cx="32" cy="28" r="2.6"/></svg></span>What the wave does</h2><p>The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere.</p></div>
   <section class="panel card stagebar">
     <div class="row">
       <div class="field" style="min-width:200px"><label for="animModel">Model</label><select id="animModel"></select></div>
@@ -2145,6 +2199,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
 
 <!-- ======================= MAP ======================= -->
 <section class="wrap" id="map-tab" role="tabpanel" aria-labelledby="tab-map" hidden>
+  <div class="screenhead"><h2 class="th"><span class="ti ti-map" aria-hidden="true"><svg viewBox="0 0 64 64"><ellipse class="rip" cx="32" cy="52" rx="11" ry="3.2"/><g class="pin"><path class="d" pathLength="1" style="--d:0s" d="M32 50C25 41 20 35 20 28a12 12 0 0 1 24 0c0 7-5 13-12 22Z"/><circle class="dot" cx="32" cy="28" r="4"/></g></svg></span>Coverage map</h2><p>Search a place, add transmitters and receivers, and see which sites get a usable signal.</p></div>
   <section class="panel card routebar">
     <details class="setup" id="setupBox">
       <summary><span class="setup-t">Path setup</span><span class="setup-s" id="setupSum"></span></summary>
@@ -2278,7 +2333,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
 
 <!-- ======================= MOBILE PLANNER ======================= -->
 <section class="wrap" id="mobile-tab" role="tabpanel" aria-labelledby="tab-mobile" hidden>
-  <div class="intro"><div class="stack" style="gap:4px"><h2>Cellular coverage planner</h2><p>Plan 2G–5G cell sites: tower heights, sectors and the link budget, then each test point's serving cell and the coverage map.</p><p class="hint">Methods: ITU-R P.529 (Hata), M.2412 (UMa), P.1812 beyond range, P.2108 clutter, P.2109 building entry, P.838 rain, P.1812/P.1546 location variability.</p></div></div>
+  <div class="intro"><div class="stack" style="gap:4px"><h2 class="th"><span class="ti ti-cell" aria-hidden="true"><svg viewBox="0 0 64 64"><g class="bars"><rect x="12" y="42" width="7" height="8" rx="1.5"/><rect x="23" y="34" width="7" height="16" rx="1.5"/><rect x="34" y="26" width="7" height="24" rx="1.5"/><rect x="45" y="18" width="7" height="32" rx="1.5"/></g></svg></span>Cellular coverage planner</h2><p>Plan 2G–5G cell sites: tower heights, sectors and the link budget, then each test point's serving cell and the coverage map.</p><p class="hint">Methods: ITU-R P.529 (Hata), M.2412 (UMa), P.1812 beyond range, P.2108 clutter, P.2109 building entry, P.838 rain, P.1812/P.1546 location variability.</p></div></div>
   <section class="panel card mobilecard" aria-labelledby="mcH">
     <div class="chart-head"><h2 id="mcH">My coverage &amp; network settings</h2>
       <div class="row"><span class="hint"><svg class=ic aria-hidden=true><use href=#i-pin /></svg> <b id="meName">not set</b></span><button class="btn primary" id="setMe" type="button"><svg class=ic aria-hidden=true><use href=#i-pin /></svg> Set my location</button><button class="btn" id="meTowers" type="button"><svg class=ic aria-hidden=true><use href=#i-signal /></svg> Towers near me (OSM)</button></div></div>
@@ -2337,6 +2392,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
 
 <!-- ======================= TERRAIN ======================= -->
 <section class="wrap" id="terrain-tab" role="tabpanel" aria-labelledby="tab-terrain" hidden>
+  <div class="screenhead"><h2 class="th"><span class="ti ti-terrain" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M6 50L16 38L24 44L34 22L44 38L58 30"/><path class="dash" d="M10 32L56 20"/><path class="d" pathLength="1" style="--d:0.5s" d="M10 50V32"/><circle class="dot" cx="34" cy="22" r="2.6"/></svg></span>Terrain profile</h2><p>The ground, buildings and main obstacle between a transmitter and a receiver, and the mast height a path needs.</p></div>
   <section class="panel card routebar">
     <div class="route3">
       <div class="field"><label for="tTx"><span class="dot tx"></span>Transmitter</label><select id="tTx"></select></div>
@@ -2366,7 +2422,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
 
 <!-- ======================= MODELS & EQUATIONS ======================= -->
 <section class="wrap" id="methods" role="tabpanel" aria-labelledby="tab-methods" hidden>
-  <div class="intro"><div class="stack" style="gap:4px"><h2>Models &amp; equations</h2><p>Every number in this app comes from the equations below. Pick a model to see the calculation step by step, which checks pass, and where the model stops being valid. Lecturers can use this to discuss accuracy and limitations.</p></div></div>
+  <div class="intro"><div class="stack" style="gap:4px"><h2 class="th"><span class="ti ti-models" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M44 14H20L34 32L20 50H44"/><circle class="dot" cx="50" cy="50" r="2.6"/></svg></span>Models &amp; equations</h2><p>Every number in this app comes from the equations below. Pick a model to see the calculation step by step, which checks pass, and where the model stops being valid. Lecturers can use this to discuss accuracy and limitations.</p></div></div>
   <section class="panel card mxcalc" aria-labelledby="mxH">
     <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><div class="row"><button class="btn" type="button" data-eqed="latex">Equation editor</button><button class="btn" id="mxCopy" type="button">Copy steps</button><button class="btn" id="mxPrint" type="button"><svg class=ic aria-hidden=true><use href=#i-print /></svg> Print / PDF report</button></div></div>
     <div id="rptHead" class="rpthead"></div>
@@ -2406,7 +2462,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
   <header class="lc-head">
     <div class="lc-title">
       <p class="lc-eyebrow">Propagation course · 17 lessons · about 75 minutes · based on the ITU-R Handbook on Ground Wave Propagation (2014)</p>
-      <h2>Learn how radio waves travel</h2>
+      <h2 class="th"><span class="ti ti-learn" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M32 20C26 15 16 15 10 17V49C16 47 26 47 32 52C38 47 48 47 54 49V17C48 15 38 15 32 20V52"/><path class="spark" d="M50 6v6M47 9h6"/></svg></span>Learn how radio waves travel</h2>
       <p class="lc-lead">Each lesson: the big idea, how it works, the handbook's own equations, a worked example and one quick check. Then try it in the Lab.</p>
     </div>
     <div class="lc-progress" aria-live="polite">
@@ -3062,7 +3118,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 
 <!-- ======================= QUIZ ======================= -->
 <section class="wrap" id="quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden>
-  <div class="intro"><div class="stack" style="gap:4px"><h2>Check your understanding</h2><p>Multiple choice, true/false, select-all and numeric questions. Numeric answers are marked against the app's own ITU calculations. Practice mode shows feedback straight away; exam mode marks everything when you submit.</p></div>
+  <div class="intro"><div class="stack" style="gap:4px"><h2 class="th"><span class="ti ti-quiz" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M32 12a20 20 0 1 1 0 40a20 20 0 1 1 0-40"/><path class="d" pathLength="1" style="--d:0.55s" d="M22 33L29 40L43 25"/></svg></span>Check your understanding</h2><p>Multiple choice, true/false, select-all and numeric questions. Numeric answers are marked against the app's own ITU calculations. Practice mode shows feedback straight away; exam mode marks everything when you submit.</p></div>
     <div class="row"><span class="pill info score" id="score">0 / 0</span><button class="btn sm" id="quizReset" type="button">Start again</button></div></div>
   <section class="panel card qbar">
     <label class="field"><span class="lbl">Mode</span><select id="qMode"><option value="practice">Practice (instant feedback)</option><option value="exam">Exam (marked on submit)</option></select></label>
@@ -3242,9 +3298,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" data-tab="terrain">Terrain profile</button>
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
+  <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v7.8</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4829,7 +4886,7 @@ function animSet(obj,autoRange){
 function bindAnimQuick(){
   const fc=$("aFreqChips"); A_FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f;
     b.onclick=()=>{ if(f===1800) animSet({type:"cell",tech:"4g",f,P:1,htx:30,hrx:1.5},true); else if(f===3500) animSet({type:"cell",tech:"5g",f,P:10,htx:30,hrx:1.5},true); else animSet({f,type:animModel().p.type==="cell"?"combined":animModel().p.type},true); }; fc.appendChild(b); });
-  const wc=$("aWx"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.title=w.label; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>animSet(Object.assign({},w.set)); wc.appendChild(b); });
+  const wc=$("aWx"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.title=w.label; b.innerHTML=`${icn(w.ico)}${w.label}`; b.onclick=()=>animSet(Object.assign({},w.set)); wc.appendChild(b); });
   document.querySelectorAll('input[name="aType"]').forEach(r=>r.addEventListener("change",e=>animSet({type:e.target.value})));
   $("aFreq").addEventListener("input",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)}));
   $("aFreq").addEventListener("change",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)},true));
@@ -4957,21 +5014,27 @@ function skyCols(c){
 }
 function niceStep(span){ const raw=span/6, p=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; }
 /* label pill with optional leader line to (tx,ty) */
+let PILLS=null;   /* boxes already placed this frame, so labels never sit on top of each other */
 function pill(c,text,x,y,o={}){
   c.font=`${o.bold===false?500:600} ${o.size||12}px `+cssVar("--font-body");
-  const w=c.measureText(text).width+14, h=(o.size||12)+10; let bx=o.align==="right"?x-w:o.align==="left"?x:x-w/2;
-  bx=clamp(bx,6,c.canvas.clientWidth-w-6); const by=y-h/2;
-  if(o.to){ c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=1.2; c.beginPath(); c.moveTo(clamp(o.to[0],bx,bx+w),by+(o.to[1]>y?h:0)); c.lineTo(o.to[0],o.to[1]); c.stroke(); c.fillStyle="#F7FAFC"; c.beginPath(); c.arc(o.to[0],o.to[1],2.5,0,7); c.fill(); }
+  const w=c.measureText(text).width+14, h=(o.size||12)+10, W=c.canvas.clientWidth; let bx=o.align==="right"?x-w:o.align==="left"?x:x-w/2;
+  bx=clamp(bx,6,W-w-6); let by=y-h/2;
+  if(PILLS){ const hit=(ax,ay)=>PILLS.find(r=>ax<r.x+r.w+4&&ax+w+4>r.x&&ay<r.y+r.h+3&&ay+h+3>r.y);
+    let r, guard=0; while((r=hit(bx,by))&&guard++<8){ const up=r.y-h-4; by=up>4?up:r.y+r.h+4; }
+    if(hit(bx,by)){ const r2=hit(bx,by); bx=clamp(r2.x+r2.w+6,6,W-w-6); }
+    PILLS.push({x:bx,y:by,w,h}); }
+  const yc=by+h/2;
+  if(o.to){ c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=1.2; c.beginPath(); c.moveTo(clamp(o.to[0],bx,bx+w),by+(o.to[1]>yc?h:0)); c.lineTo(o.to[0],o.to[1]); c.stroke(); c.fillStyle="#F7FAFC"; c.beginPath(); c.arc(o.to[0],o.to[1],2.5,0,7); c.fill(); }
   c.fillStyle=o.bg||SC.label; c.beginPath(); c.roundRect?c.roundRect(bx,by,w,h,6):c.rect(bx,by,w,h); c.fill();
   if(o.accent){ c.fillStyle=`rgb(${o.accent})`; c.fillRect(bx,by+4,3,h-8); }
-  c.fillStyle=o.fg||"#F7FAFC"; c.textAlign="left"; c.textBaseline="middle"; c.fillText(text,bx+7+(o.accent?2:0),y+0.5); c.textBaseline="alphabetic";
+  c.fillStyle=o.fg||"#F7FAFC"; c.textAlign="left"; c.textBaseline="middle"; c.fillText(text,bx+7+(o.accent?2:0),yc+0.5); c.textBaseline="alphabetic";
 }
 
 function drawAnim(dt){
   const W=anim.clientWidth, H=anim.clientHeight; if(!W||!H) return;
   const dpr=window.devicePixelRatio||1; if(anim.width!==Math.round(W*dpr)||anim.height!==Math.round(H*dpr)){ anim.width=W*dpr; anim.height=H*dpr; }
-  const c=actx; c.setTransform(dpr,0,0,dpr,0,0);
-  const m=animModel(); if(!m) return;
+  const c=actx; c.setTransform(dpr,0,0,dpr,0,0); PILLS=[];
+  const m=animModel(); if(!m) { PILLS=null; return; }
   const p=animParams(), io=iono(p), cosC=p.cosChi, thr=dBuV(threshold(p));
   const {d0,span}=AN.view, th0=d0/RE, thS=span/RE, Tv=0.62, x0=40, x1=W-30;
   const Rpx=(x1-x0)/(2*Math.sin(Tv/2)), drop=Rpx*(1-Math.cos(Tv/2)), gTop=H-34-drop, cx=(x0+x1)/2, cy=gTop+Rpx;
@@ -5171,12 +5234,13 @@ function drawAnim(dt){
       const lg=c.createRadialGradient(-5,-10,0,-5,-10,11); lg.addColorStop(0,`rgba(${col},${0.55*pulse})`); lg.addColorStop(1,`rgba(${col},0)`); c.fillStyle=lg; c.beginPath(); c.arc(-5,-10,11,0,7); c.fill();
       c.fillStyle=`rgb(${col})`; c.beginPath(); c.arc(-5,-10,3.6,0,7); c.fill(); }
     c.restore();
-    pill(c,`Receiver ${fmtD(AN.rx)} km · drag me`,rx,ry-58,{size:11.5});
+    pill(c,`Receiver ${fmtD(AN.rx)} km · drag me`,rx,ry-58,{size:11.5,to:[rx,ry-40]});
   }
   c.globalAlpha=1;
   // caption & zoom info
   pill(c,`${m.name} · ${fmtF(p.f)} · ${fmtP(p.P)}`,12,22,{align:"left"});
   if(TR) pill(c,`Real terrain${TR.manual?" (typed heights)":" · Copernicus DEM"}${(TR.b||[]).length?" + "+TR.b.length+" OSM buildings":""} · heights ×${Math.round(vEx)}`,12,48,{align:"left",size:11,accent:"166,138,92"});
+  PILLS=null;
   $("zoomInfo").textContent=`${fmtD(Math.max(d0,0))}–${fmtD(d0+span)} km`;
   updateMeter(p,io,thr,dt);
 }
@@ -7730,7 +7794,7 @@ function go(t,noHash){
   if(t==="map"||t==="terrain") setLayer("bcast");
   if(t==="mobile"){ setLayer("mobile"); renderPlanner(); }
   if(t==="map"||t==="terrain"||t==="mobile") updateMap();
-  if(t==="animation"){ syncRx(); }
+  if(t==="animation"){ syncRx(); if(window.animIntro) animIntro(); }
   if(t==="methods") renderMethods();
   document.querySelectorAll(".bnav a").forEach(a=>a.setAttribute("aria-current",a.dataset.tab===t?"page":"false"));
   window.scrollTo({top:0});
@@ -8177,6 +8241,14 @@ function bindTabs(){
       const step=now=>{ const u=Math.min(1,(now-t0)/600), e=1-Math.pow(1-u,3); el.textContent=Math.round(from+(to-from)*e)+suffix; if(u<1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
     const pct=document.getElementById("lcPct"); if(pct){ new MutationObserver(()=>{ const v=parseInt(pct.textContent,10); if(isFinite(v)&&String(v)!==pct.dataset.n&&!pct.dataset.lock){ pct.dataset.lock="1"; count(pct,v,"%"); setTimeout(()=>delete pct.dataset.lock,650); } }).observe(pct,{childList:true}); }
   })();
+  /* tab icons replay their drawing when you point at or tap them */
+  document.querySelectorAll(".ti").forEach(t=>{ const replay=()=>{ const sv=t.querySelector("svg"); if(!sv||t.dataset.busy) return; t.dataset.busy="1"; const n=sv.cloneNode(true); sv.replaceWith(n); setTimeout(()=>delete t.dataset.busy,900); };
+    t.addEventListener("pointerenter",replay); t.addEventListener("click",replay); });
+  /* opening the Animation tab: the camera eases in from a wider view */
+  window.animIntro=()=>{ if(matchMedia("(prefers-reduced-motion: reduce)").matches||typeof AN==="undefined") return; const s0=AN.view.span, from=Math.min(4000,s0*1.9), t0=performance.now();
+    const step=now=>{ const u=Math.min(1,(now-t0)/1300), e=1-Math.pow(1-u,3); AN.view.span=from+(s0-from)*e; if(u<1&&currentTab==="animation") requestAnimationFrame(step); else AN.view.span=s0; };
+    AN.view.span=from; requestAnimationFrame(step); };
+  ["fbTop","moreFb"].forEach(id=>{ const b=$(id); if(b) b.addEventListener("click",()=>{ const sh=$("moreSheet"); if(sh) sh.hidden=true; openFeedback(); }); });
   /* scrollable tables: focusable and named, so keyboard users can scroll them */
   const labelWraps=()=>document.querySelectorAll(".tablewrap").forEach(w=>{ if(w.hasAttribute("tabindex")) return; w.tabIndex=0; w.setAttribute("role","region");
     const cap=w.querySelector("caption"); let h=cap; if(!h){ let n=w; while(n&&!h){ let q=n.previousElementSibling; while(q&&!h){ h=q.matches("h2,h3,h4")?q:q.querySelector&&q.querySelector("h2,h3,h4"); q=q.previousElementSibling; } n=n.parentElement; } }
