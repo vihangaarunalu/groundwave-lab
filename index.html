@@ -1447,6 +1447,88 @@ footer{color:var(--muted)}
   .lc-ring .val,.lp-dot,.lp-dot svg{transition:none}
 }
 @media print{.lc-path,.lc-nav,.lc-views{display:none!important}.lesson[hidden]{display:grid!important}}
+
+/* ---- v7.3 course: lesson sections, the handbook's equations, worked examples, widgets ---- */
+.lc-reader{max-width:860px}
+.lx-sec{display:grid;gap:var(--sp-3);min-width:0}
+.lx-sec h4{margin:0;font:600 var(--fs-meta)/1.2 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:var(--sp-3)}
+.lx-sec h4::after{content:"";flex:1;height:1px;background:var(--line)}
+.lx-sec > p,.lx-sec li{margin:0;font-size:var(--fs-body);line-height:1.65;color:var(--ink);max-width:68ch}
+.lx-hb{padding:var(--sp-4) var(--sp-5);border-radius:var(--r-md);background:var(--field);border:1px solid var(--line)}
+.lx-hb h4::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--mark);box-shadow:0 0 0 1px var(--on-mark) inset}
+.mathb{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4);
+  border-radius:var(--r-sm);background:var(--panel);border-left:3px solid var(--ink);overflow-x:auto}
+.mathb .m{font:400 17px/1.6 "Cambria Math","STIX Two Math","Times New Roman",serif;color:var(--ink);white-space:nowrap;letter-spacing:.01em}
+.mathb .m sub,.mathb .m sup{font-size:.72em}
+.mathb .eqn{flex:0 0 auto;font:500 var(--fs-meta)/1 var(--font-mono);color:var(--muted)}
+.mathnote{margin:0;font-size:var(--fs-dense);line-height:1.6;color:var(--muted);max-width:70ch}
+.syms{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-1) var(--sp-4);margin:0}
+.syms > div{display:grid;grid-template-columns:70px minmax(0,1fr);gap:var(--sp-2);font-size:var(--fs-dense);padding:var(--sp-1) 0;border-bottom:1px solid var(--line)}
+.syms dt{font:italic 500 15px/1.4 "Cambria Math","Times New Roman",serif;color:var(--ink)}
+.syms dd{margin:0;color:var(--muted);line-height:1.45}
+.keyfacts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--sp-2)}
+.keyfacts li{display:grid;gap:2px;padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);border:1px solid var(--line);font-size:var(--fs-dense)!important;line-height:1.45!important;color:var(--muted)!important}
+.keyfacts b{font:600 var(--fs-h3)/1.2 var(--font-display);color:var(--ink);letter-spacing:-.01em}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.timeline li{position:relative;display:grid;grid-template-columns:86px minmax(0,1fr);gap:var(--sp-3);padding:var(--sp-2) 0 var(--sp-2) var(--sp-4);font-size:var(--fs-dense)!important;color:var(--muted)!important}
+.timeline li::before{content:"";position:absolute;left:-6px;top:13px;width:10px;height:10px;border-radius:50%;background:var(--panel);border:2px solid var(--ink)}
+.timeline b{font:600 var(--fs-dense)/1.4 var(--font-mono);color:var(--ink)}
+.lesson table.calc{width:100%;border-collapse:collapse;font-size:var(--fs-dense);font-variant-numeric:tabular-nums}
+.lesson table.calc caption{text-align:left;font-size:var(--fs-meta);color:var(--muted);padding-bottom:var(--sp-2);caption-side:top}
+.lesson table.calc th{font-size:var(--fs-meta);font-weight:600;color:var(--muted);text-align:left;padding:var(--sp-2) var(--sp-3) var(--sp-2) 0;border-bottom:1.5px solid var(--ink)}
+.lesson table.calc td{padding:var(--sp-2) var(--sp-3) var(--sp-2) 0;border-bottom:1px solid var(--line);color:var(--ink)}
+.lesson table.calc td:not(:first-child){font-family:var(--font-mono);font-size:13px}
+.lesson table.ground td:nth-child(2){font-family:var(--font-body);font-size:var(--fs-dense)}
+.lx-ex{padding-left:var(--sp-4);border-left:3px solid var(--mark)}
+.lx-src{margin:0;padding-top:var(--sp-3);border-top:1px solid var(--line);font-size:var(--fs-meta);color:var(--muted);display:flex;gap:var(--sp-2);flex-wrap:wrap}
+.lx-src b{color:var(--ink);font-weight:600}
+
+.widget{margin:0;display:grid;gap:var(--sp-3);padding:var(--sp-4) var(--sp-5);border-radius:var(--r-md);border:1.5px solid var(--ink);background:var(--panel);min-width:0}
+.widget figcaption{font:600 var(--fs-ui)/1.3 var(--font-display);color:var(--ink);display:flex;align-items:center;gap:var(--sp-2)}
+.widget figcaption::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--mark);box-shadow:0 0 0 3px color-mix(in srgb,var(--mark) 30%,transparent)}
+.wg-ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--sp-3)}
+.wg-f{display:grid;gap:var(--sp-1);font-size:var(--fs-meta);color:var(--muted);min-width:0}
+.wg-f span{display:flex;gap:var(--sp-1);align-items:baseline}
+.wg-f output{font:600 var(--fs-dense)/1 var(--font-mono);color:var(--ink)}
+.wg-f select,.wg-f input[type=number]{min-height:40px;width:100%;padding:0 var(--sp-2);font-size:var(--fs-dense)}
+.wg-f input[type=range]{width:100%;accent-color:var(--ink);min-height:32px}
+.wg-cv{width:100%;height:260px;display:block}
+.wg-svg{width:100%;max-width:440px;height:auto;display:block;justify-self:center}
+.wg-leg{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-4);font-size:var(--fs-meta);color:var(--muted)}
+.wg-leg li{display:inline-flex;align-items:center;gap:var(--sp-2)}
+.wg-leg i{width:22px;height:0;border-top:2.5px solid var(--c)}
+.wg-leg i.dash{border-top-style:dashed}
+.wg-out{margin:0;font-size:var(--fs-dense);line-height:1.6;color:var(--ink);font-variant-numeric:tabular-nums}
+.wg-out b{font-weight:600;background:color-mix(in srgb,var(--mark) 45%,transparent);padding:0 3px;border-radius:3px}
+
+.lc-refs{display:grid;gap:var(--sp-5);max-width:900px}
+.lc-refs section{display:grid;gap:var(--sp-3);padding:var(--sp-5);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel)}
+.lc-refs .ref-main{background:var(--navy);border-color:var(--navy);color:var(--cloud)}
+.lc-refs .ref-main h3{color:var(--cloud);font:600 clamp(22px,2.4vw,28px)/1.15 var(--font-display);letter-spacing:-.025em;margin:0}
+.lc-refs .ref-main p{color:rgba(247,250,252,.84);margin:0}
+.lc-refs .ref-main a{color:var(--lime)}
+.lc-refs h3{margin:0;font:600 var(--fs-h3)/1.3 var(--font-display);color:var(--ink)}
+.ref-parts{list-style:none;margin:0;padding:0;display:grid;gap:var(--sp-2)}
+.ref-parts li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:var(--sp-3);font-size:var(--fs-dense);color:rgba(247,250,252,.84)}
+.ref-parts b{color:var(--lime)}
+.ref-list{margin:0;display:grid;gap:0}
+.ref-list > div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:var(--sp-3);padding:var(--sp-2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-dense)}
+.ref-list dt{font:600 var(--fs-dense)/1.4 var(--font-mono);color:var(--ink)}
+.ref-list dd{margin:0;color:var(--muted)}
+.ref-papers{margin:0;padding-left:1.4em;display:grid;gap:var(--sp-2);font-size:var(--fs-dense);line-height:1.55;color:var(--ink)}
+
+@media (max-width:760px){
+  .lx-hb,.widget{padding:var(--sp-3) var(--sp-4)}
+  .mathb{padding:var(--sp-2) var(--sp-3)}
+  .mathb .m{font-size:15px}
+  .lx-sec > p,.lx-sec li{font-size:var(--fs-ui)}
+  .wg-cv{height:220px}
+  .timeline li{grid-template-columns:64px minmax(0,1fr)}
+  .ref-list > div{grid-template-columns:minmax(0,1fr);gap:2px}
+  .lc-refs section{padding:var(--sp-4)}
+}
+@media print{.widget{display:none!important}}
 </style>
 </head>
 <body data-tab="lab">
@@ -2119,13 +2201,13 @@ footer{color:var(--muted)}
 <section class="wrap" id="learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
   <header class="lc-head">
     <div class="lc-title">
-      <p class="lc-eyebrow">Propagation course · 11 short lessons · about 25 minutes</p>
+      <p class="lc-eyebrow">Propagation course · 17 lessons · about 75 minutes · based on the ITU-R Handbook on Ground Wave Propagation (2014)</p>
       <h2>Learn how radio waves travel</h2>
-      <p class="lc-lead">One idea per lesson. Read the big idea, answer one quick check, then try it in the Lab.</p>
+      <p class="lc-lead">Each lesson: the big idea, how it works, the handbook's own equations, a worked example and one quick check. Then try it in the Lab.</p>
     </div>
     <div class="lc-progress" aria-live="polite">
-      <div class="lc-ring" id="lcRing" role="img" aria-label="0 of 11 lessons complete"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="trk" cx="22" cy="22" r="19"/><circle class="val" id="lcRingVal" cx="22" cy="22" r="19"/></svg><b id="lcPct">0%</b></div>
-      <div class="lc-ptext"><b id="lcCount">0 of 11 lessons</b><span id="lcNext">Start with lesson 1</span></div>
+      <div class="lc-ring" id="lcRing" role="img" aria-label="0 of 17 lessons complete"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="trk" cx="22" cy="22" r="19"/><circle class="val" id="lcRingVal" cx="22" cy="22" r="19"/></svg><b id="lcPct">0%</b></div>
+      <div class="lc-ptext"><b id="lcCount">0 of 17 lessons</b><span id="lcNext">Start with lesson 1</span></div>
       <button class="btn primary lc-resume" id="lcResume" type="button">Start</button>
     </div>
   </header>
@@ -2133,87 +2215,409 @@ footer{color:var(--muted)}
   <div class="lc-views" role="group" aria-label="Show">
     <button type="button" class="lc-view" id="lcViewLessons" aria-pressed="true">Lessons</button>
     <button type="button" class="lc-view" id="lcViewGloss" aria-pressed="false">Glossary</button>
+    <button type="button" class="lc-view" id="lcViewRefs" aria-pressed="false">References</button>
   </div>
 
   <div class="lc-body" id="lcLessons">
     <nav class="lc-path" aria-label="Lessons"><ol id="lcPath"></ol></nav>
 
     <div class="lc-reader">
-      <article class="lesson" id="L-ground" data-unit="Ground wave" data-mins="2" data-try="lab:1" data-try-label="Compare ground types in the Lab" hidden>
-        <h3>What a ground wave is</h3>
-        <p class="bigidea"><b>Big idea</b>A vertically polarized wave clings to the ground and bends with the earth, so it reaches beyond the horizon.</p>
-        <p>The wave is guided along the boundary between air and earth. Currents induced in the ground drag the lower part of the wavefront, so it follows the curve of the earth. That is why medium-wave (AM) broadcasting gives stable daytime coverage over hundreds of kilometres.</p>
-        <p>Horizontal polarization is short-circuited by the conducting ground, so ground-wave stations use vertical masts.</p>
-        <fieldset class="qc" data-correct="0"><legend>Quick check: why do AM stations use vertical masts?</legend>
-          <label><input type="radio" name="qc-ground" value="0">Horizontally polarized waves are short-circuited by the ground</label>
-          <label><input type="radio" name="qc-ground" value="1">Vertical masts are cheaper to build</label>
-          <label><input type="radio" name="qc-ground" value="2">The ionosphere only reflects vertical waves</label>
-          <p class="qc-why" hidden>The conducting earth shorts out a horizontal electric field. A vertical field survives and is guided along the surface.</p>
+      <article class="lesson" id="L-what" data-unit="Foundations" data-mins="4" data-src="Handbook Part 1, §1 and §3.1, eqs (1)–(2)" data-try="lab:1" data-try-label="Compare ground types in the Lab" hidden>
+        <h3>The ground wave: three waves, one survives</h3>
+        <p class="bigidea"><b>Big idea</b>Near the ground the direct and reflected waves cancel. What is left is the surface wave, carried by currents flowing in the earth.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>A receiver above flat ground picks up a <b>direct wave</b> and a <b>ground-reflected wave</b>. At VHF and above, these two are usually all you need.</p>
+          <p>A full solution needs a third term, the <b>surface wave</b>. When both antennas sit on the ground, the reflection coefficient is −1, so the direct and reflected waves cancel. The surface wave is then the only important component. At MF in daylight it carries the whole broadcast service.</p>
+          <ul class="keyfacts">
+            <li><b>Vertical only</b>Horizontally polarised surface waves are "very heavily attenuated and have little or no practical worth".</li>
+            <li><b>No dispersion</b>The surface wave suffers negligible dispersion, so in principle wideband signals can be sent.</li>
+            <li><b>Stable</b>Over land it fades only if the path itself changes; over sea, tides and sea roughness cause slow changes.</li>
+          </ul>
+        </section>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">V = QI [ Q<sub>1</sub> e<sup>−jkr<sub>1</sub></sup>/r<sub>1</sub> + Q<sub>2</sub> R e<sup>−jkr<sub>2</sub></sup>/r<sub>2</sub> + <b>S</b> e<sup>−jkr<sub>2</sub></sup>/r<sub>2</sub> ]</span><span class="eqn">(2)</span></div>
+          <p class="mathnote">ground wave = direct wave + reflected wave (together, the <i>space wave</i>) + surface wave</p>
+          <dl class="syms"><div><dt>I</dt><dd>transmitting antenna current</dd></div><div><dt>Q<sub>1</sub>, Q<sub>2</sub></dt><dd>antenna polar-diagram factors</dd></div><div><dt>R</dt><dd>ground reflection coefficient</dd></div><div><dt>k</dt><dd>wave number, 2π/λ</dd></div><div><dt>S</dt><dd>surface-wave factor: depends on ground, polarisation, frequency and terminal positions</dd></div></dl>
+          <p class="mathnote">Terminology varies: the surface wave is often just called the ground wave, or the <i>Norton surface wave</i>.</p>
+        </section>
+        <section class="lx-sec"><h4>A short history</h4>
+          <ol class="timeline">
+            <li><b>1909</b>Sommerfeld: vertical dipole over a conducting plane</li>
+            <li><b>1936–37</b>Norton: practical flat-earth calculations</li>
+            <li><b>1937–39</b>Van der Pol and Bremmer: spherical earth by residue series</li>
+            <li><b>1949</b>Millington: mixed land–sea paths</li>
+            <li><b>1952 / 1970</b>Hufford's integral equation; Ott and Berry solve it by computer</li>
+            <li><b>Today</b>Rotheram's GRWAVE program produces the curves in ITU-R P.368</li>
+          </ol>
+        </section>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: why is the surface wave the only important component for two antennas on the ground?</legend>
+          <label><input type="radio" name="qc-what" value="0">The ionosphere absorbs the direct wave</label>
+          <label><input type="radio" name="qc-what" value="1">The reflection coefficient is −1, so the direct and reflected waves cancel</label>
+          <label><input type="radio" name="qc-what" value="2">Horizontally polarised waves dominate near the ground</label>
+          <p class="qc-why" hidden>With Rv = −1 and both grazing angles zero, the two space-wave terms in equation (2) sum to zero, leaving the surface-wave term S (Handbook §3.1).</p>
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-constants" data-unit="Ground wave" data-mins="3" data-try="lab:1" data-try-label="Compare sea, land and rock in the Lab" hidden>
-        <h3>Ground constants and numerical distance</h3>
-        <p class="bigidea"><b>Big idea</b>The better the ground conducts, the less the wave loses. One number, the numerical distance p, sums this up.</p>
-        <p>Losses depend on ground conductivity σ and relative permittivity εr. Sea water conducts well (σ ≈ 5 S/m); dry rock barely conducts (σ ≈ 0.0001 S/m).</p>
-        <p>Small p means little loss: sea water, low frequency. Large p means fast attenuation: dry ground, high frequency.</p>
-        <details class="deeper"><summary>Go deeper: the maths</summary>
-          <p>The lab computes ITU-R P.368 the way the ITU's GRWAVE program does: the exact Sommerfeld–Norton solution for a flat earth, then the Fock/Wait residue series for the curved earth. The Models tab shows every step.</p>
-          <div class="eq">ε<sub>c</sub> = εr − j60λσ &nbsp; Δ = √(ε<sub>c</sub> − 1)/ε<sub>c</sub> &nbsp; w = −j(kd/2)Δ² &nbsp;(|w| ≈ p)</div>
-          <div class="eq">F = 1 − j√(πw)·e<sup>−w</sup>·erfc(j√w) &nbsp;&nbsp; E = 300·√P · |W| / d &nbsp;[mV/m, kW, km]</div>
-          <div class="eq">Terman hand estimate: A ≈ (2 + 0.3p)/(2 + p + 0.6p²), p = (π d / λ x)·cos b, x = 1.8×10⁴σ/f<sub>MHz</sub></div>
-        </details>
-        <fieldset class="qc" data-correct="1"><legend>Quick check: at 1 MHz, which path has the least loss?</legend>
-          <label><input type="radio" name="qc-constants" value="0">Average farmland</label>
-          <label><input type="radio" name="qc-constants" value="1">Sea water</label>
-          <label><input type="radio" name="qc-constants" value="2">Dry rocky ground</label>
-          <p class="qc-why" hidden>Sea water has the highest conductivity, so its numerical distance p stays small and the field falls slowly.</p>
+      <article class="lesson" id="L-flat" data-unit="Foundations" data-mins="6" data-src="Handbook Part 1, §3.2.1, eqs (5)–(14); Part 3, §10.1.2, eqs (38)–(40)" data-try="lab:2" data-try-label="Compare LF, MW and HF in the Lab" hidden>
+        <h3>Flat earth: the Sommerfeld–Norton field</h3>
+        <p class="bigidea"><b>Big idea</b>Close in, the field falls as 1/r like free space. Further out the ground's losses take over and it falls as 1/r². One number, the numerical distance, says where you are.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>Start from the field of a short vertical antenna on perfectly conducting ground. Multiply it by an <b>attenuation function F</b> that holds all the ground losses.</p>
+          <p>Within a few wavelengths |F| ≈ 1, so the field falls as 1/r. At larger distances (while the earth can still be treated as flat), |F| itself falls as 1/r, so the field falls as 1/r².</p>
+          <p>F depends on the <b>numerical distance</b> (w or ρ). It grows with distance and frequency, and shrinks as conductivity rises.</p>
+        </section>
+        <figure class="widget" data-widget="fieldcurve" aria-label="Interactive field-strength curve"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">F = 1 − j√(πw) · e<sup>−w</sup> · erfc(j√w)</span><span class="eqn">(5)</span></div>
+          <div class="mathb"><span class="m">w = −jkr u<sup>2</sup>(1 − u<sup>2</sup>) / 2 &nbsp;&nbsp;(ground-based terminals)</span><span class="eqn">(11)</span></div>
+          <div class="mathb"><span class="m">u<sup>2</sup> = 1 / (ε<sub>r</sub> − jx), &nbsp; x = σ/(ωε<sub>0</sub>) = 1.8×10<sup>4</sup> σ / f<sub>MHz</sub></span><span class="eqn">(7)–(8)</span></div>
+          <div class="mathb"><span class="m">E<sub>z</sub> = (300 / r) · √P · F &nbsp;&nbsp;[mV/m, kW, km]</span><span class="eqn">(14)</span></div>
+          <p class="mathnote">A practical approximation, used in the handbook for MF over low-conductivity ground:</p>
+          <div class="mathb"><span class="m">ρ = −j(πR/λ) · (ε′ − 1)/ε′<sup>2</sup>, &nbsp; ε′ = ε − j60λσ</span><span class="eqn">(39)</span></div>
+          <div class="mathb"><span class="m">V ≈ (2 + 0.3ρ) / (2 + ρ + 0.6ρ<sup>2</sup>)</span><span class="eqn">(40)</span></div>
+          <dl class="syms"><div><dt>P</dt><dd>radiated power from a short vertical radiator, kW</dd></div><div><dt>σ, ε<sub>r</sub></dt><dd>ground conductivity (S/m) and relative permittivity</dd></div><div><dt>erfc</dt><dd>complementary error function</dd></div><div><dt>F, V</dt><dd>attenuation function (|F| ≤ 1)</dd></div></dl>
+          <p class="mathnote">Equation (14) uses 300 for a short monopole. For a λ/4 monopole the constant (the cymomotive force) is 314.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example (from the handbook)</h4>
+          <p>1 kW, λ = 200 m (1.5 MHz), σ = 1 mS/m. For low-conductivity ground the handbook neglects ε, so ρ ≈ 10<sup>5</sup>πR/(6λ<sup>2</sup>σ) with R in km and σ in mS/m.</p>
+          <div class="tablewrap"><table class="calc"><thead><tr><th>Step</th><th>R = 1 km</th><th>R = 10 km</th></tr></thead><tbody>
+            <tr><td>Numerical distance ρ</td><td>1.31</td><td>13.1</td></tr>
+            <tr><td>V from (40)</td><td>0.551</td><td>0.0502</td></tr>
+            <tr><td>E = 300·V / R</td><td>165 mV/m</td><td>1.51 mV/m</td></tr>
+            <tr><td>In dB(µV/m)</td><td>104.4</td><td>63.6</td></tr>
+          </tbody></table></div>
+          <p>Inverse distance alone would give 300 and 30 mV/m. At 10 km the ground has cost about 26 dB.</p>
+        </section>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: in the worked example the field drops 40.8 dB from 1 km to 10 km. How much of that is extra ground loss, beyond the inverse-distance law?</legend>
+          <label><input type="radio" name="qc-flat" value="0">None: it is all inverse distance</label>
+          <label><input type="radio" name="qc-flat" value="1">About 21 dB</label>
+          <label><input type="radio" name="qc-flat" value="2">About 41 dB</label>
+          <p class="qc-why" hidden>Inverse distance over a factor of 10 costs 20 dB. The rest, 20·log(0.0502/0.551) ≈ −21 dB, is the change in the attenuation function V.</p>
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-freq" data-unit="Ground wave" data-mins="2" data-try="lab:2" data-try-label="Compare LF, MW and HF in the Lab" hidden>
-        <h3>Why lower frequencies travel further</h3>
-        <p class="bigidea"><b>Big idea</b>Raise the frequency and the ground wave dies sooner. LF and MF use the ground wave; HF relies on the sky.</p>
-        <p>The numerical distance p grows with frequency. At 200 kHz over sea the signal stays strong for hundreds of kilometres. At 10 MHz over dry land the ground wave is gone within a few tens of kilometres.</p>
-        <p>That is why LF and MF carry broadcasting and navigation, and HF services depend on the sky wave.</p>
-        <fieldset class="qc" data-correct="2"><legend>Quick check: how far does a 10 MHz ground wave usually last over dry land?</legend>
-          <label><input type="radio" name="qc-freq" value="0">Thousands of kilometres</label>
-          <label><input type="radio" name="qc-freq" value="1">Several hundred kilometres</label>
-          <label><input type="radio" name="qc-freq" value="2">A few tens of kilometres</label>
-          <p class="qc-why" hidden>High frequency over poor ground gives a large p, so the ground wave fades within a few tens of kilometres.</p>
+      <article class="lesson" id="L-tilt" data-unit="Foundations" data-mins="4" data-src="Handbook Part 1, §3.2.1.1–3.2.1.2, eqs (9)–(13), Table 1; §18.3.3" data-try="animation" data-try-label="Watch the wave tilt in Animation" hidden>
+        <h3>Wave tilt: where the energy goes</h3>
+        <p class="bigidea"><b>Big idea</b>The electric field leans forward. That tilt sends part of the power down into the ground, and that is the loss.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>Even with both antennas on the ground, the surface wave has a small <b>radial</b> component E<sub>ρ</sub> as well as the vertical E<sub>z</sub>. Their phase makes the wavefront tilt forward, in the direction of travel.</p>
+          <p>The magnetic field is horizontal, so a tilted E gives a <b>downward Poynting vector</b>. Energy flows into the earth, adding to the ordinary spreading loss. The bigger the tilt, the faster the attenuation.</p>
+        </section>
+        <figure class="widget" data-widget="tilt" aria-label="Interactive wave-tilt diagram"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">E<sub>ρ</sub> / E<sub>z</sub> ≈ u = 1 / √K<sub>r</sub></span><span class="eqn">(13)</span></div>
+          <div class="mathb"><span class="m">H<sub>φ</sub> = −E / Z<sub>0</sub>, &nbsp; Z<sub>0</sub> = 120π Ω</span><span class="eqn">(12)</span></div>
+          <p class="mathnote">K<sub>r</sub> = ε<sub>r</sub> − jx is the complex permittivity of the ground. Table 1 of the handbook:</p>
+          <div class="tablewrap"><table class="calc"><thead><tr><th>Ground</th><th>200 kHz (LF)</th><th>1 000 kHz (MF)</th></tr></thead><tbody>
+            <tr><td>Sea (σ = 5 S/m, ε<sub>r</sub> = 70)</td><td>70 − j450 000</td><td>70 − j90 000</td></tr>
+            <tr><td>Good ground (σ = 10<sup>−2</sup>, ε<sub>r</sub> = 10)</td><td>10 − j900</td><td>10 − j180</td></tr>
+            <tr><td>Poor ground (σ = 10<sup>−3</sup>, ε<sub>r</sub> = 4)</td><td>4 − j90</td><td>4 − j18</td></tr>
+          </tbody></table></div>
+          <p class="mathnote">Large K<sub>r</sub> means little tilt and low loss. Because E and H stay locked by (12) in open country, coverage can be planned in electric field alone, even though most domestic receivers use ferrite-rod (magnetic) antennas.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example</h4>
+          <p>Poor ground at 1 MHz: |K<sub>r</sub>| = |4 − j18| = 18.4, so |u| = 1/√18.4 = 0.233 and the tilt is about 13°. Over sea at 1 MHz, |u| = 1/300 and the tilt is only 0.19°: the field is almost vertical, which is why sea paths lose so little.</p>
+          <p>The tilt can be measured to estimate the ground constants (the <i>wave-tilt method</i>, §18.3.3), but it needs very flat, uniform terrain.</p>
+        </section>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: for poor ground at 1 MHz (K<sub>r</sub> = 4 − j18), what is |E<sub>ρ</sub>/E<sub>z</sub>|?</legend>
+          <label><input type="radio" name="qc-tilt" value="0">About 0.23</label>
+          <label><input type="radio" name="qc-tilt" value="1">About 0.003</label>
+          <label><input type="radio" name="qc-tilt" value="2">About 4.3</label>
+          <p class="qc-why" hidden>|u| = 1/√|K<sub>r</sub>| = 1/√18.4 ≈ 0.233 (eq. 13). The 0.003 figure is the sea value.</p>
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-tilt" data-unit="Ground wave" data-mins="2" data-try="animation" data-try-label="Watch the wave tilt in Animation" hidden>
-        <h3>Wave tilt</h3>
-        <p class="bigidea"><b>Big idea</b>The ground slows the bottom of the wave, so the wavefront leans forward and feeds energy into the earth.</p>
-        <p>Ground losses tilt the wavefront forward. The power flow then has a downward part, and that is the energy the earth absorbs. Poor ground tilts the wave more.</p>
-        <p>The Animation tab exaggerates the tilt three times so you can see it.</p>
-        <details class="deeper"><summary>Go deeper: the maths</summary>
-          <div class="eq">tan ψ ≈ 1 / √|εr − j x|</div>
-        </details>
-        <fieldset class="qc" data-correct="0"><legend>Quick check: where is the wave tilt larger?</legend>
-          <label><input type="radio" name="qc-tilt" value="0">Over poor, dry ground</label>
-          <label><input type="radio" name="qc-tilt" value="1">Over sea water</label>
-          <label><input type="radio" name="qc-tilt" value="2">It is the same everywhere</label>
-          <p class="qc-why" hidden>Lower conductivity means more loss, and the tilt grows with the loss.</p>
+      <article class="lesson" id="L-curve" data-unit="Foundations" data-mins="4" data-src="Handbook Part 1, §3.2.2–3.3, eq (15)" data-try="lab:2" data-try-label="See long-range loss in the Lab" hidden>
+        <h3>The curved earth and the air above it</h3>
+        <p class="bigidea"><b>Big idea</b>The ground wave has three distance regimes: 1/r, then 1/r², then an exponential fall around the curve of the earth.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>Over a sphere, Sommerfeld's flat-earth result still holds at short range. Further out the wave must diffract around the curved earth (Van der Pol and Bremmer's residue series). Beyond the 1/r² region the field decays <b>exponentially</b>.</p>
+          <p>The atmosphere also matters. Its refractive index usually falls with height, which bends waves down toward the ground. This is modelled by enlarging the earth's radius by a factor k.</p>
+          <ul class="keyfacts">
+            <li><b>k ≈ 4/3</b>Typical at VHF and above</li>
+            <li><b>k ≈ 1.20–1.25</b>Near the MF broadcast band, for most grounds (Rotheram)</li>
+            <li><b>k → 1</b>Below 10 kHz the atmosphere has negligible effect</li>
+          </ul>
+          <p>P.368 assumes a typical atmosphere: surface refractivity N<sub>0</sub> = 315 and scale height 7.35 km. GRWAVE accepts other values for unusual conditions (Recommendation ITU-R P.453).</p>
+        </section>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">d = 80 / ∛f<sub>MHz</sub> &nbsp;&nbsp;[km]</span><span class="eqn">(15)</span></div>
+          <p class="mathnote">The distance out to which the earth can be considered flat; beyond it the exponential regime begins.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example</h4>
+          <div class="tablewrap"><table class="calc"><thead><tr><th>Frequency</th><th>∛f</th><th>Flat out to</th></tr></thead><tbody>
+            <tr><td>200 kHz (LF)</td><td>0.585</td><td>137 km</td></tr>
+            <tr><td>1 MHz (MF)</td><td>1.000</td><td>80 km</td></tr>
+            <tr><td>10 MHz (HF)</td><td>2.154</td><td>37 km</td></tr>
+          </tbody></table></div>
+        </section>
+        <fieldset class="qc" data-correct="2"><legend>Quick check: using eq. (15), out to what distance can the earth be treated as flat at 8 MHz?</legend>
+          <label><input type="radio" name="qc-curve" value="0">10 km</label>
+          <label><input type="radio" name="qc-curve" value="1">80 km</label>
+          <label><input type="radio" name="qc-curve" value="2">40 km</label>
+          <p class="qc-why" hidden>∛8 = 2, so d = 80/2 = 40 km.</p>
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-curve" data-unit="Ground wave" data-mins="2" data-try="lab:2" data-try-label="See curvature loss at long range" hidden>
-        <h3>Earth curvature and refraction</h3>
-        <p class="bigidea"><b>Big idea</b>Past a certain distance the earth's curve adds extra loss. The air bends waves slightly and changes how much.</p>
-        <p>The flat-earth formula holds up to about 80/∛f<sub>MHz</sub> km. Beyond that, diffraction around the curved earth adds roughly 0.04·∛f dB per km at standard refraction.</p>
-        <p>The lower atmosphere bends waves a little. This is modelled with an effective earth radius factor k. A larger k (super-refraction in warm, humid inversions) reduces the curvature loss; k = 1 increases it.</p>
-        <fieldset class="qc" data-correct="1"><legend>Quick check: super-refraction (larger k) makes the curvature loss…</legend>
-          <label><input type="radio" name="qc-curve" value="0">Larger</label>
-          <label><input type="radio" name="qc-curve" value="1">Smaller</label>
-          <label><input type="radio" name="qc-curve" value="2">No different</label>
-          <p class="qc-why" hidden>A larger k makes the earth look flatter to the wave, so less diffraction loss is added.</p>
+      <article class="lesson" id="L-p368" data-unit="Predicting coverage" data-mins="5" data-src="Handbook Part 2, §4, Table 2, eqs (14), (16); Rec. ITU-R P.368, P.341" data-try="methods" data-try-label="See the P.368 steps in Models" hidden>
+        <h3>Reading the ITU-R P.368 curves</h3>
+        <p class="bigidea"><b>Big idea</b>P.368 gives the field for one fixed reference station. You correct for your own power, antenna and losses.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>The curves come from GRWAVE and assume <b>1 kW e.m.r.p.</b>: 1 kW radiated omnidirectionally from a short vertical radiator on a smooth spherical earth. (GRWAVE uses a dipole moment of 5λ/2π to achieve this.)</p>
+          <p>There are two sets: one figure per ground type covering 10 kHz–30 MHz, and one figure per frequency (30–3 000 kHz) covering all grounds. Each includes the inverse-distance line, dashed.</p>
+        </section>
+        <div class="tablewrap"><table class="calc ground"><caption>The 11 ground types in P.368 (Handbook Table 2)</caption><thead><tr><th>#</th><th>Description</th><th>σ (S/m)</th><th>ε<sub>r</sub></th></tr></thead><tbody>
+          <tr><td>1</td><td>Sea water, low salinity</td><td>1</td><td>80</td></tr>
+          <tr><td>2</td><td>Sea water, average salinity</td><td>5</td><td>80</td></tr>
+          <tr><td>3</td><td>Fresh water</td><td>3×10<sup>−3</sup></td><td>80</td></tr>
+          <tr><td>4</td><td>Land</td><td>3×10<sup>−2</sup></td><td>40</td></tr>
+          <tr><td>5</td><td>Wet ground</td><td>1×10<sup>−2</sup></td><td>30</td></tr>
+          <tr><td>6</td><td>Land</td><td>3×10<sup>−3</sup></td><td>22</td></tr>
+          <tr><td>7</td><td>Medium dry ground</td><td>1×10<sup>−3</sup></td><td>15</td></tr>
+          <tr><td>8</td><td>Dry ground</td><td>3×10<sup>−4</sup></td><td>7</td></tr>
+          <tr><td>9</td><td>Very dry ground</td><td>1×10<sup>−4</sup></td><td>3</td></tr>
+          <tr><td>10</td><td>Fresh water ice, −1 °C</td><td>3×10<sup>−5</sup></td><td>3</td></tr>
+          <tr><td>11</td><td>Fresh water ice, −10 °C</td><td>1×10<sup>−5</sup></td><td>3</td></tr>
+        </tbody></table></div>
+        <figure class="widget" data-widget="p368" aria-label="P.368 correction calculator"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <p class="mathnote">The curves are accurate to better than 1 dB when kr &gt; 10 (k = 2π/λ). Closer in, add the near-field correction:</p>
+          <div class="mathb"><span class="m">ΔE = 10 log [ 1 − 1/(kr)<sup>2</sup> + 1/(kr)<sup>4</sup> ] &nbsp;dB</span><span class="eqn">(16)</span></div>
+          <p class="mathnote">This is within ±0.1 dB for sea and wet ground, and ±1 dB for σ &gt; 10<sup>−3</sup> S/m. The curves also work for elevated antennas when ε<sub>r</sub> ≪ 60σλ, for heights up to h = 1.2σ<sup>1/2</sup>λ<sup>3/2</sup>.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example</h4>
+          <p>At 1 MHz (λ = 300 m), kr = 10 at r = 10·300/2π ≈ 480 m, so the curves are trustworthy beyond about half a kilometre. At kr = 0.5 the near-field correction is +11.1 dB; at kr = 2 it is −0.9 dB.</p>
+          <p>A 50 kW station with a λ/4 monopole: add 10 log 50 = 17.0 dB for power and 20 log(314/300) = 0.4 dB for the antenna, then subtract coupling, ground-system and pattern losses.</p>
+        </section>
+        <fieldset class="qc" data-correct="2"><legend>Quick check: the 1 kW curve reads 60 dB(µV/m) at 100 km. What do you predict for a 10 kW station with a short monopole and no other losses?</legend>
+          <label><input type="radio" name="qc-p368" value="0">600 dB(µV/m)</label>
+          <label><input type="radio" name="qc-p368" value="1">80 dB(µV/m)</label>
+          <label><input type="radio" name="qc-p368" value="2">70 dB(µV/m)</label>
+          <p class="qc-why" hidden>Field scales with √P, so add 10 log(10/1) = 10 dB.</p>
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-sky" data-unit="Sky wave" data-mins="3" data-try="lab:5" data-try-label="Find the HF skip zone in the Lab" hidden>
+      <article class="lesson" id="L-cond" data-unit="Predicting coverage" data-mins="5" data-src="Handbook Part 2, §5–6, eqs (17)–(21); Part 3, §7.3, eq (25); Recs ITU-R P.527, P.832" data-try="lab:1" data-try-label="Compare ground types in the Lab" hidden>
+        <h3>Ground conductivity: the biggest unknown</h3>
+        <p class="bigidea"><b>Big idea</b>The prediction method is reliable; the ground constants you feed it are not. And the wave "sees" metres to tens of metres below the surface.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>The handbook calls conductivity "the biggest uncertainty" in a ground-wave prediction. At HF and below, ground constants are taken as independent of frequency (except fresh-water ice at LF and VLF).</p>
+          <p>The wave penetrates to the <b>skin depth</b>: about 25 cm in sea water at 1 MHz but about 25 m in medium-dry ground. So the sub-surface geology matters, and an earth probe in the topsoil "is very unlikely to give useful results". The best estimate comes from field measurements at increasing distances from a real transmitter (§18.3).</p>
+          <p>Where there is no data, use the ITU World Atlas of ground conductivities (P.832), or compare geological maps with a region of similar geology and climate.</p>
+        </section>
+        <figure class="widget" data-widget="ground" aria-label="Skin depth and sea conductivity calculator"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">δ = { ω √(μ<sub>r</sub>μ<sub>0</sub>ε<sub>r</sub>ε<sub>0</sub>/2) · [ √(1 + (σ/ωε<sub>r</sub>ε<sub>0</sub>)<sup>2</sup>) − 1 ]<sup>1/2</sup> }<sup>−1</sup></span><span class="eqn">(20)</span></div>
+          <div class="mathb"><span class="m">σ<sub>sea</sub> = 0.18 C<sup>0.93</sup> [ 1 + 0.02 (T − 20) ] &nbsp;S/m</span><span class="eqn">(21)</span></div>
+          <div class="mathb"><span class="m">σ<sub>weighted</sub> = Σ σ<sub>i</sub>d<sub>i</sub> / Σ d<sub>i</sub></span><span class="eqn">(25)</span></div>
+          <div class="mathb"><span class="m">η = √(ε − j60σλ − 1) / (ε − j60σλ)</span><span class="eqn">(19)</span></div>
+          <dl class="syms"><div><dt>C</dt><dd>salinity, g of salt per litre</dd></div><div><dt>T</dt><dd>water temperature, °C</dd></div><div><dt>η</dt><dd>surface impedance: a compact way to describe terrain, trees, buildings and sea waves</dd></div></dl>
+          <p class="mathnote">Cold seas are about 3.5 S/m and warm seas about 5 S/m. Use the weighted conductivity (25) for all-land paths; on land–sea–land paths use it for the land sections only, then apply Millington.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example</h4>
+          <p>A land path: 40 km at 10 mS/m then 60 km at 1 mS/m. σ<sub>weighted</sub> = (10·40 + 1·60)/100 = <b>4.6 mS/m</b>.</p>
+          <p>Ocean water at C = 35 g/l: at 20 °C, σ = 0.18 × 35<sup>0.93</sup> = 4.9 S/m. At 5 °C the bracket is 0.7, giving 3.4 S/m.</p>
+        </section>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: 30 km at 3 mS/m followed by 70 km at 1 mS/m. What is the weighted conductivity?</legend>
+          <label><input type="radio" name="qc-cond" value="0">1.6 mS/m</label>
+          <label><input type="radio" name="qc-cond" value="1">2.0 mS/m</label>
+          <label><input type="radio" name="qc-cond" value="2">4.0 mS/m</label>
+          <p class="qc-why" hidden>(3·30 + 1·70)/100 = 160/100 = 1.6 mS/m (eq. 25).</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-mixed" data-unit="Real paths" data-mins="6" data-src="Handbook Part 3, §7.1–7.2, eqs (22)–(24); Rec. ITU-R P.368 Annex 2" data-try="lab:4" data-try-label="Cross a coastline in the Lab" hidden>
+        <h3>Mixed paths and the recovery effect</h3>
+        <p class="bigidea"><b>Big idea</b>Cross from land onto sea and the field can rise again. Millington's method predicts this by averaging the path computed in both directions.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>On a land–sea–land path the field falls over the first land section, then rises quickly after the coast, decays slowly over the sea, and drops sharply at the next coast. Early methods got this wrong because they were not <b>reciprocal</b>: swapping transmitter and receiver gave a different answer.</p>
+          <p>Millington (1949) forced reciprocity. Follow each section's curve, jumping between curves at each boundary; do the same from the other end; then average the two in dB.</p>
+          <ul class="keyfacts">
+            <li><b>77 MHz</b>Millington's first short-range test showing recovery</li>
+            <li><b>3 MHz</b>Confirmed across the English Channel, Slough → Dieppe</li>
+            <li><b>3.9 MHz</b>Land–sea–land–sea test across the Baltic Sea</li>
+          </ul>
+          <p>The handbook notes the effect is so unexpected "it may be necessary to demonstrate the effect again for new generations of engineers". The graph below does that.</p>
+        </section>
+        <figure class="widget" data-widget="millington" aria-label="Interactive Millington mixed-path graph"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">E<sub>R</sub> = E<sub>1</sub>(L<sub>1</sub>) − E<sub>2</sub>(L<sub>1</sub>) + E<sub>2</sub>(L<sub>1</sub>+L<sub>2</sub>) − E<sub>3</sub>(L<sub>1</sub>+L<sub>2</sub>) + E<sub>3</sub>(L<sub>1</sub>+L<sub>2</sub>+L<sub>3</sub>)</span><span class="eqn">(22)</span></div>
+          <div class="mathb"><span class="m">E<sub>T</sub> = E<sub>3</sub>(L<sub>3</sub>) − E<sub>2</sub>(L<sub>3</sub>) + E<sub>2</sub>(L<sub>3</sub>+L<sub>2</sub>) − E<sub>1</sub>(L<sub>3</sub>+L<sub>2</sub>) + E<sub>1</sub>(L<sub>3</sub>+L<sub>2</sub>+L<sub>1</sub>)</span><span class="eqn">(23)</span></div>
+          <div class="mathb"><span class="m">E<sub>M</sub> = (E<sub>R</sub> + E<sub>T</sub>) / 2 &nbsp;&nbsp;[dB(µV/m)]</span><span class="eqn">(24)</span></div>
+          <p class="mathnote">E<sub>i</sub>(d) is the homogeneous-earth field for section i's ground at distance d, all in dB(µV/m). Averaging in dB is the geometric mean of the fields.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example (illustrative curve readings)</h4>
+          <p>Land for 30 km, then sea for 70 km. Readings: land 60 dB at 30 km, 46 at 70 km, 40 at 100 km; sea 72 at 30 km, 63 at 70 km, 58 at 100 km.</p>
+          <div class="tablewrap"><table class="calc"><tbody>
+            <tr><td>Forward, E<sub>R</sub></td><td>60 − 72 + 58</td><td>46 dB</td></tr>
+            <tr><td>Reverse, E<sub>T</sub></td><td>63 − 46 + 40</td><td>57 dB</td></tr>
+            <tr><td>Millington, E<sub>M</sub></td><td>(46 + 57) / 2</td><td><b>51.5 dB(µV/m)</b></td></tr>
+          </tbody></table></div>
+          <p>The answer sits between all-land (40) and all-sea (58), and is far above the land value.</p>
+        </section>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: forward and reverse calculations give 52 and 60 dB(µV/m). What does Millington predict?</legend>
+          <label><input type="radio" name="qc-mixed" value="0">52 dB(µV/m), the lower one</label>
+          <label><input type="radio" name="qc-mixed" value="1">56 dB(µV/m)</label>
+          <label><input type="radio" name="qc-mixed" value="2">112 dB(µV/m)</label>
+          <p class="qc-why" hidden>E<sub>M</sub> = (52 + 60)/2 = 56 dB(µV/m), eq. (24).</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-sea" data-unit="Real paths" data-mins="4" data-src="Handbook Part 3, §8, §9, §11, Table 3; Recs ITU-R P.368, P.1321" data-try="lab:3" data-try-label="Compare monsoon and drought in the Lab" hidden>
+        <h3>Rough seas, seasons and day-to-day change</h3>
+        <p class="bigidea"><b>Big idea</b>A prediction is a median. Waves on the sea, frozen ground and the water table move the real field by several decibels.</p>
+        <section class="lx-sec"><h4>Sea roughness</h4>
+          <p>Waves scatter energy out of the surface-wave mode. Barrick's theory replaces the smooth-sea surface impedance with an effective one. It assumes small heights and slopes compared with λ, and a highly conducting medium below: valid for HF over the sea, not for VHF over disturbed seas or for land.</p>
+          <p>Losses grow with path length, sea state and frequency. Surprisingly, a slightly rough sea (state 2) can give a <i>stronger</i> field than a smooth one, up to about 100 km beyond the coast.</p>
+        </section>
+        <section class="lx-sec"><h4>Seasons</h4>
+          <p>Vegetation, the water table, freezing and snow change the effective conductivity; tropospheric refractivity changes too. Field strength is often lower in winter.</p>
+          <div class="tablewrap"><table class="calc"><caption>Typical winter–summer change H (Handbook Table 3)</caption><thead><tr><th>Average January temperature (°C)</th><th>4</th><th>0</th><th>−10</th><th>−16</th></tr></thead><tbody><tr><td>Typical variation H (dB)</td><td>4</td><td>8</td><td>13</td><td>15</td></tr></tbody></table></div>
+          <ul class="keyfacts">
+            <li><b>4–5 dB</b>Monthly seasonal change, Philadelphia–Baltimore, 1939–40</li>
+            <li><b>up to 8 dB</b>Switzerland, 1938–44, larger temperature range</li>
+            <li><b>15 dB+</b>Siberia (Tomsk, 576 kHz, 155 km)</li>
+          </ul>
+        </section>
+        <section class="lx-sec"><h4>Day to day</h4>
+          <p>At LF the rms day-to-day deviation ranges from fractions of a dB (average 0.8 dB) on short low-frequency paths to about 10 dB at the top of the band on paths of 1 000 km or more. At MF, paths of tens of kilometres typically vary by 2–4 dB, occasionally 5–6 dB. In open rural areas, nearby locations follow a log-normal spread with a standard deviation of about 2–4 dB.</p>
+        </section>
+        <fieldset class="qc" data-correct="2"><legend>Quick check: a region's average January temperature is −10 °C. What seasonal swing does Table 3 suggest?</legend>
+          <label><input type="radio" name="qc-sea" value="0">About 4 dB</label>
+          <label><input type="radio" name="qc-sea" value="1">About 8 dB</label>
+          <label><input type="radio" name="qc-sea" value="2">About 13 dB</label>
+          <p class="qc-why" hidden>Table 3 lists H = 13 dB for an average January temperature of −10 °C.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-city" data-unit="Real paths" data-mins="5" data-src="Handbook Part 3, §10; Part 4, §15, Table 4" data-try="map" data-try-label="Place a receiver in a city on the Map" hidden>
+        <h3>Ground waves in cities</h3>
+        <p class="bigidea"><b>Big idea</b>A city behaves like very poor ground, and its steel and concrete add their own losses. Narrow streets and higher frequencies make it worse.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>Vertical conductors in buildings, and even trees, act like a bed of "conducting nails". This makes an inductive surface, so attenuation no longer follows the smooth-earth curves and E/H is no longer Z<sub>0</sub>.</p>
+          <p>Moscow measurements found that beyond about 500 m, MF in built-up areas behaves like ground with σ ≈ 1 mS/m. The field falls as 1/R close in and close to 1/R² from roughly 0.7 to 10 km. The handbook calls 1/R² the fastest decrease possible over a flat, homogeneous city.</p>
+          <p>Causebrook's measurements across London (three frequencies) showed the field holding up, then a rapid fall to a <b>minimum</b>, then a recovery.</p>
+        </section>
+        <ul class="keyfacts">
+          <li><b>≈ −5 dB</b>Mean level in open city areas vs. rural at the same distance; std. dev. 1.7–5 dB</li>
+          <li><b>15–20 dB</b>Drop in courtyards of tall buildings; std. dev. at least 6–8 dB</li>
+          <li><b>6–28 dB</b>Extra loss at 1 260 kHz compared with 810 kHz at the same locations (Madrid)</li>
+          <li><b>10–18%</b>Of an urban route affected by deep local fades (Madrid–Delhi); 3% or less in rural areas</li>
+        </ul>
+        <div class="tablewrap"><table class="calc"><caption>Extra loss vs. wide streets (more than eight lanes), median ± std. dev. (Handbook Table 4)</caption><thead><tr><th>City – frequency</th><th>Medium streets</th><th>Narrow streets</th></tr></thead><tbody>
+          <tr><td>Delhi – 666 kHz</td><td>4 ± 1 dB</td><td>n/d</td></tr>
+          <tr><td>Madrid – 810 kHz</td><td>6 ± 4 dB</td><td>12 ± 6 dB</td></tr>
+          <tr><td>México D.F. – 1 060 kHz</td><td>3 ± 3 dB</td><td>9 ± 5 dB</td></tr>
+          <tr><td>Madrid – 1 260 kHz</td><td>11 ± 6 dB</td><td>19 ± 8 dB</td></tr>
+        </tbody></table></div>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: beyond about 500 m, MF propagation in a built-up area is similar to which ground?</legend>
+          <label><input type="radio" name="qc-city" value="0">Sea water, σ = 5 S/m</label>
+          <label><input type="radio" name="qc-city" value="1">Poor ground, σ ≈ 1 mS/m</label>
+          <label><input type="radio" name="qc-city" value="2">Wet ground, σ = 10 mS/m</label>
+          <p class="qc-why" hidden>The Moscow results show urban MF behaving like ground with poor conductivity, σ = 1 mS/m (§10.1).</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-terrain" data-unit="At the receiver" data-mins="5" data-src="Handbook Part 4, §13–14, eqs (43)–(44)" data-try="terrain" data-try-label="Open a terrain profile" hidden>
+        <h3>Hills and obstacles near the receiver</h3>
+        <p class="bigidea"><b>Big idea</b>A hill costs the most when it is high (in wavelengths) and close to the receiver.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>Ground constants set the main attenuation, but terrain roughness adds loss when high irregularities, compared with λ, block the path near the receiver. A steep far side of the obstacle is especially harmful.</p>
+          <p>Crossing the Somosierra range in Spain, measurements fell more than 10 dB (medians) on the shadowed side, then recovered with distance. A second obstacle only λ/4 high (λ = 221 m) still caused a drop because it was very close to the receiver.</p>
+          <p>The handbook splits the measured signal r(x) into a <b>large-scale</b> part m(x) (path and environment) and a <b>small-scale</b> part r<sub>0</sub>(x) (local clutter), found with the Generalised Lee method.</p>
+        </section>
+        <figure class="widget" data-widget="terrain" aria-label="Terrain irregularity loss calculator"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">r(x) = m(x) · r<sub>0</sub>(x)</span><span class="eqn">(43)</span></div>
+          <div class="mathb"><span class="m">L<sub>Irr</sub> = ( −17.2 log<sub>10</sub>d + 25.1 ) · log<sub>10</sub>(2.84 h) &nbsp;dB</span><span class="eqn">(44)</span></div>
+          <dl class="syms"><div><dt>d</dt><dd>distance from the obstacle to the receiver, km</dd></div><div><dt>h</dt><dd>obstacle height above the TX–RX line of sight, in wavelengths</dd></div></dl>
+          <p class="mathnote">Subtract L<sub>Irr</sub> from the smooth-earth field. Ignore it when d &gt; 25 km and h &lt; 2λ, and don't use log arguments smaller than 1. With several obstacles, take only the largest loss, as Epstein–Peterson, Deygout and Bullington do.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example</h4>
+          <p>At 1 MHz (λ = 300 m), a ridge 300 m above the line of sight (h = 1λ), 2 km before the receiver: L = (−17.2 × 0.301 + 25.1) × log 2.84 = 19.9 × 0.453 = <b>9.0 dB</b>.</p>
+        </section>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: the same ridge (h = 1λ) is now only 1 km from the receiver. What is L<sub>Irr</sub>?</legend>
+          <label><input type="radio" name="qc-terrain" value="0">About 11 dB</label>
+          <label><input type="radio" name="qc-terrain" value="1">About 9 dB</label>
+          <label><input type="radio" name="qc-terrain" value="2">About 25 dB</label>
+          <p class="qc-why" hidden>log 1 = 0, so L = 25.1 × log 2.84 = 25.1 × 0.453 ≈ 11.4 dB. Closer obstacles cost more.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-indoor" data-unit="At the receiver" data-mins="5" data-src="Handbook Part 4, §12, §16–17, eqs (45)–(46), Table 5" data-try="map" data-try-label="Check a receiver on the Map" hidden>
+        <h3>Indoors, under bridges and with different antennas</h3>
+        <p class="bigidea"><b>Big idea</b>Indoors at MF you lose about 15–24 dB compared with P.368, and the spread between rooms is huge, so plan with statistics.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p><b>Antennas.</b> Rods respond to the electric field; loops and ferrite rods to the magnetic field. In cluttered places the electric field varies much more, so measuring receivers use calibrated loops.</p>
+          <p><b>Structures.</b> Power lines and metal structures can raise the field by up to 10 dB, or occasionally cut it by 15–20 dB. Driving under a road overpass gives a short, deep fade (Table 5: 23.1 dB for an 18–24 m wide structure; 9.1 dB on average).</p>
+          <p><b>Indoors.</b> In 21 buildings (360 locations) in northern Spain, indoor medians followed a log-normal distribution with σ = 11.8 dB; levels in one building differed by up to 50 dB. Mean building penetration loss was 6.7 dB. Lifts can cost up to 40 dB.</p>
+        </section>
+        <figure class="widget" data-widget="indoor" aria-label="Indoor field strength calculator"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">L<sub>indoor</sub> = −42.1 + 20.5 log f<sub>kHz</sub> &nbsp;dB</span><span class="eqn">(45)</span></div>
+          <div class="mathb"><span class="m">E<sub>indoor</sub> = E<sub>P.368</sub> + 42.1 − 20.5 log f<sub>kHz</sub> &nbsp;dB(µV/m)</span><span class="eqn">(46)</span></div>
+          <p class="mathnote">Equation (46) gives the level exceeded at 50% of indoor locations. For other percentages apply a log-normal spread with σ = 11.8 dB. Validated against DRM measurements in Madrid with a mean error of 1.2 dB.</p>
+        </section>
+        <fieldset class="qc" data-correct="2"><legend>Quick check: using eq. (45), what is the indoor loss at 1 000 kHz?</legend>
+          <label><input type="radio" name="qc-indoor" value="0">About 6.7 dB</label>
+          <label><input type="radio" name="qc-indoor" value="1">About 42 dB</label>
+          <label><input type="radio" name="qc-indoor" value="2">About 19.4 dB</label>
+          <p class="qc-why" hidden>−42.1 + 20.5 × log 1000 = −42.1 + 61.5 = 19.4 dB. (6.7 dB is the separate building-penetration figure.)</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-measure" data-unit="Measuring" data-mins="5" data-src="Handbook Part 5, §18; Recs ITU-R SM.378, SM.1708" data-try="methods" data-try-label="Compare with measured data in Models" hidden>
+        <h3>Measuring field, power and ground</h3>
+        <p class="bigidea"><b>Big idea</b>Measure with a loop, away from clutter, and at the right distance. The same measurements give you the radiated power and the real ground conductivity.</p>
+        <section class="lx-sec"><h4>Field strength (§18.1)</h4>
+          <p>A single measurement is accurate to about ±2 dB (SM.378). Use a loop antenna: the magnetic field is less disturbed. Pick open spots away from trees, buildings and overhead wires, and take several nearby readings.</p>
+          <p>Rotate the loop to find a null, then turn it 90° for the maximum. Aim for a peak-to-null ratio of at least 20 dB; a poorer null suggests a problem at that spot. Very good sites reach 40 dB.</p>
+        </section>
+        <section class="lx-sec"><h4>Radiated power (§18.2)</h4>
+          <p>Measure at about 1 km, beyond the near field. Take the median of several readings, correct each to 1 km using inverse distance, and compare with <b>109.5 dB(µV/m)</b> (300 mV/m), the value for 1 kW e.m.r.p.</p>
+        </section>
+        <section class="lx-sec"><h4>Ground conductivity (§18.3)</h4>
+          <ul class="facts">
+            <li><b>Attenuation method:</b> normalise readings at increasing distances to 1 kW e.m.r.p. and find the P.368 curve that matches; use Millington where the trend has a step.</li>
+            <li><b>Reflection-coefficient method</b> (DeMinco): multilayer analysis of measured reflection.</li>
+            <li><b>Wave-tilt method</b> (Eaton): measure the tilt and ellipse axial ratio of the field. Hard in practice; needs very flat, uniform ground.</li>
+          </ul>
+          <p>In DeMinco's 30–915 MHz short-range study, loss depended on conductivity below about 150 MHz, but above 150 MHz mainly on permittivity.</p>
+        </section>
+        <section class="lx-sec lx-ex"><h4>Worked example</h4>
+          <p>The median reading at 2 km is 98 dB(µV/m). Correcting to 1 km adds 20 log 2 = 6.0 dB, giving 104.0. Compared with 109.5 that is −5.5 dB, so e.m.r.p. ≈ 10<sup>−0.55</sup> kW ≈ <b>0.28 kW</b>.</p>
+        </section>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: corrected to 1 km, the median field is 109.5 dB(µV/m). What is the e.m.r.p.?</legend>
+          <label><input type="radio" name="qc-measure" value="0">109.5 kW</label>
+          <label><input type="radio" name="qc-measure" value="1">1 kW</label>
+          <label><input type="radio" name="qc-measure" value="2">300 kW</label>
+          <p class="qc-why" hidden>109.5 dB(µV/m) at 1 km is exactly the 1 kW e.m.r.p. reference (300 mV/m).</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-phase" data-unit="Measuring" data-mins="4" data-src="Handbook Part 5, §19" data-try="methods" data-try-label="See the model steps in Models" hidden>
+        <h3>The phase of the ground wave</h3>
+        <p class="bigidea"><b>Big idea</b>Navigation systems time the ground wave, so they care about its phase. The ground adds a small extra delay, the secondary phase.</p>
+        <section class="lx-sec"><h4>How it works</h4>
+          <p>The total phase is a <b>primary phase</b> (free-space travel at the surface refractive index) plus a <b>secondary phase</b> Φ<sub>S</sub> from the ground. Below about 3 MHz the smooth-earth theory gives Φ<sub>S</sub> well enough for navigation over sea, even with large waves.</p>
+          <p>Over land, conductivity changes, terrain and sub-surface layers perturb it. At a land–sea boundary use the <b>Millington–Pressey</b> method, the phase version of Millington. Where ground differs sideways, the wavefront bends toward the lower conductivity, which can mislead direction finders.</p>
+          <p>Loran-C measurements show time-of-arrival changes of up to ±0.5 µs, both daily and long-term, linked to the atmospheric refractive-index gradient and passing weather fronts.</p>
+        </section>
+        <figure class="widget" data-widget="phase" aria-label="Secondary phase to delay calculator"></figure>
+        <section class="lx-sec lx-hb"><h4>In the handbook</h4>
+          <div class="mathb"><span class="m">Φ = nkd + Φ<sub>S</sub></span><span class="eqn">§19.1</span></div>
+          <div class="mathb"><span class="m">t<sub>s</sub> = Φ<sub>S</sub>λ / (2π · 300) = Φ<sub>S</sub> · 10<sup>6</sup> / (2π f<sub>Hz</sub>) &nbsp;[µs]</span><span class="eqn">§19.1</span></div>
+          <dl class="syms"><div><dt>n</dt><dd>surface refractive index of the atmosphere</dd></div><div><dt>Φ<sub>S</sub></dt><dd>secondary phase, rad</dd></div><div><dt>t<sub>s</sub></dt><dd>secondary phase delay, µs</dd></div></dl>
+        </section>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: at 100 kHz, 36° of secondary phase is 1 µs. How much delay is 72°?</legend>
+          <label><input type="radio" name="qc-phase" value="0">2 µs</label>
+          <label><input type="radio" name="qc-phase" value="1">0.5 µs</label>
+          <label><input type="radio" name="qc-phase" value="2">72 µs</label>
+          <p class="qc-why" hidden>t<sub>s</sub> is proportional to Φ<sub>S</sub>: one period at 100 kHz is 10 µs = 360°, so 72° = 2 µs.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-sky" data-unit="Beyond the ground wave" data-src="Lab model notes: ITU-R P.1147 (MF sky wave) and P.533 (HF); not covered by the ground-wave handbook" data-mins="3" data-try="lab:5" data-try-label="Find the HF skip zone in the Lab" hidden>
         <h3>Sky wave and the ionosphere</h3>
         <p class="bigidea"><b>Big idea</b>Layers of charged gas high above the earth bend radio waves back down, but only up to a certain frequency.</p>
         <ul class="layers">
@@ -2234,7 +2638,7 @@ footer{color:var(--muted)}
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-night" data-unit="Sky wave" data-mins="2" data-try="lab:0" data-try-label="Compare MW day and night in the Lab" hidden>
+      <article class="lesson" id="L-night" data-unit="Beyond the ground wave" data-src="Lab model notes: ITU-R P.1147 (MF sky wave) and P.533 (HF); not covered by the ground-wave handbook" data-mins="2" data-try="lab:0" data-try-label="Compare MW day and night in the Lab" hidden>
         <h3>Day, night and the fading zone</h3>
         <p class="bigidea"><b>Big idea</b>At night the sky wave comes back, and where it meets the ground wave at similar strength the signal fades in and out.</p>
         <p>By day the D layer absorbs the MW sky wave, so you hear only the ground wave. At night the D layer vanishes and the sky wave returns strongly hundreds of kilometres away.</p>
@@ -2247,44 +2651,11 @@ footer{color:var(--muted)}
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-weather" data-unit="Real world" data-mins="3" data-try="lab:3" data-try-label="Compare monsoon and drought in the Lab" hidden>
-        <h3>How weather changes coverage</h3>
-        <p class="bigidea"><b>Big idea</b>Weather changes the ground and the noise. Space weather changes the sky.</p>
-        <ul class="facts">
-          <li><b>Rain and monsoon</b> raise soil conductivity, so the ground wave reaches further.</li>
-          <li><b>Drought and frozen ground</b> lower conductivity and shorten coverage.</li>
-          <li><b>Thunderstorms</b> add static, so a stronger signal is needed for the same service.</li>
-          <li><b>Rain in the air</b> barely matters below a few GHz, so the lab ignores it.</li>
-          <li><b>Solar flares</b> cause sudden HF fade-outs; geomagnetic storms weaken the F2 layer.</li>
-        </ul>
-        <fieldset class="qc" data-correct="1"><legend>Quick check: what does monsoon rain do to MW ground-wave reach?</legend>
-          <label><input type="radio" name="qc-weather" value="0">Shortens it, because rain drops absorb the wave</label>
-          <label><input type="radio" name="qc-weather" value="1">Extends it, because wet soil conducts better</label>
-          <label><input type="radio" name="qc-weather" value="2">Nothing at all</label>
-          <p class="qc-why" hidden>Wet soil has higher conductivity, so the ground wave travels further. Storm static can still raise the level you need.</p>
-        </fieldset>
-      </article>
-
-      <article class="lesson" id="L-mixed" data-unit="Real world" data-mins="2" data-try="lab:4" data-try-label="Cross a coastline in the Lab" hidden>
-        <h3>Mixed paths: land and sea</h3>
-        <p class="bigidea"><b>Big idea</b>When a path crosses a coastline, the signal can get stronger again over the sea.</p>
-        <p>Millington's method combines different ground types along one path. It averages a forward and a reverse calculation, in dB.</p>
-        <p>Over sea after a coastline, the field can actually rise for a while. This is the <b>recovery effect</b>.</p>
-        <details class="deeper"><summary>Go deeper: the maths</summary>
-          <div class="eq">E = ½[ (E₁(d₁) − E₂(d₁) + E₂(d)) + (E₂(d₂) − E₁(d₂) + E₁(d)) ]</div>
-        </details>
-        <fieldset class="qc" data-correct="2"><legend>Quick check: a path goes from land onto sea. Just past the coast the field…</legend>
-          <label><input type="radio" name="qc-mixed" value="0">Drops to zero</label>
-          <label><input type="radio" name="qc-mixed" value="1">Stays exactly as it was over land</label>
-          <label><input type="radio" name="qc-mixed" value="2">Can rise for a while</label>
-          <p class="qc-why" hidden>That rise is the recovery effect: the well-conducting sea lets the wave regain strength.</p>
-        </fieldset>
-      </article>
-
-      <article class="lesson" id="L-limits" data-unit="Real world" data-mins="1" data-try="methods" data-try-label="See every equation in Models" hidden>
+      <article class="lesson" id="L-limits" data-unit="Beyond the ground wave" data-src="Lab model notes: ITU-R P.1147 (MF sky wave) and P.533 (HF); not covered by the ground-wave handbook" data-mins="1" data-try="methods" data-try-label="See every equation in Models" hidden>
         <h3>Limits of this lab</h3>
         <p class="bigidea"><b>Big idea</b>This is a teaching model. Use it to understand, not to license a station.</p>
-        <p>For real work use ITU-R P.368 (ground-wave curves), P.527 (ground constants), P.1147 (MF sky wave), P.533 (HF) and P.372 (radio noise), or professional planning tools.</p>
+        <p>For real work use ITU-R P.368 (ground-wave curves), P.527 (ground constants), P.832 (conductivity atlas), P.1147 (MF sky wave), P.533 (HF) and P.372 (radio noise), or professional planning tools.</p>
+        <p>Even the full method is only as good as its ground constants. The handbook calls conductivity "the biggest uncertainty", and P.368 assumes a smooth earth: cities, hills and indoor reception need the corrections in lessons 9–11.</p>
         <p>The sky wave here is a median value. Real signals fade by 5–10 dB within minutes.</p>
         <fieldset class="qc" data-correct="0"><legend>Quick check: you are planning a real licensed station. What should you use?</legend>
           <label><input type="radio" name="qc-limits" value="0">The ITU-R recommendations or professional planning tools</label>
@@ -2294,7 +2665,7 @@ footer{color:var(--muted)}
         </fieldset>
       </article>
 
-      <article class="lesson" id="L-build" data-unit="Practice" data-mins="4" data-try="lab:9" data-try-label="Start building in the Lab" hidden>
+      <article class="lesson" id="L-build" data-unit="Beyond the ground wave" data-src="Lab model notes: ITU-R P.1147 (MF sky wave) and P.533 (HF); not covered by the ground-wave handbook" data-mins="4" data-try="lab:9" data-try-label="Start building in the Lab" hidden>
         <h3>Build and test your own model</h3>
         <p class="bigidea"><b>Big idea</b>Change exactly one setting at a time, and compare against a copy. That is how you see cause and effect.</p>
         <ol class="steps">
@@ -2321,6 +2692,51 @@ footer{color:var(--muted)}
     </div>
   </div>
 
+  <div class="lc-refs" id="lcRefs" hidden>
+    <section class="ref-main">
+      <p class="lc-eyebrow">Main text for this course</p>
+      <h3>Handbook on Ground Wave Propagation</h3>
+      <p>ITU-R Radiocommunication Bureau, Geneva, edition of 2014. Contributors: I. Angulo, L. Barclay, Y. Chernov, N. DeMinco, I. Fernández, U. Gil, D. Guerra, J. Milsom, I. Peña, D. de la Vega.</p>
+      <p><a href="https://www.itu.int/dms_pub/itu-r/opb/hdb/R-HDB-59-2014-PDF-E.pdf" target="_blank" rel="noopener">Open the handbook (PDF, itu.int)</a></p>
+      <ol class="ref-parts">
+        <li><b>Part 1</b>Theory: surface-wave theory, flat and spherical earth, the atmosphere → lessons 1–4</li>
+        <li><b>Part 2</b>The ITU-R prediction method: P.368, surface impedance, ground conductivity → lessons 5–6</li>
+        <li><b>Part 3</b>Variations: mixed paths, sea roughness, rural and urban areas, seasons → lessons 7–9</li>
+        <li><b>Part 4</b>Receiving antennas, spatial variability, terrain, built-up areas, indoors → lessons 10–11</li>
+        <li><b>Part 5</b>Measurement methods and surface-wave phase → lessons 12–13</li>
+      </ol>
+    </section>
+    <section><h3>ITU-R Recommendations used</h3>
+      <dl class="ref-list">
+        <div><dt>P.368</dt><dd>Ground-wave propagation curves for frequencies between 10 kHz and 30 MHz</dd></div>
+        <div><dt>P.527</dt><dd>Electrical characteristics of the surface of the Earth</dd></div>
+        <div><dt>P.832</dt><dd>World Atlas of Ground Conductivities</dd></div>
+        <div><dt>P.453</dt><dd>The radio refractive index: its formula and refractivity data</dd></div>
+        <div><dt>P.341</dt><dd>The concept of transmission loss for radio links</dd></div>
+        <div><dt>P.1321</dt><dd>Propagation factors affecting systems using digital modulation techniques at LF and MF</dd></div>
+        <div><dt>SM.378</dt><dd>Field-strength measurements at monitoring stations</dd></div>
+        <div><dt>SM.1708</dt><dd>Field-strength measurements along a route with geographical coordinate registrations</dd></div>
+        <div><dt>P.1147, P.533</dt><dd>Sky-wave prediction at MF and HF (lessons 14–15, from the Lab's models)</dd></div>
+      </dl>
+    </section>
+    <section><h3>Classic papers cited by the handbook</h3>
+      <ol class="ref-papers">
+        <li>Sommerfeld, A., "The propagation of waves in wireless telegraphy", <i>Ann. Phys.</i>, 28, p. 665, 1909. [1]</li>
+        <li>Norton, K.A., "The propagation of radio waves over the surface of the Earth and in the upper atmosphere", Parts 1–2, <i>Proc. IRE</i>, 24, pp. 1367–1387, 1936; 25, pp. 1203–1236, 1937. [2], [3]</li>
+        <li>Van der Pol, B. and Bremmer, H., "The diffraction of electromagnetic waves from an electrical point source round a finitely conducting sphere", <i>Phil. Mag.</i>, 1937–1939. [4]</li>
+        <li>Norton, K.A., "The calculation of ground-wave field intensity over a finitely conducting spherical Earth", <i>Proc. IRE</i>, 29, pp. 623–639, 1941. [5]</li>
+        <li>Millington, G., "Ground-wave propagation over an inhomogeneous smooth earth", <i>Proc. IEE</i>, 96, 53, 1949. [6]</li>
+        <li>Millington, G. and Isted, G.A., "Ground-wave propagation over an inhomogeneous Earth, Part 2: Experimental evidence and practical implications", <i>Proc. IEE</i>, 97, 209, 1950. [31]</li>
+        <li>Hufford, G.A., "An integral equation approach to the problem of wave propagation over an irregular surface", <i>Quart. Appl. Math.</i>, 9, 391, 1952. [7]</li>
+        <li>Ott, R.H. and Berry, L.A., "An alternative integral equation for propagation over irregular terrain", <i>Radio Sci.</i>, 5(5), pp. 767–771, 1970. [8]</li>
+        <li>Barrick, D.E., "Theory of HF and VHF propagation across the rough sea", Parts 1–2, <i>Radio Sci.</i>, 6, pp. 517–533, 1971. [34], [35]</li>
+        <li>Rotheram, A.S., "Ground-wave propagation", Parts 1–2, <i>IEE Proc. F</i>, 128, pp. 275–295, 1981. [18], [19]</li>
+        <li>Causebrook, J.H., "Medium-wave propagation in built-up areas", <i>Proc. IEE</i>, 125(9), pp. 804–808, 1978. [22]</li>
+        <li>Bremmer, H., <i>Terrestrial Radio Waves</i>, Elsevier, 1949. [23]</li>
+      </ol>
+      <p class="lc-gcount">Numbers in brackets are the handbook's own reference numbers (§20).</p>
+    </section>
+  </div>
   <div class="lc-gloss" id="lcGloss" hidden>
     <label class="lc-search" for="glossQ"><span>Search terms</span><input type="search" id="glossQ" placeholder="e.g. skip, dB, sea" autocomplete="off"></label>
     <p class="lc-gcount" id="glossCount" aria-live="polite"></p>
@@ -2339,6 +2755,17 @@ footer{color:var(--muted)}
       <div><dt>Wave tilt</dt><dd>Forward lean of the wavefront caused by ground losses. Larger over poor ground.</dd></div>
       <div><dt>Effective earth radius k</dt><dd>Factor that models atmospheric bending. Standard k = 4/3; larger k means less curvature loss.</dd></div>
       <div><dt>Recovery effect</dt><dd>Rise in field strength after a path crosses from land onto sea.</dd></div>
+      <div><dt>Surface wave</dt><dd>The third term of the ground wave, carried by currents in the earth; dominant when both antennas are on the ground (Handbook §3.1).</dd></div>
+      <div><dt>Space wave</dt><dd>Direct wave plus ground-reflected wave. They cancel for ground-based antennas.</dd></div>
+      <div><dt>e.m.r.p.</dt><dd>Effective monopole radiated power: power relative to a short vertical monopole. P.368 curves are for 1 kW e.m.r.p.</dd></div>
+      <div><dt>Cymomotive force</dt><dd>Field × distance for 1 kW: 300 V for a short monopole, 314 V for a λ/4 monopole (P.341).</dd></div>
+      <div><dt>Complex permittivity K<sub>r</sub></dt><dd>ε<sub>r</sub> − jx with x = 1.8×10⁴σ/f<sub>MHz</sub>. Large K<sub>r</sub> means little wave tilt and low loss.</dd></div>
+      <div><dt>Surface impedance η</dt><dd>√(ε − j60σλ − 1)/(ε − j60σλ). Describes terrain, trees, buildings and sea waves in one number.</dd></div>
+      <div><dt>Skin depth δ</dt><dd>Depth at which the wave falls to 1/e: about 25 cm in sea water and 25 m in medium-dry ground at 1 MHz.</dd></div>
+      <div><dt>GRWAVE</dt><dd>Rotheram's program for ground-wave field over a smooth sphere in an exponential atmosphere; produces the P.368 curves.</dd></div>
+      <div><dt>Secondary phase Φ<sub>S</sub></dt><dd>Extra phase added by the ground on top of free-space travel; matters for navigation systems such as Loran-C.</dd></div>
+      <div><dt>Generalised Lee method</dt><dd>Running mean over a window 2L that separates large-scale from small-scale field variation (SM.1708).</dd></div>
+      <div><dt>Weighted conductivity</dt><dd>Length-weighted average conductivity of an all-land path, Σσ<sub>i</sub>d<sub>i</sub>/Σd<sub>i</sub>.</dd></div>
     </dl>
     <p class="lc-empty" id="glossEmpty" hidden>No term matches. Try a shorter word, such as “wave” or “sea”.</p>
   </div>
@@ -2459,7 +2886,7 @@ footer{color:var(--muted)}
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v7.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -6915,7 +7342,7 @@ function bindTabs(){
 /* ================= LEARN: a short course, one lesson at a time ================= */
 (function initLearn(){
   const root=$("learn"); if(!root) return;
-  const KEY="gwlab-learn";
+  const KEY="gwlab-learn-v2";
   const L=[...root.querySelectorAll(".lesson")];
   const read=()=>{ try{ return JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ return {}; } };
   const write=o=>{ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} };
@@ -6923,6 +7350,125 @@ function bindTabs(){
   let cur=Math.max(0,L.findIndex(a=>a.id===st.last));
   const reduce=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
   const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  /* ---- lesson widgets: small calculators built from the handbook's equations ---- */
+  const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmt=(x,d)=>Number.isFinite(x)?x.toFixed(d):"—";
+  const sel=(id,label,opts,val)=>'<label class="wg-f" for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(String(o[0])===String(val)?' selected':'')+'>'+o[1]+'</option>').join("")+'</select></label>';
+  const rng=(id,label,min,max,step,val,unit)=>'<label class="wg-f" for="'+id+'"><span>'+label+' <output id="'+id+'o"></output>'+(unit?' '+unit:'')+'</span><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"></label>';
+  const num=(id,label,val,step,unit)=>'<label class="wg-f" for="'+id+'"><span>'+label+(unit?' ('+unit+')':'')+'</span><input type="number" id="'+id+'" value="'+val+'" step="'+step+'" inputmode="decimal"></label>';
+  const GROUNDS=[["5,80","Sea water, average (5 S/m)"],["1,80","Sea water, low salinity (1 S/m)"],["0.03,40","Land (30 mS/m)"],["0.01,30","Wet ground (10 mS/m)"],["0.003,22","Land (3 mS/m)"],["0.001,15","Medium dry ground (1 mS/m)"],["0.0003,7","Dry ground (0.3 mS/m)"],["0.0001,3","Very dry ground (0.1 mS/m)"]];
+  const FREQS=[["0.2","200 kHz (LF)"],["0.5","500 kHz"],["1","1 MHz (MF)"],["1.5","1.5 MHz"],["5","5 MHz (HF)"],["10","10 MHz (HF)"]];
+  const gpair=v=>v.split(",").map(Number);
+  /* complex helpers for eq. (39) */
+  const cdiv=(a,b)=>{ const d=b[0]*b[0]+b[1]*b[1]; return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d]; };
+  const cmul=(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]];
+  function fieldDb(Rkm,fMHz,sig,er){ const lam=300/fMHz; const ep=[er,-60*lam*sig]; const q=cdiv([ep[0]-1,ep[1]],cmul(ep,ep));
+    const rho=Math.PI*Rkm*1000/lam*Math.hypot(q[0],q[1]); const V=(2+0.3*rho)/(2+rho+0.6*rho*rho);
+    return {db:20*Math.log10(300/Rkm*V*1000), rho, V}; }
+  function setupCanvas(cv){ const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; cv.width=Math.max(1,Math.round(r.width*dpr)); cv.height=Math.max(1,Math.round(r.height*dpr)); const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); return [c,r.width,r.height]; }
+  function plot(cv,series,o){ const [c,W,H]=setupCanvas(cv); const ink=css("--ink"),mut=css("--muted"),line=css("--line");
+    const L=44,R=26,T=12,B=30, pw=W-L-R, ph=H-T-B; c.clearRect(0,0,W,H);
+    const xs=d=>L+(o.log?(Math.log10(d)-Math.log10(o.x0))/(Math.log10(o.x1)-Math.log10(o.x0)):(d-o.x0)/(o.x1-o.x0))*pw;
+    const ys=v=>T+(1-(v-o.y0)/(o.y1-o.y0))*ph;
+    c.font="11px "+css("--font-body"); c.fillStyle=mut; c.strokeStyle=line; c.lineWidth=1;
+    for(let v=o.y0; v<=o.y1+1e-9; v+=o.ystep){ const y=ys(v); c.beginPath(); c.moveTo(L,y); c.lineTo(W-R,y); c.stroke(); c.textAlign="right"; c.fillText(v,L-6,y+4); }
+    o.xticks.forEach(d=>{ const x=xs(d); c.beginPath(); c.moveTo(x,T); c.lineTo(x,T+ph); c.stroke(); c.textAlign="center"; c.fillText(d+(o.xunit||""),x,H-10); });
+    if(o.shade){ const x=xs(o.shade); c.fillStyle=css("--field"); c.globalAlpha=.7; c.fillRect(x,T,W-R-x,ph); c.globalAlpha=1; c.fillStyle=mut; c.textAlign="left"; c.fillText(o.shadeLabel,Math.min(x+6,W-R-150),T+14); }
+    if(o.vline){ const x=xs(o.vline); c.strokeStyle=ink; c.setLineDash([2,3]); c.beginPath(); c.moveTo(x,T); c.lineTo(x,T+ph); c.stroke(); c.setLineDash([]); }
+    c.save(); c.beginPath(); c.rect(L,T,pw,ph); c.clip();
+    series.forEach(s=>{ c.strokeStyle=s.color; c.lineWidth=s.w||2.2; c.setLineDash(s.dash||[]); c.beginPath(); s.pts.forEach(([d,v],i)=>{ const x=xs(d),y=ys(v); i?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke(); });
+    c.restore(); c.setLineDash([]);
+    c.save(); c.translate(12,T+ph/2); c.rotate(-Math.PI/2); c.textAlign="center"; c.fillStyle=mut; c.fillText(o.ylabel,0,0); c.restore(); }
+  const legend=items=>'<ul class="wg-leg">'+items.map(i=>'<li><i style="--c:'+i[0]+'"'+(i[2]?' class="dash"':'')+'></i>'+i[1]+'</li>').join("")+'</ul>';
+  const colA=()=>css("--ink"), colB=()=>getComputedStyle(document.documentElement).getPropertyValue("--good").trim()||"#17633f", colC=()=>"#d9822b";
+
+  const W={
+    fieldcurve(el){
+      el.innerHTML='<figcaption>Try it: field strength for 1 kW from eqs (38)–(40), flat earth</figcaption><div class="wg-ctl">'+sel("wfF","Frequency",FREQS,"1")+sel("wfG","Ground",GROUNDS,"0.001,15")+'</div><canvas class="wg-cv" role="img"></canvas><div class="wg-leg-row"></div><p class="wg-out" aria-live="polite"></p>';
+      const cv=el.querySelector("canvas");
+      const draw=()=>{ const f=+$("wfF").value,[sg,er]=gpair($("wfG").value); const pts=[],inv=[];
+        for(let i=0;i<=120;i++){ const d=Math.pow(10,i/40); pts.push([d,fieldDb(d,f,sg,er).db]); inv.push([d,20*Math.log10(300/d*1000)]); }
+        const flat=80/Math.cbrt(f);
+        plot(cv,[{pts:inv,color:css("--muted"),dash:[5,4],w:1.4},{pts,color:colA()}],{log:true,x0:1,x1:1000,y0:0,y1:120,ystep:20,xticks:[1,10,100,1000],xunit:" km",ylabel:"dB(µV/m)",shade:flat,shadeLabel:"beyond eq. (15): curvature adds loss"});
+        el.querySelector(".wg-leg-row").innerHTML=legend([[colA(),"Ground wave (flat-earth approximation)"],[css("--muted"),"Inverse distance, 300 mV/m at 1 km",1]]);
+        const a=fieldDb(10,f,sg,er), b=fieldDb(100,f,sg,er);
+        cv.setAttribute("aria-label","Field strength falls from "+fmt(fieldDb(1,f,sg,er).db,0)+" dB at 1 km to "+fmt(b.db,0)+" dB at 100 km");
+        el.querySelector(".wg-out").innerHTML="At 10 km: ρ = "+fmt(a.rho,2)+", V = "+fmt(a.V,3)+", E = <b>"+fmt(a.db,1)+" dB(µV/m)</b>. At 100 km: <b>"+fmt(b.db,1)+" dB(µV/m)</b>. Flat out to "+fmt(flat,0)+" km. P.368 (GRWAVE) also includes the curved earth and the atmosphere."; };
+      el.addEventListener("change",draw); return draw; },
+
+    tilt(el){
+      el.innerHTML='<figcaption>Try it: wave tilt from eq. (13)</figcaption><div class="wg-ctl">'+sel("wtF","Frequency",FREQS,"1")+sel("wtG","Ground",GROUNDS,"0.001,15")+'</div><svg class="wg-svg" viewBox="0 0 320 170" role="img"></svg><p class="wg-out" aria-live="polite"></p>';
+      const svg=el.querySelector("svg");
+      const draw=()=>{ const f=+$("wtF").value,[sg,er]=gpair($("wtG").value); const x=1.8e4*sg/f; const mag=Math.hypot(er,x); const u=1/Math.sqrt(mag); const deg=Math.atan(u)*180/Math.PI;
+        const a=deg*Math.PI/180, cx=150, gy=140, L=110; const tx=cx+Math.sin(a)*L, ty=gy-Math.cos(a)*L;
+        svg.innerHTML='<rect x="0" y="'+gy+'" width="320" height="30" fill="var(--field)"/><line x1="0" y1="'+gy+'" x2="320" y2="'+gy+'" stroke="var(--control)"/>'+
+          '<line x1="'+cx+'" y1="'+gy+'" x2="'+cx+'" y2="'+(gy-L)+'" stroke="var(--muted)" stroke-dasharray="4 4"/>'+
+          '<line x1="'+cx+'" y1="'+gy+'" x2="'+tx.toFixed(1)+'" y2="'+ty.toFixed(1)+'" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>'+
+          '<text x="'+(cx+8)+'" y="'+(gy-L-4)+'" fill="var(--muted)" font-size="11">vertical</text>'+
+          '<text x="'+(Math.min(tx,260)+8)+'" y="'+(ty+14)+'" fill="var(--ink)" font-size="12" font-weight="600">E, tilted '+fmt(deg,deg<1?2:1)+'°</text>'+
+          '<path d="M230 70 h60" stroke="var(--ink)" stroke-width="2" marker-end="url(#ah)"/><text x="230" y="62" fill="var(--muted)" font-size="11">direction of travel</text>'+
+          '<path d="M'+(cx+30)+' 95 v34" stroke="#d9822b" stroke-width="2" marker-end="url(#ah2)"/><text x="'+(cx+36)+'" y="112" fill="var(--muted)" font-size="11">power into ground</text>'+
+          '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ink)"/></marker><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d9822b"/></marker></defs>';
+        svg.setAttribute("aria-label","Electric field tilted forward by "+fmt(deg,2)+" degrees");
+        el.querySelector(".wg-out").innerHTML="K<sub>r</sub> = "+er+" − j"+(x>=100?Math.round(x).toLocaleString("en"):fmt(x,1))+", |u| = 1/√|K<sub>r</sub>| = <b>"+fmt(u,u<0.01?4:3)+"</b>, tilt ≈ <b>"+fmt(deg,2)+"°</b>. Drawn to true scale."; };
+      el.addEventListener("change",draw); return draw; },
+
+    p368(el){
+      el.innerHTML='<figcaption>Try it: from a P.368 curve reading to your station</figcaption><div class="wg-ctl">'+num("wpE","Curve reading at 1 kW",60,0.5,"dB(µV/m)")+num("wpP","Radiated power",50,1,"kW")+sel("wpA","Antenna",[["300","Short monopole (300 V)"],["314","λ/4 monopole (314 V)"]],"314")+num("wpL","Other losses",1,0.5,"dB")+'</div><p class="wg-out" aria-live="polite"></p>';
+      const draw=()=>{ const e=+$("wpE").value,p=Math.max(1e-6,+$("wpP").value),a=+$("wpA").value,l=+$("wpL").value;
+        const dp=10*Math.log10(p), da=20*Math.log10(a/300); const r=e+dp+da-l;
+        el.querySelector(".wg-out").innerHTML=fmt(e,1)+" + "+fmt(dp,1)+" (power) + "+fmt(da,1)+" (antenna) − "+fmt(l,1)+" (losses) = <b>"+fmt(r,1)+" dB(µV/m)</b>"; };
+      el.addEventListener("input",draw); el.addEventListener("change",draw); return draw; },
+
+    ground(el){
+      el.innerHTML='<figcaption>Try it: skin depth (eq. 20) and sea-water conductivity (eq. 21)</figcaption><div class="wg-ctl">'+sel("wgF","Frequency",FREQS,"1")+sel("wgG","Ground",GROUNDS,"0.001,15")+'</div><p class="wg-out" id="wgO1" aria-live="polite"></p><div class="wg-ctl">'+rng("wgC","Salinity C",5,40,1,35,"g/l")+rng("wgT","Temperature T",0,30,1,20,"°C")+'</div><p class="wg-out" id="wgO2" aria-live="polite"></p>';
+      const draw=()=>{ const f=+$("wgF").value*1e6,[sg,er]=gpair($("wgG").value); const w=2*Math.PI*f, mu=4e-7*Math.PI, e0=8.854e-12;
+        const d=1/(w*Math.sqrt(mu*e0*er/2)*Math.sqrt(Math.sqrt(1+Math.pow(sg/(w*e0*er),2))-1));
+        $("wgO1").innerHTML="Skin depth δ = <b>"+(d<1?fmt(d*100,0)+" cm":fmt(d,1)+" m")+"</b>. The wave samples the ground down to about this depth.";
+        const C=+$("wgC").value,T=+$("wgT").value; $("wgCo").textContent=C; $("wgTo").textContent=T;
+        $("wgO2").innerHTML="σ = 0.18 × "+C+"<sup>0.93</sup> × [1 + 0.02("+T+" − 20)] = <b>"+fmt(0.18*Math.pow(C,0.93)*(1+0.02*(T-20)),2)+" S/m</b>"; };
+      el.addEventListener("input",draw); el.addEventListener("change",draw); return draw; },
+
+    millington(el){
+      el.innerHTML='<figcaption>Try it: a land → sea path, Millington eqs (22)–(24)</figcaption><div class="wg-ctl">'+sel("wmF","Frequency",FREQS.slice(0,4),"1")+sel("wmG","Land",GROUNDS.slice(2),"0.001,15")+rng("wmD","Coast at",10,150,5,60,"km")+'</div><canvas class="wg-cv" role="img"></canvas><div class="wg-leg-row"></div><p class="wg-out" aria-live="polite"></p>';
+      const cv=el.querySelector("canvas");
+      const draw=()=>{ const f=+$("wmF").value,[sg,er]=gpair($("wmG").value),c=+$("wmD").value; $("wmDo").textContent=c;
+        const E1=d=>fieldDb(d,f,sg,er).db, E2=d=>fieldDb(d,f,5,80).db; const land=[],sea=[],mix=[];
+        for(let d=2; d<=300; d+=2){ land.push([d,E1(d)]); sea.push([d,E2(d)]);
+          let m; if(d<=c) m=E1(d); else { const ER=E1(c)-E2(c)+E2(d); const ET=E2(d-c)-E1(d-c)+E1(d); m=(ER+ET)/2; } mix.push([d,m]); }
+        plot(cv,[{pts:sea,color:css("--muted"),dash:[5,4],w:1.4},{pts:land,color:colC(),dash:[2,3],w:1.6},{pts:mix,color:colA(),w:2.6}],{log:false,x0:0,x1:300,y0:0,y1:120,ystep:20,xticks:[0,50,100,150,200,250,300],xunit:"",ylabel:"dB(µV/m)",vline:c});
+        el.querySelector(".wg-leg-row").innerHTML=legend([[colA(),"Land then sea (Millington)"],[colC(),"All land",1],[css("--muted"),"All sea",1]]);
+        const d=Math.min(300,c+40), ER=E1(c)-E2(c)+E2(d), ET=E2(d-c)-E1(d-c)+E1(d);
+        cv.setAttribute("aria-label","Mixed-path field recovers after the coast at "+c+" km");
+        el.querySelector(".wg-out").innerHTML="Receiver 40 km past the coast ("+d+" km): E<sub>R</sub> = "+fmt(ER,1)+", E<sub>T</sub> = "+fmt(ET,1)+", E<sub>M</sub> = <b>"+fmt((ER+ET)/2,1)+" dB(µV/m)</b>, against "+fmt(E1(d),1)+" for all land. Distance in km. Teaching curves from the flat-earth model; P.368 adds curvature."; };
+      el.addEventListener("input",draw); el.addEventListener("change",draw); return draw; },
+
+    terrain(el){
+      el.innerHTML='<figcaption>Try it: terrain irregularity loss, eq. (44)</figcaption><div class="wg-ctl">'+rng("wrD","Obstacle to receiver d",1,25,0.5,2,"km")+rng("wrH","Height above line of sight h",0.4,5,0.1,1,"λ")+sel("wrF","Frequency",FREQS.slice(0,4),"1")+'</div><p class="wg-out" aria-live="polite"></p>';
+      const draw=()=>{ const d=+$("wrD").value,h=+$("wrH").value,f=+$("wrF").value; $("wrDo").textContent=d; $("wrHo").textContent=h.toFixed(1);
+        const L=(-17.2*Math.log10(d)+25.1)*Math.log10(2.84*h); const neg=d>25||(d>=25&&h<2);
+        el.querySelector(".wg-out").innerHTML="h = "+h.toFixed(1)+"λ = "+Math.round(h*300/f)+" m at "+(f<1?f*1000+" kHz":f+" MHz")+". L<sub>Irr</sub> = (−17.2 log "+d+" + 25.1) × log(2.84 × "+h.toFixed(1)+") = <b>"+fmt(Math.max(0,L),1)+" dB</b>"+(neg?" (negligible by the handbook's rule)":"")+"."; };
+      el.addEventListener("input",draw); el.addEventListener("change",draw); return draw; },
+
+    indoor(el){
+      el.innerHTML='<figcaption>Try it: indoor field from P.368, eqs (45)–(46)</figcaption><div class="wg-ctl">'+rng("wiF","Frequency",530,1700,10,1000,"kHz")+num("wiE","Outdoor P.368 field",70,0.5,"dB(µV/m)")+'</div><p class="wg-out" aria-live="polite"></p>';
+      const draw=()=>{ const f=+$("wiF").value,e=+$("wiE").value; $("wiFo").textContent=f; const L=-42.1+20.5*Math.log10(f), m=e-L;
+        el.querySelector(".wg-out").innerHTML="L<sub>indoor</sub> = <b>"+fmt(L,1)+" dB</b>. Indoor median (50% of locations) = <b>"+fmt(m,1)+" dB(µV/m)</b>. Exceeded at 90% of indoor locations: "+fmt(m-1.2816*11.8,1)+" dB(µV/m) (median − 1.28 × 11.8 dB)."; };
+      el.addEventListener("input",draw); el.addEventListener("change",draw); return draw; },
+
+    phase(el){
+      el.innerHTML='<figcaption>Try it: secondary phase to time delay</figcaption><div class="wg-ctl">'+num("wsF","Frequency",100,10,"kHz")+num("wsP","Secondary phase Φ<sub>S</sub>",36,1,"degrees")+'</div><p class="wg-out" aria-live="polite"></p>';
+      const draw=()=>{ const f=+$("wsF").value*1e3,p=+$("wsP").value*Math.PI/180; const t=p*1e6/(2*Math.PI*f);
+        el.querySelector(".wg-out").innerHTML="t<sub>s</sub> = Φ<sub>S</sub> × 10<sup>6</sup> / (2π f) = <b>"+fmt(t,3)+" µs</b>"; };
+      el.addEventListener("input",draw); el.addEventListener("change",draw); return draw; }
+  };
+  const drawers=new Map();
+  function mountWidgets(a){ a.querySelectorAll("[data-widget]").forEach(el=>{ if(!drawers.has(el)&&W[el.dataset.widget]) drawers.set(el,W[el.dataset.widget](el)); const fn=drawers.get(el); if(fn) requestAnimationFrame(fn); }); }
+  const redrawAll=()=>{ const a=L[cur]; if(a&&!root.hidden) a.querySelectorAll("[data-widget]").forEach(el=>{ const fn=drawers.get(el); if(fn) fn(); }); };
+  window.addEventListener("resize",()=>{ clearTimeout(redrawAll.t); redrawAll.t=setTimeout(redrawAll,120); });
+  new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",redrawAll);
+  new MutationObserver(()=>{ if(!root.hidden) redrawAll(); }).observe(root,{attributes:true,attributeFilter:["hidden"]});
 
   /* the path: units as headings, lessons as steps */
   const path=$("lcPath"); let unit="";
@@ -6933,6 +7479,7 @@ function bindTabs(){
     b.addEventListener("click",()=>show(i,true)); li.appendChild(b); path.appendChild(li);
     /* eyebrow inside each lesson */
     const eb=document.createElement("p"); eb.className="lx-eyebrow"; eb.textContent="Lesson "+(i+1)+" of "+L.length+" · "+a.dataset.unit+" · "+a.dataset.mins+" min read"; a.prepend(eb);
+    if(a.dataset.src){ const sr=document.createElement("p"); sr.className="lx-src"; sr.innerHTML="<b>Source</b>"+a.dataset.src; a.appendChild(sr); }
     /* quick check: one answer, instant feedback, explanation */
     const fs=a.querySelector(".qc"); if(!fs) return;
     const btn=document.createElement("button"); btn.type="button"; btn.className="btn qc-go"; btn.textContent="Check answer"; btn.disabled=true;
@@ -6970,6 +7517,7 @@ function bindTabs(){
     $("lcPrev").disabled=cur===0;
     $("lcNext2").innerHTML= cur===L.length-1 ? 'Go to the quiz <span aria-hidden="true">→</span>' : 'Next lesson <span aria-hidden="true">→</span>';
     $("lcTry").textContent=a.dataset.tryLabel||"Try it";
+    mountWidgets(a);
     render();
     const item=path.querySelector('.lp-item[data-i="'+cur+'"]'); if(item&&item.scrollIntoView) item.scrollIntoView({block:"nearest",inline:"center",behavior:reduce()?"auto":"smooth"});
     if(focus){ const h=a.querySelector("h3"); h.tabIndex=-1; h.focus({preventScroll:true}); const top=root.querySelector(".lc-reader").getBoundingClientRect().top+scrollY-120; if(scrollY>top) window.scrollTo({top,behavior:reduce()?"auto":"smooth"}); }
@@ -6978,12 +7526,15 @@ function bindTabs(){
   $("lcNext2").addEventListener("click",()=>{ if(cur===L.length-1) go("quiz"); else show(cur+1,true); });
   $("lcTry").addEventListener("click",()=>{ const t=(L[cur].dataset.try||"lab").split(":"); go(t[0]);
     if(t[0]==="lab"&&t[1]!=null){ const chip=$("presets")&&$("presets").children[+t[1]]; if(chip) chip.click(); } });
-  $("lcResume").addEventListener("click",()=>{ const nx=L.findIndex(a=>!st.done[a.id]); if(nx<0){ go("quiz"); return; } setView(false); show(nx,true); });
+  $("lcResume").addEventListener("click",()=>{ const nx=L.findIndex(a=>!st.done[a.id]); if(nx<0){ go("quiz"); return; } setView("lessons"); show(nx,true); });
 
   /* lessons | glossary */
-  function setView(g){ $("lcLessons").hidden=g; $("lcGloss").hidden=!g; $("lcViewLessons").setAttribute("aria-pressed",String(!g)); $("lcViewGloss").setAttribute("aria-pressed",String(g)); if(g) $("glossQ").focus(); }
-  $("lcViewLessons").addEventListener("click",()=>setView(false));
-  $("lcViewGloss").addEventListener("click",()=>setView(true));
+  function setView(v){ v=v===true?"gloss":(v||"lessons"); $("lcLessons").hidden=v!=="lessons"; $("lcGloss").hidden=v!=="gloss"; $("lcRefs").hidden=v!=="refs";
+    $("lcViewLessons").setAttribute("aria-pressed",String(v==="lessons")); $("lcViewGloss").setAttribute("aria-pressed",String(v==="gloss")); $("lcViewRefs").setAttribute("aria-pressed",String(v==="refs"));
+    if(v==="gloss") $("glossQ").focus(); if(v==="lessons") redrawAll(); }
+  $("lcViewLessons").addEventListener("click",()=>setView("lessons"));
+  $("lcViewGloss").addEventListener("click",()=>setView("gloss"));
+  $("lcViewRefs").addEventListener("click",()=>setView("refs"));
   const items=[...$("glossList").children];
   const filt=()=>{ const q=$("glossQ").value.trim().toLowerCase(); let k=0;
     items.forEach(d=>{ const on=!q||d.textContent.toLowerCase().includes(q); d.hidden=!on; if(on) k++; });
