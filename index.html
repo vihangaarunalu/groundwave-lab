@@ -382,6 +382,8 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .stage.is-expanded{position:fixed;inset:0;z-index:200;border-radius:0;border:0}
 .stage.is-expanded #anim{height:100vh}
 .stage:fullscreen .tourbox,.stage.is-expanded .tourbox{top:60px}
+.tourbox{z-index:8}
+.stage:has(.tourbox:not([hidden])) .rxhud:not(.moved){top:auto;bottom:12px}
 .learn-build ol{padding-left:22px;display:grid;gap:8px}
 
 .fsbar{display:none;position:absolute;left:50%;bottom:16px;transform:translateX(-50%);gap:10px;align-items:center;background:rgba(12,20,36,.88);color:#fff;padding:8px 12px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);flex-wrap:wrap;max-width:calc(100% - 24px)}
@@ -1764,6 +1766,23 @@ h2.th{display:flex;align-items:center;gap:var(--sp-4)}
   .wrap:not([hidden]) > *,.ti *{animation:none!important}
   .ti .d{stroke-dashoffset:0}.ti .dash{opacity:1}.ti .dot{transform:none}
 }
+
+/* ---- v7.9 user-satisfaction pass ---- */
+/* quiz answers: full-width cards with A/B/C letters; one column on phones */
+.q .opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;counter-reset:opt}
+.q .opts button{counter-increment:opt;display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 14px;border-radius:var(--r-md);text-align:left;line-height:1.35;white-space:normal}
+.q .opts button::before{content:counter(opt,upper-alpha);flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--field);color:var(--ink);font:600 12px/1 var(--font-display);transition:background-color var(--dur-2) var(--ease-out),color var(--dur-2) var(--ease-out)}
+.q .opts button[aria-pressed="true"]::before{background:var(--ink);color:var(--bg)}
+.q .opts button.right::before{content:"✓";background:var(--good);color:#fff}
+.q .opts button.wrong::before{content:"✕";background:var(--bad);color:#fff}
+.q .opts button.right,.q .opts button.wrong{animation:mo-pop .26s var(--ease-out)}
+@media (max-width:760px){.q .opts{grid-template-columns:1fr}}
+.q .opts button.wrong,.q .opts button.wrong[aria-pressed="true"]{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--panel))}
+.q .opts button.right,.q .opts button.right[aria-pressed="true"]{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--panel))}
+/* feedback is one tap away from every screen */
+.appbar .fbtop svg{width:16px;height:16px}
+.appbar .fbtop{gap:6px}
+@media (max-width:760px){.appbar .fbtop .lbl-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.appbar .fbtop{width:44px;justify-content:center;padding:0}}
 </style>
 </head>
 <body data-tab="lab">
@@ -1822,6 +1841,7 @@ h2.th{display:flex;align-items:center;gap:var(--sp-4)}
       <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">8</span>Quiz</button>
     </nav>
     <button class="scope" id="scopeChip" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>&#8212;</b></button>
+    <button class="iconbtn themebtn fbtop" id="fbTop" type="button" aria-haspopup="dialog" aria-label="Give feedback" title="Tell us how it went"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg><span class="lbl-t">Feedback</span></button>
     <button class="iconbtn themebtn" id="helpBtn" type="button" aria-haspopup="dialog" title="Help and quick start">? Help</button>
     <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
   </div>
@@ -3278,6 +3298,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" data-tab="terrain">Terrain profile</button>
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
+  <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
 <footer><b>Groundwave Propagation Lab v7.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
@@ -4865,7 +4886,7 @@ function animSet(obj,autoRange){
 function bindAnimQuick(){
   const fc=$("aFreqChips"); A_FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f;
     b.onclick=()=>{ if(f===1800) animSet({type:"cell",tech:"4g",f,P:1,htx:30,hrx:1.5},true); else if(f===3500) animSet({type:"cell",tech:"5g",f,P:10,htx:30,hrx:1.5},true); else animSet({f,type:animModel().p.type==="cell"?"combined":animModel().p.type},true); }; fc.appendChild(b); });
-  const wc=$("aWx"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.title=w.label; b.innerHTML=`<span class="ico" aria-hidden="true">${w.ico}</span>${w.label}`; b.onclick=()=>animSet(Object.assign({},w.set)); wc.appendChild(b); });
+  const wc=$("aWx"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.title=w.label; b.innerHTML=`${icn(w.ico)}${w.label}`; b.onclick=()=>animSet(Object.assign({},w.set)); wc.appendChild(b); });
   document.querySelectorAll('input[name="aType"]').forEach(r=>r.addEventListener("change",e=>animSet({type:e.target.value})));
   $("aFreq").addEventListener("input",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)}));
   $("aFreq").addEventListener("change",e=>animSet({f:+Math.pow(10,+e.target.value).toPrecision(3)},true));
@@ -8227,6 +8248,7 @@ function bindTabs(){
   window.animIntro=()=>{ if(matchMedia("(prefers-reduced-motion: reduce)").matches||typeof AN==="undefined") return; const s0=AN.view.span, from=Math.min(4000,s0*1.9), t0=performance.now();
     const step=now=>{ const u=Math.min(1,(now-t0)/1300), e=1-Math.pow(1-u,3); AN.view.span=from+(s0-from)*e; if(u<1&&currentTab==="animation") requestAnimationFrame(step); else AN.view.span=s0; };
     AN.view.span=from; requestAnimationFrame(step); };
+  ["fbTop","moreFb"].forEach(id=>{ const b=$(id); if(b) b.addEventListener("click",()=>{ const sh=$("moreSheet"); if(sh) sh.hidden=true; openFeedback(); }); });
   /* scrollable tables: focusable and named, so keyboard users can scroll them */
   const labelWraps=()=>document.querySelectorAll(".tablewrap").forEach(w=>{ if(w.hasAttribute("tabindex")) return; w.tabIndex=0; w.setAttribute("role","region");
     const cap=w.querySelector("caption"); let h=cap; if(!h){ let n=w; while(n&&!h){ let q=n.previousElementSibling; while(q&&!h){ h=q.matches("h2,h3,h4")?q:q.querySelector&&q.querySelector("h2,h3,h4"); q=q.previousElementSibling; } n=n.parentElement; } }
