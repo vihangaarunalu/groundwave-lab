@@ -17,9 +17,25 @@
  *
  * Stores one integer. No cookie, no address, nothing about anyone.
  *
- * GET /api/visits        -> {"count": n}   and counts this visit
- * GET /api/visits?peek=1 -> {"count": n}   without counting
+ * GET /api/visits        -> {"ok": true}   counts this visit
+ * GET /api/visits?peek=1 with  Authorization: Bearer <staff passphrase>
+ *                         -> {"count": n}   without counting (Feedback inbox)
  */
+
+/* The total is for staff: the same passphrase as the Feedback inbox
+   (the FEEDBACK_KEY secret, or the "fb:admin" record created on first visit). */
+const enc = new TextEncoder();
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+async function sha(t) { return hex(await crypto.subtle.digest("SHA-256", enc.encode(t))); }
+function same(a, b) { if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i); return d === 0; }
+async function isStaff(request, env) {
+  const h = request.headers.get("Authorization") || "";
+  const given = h.startsWith("Bearer ") ? h.slice(7) : "";
+  if (!given) return false;
+  if (env.FEEDBACK_KEY) return same(await sha(given), await sha(env.FEEDBACK_KEY));
+  let rec = null; try { rec = JSON.parse((await env.VISITS.get("fb:admin")) || "null"); } catch (e) {}
+  return !!rec && same(await sha(rec.salt + ":" + given), rec.hash);
+}
 
 export async function onRequestGet({ request, env }) {
   const headers = {
@@ -45,5 +61,7 @@ export async function onRequestGet({ request, env }) {
     await env.VISITS.put("total", String(n));
   }
 
+  // Only staff see the number; everyone else just gets their visit counted.
+  if (!(await isStaff(request, env))) return new Response(JSON.stringify({ ok: true }), { headers });
   return new Response(JSON.stringify({ count: n }), { headers });
 }
