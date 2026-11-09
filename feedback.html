@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Feedback inbox · Groundwave Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Feedback inbox — same tokens as the lab: Midnight Navy chrome, Cloud White ground, Electric Lime for the one action */
+:root{
+  --navy:#102C40; --cloud:#F7FAFC; --lime:#CDF23A; --lime-2:#B9E01F;
+  --bg:#F7FAFC; --panel:#FFFFFF; --field:#EDF2F6; --ink:#102C40; --muted:#4D6375; --line:#DCE4EB; --control:#B7C6D3;
+  --mark:#CDF23A; --on-mark:#102C40; --accent:#102C40; --accent-soft:#E2EAF1;
+  --good:#17633f; --warn:#7a5312; --bad:#b3261e;
+  --font-display:"Inter Tight","IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --font-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--sp-6:32px;
+  --r-sm:6px;--r-md:10px;--r-lg:14px;--r-pill:999px;
+  --fs-meta:12px;--fs-dense:14px;--fs-ui:15px;--fs-body:16px;--fs-h3:17px;--fs-h2:20px;
+  --ease:cubic-bezier(.23,1,.32,1);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#081A27;--panel:#0C2131;--field:#11293C;--ink:#F7FAFC;--muted:#9DB2C3;--line:#1B3549;--control:#2C4B63;
+  --accent:#CDF23A;--accent-soft:#16324A;--good:#58d08a;--warn:#e8b85c;--bad:#ff8178}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#081A27;--panel:#0C2131;--field:#11293C;--ink:#F7FAFC;--muted:#9DB2C3;--line:#1B3549;--control:#2C4B63;
+  --accent:#CDF23A;--accent-soft:#16324A;--good:#58d08a;--warn:#e8b85c;--bad:#ff8178}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--fs-ui)/1.5 var(--font-body);overflow-x:clip}
+[hidden]{display:none!important}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+
+.top{background:var(--navy);color:var(--cloud);padding-top:env(safe-area-inset-top,0px)}
+.top-in{max-width:1180px;margin:0 auto;padding:var(--sp-3) max(16px,env(safe-area-inset-right,0px)) var(--sp-3) max(16px,env(safe-area-inset-left,0px));
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-3) var(--sp-4);min-height:60px}
+.brand{display:flex;align-items:center;gap:var(--sp-2);font:600 var(--fs-h3)/1.2 var(--font-display);letter-spacing:-.02em}
+.brand svg{width:22px;height:22px;color:var(--lime)}
+.brand small{font:500 var(--fs-dense)/1 var(--font-body);color:rgba(247,250,252,.7);margin-left:var(--sp-2);padding-left:var(--sp-3);border-left:1px solid rgba(247,250,252,.2)}
+.top .sp{flex:1}
+.top a.back,.top button{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:40px;padding:0 var(--sp-4);border-radius:var(--r-pill);
+  border:1px solid rgba(247,250,252,.22);background:rgba(247,250,252,.07);color:var(--cloud);font:500 var(--fs-dense)/1 var(--font-body);text-decoration:none;cursor:pointer}
+@media (hover:hover){.top a.back:hover,.top button:hover{background:rgba(247,250,252,.16)}}
+.top :focus-visible{outline-color:var(--lime)}
+
+main{max-width:1180px;margin:0 auto;padding:var(--sp-5) max(16px,env(safe-area-inset-right,0px)) var(--sp-6) max(16px,env(safe-area-inset-left,0px));display:grid;gap:var(--sp-5)}
+.demo{padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);background:color-mix(in srgb,var(--mark) 30%,var(--panel));color:var(--ink);font-size:var(--fs-dense);border:1px solid var(--line)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);min-height:40px;padding:0 var(--sp-4);border-radius:var(--r-pill);
+  border:1px solid var(--control);background:var(--panel);color:var(--ink);font:500 var(--fs-dense)/1 var(--font-body);cursor:pointer;text-decoration:none;
+  transition:background-color .15s var(--ease),border-color .15s var(--ease),transform .12s var(--ease)}
+.btn:active{transform:scale(.97)}
+@media (hover:hover){.btn:hover{border-color:var(--ink)}}
+.btn.primary{background:var(--mark);border-color:var(--mark);color:var(--on-mark);font-weight:600}
+@media (hover:hover){.btn.primary:hover{background:var(--lime-2);border-color:var(--lime-2)}}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.btn.solid-danger{background:var(--bad);border-color:var(--bad);color:#fff;font-weight:600}
+.btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* sign-in */
+.signin{max-width:480px;margin:min(8vh,64px) auto 0;display:grid;gap:var(--sp-4);padding:var(--sp-6) var(--sp-5);border-radius:var(--r-lg);background:var(--panel);border:1px solid var(--line)}
+.signin h1{font-size:28px}
+.signin p{margin:0;color:var(--muted)}
+.field{display:grid;gap:var(--sp-2)}
+.field > span{font-size:var(--fs-dense);font-weight:500}
+input[type=password],input[type=search],input[type=text],select{min-height:44px;padding:0 var(--sp-3);border-radius:var(--r-sm);border:1px solid var(--control);background:var(--panel);color:var(--ink);font:inherit;font-size:var(--fs-ui);width:100%}
+.check{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-dense);min-height:32px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--ink)}
+.err{margin:0;color:var(--bad);font-size:var(--fs-dense);min-height:1.4em}
+.setup{margin:0;padding:var(--sp-4);border-radius:var(--r-md);background:var(--field);font-size:var(--fs-dense);display:grid;gap:var(--sp-2)}
+.setup ol{margin:0;padding-left:1.3em;display:grid;gap:var(--sp-1)}
+code{font:500 13px/1.4 var(--font-mono);background:var(--field);padding:1px 5px;border-radius:4px}
+
+/* summary */
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:var(--sp-3)}
+.head h1{font-size:clamp(26px,3vw,34px)}
+.head p{margin:var(--sp-1) 0 0;color:var(--muted);font-size:var(--fs-dense)}
+.head .row{display:flex;gap:var(--sp-2);flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-3)}
+.stat{padding:var(--sp-4);border-radius:var(--r-md);background:var(--panel);border:1px solid var(--line);display:grid;gap:var(--sp-1);align-content:start}
+.stat .k{font-size:var(--fs-meta);color:var(--muted);font-weight:500}
+.stat .v{font:600 30px/1.1 var(--font-display);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat .s{font-size:var(--fs-meta);color:var(--muted)}
+.stat.wide{grid-column:span 2}
+@media (max-width:560px){.stat.wide{grid-column:auto}}
+.bar{display:flex;height:12px;border-radius:var(--r-pill);overflow:hidden;background:var(--field);margin:var(--sp-2) 0 var(--sp-1)}
+.bar i{display:block;height:100%}
+.bar .a{background:var(--good)}.bar .b{background:var(--warn)}.bar .c{background:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-4);font-size:var(--fs-meta);color:var(--ink)}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:var(--c)}
+
+/* toolbar */
+.tools{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(150px,1fr));gap:var(--sp-3);align-items:end;
+  padding:var(--sp-4);border-radius:var(--r-md);background:var(--panel);border:1px solid var(--line)}
+.tools label{display:grid;gap:var(--sp-1);font-size:var(--fs-meta);color:var(--muted);font-weight:500}
+@media (max-width:860px){.tools{grid-template-columns:1fr 1fr}.tools label:first-child{grid-column:1/-1}}
+.count{margin:0;font-size:var(--fs-dense);color:var(--muted)}
+
+/* list */
+.list{list-style:none;margin:0;padding:0;display:grid;gap:var(--sp-3)}
+.item{display:grid;gap:var(--sp-3);padding:var(--sp-4) var(--sp-5);border-radius:var(--r-md);background:var(--panel);border:1px solid var(--line);
+  box-shadow:inset 4px 0 0 var(--mark);transition:opacity .2s var(--ease)}
+.item.reviewed{box-shadow:none;background:var(--field)}
+.item .meta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2) var(--sp-3);font-size:var(--fs-meta);color:var(--muted)}
+.item time{font:500 var(--fs-dense)/1 var(--font-mono);color:var(--ink)}
+.pill{display:inline-flex;align-items:center;min-height:24px;padding:0 var(--sp-3);border-radius:var(--r-pill);font:600 var(--fs-meta)/1 var(--font-body);background:var(--field);color:var(--muted)}
+.pill.a{background:color-mix(in srgb,var(--good) 14%,var(--panel));color:var(--good)}
+.pill.b{background:color-mix(in srgb,var(--warn) 16%,var(--panel));color:var(--warn)}
+.pill.c{background:color-mix(in srgb,var(--bad) 12%,var(--panel));color:var(--bad)}
+.pill.ok{background:var(--accent-soft);color:var(--ink)}
+.tag{display:inline-flex;align-items:center;gap:4px}
+.tag b{font-weight:500;color:var(--ink)}
+.ans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--sp-3)}
+.ans div{display:grid;gap:2px}
+.ans dt{font-size:var(--fs-meta);color:var(--muted);font-weight:500}
+.ans dd{margin:0;font-size:var(--fs-body);line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.ans dd.none{color:var(--muted);font-style:italic;font-size:var(--fs-dense)}
+.item .acts{display:flex;flex-wrap:wrap;gap:var(--sp-2);justify-content:flex-end}
+.empty{padding:var(--sp-6) var(--sp-5);border-radius:var(--r-lg);border:1px dashed var(--control);text-align:center;display:grid;gap:var(--sp-2);justify-items:center}
+.empty h2{font-size:var(--fs-h2)}
+.empty p{margin:0;color:var(--muted);max-width:52ch}
+.more{justify-self:center}
+.loading{display:grid;gap:var(--sp-3)}
+.sk{height:120px;border-radius:var(--r-md);background:linear-gradient(90deg,var(--field),var(--panel),var(--field));background-size:200% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+dialog{border:1px solid var(--line);border-radius:var(--r-lg);padding:0;background:var(--panel);color:var(--ink);max-width:min(440px,92vw);width:100%}
+dialog::backdrop{background:rgba(8,26,39,.55)}
+.dlg{display:grid;gap:var(--sp-3);padding:var(--sp-5)}
+.dlg p{margin:0;color:var(--muted)}
+.dlg .row{display:flex;justify-content:flex-end;gap:var(--sp-2);margin-top:var(--sp-2)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--cloud);
+  padding:var(--sp-3) var(--sp-5);border-radius:var(--r-pill);font-size:var(--fs-dense);box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:10}
+
+@media (max-width:600px){
+  .brand small{display:none}
+  .top .long{display:none}
+  .item{padding:var(--sp-4)}
+  .btn{min-height:44px}
+  .item .acts .btn{flex:1}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 28 L15 8" stroke="currentColor" stroke-width="2"/><path d="M11 28 L15 8 L19 28" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 7 a9 9 0 0 1 14 0 M5 4 a13 13 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Groundwave Lab<small>Feedback inbox</small></div>
+  <span class="sp"></span>
+  <a class="back" href="./">← <span class="long">Back to the&nbsp;</span>lab</a>
+  <button type="button" id="signOut" hidden>Sign out</button>
+</div></header>
+
+<main>
+  <p class="demo" id="demoNote" hidden><b>Preview with example data.</b> These responses are made up to show the layout. On the live site this page shows the real answers students send.</p>
+
+  <!-- sign in -->
+  <form class="signin" id="signin" hidden>
+    <h1>Staff sign-in</h1>
+    <p>Students' answers to “How did that go?” are stored on this site. Enter the staff passphrase to read them.</p>
+    <label class="field" for="key"><span>Passphrase</span><input type="password" id="key" autocomplete="current-password" required></label>
+    <label class="check" for="remember"><input type="checkbox" id="remember"> Remember on this device</label>
+    <p class="err" id="signErr" role="alert"></p>
+    <button class="btn primary" type="submit" id="signBtn">Open inbox</button>
+    <div class="setup" id="setupHelp" hidden>
+      <b>Feedback storage is not switched on for this site yet.</b>
+      <ol>
+        <li>Cloudflare dashboard → your Pages project → <b>Settings → Bindings</b>: add KV namespace <code>VISITS</code> → <code>groundwave-visits</code>.</li>
+        <li><b>Settings → Variables and Secrets</b>: add a <b>Secret</b> named <code>FEEDBACK_KEY</code> with a long passphrase.</li>
+        <li><b>Deployments → Retry deployment</b>, then sign in here with that passphrase.</li>
+      </ol>
+    </div>
+  </form>
+
+  <!-- inbox -->
+  <section id="inbox" hidden aria-labelledby="inboxTitle" style="display:grid;gap:var(--sp-5)">
+    <div class="head">
+      <div><h1 id="inboxTitle">Student feedback</h1><p id="updated">Loading…</p></div>
+      <div class="row">
+        <button class="btn" type="button" id="refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"/><path d="M4 3.5V8h4.5"/></svg>Refresh</button>
+        <button class="btn primary" type="button" id="exportCsv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></svg>Export CSV</button>
+      </div>
+    </div>
+
+    <div class="stats" id="stats" aria-live="polite"></div>
+
+    <div class="tools" role="search">
+      <label for="q">Search answers<input type="search" id="q" placeholder="Word in any answer, course or activity" autocomplete="off"></label>
+      <label for="fRate">Helped?<select id="fRate"><option value="">Any answer</option><option value="a lot">A lot</option><option value="somewhat">Somewhat</option><option value="not really">Not really</option><option value="-">No rating</option></select></label>
+      <label for="fState">Status<select id="fState"><option value="">All</option><option value="new">To review</option><option value="done">Reviewed</option></select></label>
+      <label for="fSort">Order<select id="fSort"><option value="new">Newest first</option><option value="old">Oldest first</option></select></label>
+    </div>
+
+    <p class="count" id="shown" aria-live="polite"></p>
+    <div class="loading" id="loading" hidden><div class="sk"></div><div class="sk"></div></div>
+    <ul class="list" id="list"></ul>
+    <div class="empty" id="empty" hidden></div>
+  </section>
+</main>
+
+<dialog id="delDlg" aria-labelledby="delTitle">
+  <form method="dialog" class="dlg">
+    <h2 id="delTitle" style="font-size:var(--fs-h2)">Delete this feedback?</h2>
+    <p id="delBody"></p>
+    <div class="row"><button class="btn" value="cancel" id="delCancel" autofocus>Cancel</button><button class="btn solid-danger" value="ok" id="delOk">Delete feedback</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var API = "/api/feedback";
+  var KEYNAME = "gwlab-fb-key";
+  var DEMO = !!window.FB_DEMO;
+  var ACT = ["MW day vs night","Ground types","LF vs MW vs HF","Monsoon vs drought","Coastline","HF skip zone","Solar flare","Flare on every band","VHF & UHF","Build your own"];
+  var PAGES = {lab:"Lab",animation:"Animation",map:"Map",terrain:"Terrain profile",mobile:"Cellular",methods:"Models",learn:"Learn",quiz:"Quiz"};
+  var RATE = {"a lot":["A lot","a"],"somewhat":["Somewhat","b"],"not really":["Not really","c"]};
+  var S = { key:"", items:[], count:0 };
+
+  function store(){ try { return localStorage.getItem(KEYNAME) || sessionStorage.getItem(KEYNAME) || ""; } catch(e){ return ""; } }
+  function saveKey(k, remember){ try { sessionStorage.setItem(KEYNAME,k); if(remember) localStorage.setItem(KEYNAME,k); } catch(e){} }
+  function forget(){ try { sessionStorage.removeItem(KEYNAME); localStorage.removeItem(KEYNAME); } catch(e){} }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function actName(a){ if(!a) return ""; var m=/^exp(\d+)$/.exec(a); if(m) return "Experiment: "+(ACT[+m[1]]||("#"+(+m[1]+1))); if(a==="quiz") return "Quiz"; return a; }
+  function when(iso){ var d=new Date(iso); if(isNaN(d)) return iso||""; return d.toLocaleString(undefined,{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
+  function toast(msg){ var t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ t.hidden=true; },2400); }
+
+  function api(method, qs, body){
+    if(DEMO) return Promise.resolve(demoApi(method, qs, body));
+    return fetch(API+(qs||""), { method:method, headers: Object.assign({"Authorization":"Bearer "+S.key}, body?{"Content-Type":"application/json"}:{}), body: body?JSON.stringify(body):undefined, cache:"no-store" })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if(!r.ok){ var e=new Error(j.error||("HTTP "+r.status)); e.status=r.status; throw e; } return j; }); });
+  }
+
+  function loadAll(){
+    $("loading").hidden=false; $("list").innerHTML=""; $("empty").hidden=true;
+    var all=[];
+    function page(cursor){
+      return api("GET","?list=1"+(cursor?"&cursor="+encodeURIComponent(cursor):"")).then(function(j){
+        all=all.concat(j.items||[]); S.count=j.count||all.length;
+        if(j.cursor && all.length<5000) return page(j.cursor);
+      });
+    }
+    return page(null).then(function(){ S.items=all; $("loading").hidden=true; $("updated").textContent="Updated "+when(new Date().toISOString())+" · newest answers appear when you refresh"; render(); });
+  }
+
+  function showSignin(msg, setup){
+    $("inbox").hidden=true; $("signOut").hidden=true; $("signin").hidden=false;
+    $("signErr").textContent=msg||""; $("setupHelp").hidden=!setup; if(!setup) $("key").focus();
+  }
+  function open(key){
+    S.key=key; $("signBtn").disabled=true; $("signBtn").textContent="Opening…";
+    return loadAll().then(function(){
+      $("signin").hidden=true; $("inbox").hidden=false; $("signOut").hidden=DEMO;
+    }).catch(function(e){
+      $("loading").hidden=true;
+      if(e.status===401){ forget(); showSignin("That passphrase didn't match. It's the FEEDBACK_KEY secret set in Cloudflare."); }
+      else if(e.status===503){ showSignin("", true); }
+      else showSignin("Couldn't reach the feedback store. Check your connection and try again.");
+    }).then(function(){ $("signBtn").disabled=false; $("signBtn").textContent="Open inbox"; });
+  }
+
+  function filtered(){
+    var q=$("q").value.trim().toLowerCase(), r=$("fRate").value, st=$("fState").value, sort=$("fSort").value;
+    var out=S.items.filter(function(x){
+      if(r==="-" ? !!x.rating : (r && x.rating!==r)) return false;
+      if(st==="new" && x.reviewed) return false; if(st==="done" && !x.reviewed) return false;
+      if(q){ var hay=[x.confusing,x.missing,x.course,actName(x.activity),PAGES[x.page]||x.page,x.rating].join(" ").toLowerCase(); if(hay.indexOf(q)<0) return false; }
+      return true;
+    });
+    out.sort(function(a,b){ return sort==="old" ? (a.at<b.at?-1:1) : (a.at<b.at?1:-1); });
+    return out;
+  }
+
+  function renderStats(){
+    var n=S.items.length, c={"a lot":0,"somewhat":0,"not really":0}, none=0, todo=0, last="";
+    S.items.forEach(function(x){ if(c[x.rating]!=null) c[x.rating]++; else none++; if(!x.reviewed) todo++; if(x.at>last) last=x.at; });
+    var rated=n-none, pct=function(v){ return rated?Math.round(100*v/rated):0; };
+    $("stats").innerHTML=
+      '<div class="stat"><span class="k">Responses</span><span class="v">'+n+'</span><span class="s">'+(last?"Latest "+esc(when(last)):"None yet")+'</span></div>'+
+      '<div class="stat"><span class="k">To review</span><span class="v">'+todo+'</span><span class="s">'+(n-todo)+' marked reviewed</span></div>'+
+      '<div class="stat wide"><span class="k">Did it help you understand the topic? ('+rated+' answered)</span>'+
+        '<div class="bar" role="img" aria-label="A lot '+pct(c["a lot"])+'%, somewhat '+pct(c.somewhat)+'%, not really '+pct(c["not really"])+'%"><i class="a" style="width:'+pct(c["a lot"])+'%"></i><i class="b" style="width:'+pct(c.somewhat)+'%"></i><i class="c" style="width:'+pct(c["not really"])+'%"></i></div>'+
+        '<div class="legend"><span style="--c:var(--good)">A lot '+c["a lot"]+' ('+pct(c["a lot"])+'%)</span><span style="--c:var(--warn)">Somewhat '+c.somewhat+'</span><span style="--c:var(--bad)">Not really '+c["not really"]+'</span>'+(none?'<span style="--c:var(--control)">No rating '+none+'</span>':'')+'</div></div>';
+  }
+
+  function render(){
+    renderStats();
+    var rows=filtered(), ul=$("list"), em=$("empty");
+    $("shown").textContent= S.items.length ? ("Showing "+rows.length+" of "+S.items.length) : "";
+    ul.innerHTML=rows.map(function(x){
+      var r=RATE[x.rating];
+      var ans=function(label,v){ return '<div><dt>'+label+'</dt><dd'+(v?'':' class="none"')+'>'+(v?esc(v):"No answer")+'</dd></div>'; };
+      return '<li class="item'+(x.reviewed?' reviewed':'')+'" data-id="'+esc(x.id)+'">'+
+        '<div class="meta"><time datetime="'+esc(x.at)+'">'+esc(when(x.at))+'</time>'+
+          (r?'<span class="pill '+r[1]+'">Helped: '+r[0]+'</span>':'<span class="pill">No rating</span>')+
+          (x.reviewed?'<span class="pill ok">Reviewed</span>':'')+
+          (x.activity?'<span class="tag">After <b>'+esc(actName(x.activity))+'</b></span>':'')+
+          (x.page?'<span class="tag">on <b>'+esc(PAGES[x.page]||x.page)+'</b></span>':'')+
+          (x.course?'<span class="tag">Course <b>'+esc(x.course)+'</b></span>':'')+'</div>'+
+        '<dl class="ans" style="margin:0">'+ans("What was confusing",x.confusing)+ans("What they would add",x.missing)+'</dl>'+
+        '<div class="acts"><button class="btn" type="button" data-act="rev">'+(x.reviewed?'Mark as to review':'Mark reviewed')+'</button>'+
+        '<button class="btn danger" type="button" data-act="del"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M9 6.5V4h6v2.5M6 6.5 7 20h10l1-13.5"/></svg>Delete</button></div></li>';
+    }).join("");
+    if(!S.items.length){ em.hidden=false; em.innerHTML='<h2>No feedback yet</h2><p>Students are asked “How did that go?” after finishing an experiment or the quiz, and can use “Give feedback” at the bottom of every page. Their answers will appear here.</p>'; }
+    else if(!rows.length){ em.hidden=false; em.innerHTML='<h2>Nothing matches these filters</h2><p>Try a shorter search word or set the filters back to “Any answer” and “All”.</p><button class="btn" type="button" id="clearF">Clear filters</button>'; $("clearF").onclick=function(){ $("q").value=""; $("fRate").value=""; $("fState").value=""; render(); }; }
+    else em.hidden=true;
+  }
+
+  $("list").addEventListener("click",function(e){
+    var b=e.target.closest("button[data-act]"); if(!b) return;
+    var li=b.closest(".item"), id=li.dataset.id, x=S.items.find(function(i){ return i.id===id; }); if(!x) return;
+    if(b.dataset.act==="rev"){
+      b.disabled=true;
+      api("PATCH","?id="+encodeURIComponent(id),{reviewed:!x.reviewed}).then(function(){ x.reviewed=!x.reviewed; render(); toast(x.reviewed?"Marked reviewed":"Moved back to review"); })
+        .catch(function(err){ b.disabled=false; toast(err.status===401?"Signed out. Sign in again.":"Couldn't save that. Try again."); });
+    } else {
+      var d=$("delDlg"); $("delBody").textContent="The feedback sent on "+when(x.at)+" will be removed permanently. This can't be undone.";
+      d.returnValue=""; d.showModal();
+      d.onclose=function(){ d.onclose=null; if(d.returnValue!=="ok"){ b.focus(); return; }
+        api("DELETE","?id="+encodeURIComponent(id)).then(function(){ S.items=S.items.filter(function(i){ return i.id!==id; }); render(); toast("Feedback deleted"); $("q").focus(); })
+          .catch(function(err){ toast(err.status===404?"Already deleted.":"Couldn't delete that. Try again."); });
+      };
+    }
+  });
+
+  ["q","fRate","fState","fSort"].forEach(function(id){ $(id).addEventListener(id==="q"?"input":"change",render); });
+  $("refresh").addEventListener("click",function(){ loadAll().catch(function(){ toast("Couldn't refresh. Try again."); }); });
+  $("signOut").addEventListener("click",function(){ forget(); S.key=""; S.items=[]; $("key").value=""; showSignin("Signed out."); });
+  $("signin").addEventListener("submit",function(e){ e.preventDefault(); var k=$("key").value.trim(); if(!k){ $("signErr").textContent="Enter the passphrase."; return; } open(k).then(function(){ if(!$("inbox").hidden) saveKey(k,$("remember").checked); }); });
+
+  $("exportCsv").addEventListener("click",function(){
+    var rows=filtered(), cols=["Date (UTC)","Helped","What was confusing","What they would add","Course","Activity","Page","Reviewed"];
+    var q=function(v){ v=String(v==null?"":v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+    var csv=[cols.join(",")].concat(rows.map(function(x){ return [x.at,x.rating,x.confusing,x.missing,x.course,actName(x.activity),PAGES[x.page]||x.page,x.reviewed?"yes":"no"].map(q).join(","); })).join("\r\n");
+    var blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}), a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download="groundwave-feedback-"+new Date().toISOString().slice(0,10)+".csv"; document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },500); toast("Exported "+rows.length+" responses");
+  });
+
+  /* preview only: example responses so the layout can be reviewed before deployment */
+  function demoApi(method, qs, body){
+    if(!demoApi.d){ var now=Date.now(), h=3600e3;
+      demoApi.d=[
+        {at:new Date(now-2*h).toISOString(),activity:"exp0",page:"lab",rating:"a lot",confusing:"",missing:"A short video of the night-time sky wave would help.",course:"3rd year ECE",reviewed:false},
+        {at:new Date(now-5*h).toISOString(),activity:"quiz",page:"quiz",rating:"somewhat",confusing:"Question 6 asks for dB(µV/m) but the chart was in mV/m, I mixed them up.",missing:"",course:"Example course",reviewed:false},
+        {at:new Date(now-26*h).toISOString(),activity:"exp4",page:"map",rating:"not really",confusing:"I couldn't find how to move the receiver after placing it.",missing:"A hint on the map itself.",course:"",reviewed:true},
+        {at:new Date(now-50*h).toISOString(),activity:"exp2",page:"learn",rating:"a lot",confusing:"",missing:"",course:"Broadcast trainee",reviewed:false}
+      ].map(function(x,i){ x.id="fb:"+x.at+"-demo"+i; return x; }); }
+    if(method==="GET") return {items:demoApi.d.slice(),cursor:null,count:demoApi.d.length};
+    var id=decodeURIComponent((qs||"").split("id=")[1]||"");
+    if(method==="PATCH"){ demoApi.d.forEach(function(x){ if(x.id===id) x.reviewed=body.reviewed; }); return {ok:true}; }
+    if(method==="DELETE"){ demoApi.d=demoApi.d.filter(function(x){ return x.id!==id; }); return {ok:true}; }
+    return {};
+  }
+
+  if(DEMO){ $("demoNote").hidden=false; open("demo"); }
+  else { var k=store(); if(k){ $("remember").checked=true; open(k); } else showSignin(""); }
+})();
+</script>
+</body>
+</html>

@@ -12,8 +12,9 @@ analytics service, and nothing in any address names a person.
 2. Name the project. **Pick a neutral name** — it becomes the public address,
    `https://<name>.pages.dev`. `groundwave-lab` or `propagation-lab` is fine.
    Do not use your own name here: this is the only place a name could leak.
-3. Upload this whole folder (not just `index.html` — `functions/` has to come
-   too, or the visit counter will not exist).
+3. Upload this whole folder (not just `index.html` — `functions/`, `assets/`
+   and `feedback.html` have to come too, or the counter, the feedback inbox,
+   the hero photo and the equations will be missing).
 4. **Deploy site.** The link works immediately.
 
 To publish a new version later, open the project → **Create deployment** →
@@ -47,13 +48,36 @@ rather than a number it cannot stand behind.
 - If `/api/visits` cannot be reached the line hides rather than showing a
   stale number.
 
-### Reading the feedback
+### Reading the feedback: the Feedback inbox
 
-Cloudflare dashboard -> **Workers & Pages -> KV -> groundwave-visits**. Every
-response is a key beginning `fb:`, holding JSON with the date, which activity
-the student had just finished, their rating, what confused them, what they
-would add, and their year or course if they gave it. `fb:count` is the running
-total.
+Students' answers are stored in the same KV namespace and read on a staff
+page inside the site: **`https://<your-site>/feedback.html`** (also linked as
+"Feedback inbox (staff)" at the bottom of every page).
+
+It needs one secret, once:
+
+1. Pages project → **Settings → Variables and Secrets → Add**
+2. Type: **Secret**. Name: `FEEDBACK_KEY`. Value: a long passphrase (for
+   example four random words). Share it only with staff.
+3. Save, then **Deployments → Retry deployment**.
+
+Open `/feedback.html`, enter the passphrase, and you get:
+
+- totals, how many are still to review, and the "Did it help?" split;
+- every response with its date, rating, what confused the student, what they
+  would add, their course (if given), the activity they had just finished and
+  the tab they were on;
+- search, filters (rating, reviewed or not) and newest/oldest order;
+- **Mark reviewed** to keep track of what you have read;
+- **Delete** (asks first; permanent);
+- **Export CSV** (opens in Excel or Google Sheets).
+
+Without the passphrase nobody can list or delete feedback: students can only
+send it. To change the passphrase, edit the secret and redeploy. Anyone who
+ticked "Remember on this device" is signed out the next time they open the page.
+
+The raw entries are still visible in **Workers & Pages → KV →
+groundwave-visits** (keys beginning `fb:20…`; `fb:count` is the total).
 
 The form asks for **no name, no email and no address**, so there is nothing
 identifying to protect and nothing to declare beyond the answers themselves.

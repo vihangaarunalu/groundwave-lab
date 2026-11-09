@@ -2,7 +2,10 @@
 
 This folder is a complete static website. Upload it to any free static host to get a public link that anyone can open.
 
-- `index.html`: the whole app (Lab, Animation, Map & location, Learn, Quiz).
+- `index.html`: the whole app (Lab, Animation, Map & location, Cellular, Models, Learn, Quiz).
+- `assets/`: the mast photograph used on the home screen and the KaTeX stylesheet and fonts that typeset the equations. **Upload this folder together with `index.html`**, or the hero photo and the equations will not display correctly.
+- `feedback.html`: the staff Feedback inbox (passphrase protected; see SETUP.md).
+- `functions/api/`: the visit counter and feedback storage (Cloudflare Pages Functions).
 - `_headers`: security and caching headers for Cloudflare Pages.
 
 When the page is served from a real website (https), these all work:
@@ -89,9 +92,13 @@ Use this to check that students and trainees can use the lab. Test with 5 people
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--accent` | `#1f5fd1` | `#6ea8ff` | buttons, selection, links |
+| `--navy` (Midnight Navy) | `#102C40` | `#102C40` | masthead, phone nav, big-idea boxes |
+| `--cloud` (Cloud White) | `#F7FAFC` | | page ground (light) |
+| `--lime` / `--mark` (Electric Lime) | `#CDF23A` | `#CDF23A` | active tab, chosen band, primary action; never text on white |
+| `--accent` | `#102C40` | `#CDF23A` | links, focus ring, selection |
 | `--good` / `--warn` / `--bad` | green / amber / red | lighter variants | reception status only |
-| `--font-display` | Archivo | | headings |
+| `--font-display` | Inter Tight | | headings |
+| `--font-math` | KaTeX fonts (equations), STIX Two Text (model equations) | | mathematics |
 | `--font-body` | IBM Plex Sans | | text |
 | `--font-mono` | IBM Plex Mono | | numbers, units |
 | Scene: ground wave | `rgb(255,200,61)` | | animation, legend, meter |
