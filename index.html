@@ -1292,7 +1292,6 @@ footer{color:var(--muted)}
 @keyframes gw-zoom{from{transform:scale(1.08)}to{transform:scale(1)}}
 @keyframes gw-pulse{0%{box-shadow:0 0 0 0 rgba(205,242,58,.55)}70%{box-shadow:0 0 0 14px rgba(205,242,58,0)}100%{box-shadow:0 0 0 0 rgba(205,242,58,0)}}
 @keyframes gw-wave{0%,100%{opacity:.35}50%{opacity:1}}
-.hero-bg{animation:gw-zoom 2.4s cubic-bezier(.23,1,.32,1) both}
 .hero-words dt{animation:gw-rise .8s cubic-bezier(.23,1,.32,1) both}
 .hero-words dd{animation:gw-fade .7s ease-out both}
 .hero-words > div:nth-child(1) dt{animation-delay:.10s}.hero-words > div:nth-child(1) dd{animation-delay:.45s}
@@ -1710,7 +1709,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
    ======================================================================= */
 @keyframes lv-drift{0%{transform:scale(1.04) translate3d(0,0,0)}100%{transform:scale(1.1) translate3d(-1.5%,-1%,0)}}
 @keyframes lv-glow{0%,100%{opacity:.55}50%{opacity:1}}
-.hero-bg{animation:gw-zoom 2.4s cubic-bezier(.23,1,.32,1) both,lv-drift 28s ease-in-out 2.4s infinite alternate}
 .hero-words dt b{display:inline-block;animation:lv-glow 2.6s ease-in-out 1.2s infinite}
 /* scroll reveal: only applied by script, so content is never hidden without it */
 .rv{opacity:0;transform:translateY(18px);transition:opacity .5s var(--ease-out),transform .6s var(--ease-out)}
@@ -1783,6 +1781,49 @@ h2.th{display:flex;align-items:center;gap:var(--sp-4)}
 .appbar .fbtop svg{width:16px;height:16px}
 .appbar .fbtop{gap:6px}
 @media (max-width:760px){.appbar .fbtop .lbl-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.appbar .fbtop{width:44px;justify-content:center;padding:0}}
+
+/* =======================================================================
+   v8.0 ALWAYS-ALIVE HERO 路 one continuous motion (no jump, no stall),
+   drifting cloud layer, pointer and scroll parallax. Every loop can be
+   paused (WCAG 2.2.2) by the Pause motion button or the reduce-motion
+   setting. Ambient timings are tokens.
+   ======================================================================= */
+:root{--dur-enter:550ms;--dur-intro:2400ms;--dur-ambient:18s;--dur-ambient-slow:46s}
+@keyframes hero-in{from{transform:scale(1.16)}to{transform:scale(1.06)}}
+@keyframes hero-kb{0%{transform:scale(1.06) translate3d(0,0,0)}50%{transform:scale(1.13) translate3d(-2.2%,-1.6%,0)}100%{transform:scale(1.06) translate3d(0,0,0)}}
+@keyframes hero-cloud{from{background-position:0 0,0 0}to{background-position:1400px 0,-900px 0}}
+@keyframes bar-sweep{from{transform:translateX(-30%)}to{transform:translateX(130%)}}
+.hero-par{position:absolute;inset:-24px;z-index:-2;transform:translate3d(var(--px,0px),calc(var(--py,0px) + var(--sy,0px)),0);will-change:transform}
+.hero-par .hero-bg{z-index:auto;will-change:transform;
+  animation:hero-in var(--dur-intro) var(--ease-out) both,hero-kb var(--dur-ambient) ease-in-out var(--dur-intro) infinite}
+.hero-clouds{position:absolute;inset:0;pointer-events:none;opacity:.55;mix-blend-mode:screen;
+  background:radial-gradient(38% 22% at 25% 30%,rgba(247,250,252,.22),transparent 70%),radial-gradient(30% 18% at 70% 18%,rgba(247,250,252,.16),transparent 70%);
+  background-size:1400px 100%,900px 100%;background-repeat:repeat-x;animation:hero-cloud var(--dur-ambient-slow) linear infinite}
+.hero-pause{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:48px;padding:0 var(--sp-4);border-radius:var(--r-pill);
+  border:1px solid rgba(247,250,252,.35);background:rgba(11,33,51,.45);color:var(--cloud);font:500 var(--fs-dense)/1 var(--font-body);cursor:pointer;margin-right:auto}
+.hero-pause svg{width:16px;height:16px}
+@media (hover:hover){.hero-pause:hover{background:rgba(11,33,51,.7)}}
+.hero-pause:focus-visible{outline:2px solid var(--cloud);outline-offset:3px}
+@media (max-width:760px){.hero-pause{flex:0 0 auto;margin-right:0}.hero-pause .mt-l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.hero-pause{width:48px;justify-content:center;padding:0}.hero-foot{flex-wrap:wrap}.hero-tour{flex:1 1 auto}}
+/* the Learn header photo breathes the same way */
+.lc-head::after{animation:hero-kb var(--dur-ambient) ease-in-out infinite;transform-origin:80% 50%}
+/* a slow light runs along the bottom of the top bar */
+.appbar{position:sticky}
+.appbar::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;pointer-events:none;overflow:hidden;
+  background:linear-gradient(90deg,transparent,rgba(205,242,58,.9),transparent) 0 0/30% 100% no-repeat;animation:bar-sweep 7s linear infinite}
+/* one switch stops every loop: hero, clouds, icons, layers, pulses */
+body.still .hero-par .hero-bg{animation:hero-in var(--dur-intro) var(--ease-out) both}
+body.still .hero-clouds,body.still .lc-head::after,body.still .appbar::after,body.still .hero-words dt b,body.still .appbar .brand svg path,
+body.still .ti-anim .arc,body.still .ti-map .rip,body.still .ti-learn .spark{animation:none!important}
+body.still .ti-anim .arc{opacity:1}
+body.still .ti .dot{animation:ti-pop .4s var(--ease-out) .9s forwards!important}
+body.still .ti-cell .bars rect{animation:ti-bar .5s var(--ease-out) both!important}
+body.still .hero-par{transform:none}
+@media (prefers-reduced-motion: reduce){
+  .hero-par .hero-bg,.hero-clouds,.lc-head::after,.appbar::after{animation:none!important}
+  .hero-par{transform:none!important}
+}
+@media print{.hero-clouds,.appbar::after{display:none}}
 </style>
 </head>
 <body data-tab="lab">
@@ -1847,7 +1888,7 @@ h2.th{display:flex;align-items:center;gap:var(--sp-4)}
   </div>
 </header>
 <section class="hero" aria-label="Introduction">
-  <div class="hero-bg" role="img" aria-label="Two lattice transmission masts with microwave dishes on a green hilltop under a blue sky"></div>
+  <div class="hero-par"><div class="hero-bg" role="img" aria-label="Two lattice transmission masts with microwave dishes on a green hilltop under a blue sky"></div><div class="hero-clouds" aria-hidden="true"></div></div>
   <div class="hero-in">
     <dl class="hero-words">
       <div><dt>Ground.</dt><dd>LF and MF follow the curve of the earth, beyond the horizon.</dd></div>
@@ -1856,6 +1897,7 @@ h2.th{display:flex;align-items:center;gap:var(--sp-4)}
     </dl>
   </div>
   <div class="hero-foot">
+    <button class="hero-pause motion-toggle" type="button" aria-pressed="false" title="Pause background motion"><svg class=ic aria-hidden=true><use href=#i-pause /></svg><span class="mt-l">Pause motion</span></button>
     <button class="hero-tour" type="button" data-site-tour>Take the tour</button>
     <button class="hero-cta" id="heroGo" type="button">Start an experiment<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></button>
   </div>
@@ -3282,7 +3324,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">鈥
       <p><b>Accuracy:</b> the Models tab lists every equation, the checks that pass or fail for your inputs, built-in verification tests, and a tool to compare predictions with your own measurements. Use certified planning software for licensing or frequency coordination.</p>
       <p class="hint">Map data 漏 OpenStreetMap contributors 路 OpenTopoMap (CC-BY-SA) 路 Elevation: Copernicus DEM GLO-90 via Open-Meteo.</p>
     </div>
-    <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn" type="button" data-site-tour>Take the guided tour</button><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
+    <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn motion-toggle" type="button" aria-pressed="false"><svg class=ic aria-hidden=true><use href=#i-pause /></svg><span class="mt-l">Pause motion</span></button><button class="btn" type="button" data-site-tour>Take the guided tour</button><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
   </div>
 </dialog>
 <div class="wrap" style="padding-top:0">
@@ -3301,7 +3343,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">鈥
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v7.9</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.0</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -8249,6 +8291,23 @@ function bindTabs(){
     const step=now=>{ const u=Math.min(1,(now-t0)/1300), e=1-Math.pow(1-u,3); AN.view.span=from+(s0-from)*e; if(u<1&&currentTab==="animation") requestAnimationFrame(step); else AN.view.span=s0; };
     AN.view.span=from; requestAnimationFrame(step); };
   ["fbTop","moreFb"].forEach(id=>{ const b=$(id); if(b) b.addEventListener("click",()=>{ const sh=$("moreSheet"); if(sh) sh.hidden=true; openFeedback(); }); });
+  /* hero parallax (pointer + scroll) and the site-wide motion switch */
+  (function aliveHero(){
+    const hero=document.querySelector(".hero"), par=document.querySelector(".hero-par");
+    const rm=matchMedia("(prefers-reduced-motion: reduce)");
+    let tx=0,ty=0,x=0,y=0,raf=0;
+    const tick=()=>{ x+=(tx-x)*0.08; y+=(ty-y)*0.08; if(par){ par.style.setProperty("--px",x.toFixed(2)+"px"); par.style.setProperty("--py",y.toFixed(2)+"px"); par.style.setProperty("--sy",(Math.min(scrollY,700)*0.18).toFixed(1)+"px"); }
+      raf=(Math.abs(tx-x)>0.05||Math.abs(ty-y)>0.05)?requestAnimationFrame(tick):0; };
+    const kick=()=>{ if(!raf&&!rm.matches&&!document.body.classList.contains("still")) raf=requestAnimationFrame(tick); };
+    if(hero){ hero.addEventListener("pointermove",e=>{ if(e.pointerType!=="mouse") return; const r=hero.getBoundingClientRect(); tx=((e.clientX-r.left)/r.width-0.5)*-22; ty=((e.clientY-r.top)/r.height-0.5)*-14; kick(); });
+      hero.addEventListener("pointerleave",()=>{ tx=0; ty=0; kick(); }); addEventListener("scroll",kick,{passive:true}); }
+    const KEY="gwlab-motion"; const btns=[...document.querySelectorAll(".motion-toggle")];
+    const set=still=>{ document.body.classList.toggle("still",still); btns.forEach(b=>{ b.setAttribute("aria-pressed",String(still)); const l=b.querySelector(".mt-l"); if(l) l.textContent=still?"Play motion":"Pause motion"; b.title=still?"Play background motion":"Pause background motion"; b.querySelector("use").setAttribute("href",still?"#i-play":"#i-pause"); });
+      if(typeof AN!=="undefined"&&still&&typeof setPlaying==="function"&&AN.playing) setPlaying(false); try{ localStorage.setItem(KEY,still?"paused":"on"); }catch(e){} };
+    let saved=null; try{ saved=localStorage.getItem(KEY); }catch(e){}
+    if(saved==="paused") set(true);
+    btns.forEach(b=>b.addEventListener("click",()=>set(!document.body.classList.contains("still"))));
+  })();
   /* scrollable tables: focusable and named, so keyboard users can scroll them */
   const labelWraps=()=>document.querySelectorAll(".tablewrap").forEach(w=>{ if(w.hasAttribute("tabindex")) return; w.tabIndex=0; w.setAttribute("role","region");
     const cap=w.querySelector("caption"); let h=cap; if(!h){ let n=w; while(n&&!h){ let q=n.previousElementSibling; while(q&&!h){ h=q.matches("h2,h3,h4")?q:q.querySelector&&q.querySelector("h2,h3,h4"); q=q.previousElementSibling; } n=n.parentElement; } }
