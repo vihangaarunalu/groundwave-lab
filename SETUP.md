@@ -36,16 +36,17 @@ One binding has to be added by hand, once:
 3. KV namespace: **`groundwave-visits`** (already created in your account)
 4. Save, then **Deployments → Retry deployment** so the binding takes effect.
 
-Open the site. The line above the footer should read **"1 visits"**, then
-climb. Until the binding exists the line stays hidden — the lab shows nothing
-rather than a number it cannot stand behind.
+Open the site, then open `/feedback.html`: the **Site visits** card in the
+Feedback inbox shows the count. It is staff-only: the public pages count each
+visit but never show the number, and `/api/visits` only returns it with the
+staff passphrase.
 
 ### What it does and does not do
 
 - Counts **page opens**, not people. A laptop and a phone are two.
 - No cookie, no address, nothing about anyone is stored. One integer.
 - Not tamper-proof. Good for "is this being used?", not evidence for a report.
-- If `/api/visits` cannot be reached the line hides rather than showing a
+- If `/api/visits` cannot be reached the inbox shows "—" rather than a
   stale number.
 
 ### Reading the feedback: the Feedback inbox

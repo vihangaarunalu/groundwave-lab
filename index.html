@@ -3343,7 +3343,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">鈥
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.0</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.1</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4761,26 +4761,12 @@ function renderProgress(){
 
 /* ---- the visit counter ---- */
 function renderVisits(){
-  var box = document.getElementById("visitLine");
-  if(!box) return;
+  /* Counts this visit. The number itself is staff-only: it is shown in the
+     Feedback inbox, never on the public pages. */
+  var box = document.getElementById("visitLine"); if(box) box.hidden = true;
   var c = ENGAGE.counter;
-  if(!c || c.mode === "off"){ box.hidden = true; return; }
-
-  var url = c.mode === "goatcounter"
-    ? "https://" + c.code + ".goatcounter.com/counter/TOTAL.json"
-    : c.url;
-  if(!url){ box.hidden = true; return; }
-
-  fetch(url, { mode: "cors" })
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(j){
-      if(!j) throw new Error("no count");
-      var n = j.count != null ? j.count : j.visits;
-      if(n == null) throw new Error("no count");
-      box.hidden = false;
-      box.innerHTML = "<b>" + String(n) + "</b> visits";
-    })
-    .catch(function(){ box.hidden = true; });   /* never show a wrong number */
+  if(!c || c.mode !== "worker" || !c.url) return;
+  fetch(c.url, { cache: "no-store" }).catch(function(){});
 }
 
 /* ---- the feedback prompt ---- */

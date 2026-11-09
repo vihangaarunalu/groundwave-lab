@@ -178,7 +178,7 @@ input:focus-visible,select:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,
 <header class="top"><div class="top-in">
   <div class="brand"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 28 L15 8" stroke="currentColor" stroke-width="2"/><path d="M11 28 L15 8 L19 28" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 7 a9 9 0 0 1 14 0 M5 4 a13 13 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Groundwave Lab<small>Feedback inbox</small></div>
   <span class="sp"></span>
-  <a class="back" href="./">← <span class="long">Back to the&nbsp;</span>lab</a>
+  <a class="back" href="./"><span aria-hidden="true">←</span><span><span class="long">Back to the </span>lab</span></a>
   <button type="button" id="changePass" hidden>Change passphrase</button>
   <button type="button" id="signOut" hidden>Sign out</button>
 </div></header>
@@ -295,7 +295,8 @@ input:focus-visible,select:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,
         if(j.cursor && all.length<5000) return page(j.cursor);
       });
     }
-    return page(null).then(function(){ S.items=all; $("loading").hidden=true; $("updated").textContent="Updated "+when(new Date().toISOString())+" · newest answers appear when you refresh"; render(); });
+    var vis=DEMO?Promise.resolve({count:128}):fetch("/api/visits?peek=1",{headers:{"Authorization":"Bearer "+S.key},cache:"no-store"}).then(function(r){ return r.ok?r.json():{}; }).catch(function(){ return {}; });
+    return Promise.all([page(null),vis.then(function(v){ S.visits=(v&&v.count!=null)?v.count:null; })]).then(function(){ S.items=all; $("loading").hidden=true; $("updated").textContent="Updated "+when(new Date().toISOString())+" · newest answers appear when you refresh"; render(); });
   }
 
   var MODE="";
@@ -336,6 +337,7 @@ input:focus-visible,select:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,
     var rated=n-none, pct=function(v){ return rated?Math.round(100*v/rated):0; };
     $("stats").innerHTML=
       '<div class="stat"><span class="k">Responses</span><span class="v">'+n+'</span><span class="s">'+(last?"Latest "+esc(when(last)):"None yet")+'</span></div>'+
+      '<div class="stat" id="visitStat"><span class="k">Site visits</span><span class="v">'+(S.visits==null?"—":S.visits)+'</span><span class="s">Page opens, all devices · staff only</span></div>'+
       '<div class="stat"><span class="k">To review</span><span class="v">'+todo+'</span><span class="s">'+(n-todo)+' marked reviewed</span></div>'+
       '<div class="stat wide"><span class="k">Did it help you understand the topic? ('+rated+' answered)</span>'+
         '<div class="bar" role="img" aria-label="A lot '+pct(c["a lot"])+'%, somewhat '+pct(c.somewhat)+'%, not really '+pct(c["not really"])+'%"><i class="a" style="width:'+pct(c["a lot"])+'%"></i><i class="b" style="width:'+pct(c.somewhat)+'%"></i><i class="c" style="width:'+pct(c["not really"])+'%"></i></div>'+
