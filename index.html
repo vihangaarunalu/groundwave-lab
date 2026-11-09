@@ -2102,7 +2102,7 @@ body.still .hero-par{transform:none}
         <div class="chart-head">
           <h2>Signal strength vs distance</h2>
           <div class="chart-opts">
-            <select id="yunit" aria-label="Units"><option value="mv">Units: mV/m</option><option value="db">Units: dBµV/m</option></select>
+            <select id="yunit" aria-label="Units"><option value="mv">Units: mV/m</option><option value="db">Units: dBµV/m</option><option value="dbuv">Units: dBµV at receiver (FM/TV)</option></select>
             <select id="xscale" aria-label="Distance scale"><option value="log">Log distance</option><option value="lin">Linear distance</option></select>
             <select id="range" aria-label="Distance range"><option value="30">0–30 km</option><option value="100">0–100 km</option><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select>
           </div>
@@ -3134,6 +3134,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
       <div><dt>Permittivity εr</dt><dd>How strongly the ground stores electric field energy. Matters most at higher frequencies.</dd></div>
       <div><dt>Numerical distance p</dt><dd>Norton's measure of how "electrically far" a point is over lossy ground. Larger p means more loss.</dd></div>
       <div><dt>dBµV/m</dt><dd>Field strength in decibels above 1 µV/m. 60 dBµV/m = 1 mV/m. Every 20 dB is ×10.</dd></div>
+      <div><dt>dBµV (receiver input)</dt><dd>Voltage at the receiver's antenna socket, in decibels above 1 µV: the unit FM and TV receivers are rated in. For a half-wave dipole into a matched 75 Ω receiver, dBµV = dBµV/m + 20 log₁₀(λ/π) − 6, about dBµV/m − 6.4 at 100 MHz. ITU planning levels stay in dBµV/m.</dd></div>
       <div><dt>Critical frequency fo</dt><dd>Highest frequency a layer reflects at vertical incidence (foE, foF2).</dd></div>
       <div><dt>Skip zone</dt><dd>Region with no ground wave and no returning sky wave.</dd></div>
       <div><dt>Fading zone</dt><dd>Region where ground and sky waves are similar in strength and interfere.</dd></div>
@@ -3343,7 +3344,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4250,7 +4251,14 @@ function renderPowChips(boxId,p,onPick){
   box.querySelectorAll(".chip").forEach(b=>b.onclick=()=>onPick(+b.dataset.kw));
 }
 function fmtD(d){ return d<10?d.toFixed(1):d<100?d.toFixed(0):String(Math.round(d/5)*5); }
-function fmtField(dB){ if(dB===null||!isFinite(dB)) return "—"; const mV=mVfromdB(dB);
+/* Receiver input voltage for VHF/UHF (FM, TV): a half-wave dipole feeding a matched
+   75-ohm receiver. EMF = E·λ/π, half of it across the matched load, so
+   V(dBµV) = E(dBµV/m) + 20·log10(λ/π) − 6.02   (λ in metres, λ = 300 / f[MHz]).
+   About E − 6.4 dB at 100 MHz. Receivers are rated in dBµV; ITU planning levels are in dBµV/m. */
+function rxDbuV(dB,fMHz){ return dB+20*Math.log10((300/fMHz)/Math.PI)-6.02; }
+function fmtField(dB,fMHz){ if(dB===null||!isFinite(dB)) return "—";
+  if(fMHz>=30) return dB.toFixed(1)+" dBµV/m · "+rxDbuV(dB,fMHz).toFixed(1)+" dBµV";
+  const mV=mVfromdB(dB);
   if(mV>=1000) return (mV/1000).toFixed(mV>=10000?0:1)+" V/m";
   if(mV>=1) return mV.toFixed(mV>=100?0:mV>=10?1:2)+" mV/m";
   if(mV>=0.001) return (mV*1000).toFixed(mV>=0.1?0:mV>=0.01?1:2)+" µV/m";
@@ -4412,8 +4420,8 @@ const Y_MV={"-20":"0.1 µV/m","0":"1 µV/m","20":"10 µV/m","40":"100 µV/m","60
 function drawChart(hoverX){
   const W=chart.clientWidth, H=chart.clientHeight; if(!W) return;
   const dpr=window.devicePixelRatio||1; chart.width=W*dpr; chart.height=H*dpr; cctx.setTransform(dpr,0,0,dpr,0,0);
-  const {dmax,lg}=computeCurves(); const unit=$("yunit").value, mvMode=unit==="mv", dbmMode=unit==="dbm";
-  const cv=(v,m)=>v===null||!isFinite(v)?v:(dbmMode?v-20*Math.log10(m.p.f)-77.2:v);
+  const {dmax,lg}=computeCurves(); const unit=$("yunit").value, mvMode=unit==="mv", dbmMode=unit==="dbm", uvMode=unit==="dbuv";
+  const cv=(v,m)=>v===null||!isFinite(v)?v:(dbmMode?v-20*Math.log10(m.p.f)-77.2:uvMode?rxDbuV(v,m.p.f):v);
   const L=mvMode?74:dbmMode?92:58,R=14,T=12,B=40,w=W-L-R,h=H-T-B, ymin=dbmMode?-150:-20,ymax=dbmMode?0:130;
   const dmin=dmax<=100?0.1:1;
   const xs=d=>lg?L+Math.log10(Math.max(d,dmin)/dmin)/Math.log10(dmax/dmin)*w:L+d/dmax*w;
@@ -4427,9 +4435,9 @@ function drawChart(hoverX){
   const xt=lg?[0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000,2000,3000].filter(d=>d<=dmax&&d>=dmin):Array.from({length:7},(_,i)=>Math.round(dmax*i/6));
   for(const d of xt){ const x=xs(d); cctx.beginPath(); cctx.moveTo(x,T); cctx.lineTo(x,T+h); cctx.stroke(); cctx.fillText(d,x,T+h+5); }
   cctx.font="12px "+cssVar("--font-body"); cctx.fillText("Distance from transmitter (km)",L+w/2,T+h+22);
-  if(!mvMode){ cctx.save(); cctx.translate(12,T+h/2); cctx.rotate(-Math.PI/2); cctx.fillText(dbmMode?"RSRP / RSCP / RxLev (dBm), uplink-limited":"dBµV/m",0,-6); cctx.restore(); }
+  if(!mvMode){ cctx.save(); cctx.translate(12,T+h/2); cctx.rotate(-Math.PI/2); cctx.fillText(dbmMode?"RSRP / RSCP / RxLev (dBm), uplink-limited":uvMode?"dBµV at receiver input (λ/2 dipole, 75 Ω)":"dBµV/m",0,-6); cctx.restore(); }
   cctx.save(); cctx.beginPath(); cctx.rect(L,T,w,h); cctx.clip();
-  if(dbmMode) curveCache.forEach(c=>{ c.thr=cv(c.thr,c.m); c.pts=c.pts.map(pt=>({d:pt.d,g:cv(pt.g,c.m),s:cv(pt.s,c.m),t:cv(pt.t,c.m)})); });
+  if(dbmMode||uvMode) curveCache.forEach(c=>{ c.thr=cv(c.thr,c.m); c.pts=c.pts.map(pt=>({d:pt.d,g:cv(pt.g,c.m),s:cv(pt.s,c.m),t:cv(pt.t,c.m)})); });
   const s=curveCache.find(c=>c.m.id===selId);
   if(s && s.m.visible && s.m.p.type==="combined"){
     cctx.fillStyle=hexA(lift(s.m.color),0.13); let inZ=false,x0=0;
@@ -4464,7 +4472,7 @@ chart.addEventListener("mousemove",e=>{
   drawChart(x);
   let html=`<div class="mono" style="margin-bottom:3px"><b>${fmtD(d)} km</b></div>`;
   for(const m of models){ if(!m.visible) continue; const io=iono(m.p), v=evalP(m.p,d,io).t, ok=v!==null&&v>=dBuV(threshold(m.p));
-    html+=`<div class="r"><span><span class="sw9" style="background:${lift(m.color)}"></span>${esc(m.name)}</span><span class="mono" style="color:${ok?"var(--ink)":"var(--muted)"}">${m.p.type==="cell"&&v!==null?dBuV2dBm(v,m.p.f).toFixed(0)+" dBm":fmtField(v)}</span></div>`; }
+    html+=`<div class="r"><span><span class="sw9" style="background:${lift(m.color)}"></span>${esc(m.name)}</span><span class="mono" style="color:${ok?"var(--ink)":"var(--muted)"}">${m.p.type==="cell"&&v!==null?dBuV2dBm(v,m.p.f).toFixed(0)+" dBm":fmtField(v,m.p.f)}</span></div>`; }
   const tip=$("tip"); tip.innerHTML=html; tip.style.display="block"; const tw=tip.offsetWidth; tip.style.left=(x+14+tw>r.width?x-tw-14:x+14)+"px"; tip.style.top="16px";
 });
 chart.addEventListener("mouseleave",()=>{ $("tip").style.display="none"; drawChart(); });
@@ -4496,7 +4504,7 @@ function readouts(){
   const m=sel(); if(!m) return; const p=m.p; const A=analyse(m);
   $("selName").textContent=m.name;
   const tiles=[]; const sent=[];
-  const thrTxt=fmtField(A.thr);
+  const thrTxt=fmtField(A.thr,p.f);
   if(p.type!=="sky"){
     const rv=A.r===null?"—":A.r>=3000?"> 3000 km":A.r<1?`${Math.round(A.r*1000)} m`:`${fmtD(A.r)} km`;
     if(p.type!=="cell") tiles.push({k:"Reliable coverage",tip:"Distance out to which the ground wave (or, at VHF/UHF, the line-of-sight wave) stays above the minimum usable signal.",val:rv,sub:p.f>=30?"line-of-sight coverage":"ground-wave service radius",cls:p.type==="cell"?(A.r>=3?"good":A.r>=1?"warn":"bad"):(A.r<20?"bad":A.r<80?"warn":"good")});
@@ -4520,8 +4528,8 @@ function readouts(){
   const bn=p.type==="cell"?burstNoise(p,0,7):burstNoise(p,7,5);
   tiles.push({k:"Signal needed",tip:p.type==="cell"?"Cell-edge reference-signal level (industry practice; ITU does not set one), and the uplink maximum allowable path loss.":"ITU minimum usable field strength for this band and area.",val:p.type==="cell"?`${(cellThrdBm(p)+bn).toFixed(0)} dBm`:thrTxt,sub:p.type==="cell"?`${CELL_TECH[p.tech].meas} cell edge · uplink ≤ ${CELL_TECH[p.tech].ul} dB path loss${bn?` · +${bn.toFixed(1)} dB burst noise`:""}`:`${A.thr.toFixed(0)} dBµV/m · ${ituMinRef(p).ref}${bn?` + ${bn.toFixed(1)} dB burst noise`:""}`,cls:"info"});
   const fl=flareLevel(p); if(fl) tiles.push({k:"Solar flare",tip:"Effect of the selected NOAA radio-blackout level on this band.",val:FLARE[fl].name,sub:flareImpact(p).short,cls:flareImpact(p).cls});
-  if(p.rxDist){ const v=evalRx(p,A.io).t; const ok=v!==null&&v>=A.thr; tiles.unshift({k:"At your receiver",tip:"Predicted total field at the receiver placed on the map, including the terrain shadowing estimate.",val:fmtField(v),sub:`${fmtD(p.rxDist)} km${p.terrainLossDb?` · terrain −${p.terrainLossDb.toFixed(1)} dB`:""} · ${ok?"usable":"below minimum"}`,cls:ok?"good":"bad"});
-    sent.unshift(`At the receiver (${fmtD(p.rxDist)} km away) the predicted signal is <b>${fmtField(v)}</b>, ${ok?"which is enough for reception":"which is below the minimum usable level"}.`); }
+  if(p.rxDist){ const v=evalRx(p,A.io).t; const ok=v!==null&&v>=A.thr; tiles.unshift({k:"At your receiver",tip:"Predicted total field at the receiver placed on the map, including the terrain shadowing estimate.",val:fmtField(v,p.f),sub:`${fmtD(p.rxDist)} km${p.terrainLossDb?` · terrain −${p.terrainLossDb.toFixed(1)} dB`:""} · ${ok?"usable":"below minimum"}`,cls:ok?"good":"bad"});
+    sent.unshift(`At the receiver (${fmtD(p.rxDist)} km away) the predicted signal is <b>${fmtField(v,p.f)}</b>, ${ok?"which is enough for reception":"which is below the minimum usable level"}.`); }
   // a fact shown twice is one variable: only append what the name does not already say
   const nm=m.name.toLowerCase();
   const extra=[fmtF(p.f),fmtP(p.P),timeLabel(p)].filter(x=>!nm.includes(String(x).toLowerCase()));
@@ -5287,9 +5295,9 @@ function updateMeter(p,io,thr,dt){
   AN.meterT+=dt; if(AN.meterT<120) return; AN.meterT=0;
   const sc=v=>v===null?0:clamp((v-(thr-40))/100*100,0,100);
   $("rxD").textContent=`${fmtD(AN.rx)} km`;
-  $("bG").style.width=sc(g)+"%"; $("vG").textContent=g===null?"—":fmtField(g);
-  $("bS").style.width=sc(s)+"%"; $("vS").textContent=s===null?"none":fmtField(s);
-  $("bT").style.width=sc(thr)+"%"; $("vT").textContent=fmtField(thr);
+  $("bG").style.width=sc(g)+"%"; $("vG").textContent=g===null?"—":fmtField(g,p.f);
+  $("bS").style.width=sc(s)+"%"; $("vS").textContent=s===null?"none":fmtField(s,p.f);
+  $("bT").style.width=sc(thr)+"%"; $("vT").textContent=fmtField(thr,p.f);
   const tot=r.t; const fading=g!==null&&s!==null&&Math.abs(g-s)<6&&Math.max(g,s)>thr-6;
   let q,cls;
   if(tot===null||tot<thr){ q="No reliable signal"; cls="var(--bad)"; }
@@ -5300,7 +5308,7 @@ function updateMeter(p,io,thr,dt){
   if(p.type==="cell"){ const cq=cellVerdict(cellLevel(AN.rx,p),p.tech); q=cq[0]==="No service"?"No service":cq[0]+" signal"; cls=cq[1]==="good"?"var(--good)":cq[1]==="warn"?"var(--warn)":"var(--bad)"; }
   const qe=$("quality"); qe.textContent=q; qe.style.color=cls;
   // live HUD on the animation
-  const isCell=p.type==="cell", fmtV=v=>v===null?"—":isCell?`${dBuV2dBm(v,p.f).toFixed(0)} dBm`:fmtField(v);
+  const isCell=p.type==="cell", fmtV=v=>v===null?"—":isCell?`${dBuV2dBm(v,p.f).toFixed(0)} dBm`:fmtField(v,p.f);
   const dTxt=AN.rx<1?`${Math.round(AN.rx*1000)} m`:`${fmtD(AN.rx)} km`;
   $("hudQ").textContent=q; $("hudQ").style.color=cls.replace("var(--good)","#4cd68f").replace("var(--warn)","#f3b54a").replace("var(--bad)","#ff7a70");
   $("hudD").innerHTML=`<svg class=ic aria-hidden=true><use href=#i-radio /></svg> ${dTxt}`; $("hudT").innerHTML=fmtV(tot);
@@ -5582,7 +5590,7 @@ function predict(p){ const io=iono(p); const r=evalRx(p,io); const thr=dBuV(thre
   let v,cls; if(!ok){v="No reliable reception";cls="bad";} else if(fading){v="Receivable, with fading";cls="warn";} else if(r.t>=thr+20){v="Excellent";cls="good";} else {v="Good";cls="good";}
   if(p.type==="cell"){ const c=cellLevel(p.rxDist,p,(p.terrainLossDb&&cellModelAt(p.rxDist,p)!=="p1812")?p.terrainLossDb:0), q=cellVerdict(c,p.tech);
     return {...r,thr,ok:c.m>=0,fading:false,verdict:q[0],cls:q[1],cell:c}; }
-  return {...r,thr,ok,fading,verdict:v,cls}; }
+  return {...r,thr,ok,fading,verdict:v,cls,f:p.f}; }
 /* ===== VHF/UHF relay (transposer) stations =====
    A relay receives the main transmitter off-air (P.1812 over the real feed path) with a directional antenna,
    and re-broadcasts on its own frequency, ERP and mast. It works only if its input field reaches the planning level. */
@@ -6192,7 +6200,7 @@ function renderActive(){
   const sunEl=toDeg(Math.asin(clamp(P.cosMid,-1,1))), ph=phaseOf(P.cosMid), phTxt={day:"daytime",dusk:"twilight",night:"night"}[ph];
   const via=pr.g!==null&&(pr.s===null||pr.g>=pr.s)?"mostly by ground wave":"mostly by sky wave";
   const isCell=p.type==="cell"||!!mapCellTech(), ct=mapCellTech(), CT=ct?CELL_TECH[ct]:null;
-  const lvl=(v,pp)=>v===null||v===undefined?"—":isCell?`${(pp&&pp.cell?pp.cell.ref:dBuV2dBm(v,CT?CT.f:p.f)).toFixed(0)} dBm`:fmtField(v);
+  const lvl=(v,pp)=>v===null||v===undefined?"—":isCell?`${(pp&&pp.cell?pp.cell.ref:dBuV2dBm(v,CT?CT.f:p.f)).toFixed(0)} dBm`:fmtField(v,p.f);
   const sv=pr.server, svTxt=sv?`Served by <b>${sv.relay?"relay Y"+(sv.k+1):"T"+(sv.i+1)} · ${esc(sv.tx.name)}</b>, ${fmtD(sv.dist)} km away${sv.relay?` on ${fmtF(sv.p.f)}`:""}${sv.i!==MP.ti?" (smooth-earth estimate: select it to load its terrain)":""}.`:(pr.noServer?`None of the ${MP.txs.length} transmitters carries ${TECH_LABEL[ct]||""}. Tick ${TECH_LABEL[ct]||""} under Networks in the Transmitters table, add a tower with + Transmitter, or use Find towers.`:"");
   const isSv=a=>sv&&a.tx===sv.tx;
   const rows=(pr.servers||[]).map(a=>`<tr${isSv(a)?' class="srv"':""}><td>${a.relay?"Y"+(a.k+1)+" relay":"T"+(a.i+1)} · ${esc(a.tx.name)}</td><td class="mono">${a.skip&&!a.relay?"—":fmtD(a.dist||a.feed&&a.feed.dist||0)+" km"}</td><td class="mono">${a.skip?(a.relay?"not fed":`no ${TECH_LABEL[ct]||""}`):lvl(a.pred.t,a.pred)}</td><td>${a.skip?"":`<span class="pill ${a.pred.cls}">${esc(a.pred.verdict.split(" · ")[0])}</span>`}${isSv(a)?` <span class="srvmark">serving</span>`:""}</td></tr>`).join("");
@@ -6212,7 +6220,7 @@ function renderActive(){
     ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmPending?"loading…":T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
     ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
     ...(isCell?[["Cell edge",`${CT.thr} dBm`,`${CT.meas} · uplink ≤ ${CT.ul} dB`,"info"],["Typical real cell radius",`${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][0]}–${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][1]} km`,`${CT.sys} · ${MP.cov.env}`,"info"]]
-      :[["Ground / sky wave",`${fmtField(pr.g)}`,`sky: ${pr.s===null?"none":fmtField(pr.s)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],["Needed",fmtField(pr.thr),"minimum usable","info"]])];
+      :[["Ground / sky wave",`${fmtField(pr.g,p.f)}`,`sky: ${pr.s===null?"none":fmtField(pr.s,p.f)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],["Needed",fmtField(pr.thr,p.f),"minimum usable","info"]])];
   $("tSum").innerHTML=`<span class="pill ${pr.cls}">${pr.verdict}</span><span class="mono">${lvl(pr.t,pr)}</span><span class="muted">${fmtD(P.dist)} km · ${T?(T.loss>0.05?"terrain −"+T.loss.toFixed(1)+" dB":"no terrain loss"):"terrain loading…"} · ${T?(T.los?"line of sight clear":"line of sight blocked"):""}</span>`;
   renderClearance(P,T,p);
   $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
@@ -6271,7 +6279,7 @@ function renderSites(){
       <td><input type="number" class="ah" min="0" max="500" step="1" value="${rx.h}" aria-label="Receiver ${i+1} antenna height" style="width:76px"></td>
       <td class="mono">${r?fmtD(r.P.dist)+" km":"…"}</td>
       <td class="mono">${T?(T.loss>0.05?"−"+T.loss.toFixed(1)+" dB":"0 dB"):"…"}</td>
-      <td class="mono">${pr?(mapCellTech()?(pr.cell?pr.cell.ref.toFixed(0)+" dBm":"—"):fmtField(pr.t))+(pr.server&&MP.txs.length+MP.relays.length>1?` <span class="muted">via ${pr.server.relay?"Y"+(pr.server.k+1):"T"+(pr.server.i+1)}</span>`:""):"…"}</td>
+      <td class="mono">${pr?(mapCellTech()?(pr.cell?pr.cell.ref.toFixed(0)+" dBm":"—"):fmtField(pr.t,pr.f))+(pr.server&&MP.txs.length+MP.relays.length>1?` <span class="muted">via ${pr.server.relay?"Y"+(pr.server.k+1):"T"+(pr.server.i+1)}</span>`:""):"…"}</td>
       <td>${pr?`<span class="pill ${pr.cls}">${pr.verdict}</span>`:"…"}</td>
       <td><button class="iconbtn del" type="button" aria-label="Remove receiver ${i+1}" ${MP.rxs.length===1?"disabled":""}><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></td></tr>`; }).join("");
   $("sitesTable").innerHTML=`<tr><th></th><th>Site</th><th>Lat, lon</th><th>Ground</th><th>Antenna (m)</th><th>Distance</th><th>Terrain</th><th>Signal</th><th>Reception</th><th></th></tr>`+rows;
