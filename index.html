@@ -8,7 +8,7 @@
 <title>Groundwave Propagation Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* Layout: app bar with tabs; each tab is one workspace. Lab = control rail + results; Animation = big stage + live meter; Map = map + path report. */
 :root{
@@ -1124,9 +1124,149 @@ table.svctbl .check{white-space:nowrap}
 .starep table.kv th{font-size:var(--fs-meta);color:var(--muted);font-weight:400;text-align:left}
 .starep table.kv td:last-child{text-align:left}
 
+
+/* =======================================================================
+   H · MIDNIGHT  —  the v7 visual system.
+   Midnight Navy carries the chrome and the ink, Cloud White is the ground,
+   Electric Lime marks the one thing you act on or are on: the active tab,
+   the chosen band, the primary action. Lime is never text on white.
+   The masthead and the Lab hero sit on the mast photograph.
+   ======================================================================= */
+:root{
+  --navy:#102C40; --navy-2:#0B2133; --navy-3:#163A54; --cloud:#F7FAFC; --lime:#CDF23A; --lime-2:#B9E01F;
+  --font-display:"Inter Tight","IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  color-scheme: light;
+  --bg:#F7FAFC; --panel:#FFFFFF; --field:#EDF2F6;
+  --ink:#102C40; --muted:#4D6375; --line:#DCE4EB; --control:#B7C6D3;
+  --accent:#102C40; --accent-soft:#E2EAF1; --on-accent:#F7FAFC;
+  --mark:#CDF23A; --on-mark:#102C40;
+  --good:#17633f; --warn:#7a5312; --bad:#b3261e;
+  --good-ink:#17633f; --warn-ink:#7a5312; --bad-ink:#b3261e;
+  --draw-sea:#E8EFF5; --draw-land:#FFFFFF; --draw-landline:#C3CFDA;
+  --draw-face:#F2F6F9; --draw-halo:#FFFFFF; --draw-ink:#102C40;
+  --draw-grid:#E1E8EE; --draw-tag:rgba(247,250,252,.94); --draw-tagink:#102C40;
+  --r-xs:4px; --r-sm:6px; --r-md:10px; --r-lg:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#081A27; --panel:#0C2131; --field:#11293C;
+    --ink:#F7FAFC; --muted:#9DB2C3; --line:#1B3549; --control:#2C4B63;
+    --accent:#CDF23A; --accent-soft:#16324A; --on-accent:#102C40;
+    --good:#58d08a; --warn:#e8b85c; --bad:#ff8178;
+    --good-ink:#58d08a; --warn-ink:#e8b85c; --bad-ink:#ff8178;
+    --draw-sea:#0C2131; --draw-land:#132B3F; --draw-landline:#2C4B63;
+    --draw-face:#0C2131; --draw-halo:#081A27; --draw-ink:#F7FAFC;
+    --draw-grid:#1B3549; --draw-tag:rgba(8,26,39,.92); --draw-tagink:#F7FAFC;
+  }
+}
+[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#081A27; --panel:#0C2131; --field:#11293C;
+  --ink:#F7FAFC; --muted:#9DB2C3; --line:#1B3549; --control:#2C4B63;
+  --accent:#CDF23A; --accent-soft:#16324A; --on-accent:#102C40;
+  --good:#58d08a; --warn:#e8b85c; --bad:#ff8178;
+  --good-ink:#58d08a; --warn-ink:#e8b85c; --bad-ink:#ff8178;
+  --draw-sea:#0C2131; --draw-land:#132B3F; --draw-landline:#2C4B63;
+  --draw-face:#0C2131; --draw-halo:#081A27; --draw-ink:#F7FAFC;
+  --draw-grid:#1B3549; --draw-tag:rgba(8,26,39,.92); --draw-tagink:#F7FAFC;
+}
+
+/* ---- masthead: always Midnight Navy, in both themes ---- */
+.appbar{background:var(--navy);border-bottom:1px solid rgba(247,250,252,.08);color:var(--cloud)}
+.appbar-in{padding-top:var(--sp-2)}
+.appbar .brand h1{font-family:var(--font-display);font-weight:600;letter-spacing:-.025em;color:var(--cloud)}
+.appbar .brand svg{color:var(--lime)}
+.appbar .tabs{border-top-color:rgba(247,250,252,.1)}
+.appbar .tabs .tab{color:rgba(247,250,252,.66)}
+.appbar .tabs .tab[aria-selected="true"]{color:var(--cloud);box-shadow:inset 0 -3px 0 var(--lime)}
+@media (hover:hover) and (pointer:fine){.appbar .tabs .tab:hover{color:var(--cloud)}}
+.appbar .scope,.appbar .iconbtn{background:rgba(247,250,252,.06);border-color:rgba(247,250,252,.18);color:var(--cloud)}
+.appbar .scope .ic{color:rgba(247,250,252,.6)}
+@media (hover:hover) and (pointer:fine){.appbar .scope:hover,.appbar .iconbtn:hover{border-color:rgba(247,250,252,.42)}}
+.appbar :focus-visible{outline-color:var(--lime)}
+
+/* ---- hero: the mast photograph, three words, one lime action (Lab only) ---- */
+.hero{position:relative;isolation:isolate;overflow:hidden;color:var(--cloud);background:var(--navy);
+  min-height:clamp(340px,58vh,560px);display:grid;align-content:space-between}
+body:not([data-tab="lab"]) .hero{display:none}
+.hero-bg{position:absolute;inset:0;z-index:-2;background:var(--navy) url("assets/towers.jpg") 72% 62%/cover no-repeat}
+@media (max-width:760px){.hero-bg{background-image:url("assets/towers-sm.jpg");background-position:80% 60%}}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:
+    linear-gradient(180deg,rgba(16,44,64,.94) 0%,rgba(16,44,64,.62) 30%,rgba(16,44,64,.22) 62%,rgba(11,33,51,.94) 100%),
+    linear-gradient(90deg,rgba(16,44,64,.55) 0%,rgba(16,44,64,0) 70%)}
+.hero-in{max-width:1440px;width:100%;margin:0 auto;padding:var(--sp-6) var(--sp-6) 0;box-sizing:border-box}
+.hero-words{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-5);margin:0;padding:clamp(24px,7vh,72px) 0 0}
+.hero-words > div{display:grid;gap:var(--sp-2);align-content:start}
+.hero-words dt{font:500 clamp(40px,7.4vw,112px)/.92 var(--font-display);letter-spacing:-.055em;color:var(--cloud)}
+.hero-words dd{margin:0;font-size:var(--fs-dense);line-height:1.45;color:rgba(247,250,252,.86);max-width:26ch;text-shadow:0 1px 10px rgba(11,33,51,.9),0 0 2px rgba(11,33,51,.8)}
+.hero-words dt b{color:var(--lime);font-weight:500}
+.hero-foot{max-width:1440px;width:100%;margin:0 auto;padding:var(--sp-5) var(--sp-6) var(--sp-6);box-sizing:border-box;
+  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--sp-4)}
+.hero-card{display:grid;gap:var(--sp-1);min-width:200px;padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);
+  background:rgba(11,33,51,.72);border:1px solid rgba(247,250,252,.14)}
+.hero-card .k{font-size:var(--fs-meta);color:rgba(247,250,252,.72)}
+.hero-card .v{font:500 28px/1 var(--font-display);letter-spacing:-.03em;color:var(--cloud);font-variant-numeric:tabular-nums}
+.hero-card .v small{font-size:var(--fs-meta);font-weight:400;letter-spacing:0;color:rgba(247,250,252,.72);margin-left:var(--sp-1)}
+.hero-card .row2{display:flex;gap:var(--sp-5)}
+.hero-cta{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:48px;padding:0 var(--sp-5);
+  border:0;border-radius:var(--r-pill);background:var(--lime);color:var(--navy);cursor:pointer;
+  font:600 var(--fs-ui)/1 var(--font-display);letter-spacing:.01em;text-transform:uppercase;
+  transition:transform var(--dur-1) var(--ease-out),background-color var(--dur-1) var(--ease-out)}
+.hero-cta svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+@media (hover:hover) and (pointer:fine){.hero-cta:hover{background:var(--lime-2)}}
+.hero-cta:active{transform:scale(.97)}
+.hero-cta:focus-visible{outline:2px solid var(--cloud);outline-offset:3px}
+@media (max-width:760px){
+  .hero{min-height:420px}
+  .hero-in{padding:var(--sp-5) var(--sp-4) 0}
+  .hero-words{grid-template-columns:1fr;gap:var(--sp-3);padding-top:var(--sp-3)}
+  .hero-words > div{grid-template-columns:auto 1fr;align-items:end;gap:var(--sp-3)}
+  .hero-words dt{font-size:clamp(44px,13vw,64px)}
+  .hero-foot{padding:var(--sp-4) var(--sp-4) var(--sp-5)}
+  .hero-cta{flex:1 1 100%;justify-content:center}
+}
+
+/* ---- the band ruler: lime marks the band you are on ---- */
+.bandruler .bands button{border-radius:var(--r-xs)}
+.bandruler .bands button[aria-pressed="true"]{background:var(--mark);color:var(--on-mark)}
+
+/* ---- type ---- */
+.screenhead h2,.intro h2{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:600;letter-spacing:-.03em}
+.big{font-family:var(--font-display);letter-spacing:-.035em}
+.tile .val{font-family:var(--font-display);letter-spacing:-.025em}
+
+/* ---- controls: navy carries, lime is the one primary action ---- */
+.btn.primary{background:var(--mark);border-color:var(--mark);color:var(--on-mark);font-weight:600}
+@media (hover:hover) and (pointer:fine){.btn.primary:hover{background:var(--lime-2);border-color:var(--lime-2)}}
+.chip[aria-pressed="true"],.chip.on{background:var(--navy);border-color:var(--navy);color:var(--cloud)}
+.seg input:checked + label{background:var(--navy);color:var(--cloud)}
+[data-theme="dark"] .chip[aria-pressed="true"],[data-theme="dark"] .chip.on,
+[data-theme="dark"] .seg input:checked + label{background:var(--mark);border-color:var(--mark);color:var(--on-mark)}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .chip[aria-pressed="true"],:root:not([data-theme="light"]) .chip.on,
+  :root:not([data-theme="light"]) .seg input:checked + label{background:var(--mark);border-color:var(--mark);color:var(--on-mark)}
+}
+.model-row.sel{box-shadow:inset 3px 0 0 var(--mark)}
+::selection{background:var(--mark);color:var(--on-mark)}
+
+/* ---- phone navigation: navy bar, lime pill on the current place ---- */
+.bnav{background:var(--navy);border-top:1px solid rgba(247,250,252,.08)}
+.bnav a{color:rgba(247,250,252,.66)}
+.bnav a[aria-current="page"]{color:var(--cloud)}
+.bnav a[aria-current="page"] svg{background:var(--lime);color:var(--navy)}
+
+/* ---- footer line ---- */
+footer{color:var(--muted)}
+
+@media (prefers-reduced-motion: reduce){.hero-cta:active{transform:none}}
+@media print{.hero{display:none!important}}
+.bandwrap{scroll-margin-top:var(--appbar-h,112px)}
+@media (max-width:760px){.bandwrap{scroll-margin-top:96px}}
 </style>
 </head>
-<body>
+<body data-tab="lab">
 <svg class="icon-sprite" aria-hidden="true" focusable="false"><defs>
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></symbol>
 <symbol id="i-signal" viewBox="0 0 24 24"><path d="M4 20v-4M9.3 20v-8M14.7 20v-12M20 20V4"/></symbol>
@@ -1186,6 +1326,20 @@ table.svctbl .check{white-space:nowrap}
     <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
   </div>
 </header>
+<section class="hero" aria-label="Introduction">
+  <div class="hero-bg" role="img" aria-label="Two lattice transmission masts with microwave dishes on a green hilltop under a blue sky"></div>
+  <div class="hero-in">
+    <dl class="hero-words">
+      <div><dt>Ground.</dt><dd>LF and MF follow the curve of the earth, beyond the horizon.</dd></div>
+      <div><dt>Sky.</dt><dd>HF climbs to the ionosphere and comes back hundreds of kilometres away.</dd></div>
+      <div><dt>Signal<b>.</b></dt><dd>VHF to 5G: masts, terrain and the level a receiver actually gets.</dd></div>
+    </dl>
+  </div>
+  <div class="hero-foot">
+    <div class="hero-card"><span class="k">One lab, every band</span><div class="row2"><span class="v">LF→5G</span><span class="v">8<small>tools</small></span></div></div>
+    <button class="hero-cta" id="heroGo" type="button">Start an experiment<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></button>
+  </div>
+</section>
 <div class="bandwrap"><div class="bandruler" id="bandRuler" aria-label="Frequency band and the mechanism that carries it"><div class="bands" role="group" aria-label="Jump to a band"></div><p class="says"></p></div></div>
 
 <!-- ======================= LAB ======================= -->
@@ -1985,7 +2139,7 @@ table.svctbl .check{white-space:nowrap}
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v6.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -6412,7 +6566,7 @@ function bindQuiz(){ const topics=[...new Set(QUIZ.map(q=>q.topic))]; $("qTopic"
 const TABS=["lab","animation","map","terrain","mobile","methods","learn","quiz"];
 let currentTab="lab";
 function go(t,noHash){
-  if(!TABS.includes(t)) t="lab"; if(typeof FS!=="undefined"&&FS.on) setMapFs(false); currentTab=t;
+  if(!TABS.includes(t)) t="lab"; if(typeof FS!=="undefined"&&FS.on) setMapFs(false); currentTab=t; document.body.dataset.tab=t;
   document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
   $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz"; $("mobile-tab").hidden=t!=="mobile";
   if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
@@ -6438,6 +6592,8 @@ function bindBottomNav(){
 }
 function bindTabs(){
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+  window.addEventListener("load",()=>{ if(currentTab==="lab"&&location.hash==="#lab") setTimeout(()=>window.scrollTo({top:0}),0); });
+  if($("heroGo")) $("heroGo").addEventListener("click",()=>{ const b=document.querySelector(".bandwrap"); if(b) b.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); const m=$("main-content"); if(m) m.focus({preventScroll:true}); });
   document.querySelector(".tabs").addEventListener("keydown",e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return; const i=TABS.indexOf(currentTab); const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length]; go(n); document.querySelector(`.tab[data-tab="${n}"]`).focus(); });
   window.addEventListener("hashchange",()=>go(location.hash.slice(1),true));
 }
