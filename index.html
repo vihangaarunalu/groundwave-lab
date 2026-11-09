@@ -1548,6 +1548,7 @@ footer{color:var(--muted)}
 [data-theme="dark"] .mapseg input:checked + label{background:var(--mark);color:var(--on-mark)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .mapseg input:checked + label{background:var(--mark);color:var(--on-mark)}}
 .mxchecks li span{color:var(--bg)}
+.sitestat .staff-link{margin-left:auto;color:var(--muted);font-size:var(--fs-meta)}
 /* ---- v7.4 audit fixes ---- */
 /* status pills: tinted, with readable ink (were muted text on a solid fill, ~1:1) */
 .pill.good{background:color-mix(in srgb,var(--good) 14%,var(--panel));color:var(--good-ink)}
@@ -3003,8 +3004,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">鈥
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
-<div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v7.4</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
+<div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
+<footer><b>Groundwave Propagation Lab v7.5</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4536,7 +4537,7 @@ function bindFeedbackForm(){
     fetch("/api/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ activity: last, rating: FB.rating, confusing: conf, missing: miss, course: course })
+      body: JSON.stringify({ activity: last, page: (typeof currentTab!=="undefined"?currentTab:""), rating: FB.rating, confusing: conf, missing: miss, course: course })
     })
     .then(function(r){ return r.ok ? r.json() : r.json().then(function(j){ throw new Error(j.error || "failed"); }); })
     .then(function(){

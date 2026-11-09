@@ -4,6 +4,8 @@ This folder is a complete static website. Upload it to any free static host to g
 
 - `index.html`: the whole app (Lab, Animation, Map & location, Cellular, Models, Learn, Quiz).
 - `assets/`: the mast photograph used on the home screen and the KaTeX stylesheet and fonts that typeset the equations. **Upload this folder together with `index.html`**, or the hero photo and the equations will not display correctly.
+- `feedback.html`: the staff Feedback inbox (passphrase protected; see SETUP.md).
+- `functions/api/`: the visit counter and feedback storage (Cloudflare Pages Functions).
 - `_headers`: security and caching headers for Cloudflare Pages.
 
 When the page is served from a real website (https), these all work:
