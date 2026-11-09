@@ -342,8 +342,12 @@ input:focus-visible,select:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,
         '<div class="legend"><span style="--c:var(--good)">A lot '+c["a lot"]+' ('+pct(c["a lot"])+'%)</span><span style="--c:var(--warn)">Somewhat '+c.somewhat+'</span><span style="--c:var(--bad)">Not really '+c["not really"]+'</span>'+(none?'<span style="--c:var(--control)">No rating '+none+'</span>':'')+'</div></div>';
   }
 
+  /* count numbers up on the summary cards */
+  function countUp(){ if(matchMedia("(prefers-reduced-motion: reduce)").matches) return; document.querySelectorAll(".stat .v").forEach(function(el){ var to=parseInt(el.textContent,10); if(!isFinite(to)||to===0) return; var t0=performance.now();
+    (function step(now){ var u=Math.min(1,(now-t0)/700), e=1-Math.pow(1-u,3); el.textContent=Math.round(to*e); if(u<1) requestAnimationFrame(step); })(t0); }); }
+  var counted=false;
   function render(){
-    renderStats();
+    renderStats(); if(!counted){ counted=true; countUp(); }
     var rows=filtered(), ul=$("list"), em=$("empty");
     $("shown").textContent= S.items.length ? ("Showing "+rows.length+" of "+S.items.length) : "";
     ul.innerHTML=rows.map(function(x){

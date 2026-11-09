@@ -176,7 +176,7 @@ table.fs th{font-weight:600;color:var(--muted);font-size:12px}
 .tablewrap{overflow-x:auto}
 
 /* Animation */
-.stage{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#0b1430}
+.stage{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#0B2133}
 #anim{display:block;width:100%;height:540px;touch-action:none;cursor:default}
 @media (max-width:700px){#anim{height:400px}}
 .stagebar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
@@ -328,8 +328,8 @@ table.sites tr.selrow{background:var(--accent-soft)}
 .tourbox h3{font-size:17px}
 #anim{cursor:move}
 .keyrow i{width:18px;height:8px;border-radius:var(--r-xs)}
-.k-gw,.b-gw{background:rgb(255,200,61)}
-.k-sky,.b-sky{background:rgb(255,122,198)}
+.k-gw,.b-gw{background:rgb(205,242,58)}
+.k-sky,.b-sky{background:rgb(98,206,255)}
 .k-esc{background:repeating-linear-gradient(90deg,#9aa6b8 0 4px,transparent 4px 7px)} /* taste-skill-ignore: legend swatch is the dashed mark itself */
 .k-d{background:rgba(222,104,66,.75)}
 .k-e{background:rgba(110,190,255,.75)}
@@ -377,7 +377,7 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .dlg-b ul{margin:0;padding-left:20px}
 .steps-list{margin:0;padding-left:22px;display:grid;gap:8px}
 .dlg-f{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
-.stage:fullscreen{border-radius:0;border:0;background:#050a1a}
+.stage:fullscreen{border-radius:0;border:0;background:#081A27}
 .stage:fullscreen #anim{height:100vh}
 .stage.is-expanded{position:fixed;inset:0;z-index:200;border-radius:0;border:0}
 .stage.is-expanded #anim{height:100vh}
@@ -1701,6 +1701,34 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
   .btn,.chip,.iconbtn,.tab,.lp-item,.qc label,summary,.bnav a{transition:background-color var(--dur-1),border-color var(--dur-1),color var(--dur-1)!important}
   .btn:active,.chip:active,.iconbtn:active,.tab:active,.btn:hover,.iconbtn:hover,.chip:hover{transform:none!important}
 }
+
+/* =======================================================================
+   v7.8 LIVING PAGES · nothing sits dead on the screen: the hero breathes,
+   content rises in as you reach it, numbers count. Off with reduced motion.
+   ======================================================================= */
+@keyframes lv-drift{0%{transform:scale(1.04) translate3d(0,0,0)}100%{transform:scale(1.1) translate3d(-1.5%,-1%,0)}}
+@keyframes lv-ring{0%{transform:translate(-50%,-50%) scale(.2);opacity:.9}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+@keyframes lv-glow{0%,100%{opacity:.55}50%{opacity:1}}
+.hero-bg{animation:gw-zoom 2.4s cubic-bezier(.23,1,.32,1) both,lv-drift 28s ease-in-out 2.4s infinite alternate}
+.hero-rings{position:absolute;left:79%;top:47%;width:0;height:0;z-index:-1;pointer-events:none}
+.hero-rings i{position:absolute;left:0;top:0;width:340px;height:340px;border-radius:50%;border:2px solid rgba(205,242,58,.55);
+  box-shadow:0 0 24px rgba(205,242,58,.25) inset;animation:lv-ring 4.2s cubic-bezier(.2,.6,.3,1) infinite}
+.hero-rings i:nth-child(2){animation-delay:1.4s}.hero-rings i:nth-child(3){animation-delay:2.8s}
+@media (max-width:760px){.hero-rings{left:78%;top:58%}.hero-rings i{width:220px;height:220px}}
+.hero-words dt b{display:inline-block;animation:lv-glow 2.6s ease-in-out 1.2s infinite}
+/* scroll reveal: only applied by script, so content is never hidden without it */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .5s var(--ease-out),transform .6s var(--ease-out)}
+.rv.in{opacity:1;transform:none}
+/* small living details */
+.lc-ring .val{filter:drop-shadow(0 0 6px rgba(205,242,58,.55))}
+.bandruler .bands button[aria-pressed="true"]{box-shadow:0 0 0 0 rgba(205,242,58,.5);animation:mo-pop .22s var(--ease-out),lv-band 2.4s ease-out .3s 2}
+@keyframes lv-band{0%{box-shadow:0 0 0 0 rgba(205,242,58,.55)}100%{box-shadow:0 0 0 10px rgba(205,242,58,0)}}
+.tabs .tab[aria-selected="true"]{transition:box-shadow .3s var(--ease-out)}
+.widget{transition:border-color .2s var(--ease-out),box-shadow .25s var(--ease-out)}
+.widget:focus-within{box-shadow:0 0 0 4px color-mix(in srgb,var(--mark) 35%,transparent)}
+@media (hover:hover) and (pointer:fine){.keyfacts li,.gloss-grid > div,.lc-refs section{transition:transform .2s var(--ease-out),border-color .2s var(--ease-out)}.keyfacts li:hover,.gloss-grid > div:hover{transform:translateY(-2px);border-color:var(--control)}}
+@media print{.rv{opacity:1!important;transform:none!important}.hero-rings{display:none}}
+@media (prefers-reduced-motion: reduce){.hero-bg,.hero-rings i,.hero-words dt b,.bandruler .bands button{animation:none!important}.hero-rings{display:none}.rv{opacity:1!important;transform:none!important;transition:none!important}}
 </style>
 </head>
 <body data-tab="lab">
@@ -1764,6 +1792,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0
   </div>
 </header>
 <section class="hero" aria-label="Introduction">
+  <div class="hero-rings" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="hero-bg" role="img" aria-label="Two lattice transmission masts with microwave dishes on a green hilltop under a blue sky"></div>
   <div class="hero-in">
     <dl class="hero-words">
@@ -3215,7 +3244,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v7.7</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.8</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -3380,15 +3409,15 @@ function icn(n){ return n?"<svg class=ic aria-hidden=true><use href=#i-"+n+" /><
 /* ================= PHYSICS ================= */
 const RE = 6371;
 const GROUNDS = {
-  sea:     {name:"Sea water",                   sigma:5,      er:70, kind:"sea",   color:"#2a62a8"},
-  seaLow:  {name:"Sea water, low salinity",     sigma:1,      er:80, kind:"sea",   color:"#3a76b8"},
-  fresh:   {name:"Fresh water (lake / river)",  sigma:0.003,  er:80, kind:"fresh", color:"#4b93c8"},
-  wet:     {name:"Wet ground (paddy / marsh)",  sigma:0.01,   er:30, kind:"land",  color:"#4f7a3a"},
-  land:    {name:"Average land",                sigma:0.003,  er:22, kind:"land",  color:"#6f6a3c"},
-  medDry:  {name:"Medium dry ground",           sigma:0.001,  er:15, kind:"land",  color:"#857146"},
-  dry:     {name:"Dry ground",                  sigma:0.0003, er:7,  kind:"land",  color:"#a2865a"},
-  veryDry: {name:"Very dry ground / rock",      sigma:0.0001, er:3,  kind:"land",  color:"#958a7e"},
-  custom:  {name:"Custom σ and εr",             sigma:0.005,  er:15, kind:"land",  color:"#7b7468"}
+  sea:     {name:"Sea water",                   sigma:5,      er:70, kind:"sea",   color:"#1d5a86"},
+  seaLow:  {name:"Sea water, low salinity",     sigma:1,      er:80, kind:"sea",   color:"#2a6c98"},
+  fresh:   {name:"Fresh water (lake / river)",  sigma:0.003,  er:80, kind:"fresh", color:"#3c86b2"},
+  wet:     {name:"Wet ground (paddy / marsh)",  sigma:0.01,   er:30, kind:"land",  color:"#3f6a4c"},
+  land:    {name:"Average land",                sigma:0.003,  er:22, kind:"land",  color:"#55613f"},
+  medDry:  {name:"Medium dry ground",           sigma:0.001,  er:15, kind:"land",  color:"#6d6445"},
+  dry:     {name:"Dry ground",                  sigma:0.0003, er:7,  kind:"land",  color:"#87734f"},
+  veryDry: {name:"Very dry ground / rock",      sigma:0.0001, er:3,  kind:"land",  color:"#7b7b76"},
+  custom:  {name:"Custom σ and εr",             sigma:0.005,  er:15, kind:"land",  color:"#6a6c66"}
 };
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI;
@@ -4768,7 +4797,7 @@ function bindFeedbackForm(){
 const anim=$("anim"), actx=anim.getContext("2d");
 const scope=$("scope"), sctx2=scope.getContext("2d");
 /* scene tokens — shared with the legend swatches in CSS */
-const SC={gw:"255,200,61",sky:"255,122,198",esc:"255,255,255",D:"222,104,66",E:"110,190,255",F:"150,130,255",skip:"226,76,66",fade:"240,170,40",los:"120,230,190",label:"rgba(12,20,36,.86)"};
+const SC={gw:"205,242,58",sky:"98,206,255",esc:"235,242,248",D:"255,168,92",E:"255,128,170",F:"170,150,255",skip:"255,107,98",fade:"255,196,84",los:"120,230,190",label:"rgba(11,33,51,.9)"};
 const AN={id:null,hour:12,cycle:false,playing:!window.matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1,rx:150,t:0,last:performance.now(),
   view:{d0:0,span:1000},gwKey:"",gw:null,svc:null,ana:null,anaKey:"",scope:[],geom:null,meterT:0,drag:null,ptrs:new Map(),labels:true,tour:null,errShown:false};
 const cosFromHour=h=>Math.cos(2*Math.PI*(h-12)/24);
@@ -4921,7 +4950,7 @@ function bindAnim(){
 }
 function mixCol(a,b,u){ const pa=a.match(/\w\w/g).map(h=>parseInt(h,16)), pb=b.match(/\w\w/g).map(h=>parseInt(h,16)); return "rgb("+pa.map((v,i)=>Math.round(v+(pb[i]-v)*u)).join(",")+")"; }
 function skyCols(c){
-  const day=["4f86cf","cfe3f6"], dusk=["3b3f78","f2b27a"], night=["050a1a","1b2647"];
+  const day=["1f5a85","b9d6e8"], dusk=["1a2d50","e8976a"], night=["030b13","10293d"];
   if(c>=0.3) return day.map(x=>"#"+x);
   if(c>=-0.15){ const u=(c+0.15)/0.45; return [mixCol(dusk[0],day[0],u),mixCol(dusk[1],day[1],u)]; }
   const u=clamp((c+0.15)/-0.35,0,1); return [mixCol(dusk[0],night[0],u),mixCol(dusk[1],night[1],u)];
@@ -4953,20 +4982,33 @@ function drawAnim(dt){
   const t=AN.t, dA=d0-span*0.15, dB=d0+span*1.15;
   // sky background
   const [top,bot]=skyCols(cosC); const gr=c.createLinearGradient(0,0,0,H); gr.addColorStop(0,top); gr.addColorStop(1,bot); c.fillStyle=gr; c.fillRect(0,0,W,H);
+  { const dayA=clamp((cosC+0.2)/0.6,0,1), duskA=clamp(1-Math.abs(cosC)/0.3,0,1);
+    const hg=c.createRadialGradient(cx,gTop+40,10,cx,gTop+40,Math.max(W,H)*0.75);
+    hg.addColorStop(0,`rgba(${duskA>0.3?"255,186,130":"230,244,252"},${0.10+0.22*Math.max(dayA*0.6,duskA)})`); hg.addColorStop(1,"rgba(255,255,255,0)");
+    c.fillStyle=hg; c.fillRect(0,0,W,H); }
   const starA=clamp((-cosC-0.1)/0.4,0,1);
-  if(starA>0){ for(let i=0;i<90;i++){ c.fillStyle=`rgba(255,255,255,${starA*(0.4+0.6*Math.abs(Math.sin(i+t/900)))})`; c.fillRect((i*97.3)%W,(i*53.7)%(gTop*0.85),1.4,1.4);} }
-  const sunU=(AN.hour-6)/12; const body=(u,col,r)=>{ const x=W*0.1+u*W*0.8, y=26+(1-Math.sin(clamp(u,0,1)*Math.PI))*80; c.fillStyle=col; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); return [x,y]; };
-  if(sunU>-0.05&&sunU<1.05){ const [sx,sy]=body(sunU,"#ffd34d",14); if(flareLevel(p)>0){ c.strokeStyle="#ff7a2f"; c.lineWidth=2; for(let i=0;i<12;i++){ const a=i/12*Math.PI*2+t/900, L=24+5*Math.sin(t/120+i); c.beginPath(); c.moveTo(sx+Math.cos(a)*17,sy+Math.sin(a)*17); c.lineTo(sx+Math.cos(a)*L,sy+Math.sin(a)*L); c.stroke(); } } }
-  else { const mu=((AN.hour+6)%24)/12; const [mx,my]=body(mu,"#f3f0d8",11); c.fillStyle=top; c.beginPath(); c.arc(mx+5,my-4,10,0,7); c.fill(); }
+  if(starA>0){ for(let i=0;i<140;i++){ const sx=(i*97.31+13)%W, sy=(i*53.77+7)%(gTop*0.88), tw=0.35+0.65*Math.abs(Math.sin(i*1.7+t/(700+i%5*160))), r=i%11===0?1.6:i%3===0?1.1:0.7;
+    c.fillStyle=`rgba(${i%7===0?"205,242,58":"236,244,252"},${starA*tw})`; c.beginPath(); c.arc(sx,sy,r,0,7); c.fill(); } }
+  const sunU=(AN.hour-6)/12;
+  const body=(u,col,r,halo)=>{ const x=W*0.1+u*W*0.8, y=30+(1-Math.sin(clamp(u,0,1)*Math.PI))*80;
+    const hgr=c.createRadialGradient(x,y,r*0.6,x,y,r*halo); hgr.addColorStop(0,col.replace(")",",.55)").replace("rgb","rgba")); hgr.addColorStop(1,col.replace(")",",0)").replace("rgb","rgba"));
+    c.fillStyle=hgr; c.beginPath(); c.arc(x,y,r*halo,0,7); c.fill(); c.fillStyle=col; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); return [x,y]; };
+  if(sunU>-0.05&&sunU<1.05){ const [sx,sy]=body(sunU,"rgb(255,214,102)",13,4.2); if(flareLevel(p)>0){ c.strokeStyle="rgba(255,138,64,.9)"; c.lineWidth=2; c.lineCap="round"; for(let i=0;i<14;i++){ const a=i/14*Math.PI*2+t/1100, L=24+6*Math.sin(t/140+i); c.beginPath(); c.moveTo(sx+Math.cos(a)*17,sy+Math.sin(a)*17); c.lineTo(sx+Math.cos(a)*L,sy+Math.sin(a)*L); c.stroke(); } c.lineCap="butt"; } }
+  else { const mu=((AN.hour+6)%24)/12; const [mx,my]=body(mu,"rgb(238,242,226)",10,3.2); c.fillStyle=top; c.beginPath(); c.arc(mx+5,my-4,9.5,0,7); c.fill(); }
 
   // ionosphere layers
-  const band=(h1,h2,col)=>{ c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1); c.lineTo(x,y);} c.closePath(); c.fillStyle=col; c.fill(); };
+  /* soft, feathered layers: a radial gradient centred on the earth gives exact curved edges; a slow shimmer keeps them alive */
+  const band=(h1,h2,rgb,a)=>{ const pad=(h2-h1)*0.45, r1=Rpx+(h1-pad)*altScale, r2=Rpx+(h2+pad)*altScale; if(r2<=0) return;
+    const g=c.createRadialGradient(cx,cy,Math.max(0,r1),cx,cy,r2), sh=1+0.12*Math.sin(t/1400+h1);
+    g.addColorStop(0,`rgba(${rgb},0)`); g.addColorStop(0.3,`rgba(${rgb},${a*0.55*sh})`); g.addColorStop(0.5,`rgba(${rgb},${a*sh})`); g.addColorStop(0.7,`rgba(${rgb},${a*0.55*sh})`); g.addColorStop(1,`rgba(${rgb},0)`);
+    c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2+pad); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1-pad); c.lineTo(x,y);} c.closePath(); c.fillStyle=g; c.fill();
+    c.strokeStyle=`rgba(${rgb},${Math.min(0.9,a*1.4)})`; c.lineWidth=1; c.setLineDash([2,6]); c.lineDashOffset=-t/90; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,(h1+h2)/2); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); c.setLineDash([]); c.lineDashOffset=0; };
   const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); pill(c,txt,W-14,y,{align:"right",accent:rgb,size:11.5}); };
   c.globalAlpha=fa("iono");
   const dDens=clamp((io.I-0.08)/1.2,0,1)*(flareLevel(p)>0&&cosC>0?1+0.15*flareLevel(p):1);
-  if(dDens>0.02) band(60,90,`rgba(${SC.D},${clamp(dDens*0.6,0.06,0.78)})`);
-  band(100,120,`rgba(${SC.E},${clamp(io.foE/4,0.08,0.45)})`);
-  band(io.hF-45,io.hF+45,`rgba(${SC.F},${clamp(io.foF2/14,0.15,0.5)})`);
+  if(dDens>0.02) band(60,90,SC.D,clamp(dDens*0.7,0.08,0.8));
+  band(100,120,SC.E,clamp(io.foE/4,0.12,0.55));
+  band(io.hF-45,io.hF+45,SC.F,clamp(io.foF2/14,0.18,0.55));
   if(p.gstorm){ c.strokeStyle="rgba(90,255,170,.5)"; c.lineWidth=3; for(let k=0;k<3;k++){ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((d0+span*(0.5+i/80))/RE,430+k*14+8*Math.sin(i/4+t/500+k)); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); } }
   layerTag(`F2 layer · foF2 ${io.foF2.toFixed(1)} MHz`,io.hF,SC.F); layerTag(`E layer · foE ${io.foE.toFixed(1)} MHz`,110,SC.E);
   if(dDens>0.02) layerTag(`D layer${flareLevel(p)>0&&cosC>0?" · "+FLARE[flareLevel(p)].name:""}`,75,SC.D);
@@ -4976,6 +5018,10 @@ function drawAnim(dt){
   const arcFill=(a,b,col)=>{ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((a+(b-a)*i/40)/RE,0); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=40;i>=0;i--){ const [x,y]=map((a+(b-a)*i/40)/RE,-260); c.lineTo(x,y);} c.closePath(); c.fillStyle=col; c.fill(); };
   const segs=pathSegs(p,Math.max(dB,1)); arcFill(Math.min(dA,0),0.3,effGround(segs[0].g,p).color);
   { let pos=0; segs.forEach(s=>{ arcFill(pos,pos+s.len+0.3,effGround(s.g,p).color); pos+=s.len; }); }
+  { const dg=c.createRadialGradient(cx,cy,Math.max(0,Rpx-140),cx,cy,Rpx); dg.addColorStop(0,"rgba(8,26,39,.55)"); dg.addColorStop(1,"rgba(8,26,39,0)");
+    c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,-260); c.lineTo(x,y);} c.closePath(); c.fillStyle=dg; c.fill();
+    c.lineWidth=6; c.strokeStyle="rgba(230,244,252,.10)"; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0); i?c.lineTo(x,y-2):c.moveTo(x,y-2);} c.stroke();
+    c.lineWidth=1.2; c.strokeStyle="rgba(230,244,252,.45)"; c.stroke(); }
   if(p.frozen){ c.strokeStyle="rgba(255,255,255,.9)"; c.lineWidth=4; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0.5); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); }
   // ===== real terrain along a map path (Copernicus DEM + OpenStreetMap) =====
   const TR=p.path==="geo"&&p.terrain&&p.terrain.d&&p.terrain.d.length>1?p.terrain:null;
@@ -5041,7 +5087,8 @@ function drawAnim(dt){
   c.strokeStyle="#eef1f5"; c.lineWidth=2.4; c.beginPath(); c.moveTo(tx,ty); c.lineTo(tx,ty-58); c.stroke();
   c.lineWidth=1; for(let k=1;k<6;k++){ c.beginPath(); c.moveTo(tx-5+k*0.7,ty-k*10); c.lineTo(tx+5-k*0.7,ty-k*10-6); c.stroke(); }
   c.fillStyle=Math.floor(t/500)%2?"#ff4d4d":"#7a1d1d"; c.beginPath(); c.arc(tx,ty-60,3,0,7); c.fill();
-  for(let k=0;k<3;k++){ const r=((t/12+k*20)%60); c.strokeStyle=`rgba(255,230,140,${0.6*(1-r/60)})`; c.lineWidth=1.5; c.beginPath(); c.arc(tx,ty-58,r,-Math.PI*0.95,-Math.PI*0.05); c.stroke(); }
+  for(let k=0;k<3;k++){ const r=((t/12+k*20)%60), e=r/60; c.strokeStyle=`rgba(${SC.gw},${0.75*(1-e)*(1-e)})`; c.lineWidth=2-e; c.beginPath(); c.arc(tx,ty-58,4+r,-Math.PI*0.95,-Math.PI*0.05); c.stroke(); }
+  { const lg=c.createRadialGradient(tx,ty-60,0,tx,ty-60,10); lg.addColorStop(0,`rgba(255,77,77,${Math.floor(t/500)%2?0.55:0.12})`); lg.addColorStop(1,"rgba(255,77,77,0)"); c.fillStyle=lg; c.beginPath(); c.arc(tx,ty-60,10,0,7); c.fill(); }
   if(AN.labels&&AN.tour!==null&&TOUR[AN.tour].f.includes("tx")) pill(c,`Transmitter · ${fmtF(p.f)} · ${fmtP(p.P)}`,tx+60,ty-90,{to:[tx,ty-58]});
   c.globalAlpha=1;
 
@@ -5057,14 +5104,17 @@ function drawAnim(dt){
     c.globalAlpha=fa("gw");
     c.beginPath(); AN.gw.forEach((q,i)=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), A2=ampQ(q); const x=gx+Math.sin(a)*A2, y=gy-Math.cos(a)*A2; i?c.lineTo(x,y):c.moveTo(x,y); });
     for(let i=AN.gw.length-1;i>=0;i--){ const [gx,gy]=map(AN.gw[i].d/RE,tAlt(AN.gw[i].d)); c.lineTo(gx,gy); } c.closePath();
-    c.fillStyle=`rgba(${SC.gw},.30)`; c.fill();
+    { const fg=c.createLinearGradient(0,gTop-60,0,gTop+10); fg.addColorStop(0,`rgba(${SC.gw},.34)`); fg.addColorStop(1,`rgba(${SC.gw},.06)`); c.fillStyle=fg; c.fill(); }
     const lamV=span/16, ph=t/1000*2*Math.PI*0.9;
+    { const ptG=q=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), o=ampQ(q)*(0.5+0.5*Math.sin(2*Math.PI*q.d/lamV-ph)); return [gx+Math.sin(a)*o, gy-Math.cos(a)*o]; };
+      c.lineCap="round"; c.lineJoin="round"; c.lineWidth=9; c.strokeStyle=`rgba(${SC.gw},.16)`; c.beginPath(); let on=false;
+      AN.gw.forEach(q=>{ if(ampQ(q)<0.5){ on=false; return; } const [x,y]=ptG(q); on?c.lineTo(x,y):c.moveTo(x,y); on=true; }); c.stroke(); c.lineWidth=5; c.strokeStyle=`rgba(${SC.gw},.18)`; c.stroke(); }
     c.lineWidth=2.6; c.lineCap="round";
     for(let i=1;i<AN.gw.length;i++){ const q0=AN.gw[i-1], q1=AN.gw[i]; const A2=ampQ(q1); if(A2<0.5) continue;
       const pt=q=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), o=ampQ(q)*(0.5+0.5*Math.sin(2*Math.PI*q.d/lamV-ph)); return [gx+Math.sin(a)*o, gy-Math.cos(a)*o]; };
       const [ax,ay]=pt(q0),[bx,by]=pt(q1); c.strokeStyle=`rgba(${SC.gw},${clamp(A2/48+0.3,0,1)})`; c.beginPath(); c.moveTo(ax,ay); c.lineTo(bx,by); c.stroke(); }
     if(p.f<30) for(let k=0;k<22;k++){ const d=d0+(((k*lamV+(ph/(2*Math.PI))*lamV)%(span*1.12))+span*1.12)%(span*1.12); if(d<1) continue; const q=AN.gw[Math.min(AN.gw.length-1,Math.max(0,Math.round((d-d0)/(span*1.12)*300)))]; const A2=ampQ(q); if(A2<1) continue;
-      const a=angAt(d), [gx,gy]=map(d/RE,tAlt(d)), L=A2+10; c.strokeStyle=`rgba(255,250,210,${clamp(A2/48,0.1,0.8)})`; c.lineWidth=1.2; c.beginPath(); c.moveTo(gx,gy); c.lineTo(gx+Math.sin(a+tilt)*L, gy-Math.cos(a+tilt)*L); c.stroke(); }
+      const a=angAt(d), [gx,gy]=map(d/RE,tAlt(d)), L=A2+10; c.strokeStyle=`rgba(236,250,200,${clamp(A2/48,0.1,0.75)})`; c.lineWidth=1.2; c.beginPath(); c.moveTo(gx,gy); c.lineTo(gx+Math.sin(a+tilt)*L, gy-Math.cos(a+tilt)*L); c.stroke(); }
     c.lineCap="butt";
     // VHF / UHF: line of sight and radio horizon
     if(p.f>=30){ const hz=radioHorizon(p); const [hx,hy]=map(hz/RE,0);
@@ -5098,6 +5148,7 @@ function drawAnim(dt){
       c.setLineDash([]);
       const n=pts.length, sp=n/(h?3600*hops/1.2:2400);
       for(let k=0;k<2;k++){ const u=((t*sp)+ix*17+k*n/2)%n; const i=Math.floor(u); const a=alph[i];
+        if(h&&a>0.05){ const [hx,hy]=map(pts[i][0],pts[i][1]); const hg2=c.createRadialGradient(hx,hy,0,hx,hy,9); hg2.addColorStop(0,`rgba(${SC.sky},${clamp(a*0.6,0,0.6)})`); hg2.addColorStop(1,`rgba(${SC.sky},0)`); c.fillStyle=hg2; c.beginPath(); c.arc(hx,hy,9,0,7); c.fill(); }
         for(let q=0;q<7;q++){ const j=i-q; if(j<0) break; const [x,y]=map(pts[j][0],pts[j][1]); c.fillStyle=h?`rgba(${SC.sky},${clamp(a*(1-q/7),0,1)})`:`rgba(${SC.esc},${clamp(a*0.7*(1-q/7),0,1)})`; c.beginPath(); c.arc(x,y,q===0?3.4:2.2,0,7); c.fill(); } }
       if(h&&apex&&!apexLabel&&ed>=12) apexLabel={pt:map(apex[0],apex[1]),txt:`Sky wave bends back at the ${lname} layer`,ab};
       if(!h&&!escLabel&&ed>=36){ const q=pts[pts.length-1]; escLabel={pt:map(q[0],q[1])}; }
@@ -5114,8 +5165,11 @@ function drawAnim(dt){
   if(AN.rx>=dA&&AN.rx<=dB){
     const [rx,ry]=map(AN.rx/RE,tAlt(AN.rx)), ra=angAt(AN.rx);
     c.save(); c.translate(rx,ry); c.rotate(ra);
-    c.fillStyle="#16202e"; c.strokeStyle="#F7FAFC"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
-    c.beginPath(); c.moveTo(7,-19); c.lineTo(13,-36); c.stroke(); c.fillStyle="#ffd23c"; c.beginPath(); c.arc(-5,-10,4,0,7); c.fill();
+    c.fillStyle="#102C40"; c.strokeStyle="#F7FAFC"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
+    c.beginPath(); c.moveTo(7,-19); c.lineTo(13,-36); c.stroke();
+    { const rv=evalP(p,Math.max(AN.rx,0.05),io).t, ok=rv!==null&&rv>=thr, col=ok?SC.gw:SC.skip, pulse=0.55+0.45*Math.sin(t/260);
+      const lg=c.createRadialGradient(-5,-10,0,-5,-10,11); lg.addColorStop(0,`rgba(${col},${0.55*pulse})`); lg.addColorStop(1,`rgba(${col},0)`); c.fillStyle=lg; c.beginPath(); c.arc(-5,-10,11,0,7); c.fill();
+      c.fillStyle=`rgb(${col})`; c.beginPath(); c.arc(-5,-10,3.6,0,7); c.fill(); }
     c.restore();
     pill(c,`Receiver ${fmtD(AN.rx)} km · drag me`,rx,ry-58,{size:11.5});
   }
@@ -8108,6 +8162,21 @@ function bindTabs(){
   document.querySelectorAll("[data-site-tour]").forEach(b=>b.addEventListener("click",start));
   window.startSiteTour=start;
 })();
+  /* living pages: content rises in as it reaches the viewport; numbers count up */
+  (function livingPages(){
+    const rm=matchMedia("(prefers-reduced-motion: reduce)");
+    if(rm.matches||!("IntersectionObserver" in window)) return;
+    const SEL=".wrap > .panel, .wrap > section.panel, .lab .panel.card, .tiles .tile, .mxcard, .q, .lesson .lx-sec, .lesson .widget, .lesson .qc, .keyfacts li, .gloss-grid > div, .lc-refs section, .concepts details, .learn .panel";
+    const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{rootMargin:"0px 0px -6% 0px",threshold:0.06});
+    const scan=root=>{ (root||document).querySelectorAll(SEL).forEach(el=>{ if(el.dataset.rv) return; el.dataset.rv="1"; const r=el.getBoundingClientRect();
+      if(r.height===0||r.top<innerHeight*0.92) return; el.classList.add("rv"); io.observe(el); }); };
+    const later=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>scan()));
+    later(); new MutationObserver(()=>{ clearTimeout(scan.t); scan.t=setTimeout(later,80); }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]});
+    /* count numbers up when they change, in the learn progress ring */
+    const count=(el,to,suffix)=>{ const from=parseFloat(el.dataset.n||"0")||0; el.dataset.n=to; if(from===to){ el.textContent=to+suffix; return; } const t0=performance.now();
+      const step=now=>{ const u=Math.min(1,(now-t0)/600), e=1-Math.pow(1-u,3); el.textContent=Math.round(from+(to-from)*e)+suffix; if(u<1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
+    const pct=document.getElementById("lcPct"); if(pct){ new MutationObserver(()=>{ const v=parseInt(pct.textContent,10); if(isFinite(v)&&String(v)!==pct.dataset.n&&!pct.dataset.lock){ pct.dataset.lock="1"; count(pct,v,"%"); setTimeout(()=>delete pct.dataset.lock,650); } }).observe(pct,{childList:true}); }
+  })();
   /* scrollable tables: focusable and named, so keyboard users can scroll them */
   const labelWraps=()=>document.querySelectorAll(".tablewrap").forEach(w=>{ if(w.hasAttribute("tabindex")) return; w.tabIndex=0; w.setAttribute("role","region");
     const cap=w.querySelector("caption"); let h=cap; if(!h){ let n=w; while(n&&!h){ let q=n.previousElementSibling; while(q&&!h){ h=q.matches("h2,h3,h4")?q:q.querySelector&&q.querySelector("h2,h3,h4"); q=q.previousElementSibling; } n=n.parentElement; } }
