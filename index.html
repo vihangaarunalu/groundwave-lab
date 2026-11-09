@@ -2136,6 +2136,7 @@ body.still .hero-par{transform:none}
     <div class="row">
       <div class="field" style="min-width:200px"><label for="animModel">Model</label><select id="animModel"></select></div>
       <div class="field"><label for="animRange">View</label><select id="animRange"><option value="30">0–30 km</option><option value="100">0–100 km</option><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select></div>
+      <div class="field"><label for="unitPickA">Units</label><select class="unit-pick" id="unitPickA"><option value="auto">Auto (FM/TV: both)</option><option value="lin">µV/m · mV/m</option><option value="db">dBµV/m</option><option value="rx">dBµV at receiver (FM/TV)</option></select></div>
     </div>
     <div class="row">
       <button class="btn primary" id="tourBtn" type="button"><svg class=ic aria-hidden=true><use href=#i-play /></svg> Guided tour</button>
@@ -2167,6 +2168,7 @@ body.still .hero-par{transform:none}
           <label class="sr" for="fsFreq">Frequency</label><select id="fsFreq"></select>
           <span class="fsclock mono" id="fsClock">12:00</span>
           <input type="range" id="fsHour" min="0" max="24" step="0.05" aria-label="Time of day">
+          <label class="sr" for="unitPickF">Units</label><select class="unit-pick" id="unitPickF" title="Field strength units"><option value="auto">Units: auto</option><option value="lin">µV/m · mV/m</option><option value="db">dBµV/m</option><option value="rx">dBµV at receiver</option></select>
           <label class="check"><input type="checkbox" id="fsLabels" checked> Labels</label>
           <button class="btn" id="fsPanels" type="button" aria-pressed="false" title="Hide the readout and zoom buttons (H)">Hide panels</button>
           <button class="btn" id="fsExit" type="button">Exit full screen</button>
@@ -2308,6 +2310,7 @@ body.still .hero-par{transform:none}
       </div>
       <button class="btn" id="gpsBtn" type="button" hidden><svg class=ic aria-hidden=true><use href=#i-target /></svg> My location</button>
       <button class="btn mob-only" id="findTowers" type="button" title="Search OpenStreetMap for mobile towers within 8 km of the selected test point"><svg class=ic aria-hidden=true><use href=#i-signal /></svg> Find towers (OSM)</button>
+      <label class="covsel"><span>Units</span><select class="unit-pick" id="unitPickM"><option value="auto">Auto (FM/TV: both)</option><option value="lin">µV/m · mV/m</option><option value="db">dBµV/m</option><option value="rx">dBµV at receiver</option></select></label>
       <label class="covsel"><span>Coverage</span><select id="covMode"><option value="contour">Antenna contour</option><option value="heat">Contour + heat map</option><option value="off">Off</option></select></label>
       <span class="toolsave"><button class="btn" id="scnBtn" type="button" title="Load a worked SLBC example">Example: City FM</button><button class="btn" id="shareBtn" type="button" title="Copy a link that opens this exact scenario"><svg class=ic aria-hidden=true><use href=#i-link /></svg> Share link</button></span>
     </div>
@@ -2440,6 +2443,7 @@ body.still .hero-par{transform:none}
       <div class="field"><label for="tTx"><span class="dot tx"></span>Transmitter</label><select id="tTx"></select></div>
       <span class="arrow" aria-hidden="true">→</span>
       <div class="field"><label for="tRx"><span class="dot rx"></span>Receiver</label><select id="tRx"></select></div>
+      <div class="field"><label for="unitPickT">Units</label><select class="unit-pick" id="unitPickT"><option value="auto">Auto (FM/TV: both)</option><option value="lin">µV/m · mV/m</option><option value="db">dBµV/m</option><option value="rx">dBµV at receiver</option></select></div>
       <div class="tsum" id="tSum" aria-live="polite"></div>
     </div>
   </section>
@@ -2487,7 +2491,7 @@ body.still .hero-par{transform:none}
     <p class="hint" style="margin-top:0">Paste drive-test or field-strength measurements, or values read from an ITU-R curve (e.g. P.368, P.1546). One row per point: <code>distance_km, value</code>. The selected model above is compared, and the points are drawn on the Lab chart.</p>
     <div class="mxctl">
       <label class="field grow"><span>Data</span><textarea id="cmpData" rows="6" spellcheck="false" style="font-family:var(--font-mono);font-size:13px"></textarea></label>
-      <label class="field"><span>Units</span><select id="cmpUnit"><option value="db">dB(µV/m)</option><option value="mv">mV/m</option><option value="dbm">dBm (mobile)</option></select></label>
+      <label class="field"><span>Units</span><select id="cmpUnit"><option value="db">dB(µV/m)</option><option value="mv">mV/m</option><option value="dbuv">dBµV at receiver (λ/2 dipole, 75 Ω)</option><option value="dbm">dBm (mobile)</option></select></label>
     </div>
     <div class="row"><button class="btn primary" id="cmpRun" type="button">Compare</button><button class="btn" id="cmpClear" type="button">Clear</button></div>
     <div id="cmpOut" style="margin-top:12px"></div>
@@ -3344,7 +3348,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4256,8 +4260,13 @@ function fmtD(d){ return d<10?d.toFixed(1):d<100?d.toFixed(0):String(Math.round(
    V(dBµV) = E(dBµV/m) + 20·log10(λ/π) − 6.02   (λ in metres, λ = 300 / f[MHz]).
    About E − 6.4 dB at 100 MHz. Receivers are rated in dBµV; ITU planning levels are in dBµV/m. */
 function rxDbuV(dB,fMHz){ return dB+20*Math.log10((300/fMHz)/Math.PI)-6.02; }
+/* one shared unit setting for every readout: auto · lin · db · rx (remembered on this device) */
+const UNITS={mode:(()=>{ try{ return localStorage.getItem("gwlab-units")||"auto"; }catch(e){ return "auto"; } })()};
 function fmtField(dB,fMHz){ if(dB===null||!isFinite(dB)) return "—";
-  if(fMHz>=30) return dB.toFixed(1)+" dBµV/m · "+rxDbuV(dB,fMHz).toFixed(1)+" dBµV";
+  const md=UNITS.mode, vhf=fMHz>=30;
+  if(md==="db"||(md==="rx"&&!vhf)) return dB.toFixed(1)+" dBµV/m";
+  if(md==="rx") return rxDbuV(dB,fMHz).toFixed(1)+" dBµV";
+  if(md==="auto"&&vhf) return dB.toFixed(1)+" dBµV/m · "+rxDbuV(dB,fMHz).toFixed(1)+" dBµV";
   const mV=mVfromdB(dB);
   if(mV>=1000) return (mV/1000).toFixed(mV>=10000?0:1)+" V/m";
   if(mV>=1) return mV.toFixed(mV>=100?0:mV>=10?1:2)+" mV/m";
@@ -7678,7 +7687,7 @@ function runCompare(){
   const mob=$("mxModel").value==="mob", m=mob?{id:"mob",name:"Mobile planner",p:plannerParams()}:(models.find(x=>String(x.id)===$("mxModel").value)||sel()); const p=Object.assign({},m.p,{calib:0}), unit=$("cmpUnit").value, io=iono(p);
   const pts=parseMeas($("cmpData").value,unit);
   if(!pts.length){ $("cmpOut").innerHTML=`<p class="hint">Paste at least one row: distance (km), value.</p>`; MEAS.pts=[]; redraw(); return; }
-  const toDB=v=>unit==="mv"?dBuV(v):unit==="dbm"?dBm2dBuV(v,p.f):v;
+  const toDB=v=>unit==="mv"?dBuV(v):unit==="dbm"?dBm2dBuV(v,p.f):unit==="dbuv"?v-rxDbuV(0,p.f):v;
   const rows=pts.map(q=>{ const meas=toDB(q.v), pr=evalP(p,q.d,io).t; return {d:q.d,meas,pr,e:pr===null?NaN:pr-meas}; });
   const e=rows.map(r=>r.e).filter(isFinite), n=e.length, mean=e.reduce((a,b)=>a+b,0)/n, rms=Math.sqrt(e.reduce((a,b)=>a+b*b,0)/n), sd=Math.sqrt(e.reduce((a,b)=>a+(b-mean)**2,0)/Math.max(1,n-1)), mx=Math.max(...e.map(Math.abs));
   MEAS.pts=rows.map(r=>({d:r.d,dB:r.meas})); MEAS.modelId=m.id;
@@ -8301,6 +8310,20 @@ function bindTabs(){
     let saved=null; try{ saved=localStorage.getItem(KEY); }catch(e){}
     if(saved==="paused") set(true);
     btns.forEach(b=>b.addEventListener("click",()=>set(!document.body.classList.contains("still"))));
+  })();
+  /* units: every picker writes the one shared setting; the Lab chart's menu follows it */
+  (function unitPickers(){
+    const picks=[...document.querySelectorAll(".unit-pick")], ychart=$("yunit");
+    const toChart={lin:"mv",db:"db",rx:"dbuv"}, fromChart={mv:"lin",db:"db",dbuv:"rx"};
+    const apply=(md,from)=>{ UNITS.mode=md; try{ localStorage.setItem("gwlab-units",md); }catch(e){}
+      picks.forEach(p=>{ if(p!==from) p.value=md; });
+      if(ychart&&from!==ychart&&toChart[md]&&ychart.value!=="dbm") ychart.value=toChart[md];
+      if(typeof refreshAll==="function") refreshAll();
+      if((currentTab==="map"||currentTab==="terrain"||currentTab==="mobile")&&typeof updateMap==="function") updateMap();
+      if(typeof AN!=="undefined") AN.meterT=999; };
+    picks.forEach(p=>{ p.value=UNITS.mode; p.addEventListener("change",()=>apply(p.value,p)); });
+    if(ychart){ if(toChart[UNITS.mode]) ychart.value=toChart[UNITS.mode];
+      ychart.addEventListener("change",()=>{ const md=fromChart[ychart.value]; if(md&&md!==UNITS.mode) apply(md,ychart); }); }
   })();
   /* scrollable tables: focusable and named, so keyboard users can scroll them */
   const labelWraps=()=>document.querySelectorAll(".tablewrap").forEach(w=>{ if(w.hasAttribute("tabindex")) return; w.tabIndex=0; w.setAttribute("role","region");
