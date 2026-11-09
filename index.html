@@ -1307,6 +1307,146 @@ footer{color:var(--muted)}
   .hero-words dd{animation:gw-fade .2s ease-out both!important}
   .appbar .tabs .tab:active{transform:none}
 }
+
+/* =======================================================================
+   LEARN · a short course. One idea per screen, a visible path, one quick
+   check per lesson, one primary action, and a link into the Lab.
+   ======================================================================= */
+#learn{gap:var(--sp-5)}
+.lc-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--sp-4) var(--sp-6);align-items:end;
+  padding:var(--sp-5);border-radius:var(--r-lg);background:var(--navy);color:var(--cloud);position:relative;overflow:hidden;isolation:isolate}
+.lc-head::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.28;
+  background:linear-gradient(90deg,var(--navy) 35%,rgba(16,44,64,0)),url("assets/towers-sm.jpg") 85% 55%/cover no-repeat}
+.lc-title{display:grid;gap:var(--sp-2);min-width:0}
+.lc-eyebrow{margin:0;font-size:var(--fs-meta);color:var(--lime);font-weight:500;letter-spacing:.02em}
+.lc-head h2{margin:0;font:600 clamp(26px,3.4vw,40px)/1.05 var(--font-display);letter-spacing:-.035em;color:var(--cloud)}
+.lc-lead{margin:0;color:rgba(247,250,252,.82);font-size:var(--fs-ui);max-width:56ch}
+.lc-progress{display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap}
+.lc-ring{position:relative;width:64px;height:64px;flex:0 0 auto}
+.lc-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.lc-ring circle{fill:none;stroke-width:5}
+.lc-ring .trk{stroke:rgba(247,250,252,.16)}
+.lc-ring .val{stroke:var(--lime);stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:119.4;transition:stroke-dashoffset .6s cubic-bezier(.23,1,.32,1)}
+.lc-ring b{position:absolute;inset:0;display:grid;place-items:center;font:600 var(--fs-dense)/1 var(--font-display);color:var(--cloud);font-variant-numeric:tabular-nums}
+.lc-ptext{display:grid;gap:2px;min-width:0;max-width:30ch}
+.lc-ptext b{font:600 var(--fs-h3)/1.2 var(--font-display);color:var(--cloud)}
+.lc-ptext span{font-size:var(--fs-meta);color:rgba(247,250,252,.78)}
+.lc-resume{min-height:44px;padding:0 var(--sp-5);border-radius:var(--r-pill)}
+
+.lc-views{display:inline-flex;gap:var(--sp-1);padding:var(--sp-1);border-radius:var(--r-pill);background:var(--field);justify-self:start;width:max-content}
+.lc-view{min-height:40px;padding:0 var(--sp-5);border:0;border-radius:var(--r-pill);background:transparent;color:var(--muted);
+  font:500 var(--fs-ui)/1 var(--font-display);cursor:pointer;transition:background-color var(--dur-2) var(--ease-out),color var(--dur-2) var(--ease-out)}
+.lc-view[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(16,44,64,.14)}
+
+.lc-body{display:grid;grid-template-columns:300px minmax(0,1fr);gap:var(--sp-6);align-items:start}
+.lc-path{position:sticky;top:132px;max-height:calc(100vh - 150px);overflow:auto;overscroll-behavior:contain}
+.lc-path ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.lp-unit{font-size:var(--fs-meta);font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:var(--sp-4) var(--sp-3) var(--sp-2)}
+.lp-unit:first-child{padding-top:0}
+.lp-item{display:flex;align-items:center;gap:var(--sp-3);width:100%;min-height:52px;padding:var(--sp-2) var(--sp-3);
+  border:0;border-radius:var(--r-md);background:transparent;color:var(--ink);text-align:left;cursor:pointer;font:inherit;
+  transition:background-color var(--dur-2) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.lp-item:hover{background:var(--field)}}
+.lp-item[aria-current="step"]{background:var(--accent-soft)}
+.lp-dot{position:relative;flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  border:2px solid var(--control);color:var(--muted);font:600 var(--fs-meta)/1 var(--font-display);
+  transition:background-color var(--dur-3) var(--ease-out),border-color var(--dur-3) var(--ease-out)}
+.lp-dot svg{position:absolute;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;opacity:0;transform:scale(.5);
+  transition:opacity var(--dur-3) var(--ease-out),transform var(--dur-3) var(--ease-out)}
+.lp-item[aria-current="step"] .lp-dot{border-color:var(--ink);color:var(--ink)}
+.lp-item.done .lp-dot{background:var(--mark);border-color:var(--mark);color:var(--on-mark)}
+.lp-item.done .lp-dot .n{opacity:0}
+.lp-item.done .lp-dot svg{opacity:1;transform:none}
+.lp-t{display:grid;gap:2px;min-width:0;font-size:var(--fs-dense);font-weight:500;line-height:1.3}
+.lp-t small{font-size:var(--fs-meta);color:var(--muted);font-weight:400}
+
+.lc-reader{display:grid;gap:var(--sp-5);min-width:0;max-width:760px}
+.lesson{display:grid;gap:var(--sp-4);padding:var(--sp-6);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel)}
+.lesson.in{animation:lc-in .32s cubic-bezier(.23,1,.32,1) both}
+@keyframes lc-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.lx-eyebrow{margin:0;font-size:var(--fs-meta);color:var(--muted);font-weight:500}
+.lesson h3{margin:0;font:600 clamp(24px,2.6vw,32px)/1.1 var(--font-display);letter-spacing:-.03em;color:var(--ink);outline:none}
+.lesson > p,.lesson li{font-size:var(--fs-body);line-height:1.65;color:var(--ink);margin:0;max-width:65ch}
+.bigidea{display:grid;gap:var(--sp-1);padding:var(--sp-4) var(--sp-5);border-radius:var(--r-md);background:var(--navy);color:var(--cloud)!important;
+  font:500 var(--fs-h3)/1.45 var(--font-body)!important;box-shadow:inset 4px 0 0 var(--lime)}
+.bigidea b{font-size:var(--fs-meta);font-weight:600;color:var(--lime);letter-spacing:.06em;text-transform:uppercase}
+.lesson .layers{list-style:none;margin:0;padding:0;display:grid;gap:var(--sp-2)}
+.lesson .layers li{display:grid;grid-template-columns:90px minmax(0,1fr);gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);background:var(--field);font-size:var(--fs-dense)}
+.lesson .layers span{color:var(--muted)}
+.lesson .facts,.lesson .steps{margin:0;padding-left:1.3em;display:grid;gap:var(--sp-2)}
+.deeper{border:1px solid var(--line);border-radius:var(--r-md);padding:0 var(--sp-4)}
+.deeper summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:500;color:var(--ink);list-style:none}
+.deeper summary::before{content:"+";display:inline-grid;place-items:center;width:20px;margin-right:var(--sp-2);color:var(--muted);font-weight:600}
+.deeper[open] summary::before{content:"−"}
+.deeper > :not(summary){margin:0 0 var(--sp-3)}
+.deeper .eq{white-space:normal;overflow-wrap:anywhere;background:var(--field);border:0;line-height:1.6}
+
+.qc{margin:0;border:0;padding:var(--sp-5);border-radius:var(--r-md);background:var(--field);display:grid;gap:var(--sp-2);min-width:0}
+.qc legend{float:left;width:100%;padding:0;margin-bottom:var(--sp-3);font:600 var(--fs-h3)/1.35 var(--font-display);color:var(--ink)}
+.qc label{display:flex!important;align-items:center;gap:var(--sp-3);min-height:48px;padding:var(--sp-2) var(--sp-4);
+  border:1.5px solid var(--line);border-radius:var(--r-md);background:var(--panel);cursor:pointer;font-size:var(--fs-ui);line-height:1.4;
+  transition:border-color var(--dur-2) var(--ease-out),background-color var(--dur-2) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.qc label:hover{border-color:var(--control)}}
+.qc label:has(input:checked){border-color:var(--ink)}
+.qc label.right,.qc label.right:has(input:checked){border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,var(--panel))}
+.qc label.wrong,.qc label.wrong:has(input:checked){border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,var(--panel));animation:lc-shake .3s ease-out}
+@keyframes lc-shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.qc.is-right label.right{animation:lc-pop .35s cubic-bezier(.23,1,.32,1)}
+@keyframes lc-pop{50%{transform:scale(1.015)}}
+.qc input:disabled + *,.qc label:has(input:disabled){cursor:default}
+.qc-go{justify-self:start;margin-top:var(--sp-2);min-height:44px;background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:500}
+.qc-go:disabled{opacity:.45;cursor:not-allowed}
+.qc-fb{margin:0;font-size:var(--fs-ui);font-weight:600;min-height:0}
+.qc.is-right .qc-fb{color:var(--good-ink)}
+.qc.is-wrong .qc-fb{color:var(--bad-ink)}
+.qc-why{margin:0;font-size:var(--fs-dense);color:var(--muted);line-height:1.55}
+
+.lc-nav{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-3);align-items:center}
+.lc-nav .btn{min-height:48px;padding:0 var(--sp-5);border-radius:var(--r-pill)}
+.lc-try{justify-self:center;background:transparent;border-color:var(--ink);color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.lc-prev:disabled{visibility:hidden}
+
+.lc-gloss{display:grid;gap:var(--sp-4)}
+.lc-search{display:grid;gap:var(--sp-2);max-width:420px;font-size:var(--fs-dense);font-weight:500}
+.lc-search input{min-height:48px;padding:0 var(--sp-4);border-radius:var(--r-pill);font-size:var(--fs-ui)}
+.lc-gcount{margin:0;font-size:var(--fs-meta);color:var(--muted)}
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--sp-3);margin:0}
+.gloss-grid > div{padding:var(--sp-4);border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);display:grid;gap:var(--sp-1);align-content:start}
+.gloss-grid dt{font:600 var(--fs-h3)/1.3 var(--font-display);color:var(--ink)}
+.gloss-grid dd{margin:0;font-size:var(--fs-dense);color:var(--muted);line-height:1.55}
+.lc-empty{margin:0;color:var(--muted)}
+
+@media (max-width:1020px){
+  .lc-body{grid-template-columns:minmax(0,1fr);gap:var(--sp-4)}
+  .lc-path{position:static;max-height:none;overflow-x:auto;overflow-y:hidden;margin:0 calc(-1 * var(--sp-4));padding:0 var(--sp-4) var(--sp-2);scrollbar-width:none}
+  .lc-path ol{display:flex;gap:var(--sp-2);width:max-content}
+  .lp-unit{display:none}
+  .lp-item{width:auto;min-height:48px;padding:var(--sp-1) var(--sp-4) var(--sp-1) var(--sp-1);border:1px solid var(--line);border-radius:var(--r-pill);background:var(--panel)}
+  .lp-t small{display:none}
+  .lp-t{white-space:nowrap}
+  .lc-reader{max-width:none}
+}
+@media (max-width:760px){
+  .lc-head{grid-template-columns:minmax(0,1fr);padding:var(--sp-4)}
+  .lc-progress{gap:var(--sp-3)}
+  .lc-resume{flex:1 1 100%}
+  .lp-item:not([aria-current="step"]) .lp-t{display:none}
+  .lp-item:not([aria-current="step"]){padding:var(--sp-1)}
+  .lesson{padding:var(--sp-4);gap:var(--sp-3)}
+  .lesson > p,.lesson li{font-size:var(--fs-ui)}
+  .bigidea{font-size:var(--fs-ui)!important;padding:var(--sp-3) var(--sp-4)}
+  .qc{padding:var(--sp-4)}
+  .lesson .layers li{grid-template-columns:minmax(0,1fr)}
+  .lc-nav{grid-template-columns:1fr 1fr}
+  .lc-try{grid-column:1 / -1;grid-row:1;justify-self:stretch}
+  .lc-nav .btn{padding:0 var(--sp-3)}
+  .lc-views{width:100%}.lc-view{flex:1}
+}
+@media (prefers-reduced-motion: reduce){
+  .lesson.in,.qc label.wrong,.qc.is-right label.right{animation:none}
+  .lc-ring .val,.lp-dot,.lp-dot svg{transition:none}
+}
+@media print{.lc-path,.lc-nav,.lc-views{display:none!important}.lesson[hidden]{display:grid!important}}
 </style>
 </head>
 <body data-tab="lab">
@@ -1977,94 +2117,231 @@ footer{color:var(--muted)}
 
 <!-- ======================= LEARN ======================= -->
 <section class="wrap" id="learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
-  <div class="intro"><div class="stack" style="gap:4px"><h2>Concepts behind the lab</h2><p>Short explanations of each effect you can test. Open a card, then try the matching experiment in the Lab.</p></div></div>
-  <div class="concepts">
-      <details open>
-        <summary>1. What a ground wave is</summary>
-        <p>A ground (surface) wave is a vertically polarized wave that is guided along the boundary between air and earth. Currents induced in the ground drag the lower part of the wavefront, so it follows the earth's curvature well beyond the optical horizon. That is why MW (medium-wave) AM broadcasting gives stable daytime coverage over hundreds of kilometres.</p>
-        <p>Horizontal polarization is short-circuited by the conducting ground, so groundwave systems use vertical masts.</p>
-      </details>
-      <details open>
-        <summary>2. Ground constants and the Norton numerical distance</summary>
-        <p>Losses depend on ground conductivity σ and relative permittivity εr. The lab computes ITU-R P.368 the way the ITU's GRWAVE program does: the exact Sommerfeld–Norton solution for a flat earth, then the Fock/Wait residue series for the curved earth (see the Models tab for every step).</p>
-        <div class="eq">ε<sub>c</sub> = εr − j60λσ &nbsp; Δ = √(ε<sub>c</sub> − 1)/ε<sub>c</sub> &nbsp; w = −j(kd/2)Δ² &nbsp;(|w| ≈ Norton's numerical distance p)</div>
-        <div class="eq">F = 1 − j√(πw)·e<sup>−w</sup>·erfc(j√w) &nbsp;&nbsp; E = 300·√P · |W| / d &nbsp;[mV/m, kW, km]</div>
-        <div class="eq">Quick hand estimate (Terman): A ≈ (2 + 0.3p)/(2 + p + 0.6p²), p = (π d / λ x)·cos b, x = 1.8×10⁴σ/f<sub>MHz</sub></div>
-        <p>Small p means little loss (sea water, low frequency). Large p means rapid attenuation (dry ground, high frequency).</p>
-      </details>
-      <details>
-        <summary>3. Why lower frequencies travel further</summary>
-        <p>p grows with frequency through both λ and x. At 200 kHz over sea the attenuation factor stays near 1 for hundreds of kilometres. At 10 MHz over dry land, groundwave is gone within a few tens of kilometres. This is why LF and MF carry broadcasting and navigation, and HF relies on the sky wave.</p>
-      </details>
-      <details>
-        <summary>4. Wave tilt</summary>
-        <p>Ground losses tilt the wavefront forward. The power flow then has a downward component that feeds the losses in the earth. The tilt angle is roughly tan ψ ≈ 1/√|εr − j x|. Wave tilt is larger over poor ground. The scene exaggerates it three times so you can see it.</p>
-      </details>
-      <details>
-        <summary>5. Earth curvature and refraction</summary>
-        <p>The flat-earth formula is good up to about 80/∛f<sub>MHz</sub> km. Beyond that, diffraction around the curved earth adds loss, roughly 0.04·∛f dB per km at standard refraction. Refraction in the lower atmosphere bends waves slightly. It is modelled with an effective earth radius factor k. Larger k (super-refraction in warm, humid inversions) reduces the curvature loss. k = 1 increases it.</p>
-      </details>
-      <details>
-        <summary>6. Sky wave and the ionosphere</summary>
-        <ul>
-          <li><b>D layer</b> (60–90 km): exists in daylight only and absorbs LF/MF/low HF. The absorption scales roughly as 1/(f + f<sub>H</sub>)².</li>
-          <li><b>E layer</b> (~110 km): reflects MF by day; it is weak at night.</li>
-          <li><b>F2 layer</b> (250–350 km): reflects HF. Its critical frequency rises with solar activity.</li>
-        </ul>
-        <p>A wave returns when f ≤ f<sub>o</sub>·sec φ (secant law). Steep rays at high frequency escape, which creates the <b>skip zone</b>.</p>
-      </details>
-      <details>
-        <summary>7. Day, night and the fading zone</summary>
-        <p>By day, the D layer absorbs the MW sky wave, so only the ground wave is heard. At night the D layer vanishes and the sky wave returns strongly hundreds of kilometres away. Where ground and sky waves arrive with similar strength (within about 6 dB), their changing phase causes deep <b>fading and distortion</b>. The lab shades that zone on the plot.</p>
-      </details>
-      <details>
-        <summary>8. How weather enters the picture</summary>
-        <ul>
-          <li><b>Rain and monsoon</b> raise soil conductivity and permittivity, so the ground wave reaches further.</li>
-          <li><b>Drought and frozen ground</b> lower conductivity and shorten coverage.</li>
-          <li><b>Thunderstorms</b> add atmospheric noise (static), so a stronger signal is needed for the same service. Night-time static travels far by sky wave too.</li>
-          <li><b>Rain attenuation in the air</b> is negligible below a few GHz, so the lab ignores it.</li>
-          <li><b>Space weather</b> controls the sky wave. Solar flares cause sudden HF fade-outs, and geomagnetic storms depress the F2 layer.</li>
-        </ul>
-      </details>
-      <details>
-        <summary>9. Mixed paths (Millington's method)</summary>
-        <p>For a land–sea path, the field is the average of forward and reverse calculations, in dB:</p>
-        <div class="eq">E = ½[ (E₁(d₁) − E₂(d₁) + E₂(d)) + (E₂(d₂) − E₁(d₂) + E₁(d)) ]</div>
-        <p>Over sea after a coastline, the field can actually <i>rise</i> for a while. This is the "recovery effect".</p>
-      </details>
-      <details>
-        <summary>10. Limits of this lab</summary>
-        <p>The lab is a teaching model, not a planning tool. Use ITU-R P.368 (groundwave curves), P.527 (ground constants), P.1147 (MF sky wave), P.533 (HF) and P.372 (radio noise) for real work. The sky wave here is a median value. Real signals fade by 5–10 dB within minutes.</p>
-      </details>
+  <header class="lc-head">
+    <div class="lc-title">
+      <p class="lc-eyebrow">Propagation course · 11 short lessons · about 25 minutes</p>
+      <h2>Learn how radio waves travel</h2>
+      <p class="lc-lead">One idea per lesson. Read the big idea, answer one quick check, then try it in the Lab.</p>
     </div>
-  
-  <section class="panel card learn-build">
-    <div class="chart-head"><h2>Build and simulate your own model</h2><button class="btn primary" type="button" data-open-help="build">Open step-by-step guide</button></div>
-    <ol>
-      <li><b>Lab → + New</b> (or <b>+ Copy selected</b>) creates a model. Click its name to rename it.</li>
-      <li>Under <b>Signal</b>, choose the mechanism (ground wave, sky wave, both, or your own formula), then set the frequency, power and antenna heights.</li>
-      <li>Under <b>Ground &amp; path</b> and <b>Time &amp; weather</b>, describe the path and the conditions. Or build a real path on the <b>Map</b> and choose <b>Open in Lab</b>.</li>
-      <li>Read the result card and the plot, then open <b>Animation</b> to watch it propagate. Drag the receiver and use <svg class=ic aria-hidden=true><use href=#i-expand /></svg> for full screen.</li>
-      <li>To compare, copy the model and change exactly one setting.</li>
-    </ol>
-  </section>
-  <section class="panel pad stack">
-    <h2>Glossary</h2>
-    <div class="tablewrap"><table class="gloss">
-      <tr><td>Ground (surface) wave</td><td>Vertically polarized wave guided along the earth's surface. Main MW/LF daytime service.</td></tr>
-      <tr><td>Sky wave</td><td>Wave reflected (refracted) back to earth by the ionosphere.</td></tr>
-      <tr><td>Conductivity σ</td><td>How easily the ground carries current, in S/m. Sea ≈ 5, average land ≈ 0.003, rock ≈ 0.0001.</td></tr>
-      <tr><td>Permittivity εr</td><td>How strongly the ground stores electric field energy. Matters most at higher frequencies.</td></tr>
-      <tr><td>Numerical distance p</td><td>Norton's measure of how "electrically far" a point is over lossy ground. Larger p means more loss.</td></tr>
-      <tr><td>dBµV/m</td><td>Field strength in decibels above 1 µV/m. 60 dBµV/m = 1 mV/m. Every 20 dB is ×10.</td></tr>
-      <tr><td>Critical frequency fo</td><td>Highest frequency a layer reflects at vertical incidence (foE, foF2).</td></tr>
-      <tr><td>Skip zone</td><td>Region with no ground wave and no returning sky wave.</td></tr>
-      <tr><td>Fading zone</td><td>Region where ground and sky waves are similar in strength and interfere.</td></tr>
-      <tr><td>Millington's method</td><td>Standard way to combine different ground types along one path.</td></tr>
-      <tr><td>Great-circle path</td><td>Shortest route between two points on the earth's surface.</td></tr>
-    </table></div>
-  </section>
+    <div class="lc-progress" aria-live="polite">
+      <div class="lc-ring" id="lcRing" role="img" aria-label="0 of 11 lessons complete"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="trk" cx="22" cy="22" r="19"/><circle class="val" id="lcRingVal" cx="22" cy="22" r="19"/></svg><b id="lcPct">0%</b></div>
+      <div class="lc-ptext"><b id="lcCount">0 of 11 lessons</b><span id="lcNext">Start with lesson 1</span></div>
+      <button class="btn primary lc-resume" id="lcResume" type="button">Start</button>
+    </div>
+  </header>
+
+  <div class="lc-views" role="group" aria-label="Show">
+    <button type="button" class="lc-view" id="lcViewLessons" aria-pressed="true">Lessons</button>
+    <button type="button" class="lc-view" id="lcViewGloss" aria-pressed="false">Glossary</button>
+  </div>
+
+  <div class="lc-body" id="lcLessons">
+    <nav class="lc-path" aria-label="Lessons"><ol id="lcPath"></ol></nav>
+
+    <div class="lc-reader">
+      <article class="lesson" id="L-ground" data-unit="Ground wave" data-mins="2" data-try="lab:1" data-try-label="Compare ground types in the Lab" hidden>
+        <h3>What a ground wave is</h3>
+        <p class="bigidea"><b>Big idea</b>A vertically polarized wave clings to the ground and bends with the earth, so it reaches beyond the horizon.</p>
+        <p>The wave is guided along the boundary between air and earth. Currents induced in the ground drag the lower part of the wavefront, so it follows the curve of the earth. That is why medium-wave (AM) broadcasting gives stable daytime coverage over hundreds of kilometres.</p>
+        <p>Horizontal polarization is short-circuited by the conducting ground, so ground-wave stations use vertical masts.</p>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: why do AM stations use vertical masts?</legend>
+          <label><input type="radio" name="qc-ground" value="0">Horizontally polarized waves are short-circuited by the ground</label>
+          <label><input type="radio" name="qc-ground" value="1">Vertical masts are cheaper to build</label>
+          <label><input type="radio" name="qc-ground" value="2">The ionosphere only reflects vertical waves</label>
+          <p class="qc-why" hidden>The conducting earth shorts out a horizontal electric field. A vertical field survives and is guided along the surface.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-constants" data-unit="Ground wave" data-mins="3" data-try="lab:1" data-try-label="Compare sea, land and rock in the Lab" hidden>
+        <h3>Ground constants and numerical distance</h3>
+        <p class="bigidea"><b>Big idea</b>The better the ground conducts, the less the wave loses. One number, the numerical distance p, sums this up.</p>
+        <p>Losses depend on ground conductivity σ and relative permittivity εr. Sea water conducts well (σ ≈ 5 S/m); dry rock barely conducts (σ ≈ 0.0001 S/m).</p>
+        <p>Small p means little loss: sea water, low frequency. Large p means fast attenuation: dry ground, high frequency.</p>
+        <details class="deeper"><summary>Go deeper: the maths</summary>
+          <p>The lab computes ITU-R P.368 the way the ITU's GRWAVE program does: the exact Sommerfeld–Norton solution for a flat earth, then the Fock/Wait residue series for the curved earth. The Models tab shows every step.</p>
+          <div class="eq">ε<sub>c</sub> = εr − j60λσ &nbsp; Δ = √(ε<sub>c</sub> − 1)/ε<sub>c</sub> &nbsp; w = −j(kd/2)Δ² &nbsp;(|w| ≈ p)</div>
+          <div class="eq">F = 1 − j√(πw)·e<sup>−w</sup>·erfc(j√w) &nbsp;&nbsp; E = 300·√P · |W| / d &nbsp;[mV/m, kW, km]</div>
+          <div class="eq">Terman hand estimate: A ≈ (2 + 0.3p)/(2 + p + 0.6p²), p = (π d / λ x)·cos b, x = 1.8×10⁴σ/f<sub>MHz</sub></div>
+        </details>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: at 1 MHz, which path has the least loss?</legend>
+          <label><input type="radio" name="qc-constants" value="0">Average farmland</label>
+          <label><input type="radio" name="qc-constants" value="1">Sea water</label>
+          <label><input type="radio" name="qc-constants" value="2">Dry rocky ground</label>
+          <p class="qc-why" hidden>Sea water has the highest conductivity, so its numerical distance p stays small and the field falls slowly.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-freq" data-unit="Ground wave" data-mins="2" data-try="lab:2" data-try-label="Compare LF, MW and HF in the Lab" hidden>
+        <h3>Why lower frequencies travel further</h3>
+        <p class="bigidea"><b>Big idea</b>Raise the frequency and the ground wave dies sooner. LF and MF use the ground wave; HF relies on the sky.</p>
+        <p>The numerical distance p grows with frequency. At 200 kHz over sea the signal stays strong for hundreds of kilometres. At 10 MHz over dry land the ground wave is gone within a few tens of kilometres.</p>
+        <p>That is why LF and MF carry broadcasting and navigation, and HF services depend on the sky wave.</p>
+        <fieldset class="qc" data-correct="2"><legend>Quick check: how far does a 10 MHz ground wave usually last over dry land?</legend>
+          <label><input type="radio" name="qc-freq" value="0">Thousands of kilometres</label>
+          <label><input type="radio" name="qc-freq" value="1">Several hundred kilometres</label>
+          <label><input type="radio" name="qc-freq" value="2">A few tens of kilometres</label>
+          <p class="qc-why" hidden>High frequency over poor ground gives a large p, so the ground wave fades within a few tens of kilometres.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-tilt" data-unit="Ground wave" data-mins="2" data-try="animation" data-try-label="Watch the wave tilt in Animation" hidden>
+        <h3>Wave tilt</h3>
+        <p class="bigidea"><b>Big idea</b>The ground slows the bottom of the wave, so the wavefront leans forward and feeds energy into the earth.</p>
+        <p>Ground losses tilt the wavefront forward. The power flow then has a downward part, and that is the energy the earth absorbs. Poor ground tilts the wave more.</p>
+        <p>The Animation tab exaggerates the tilt three times so you can see it.</p>
+        <details class="deeper"><summary>Go deeper: the maths</summary>
+          <div class="eq">tan ψ ≈ 1 / √|εr − j x|</div>
+        </details>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: where is the wave tilt larger?</legend>
+          <label><input type="radio" name="qc-tilt" value="0">Over poor, dry ground</label>
+          <label><input type="radio" name="qc-tilt" value="1">Over sea water</label>
+          <label><input type="radio" name="qc-tilt" value="2">It is the same everywhere</label>
+          <p class="qc-why" hidden>Lower conductivity means more loss, and the tilt grows with the loss.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-curve" data-unit="Ground wave" data-mins="2" data-try="lab:2" data-try-label="See curvature loss at long range" hidden>
+        <h3>Earth curvature and refraction</h3>
+        <p class="bigidea"><b>Big idea</b>Past a certain distance the earth's curve adds extra loss. The air bends waves slightly and changes how much.</p>
+        <p>The flat-earth formula holds up to about 80/∛f<sub>MHz</sub> km. Beyond that, diffraction around the curved earth adds roughly 0.04·∛f dB per km at standard refraction.</p>
+        <p>The lower atmosphere bends waves a little. This is modelled with an effective earth radius factor k. A larger k (super-refraction in warm, humid inversions) reduces the curvature loss; k = 1 increases it.</p>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: super-refraction (larger k) makes the curvature loss…</legend>
+          <label><input type="radio" name="qc-curve" value="0">Larger</label>
+          <label><input type="radio" name="qc-curve" value="1">Smaller</label>
+          <label><input type="radio" name="qc-curve" value="2">No different</label>
+          <p class="qc-why" hidden>A larger k makes the earth look flatter to the wave, so less diffraction loss is added.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-sky" data-unit="Sky wave" data-mins="3" data-try="lab:5" data-try-label="Find the HF skip zone in the Lab" hidden>
+        <h3>Sky wave and the ionosphere</h3>
+        <p class="bigidea"><b>Big idea</b>Layers of charged gas high above the earth bend radio waves back down, but only up to a certain frequency.</p>
+        <ul class="layers">
+          <li><b>D layer</b><span>60–90 km · daylight only · absorbs LF, MF and low HF</span></li>
+          <li><b>E layer</b><span>~110 km · reflects MF by day · weak at night</span></li>
+          <li><b>F2 layer</b><span>250–350 km · reflects HF · stronger with solar activity</span></li>
+        </ul>
+        <p>Steep rays at high frequency go straight through. Between the end of the ground wave and the first returning sky wave there is a gap with no signal: the <b>skip zone</b>.</p>
+        <details class="deeper"><summary>Go deeper: the maths</summary>
+          <div class="eq">Returns when f ≤ f<sub>o</sub>·sec φ &nbsp;(secant law)</div>
+          <div class="eq">D-layer absorption ∝ 1 / (f + f<sub>H</sub>)²</div>
+        </details>
+        <fieldset class="qc" data-correct="2"><legend>Quick check: which layer absorbs medium wave during the day?</legend>
+          <label><input type="radio" name="qc-sky" value="0">F2 layer</label>
+          <label><input type="radio" name="qc-sky" value="1">E layer</label>
+          <label><input type="radio" name="qc-sky" value="2">D layer</label>
+          <p class="qc-why" hidden>The D layer forms in sunlight and absorbs lower frequencies. It disappears at night.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-night" data-unit="Sky wave" data-mins="2" data-try="lab:0" data-try-label="Compare MW day and night in the Lab" hidden>
+        <h3>Day, night and the fading zone</h3>
+        <p class="bigidea"><b>Big idea</b>At night the sky wave comes back, and where it meets the ground wave at similar strength the signal fades in and out.</p>
+        <p>By day the D layer absorbs the MW sky wave, so you hear only the ground wave. At night the D layer vanishes and the sky wave returns strongly hundreds of kilometres away.</p>
+        <p>Where the two waves arrive within about 6 dB of each other, their changing phase causes deep <b>fading and distortion</b>. The Lab shades that zone on the plot.</p>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: where does the fading zone appear?</legend>
+          <label><input type="radio" name="qc-night" value="0">Where ground and sky waves are within about 6 dB</label>
+          <label><input type="radio" name="qc-night" value="1">Where there is no sky wave at all</label>
+          <label><input type="radio" name="qc-night" value="2">Right next to the transmitter</label>
+          <p class="qc-why" hidden>Two waves of similar strength interfere as their phase drifts. If one wave dominates, it does not fade deeply.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-weather" data-unit="Real world" data-mins="3" data-try="lab:3" data-try-label="Compare monsoon and drought in the Lab" hidden>
+        <h3>How weather changes coverage</h3>
+        <p class="bigidea"><b>Big idea</b>Weather changes the ground and the noise. Space weather changes the sky.</p>
+        <ul class="facts">
+          <li><b>Rain and monsoon</b> raise soil conductivity, so the ground wave reaches further.</li>
+          <li><b>Drought and frozen ground</b> lower conductivity and shorten coverage.</li>
+          <li><b>Thunderstorms</b> add static, so a stronger signal is needed for the same service.</li>
+          <li><b>Rain in the air</b> barely matters below a few GHz, so the lab ignores it.</li>
+          <li><b>Solar flares</b> cause sudden HF fade-outs; geomagnetic storms weaken the F2 layer.</li>
+        </ul>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: what does monsoon rain do to MW ground-wave reach?</legend>
+          <label><input type="radio" name="qc-weather" value="0">Shortens it, because rain drops absorb the wave</label>
+          <label><input type="radio" name="qc-weather" value="1">Extends it, because wet soil conducts better</label>
+          <label><input type="radio" name="qc-weather" value="2">Nothing at all</label>
+          <p class="qc-why" hidden>Wet soil has higher conductivity, so the ground wave travels further. Storm static can still raise the level you need.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-mixed" data-unit="Real world" data-mins="2" data-try="lab:4" data-try-label="Cross a coastline in the Lab" hidden>
+        <h3>Mixed paths: land and sea</h3>
+        <p class="bigidea"><b>Big idea</b>When a path crosses a coastline, the signal can get stronger again over the sea.</p>
+        <p>Millington's method combines different ground types along one path. It averages a forward and a reverse calculation, in dB.</p>
+        <p>Over sea after a coastline, the field can actually rise for a while. This is the <b>recovery effect</b>.</p>
+        <details class="deeper"><summary>Go deeper: the maths</summary>
+          <div class="eq">E = ½[ (E₁(d₁) − E₂(d₁) + E₂(d)) + (E₂(d₂) − E₁(d₂) + E₁(d)) ]</div>
+        </details>
+        <fieldset class="qc" data-correct="2"><legend>Quick check: a path goes from land onto sea. Just past the coast the field…</legend>
+          <label><input type="radio" name="qc-mixed" value="0">Drops to zero</label>
+          <label><input type="radio" name="qc-mixed" value="1">Stays exactly as it was over land</label>
+          <label><input type="radio" name="qc-mixed" value="2">Can rise for a while</label>
+          <p class="qc-why" hidden>That rise is the recovery effect: the well-conducting sea lets the wave regain strength.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-limits" data-unit="Real world" data-mins="1" data-try="methods" data-try-label="See every equation in Models" hidden>
+        <h3>Limits of this lab</h3>
+        <p class="bigidea"><b>Big idea</b>This is a teaching model. Use it to understand, not to license a station.</p>
+        <p>For real work use ITU-R P.368 (ground-wave curves), P.527 (ground constants), P.1147 (MF sky wave), P.533 (HF) and P.372 (radio noise), or professional planning tools.</p>
+        <p>The sky wave here is a median value. Real signals fade by 5–10 dB within minutes.</p>
+        <fieldset class="qc" data-correct="0"><legend>Quick check: you are planning a real licensed station. What should you use?</legend>
+          <label><input type="radio" name="qc-limits" value="0">The ITU-R recommendations or professional planning tools</label>
+          <label><input type="radio" name="qc-limits" value="1">This lab's median sky-wave curve</label>
+          <label><input type="radio" name="qc-limits" value="2">A single hand estimate</label>
+          <p class="qc-why" hidden>The lab simplifies on purpose. Licensing needs the full recommendations and measured data.</p>
+        </fieldset>
+      </article>
+
+      <article class="lesson" id="L-build" data-unit="Practice" data-mins="4" data-try="lab:9" data-try-label="Start building in the Lab" hidden>
+        <h3>Build and test your own model</h3>
+        <p class="bigidea"><b>Big idea</b>Change exactly one setting at a time, and compare against a copy. That is how you see cause and effect.</p>
+        <ol class="steps">
+          <li><b>Lab → + Copy selected</b> (or <b>+ Add blank model</b>) creates a model. Click its name to rename it.</li>
+          <li>Under <b>Signal</b>, choose the mechanism (ground wave, sky wave, both, or your own formula), then set frequency, power and antenna heights.</li>
+          <li>Under <b>Ground &amp; path</b> and <b>Time &amp; weather</b>, describe the path. Or draw a real path on the <b>Map</b> and choose <b>Open in Lab</b>.</li>
+          <li>Read the result and the plot, then open <b>Animation</b> to watch it travel.</li>
+          <li>To compare, copy the model and change one setting.</li>
+        </ol>
+        <p><button class="btn" type="button" data-open-help="build">Open the step-by-step guide</button></p>
+        <fieldset class="qc" data-correct="1"><legend>Quick check: what is the fair way to compare two set-ups?</legend>
+          <label><input type="radio" name="qc-build" value="0">Change frequency, ground and time together</label>
+          <label><input type="radio" name="qc-build" value="1">Copy the model and change exactly one setting</label>
+          <label><input type="radio" name="qc-build" value="2">Start a blank model each time</label>
+          <p class="qc-why" hidden>With one change, any difference in the curves comes from that change alone.</p>
+        </fieldset>
+      </article>
+
+      <div class="lc-nav">
+        <button class="btn lc-prev" id="lcPrev" type="button"><span aria-hidden="true">←</span> Previous</button>
+        <button class="btn lc-try" id="lcTry" type="button"></button>
+        <button class="btn primary lc-next" id="lcNext2" type="button">Next lesson <span aria-hidden="true">→</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lc-gloss" id="lcGloss" hidden>
+    <label class="lc-search" for="glossQ"><span>Search terms</span><input type="search" id="glossQ" placeholder="e.g. skip, dB, sea" autocomplete="off"></label>
+    <p class="lc-gcount" id="glossCount" aria-live="polite"></p>
+    <dl class="gloss-grid" id="glossList">
+      <div><dt>Ground (surface) wave</dt><dd>Vertically polarized wave guided along the earth's surface. Main MW/LF daytime service.</dd></div>
+      <div><dt>Sky wave</dt><dd>Wave reflected (refracted) back to earth by the ionosphere.</dd></div>
+      <div><dt>Conductivity σ</dt><dd>How easily the ground carries current, in S/m. Sea ≈ 5, average land ≈ 0.003, rock ≈ 0.0001.</dd></div>
+      <div><dt>Permittivity εr</dt><dd>How strongly the ground stores electric field energy. Matters most at higher frequencies.</dd></div>
+      <div><dt>Numerical distance p</dt><dd>Norton's measure of how "electrically far" a point is over lossy ground. Larger p means more loss.</dd></div>
+      <div><dt>dBµV/m</dt><dd>Field strength in decibels above 1 µV/m. 60 dBµV/m = 1 mV/m. Every 20 dB is ×10.</dd></div>
+      <div><dt>Critical frequency fo</dt><dd>Highest frequency a layer reflects at vertical incidence (foE, foF2).</dd></div>
+      <div><dt>Skip zone</dt><dd>Region with no ground wave and no returning sky wave.</dd></div>
+      <div><dt>Fading zone</dt><dd>Region where ground and sky waves are similar in strength and interfere.</dd></div>
+      <div><dt>Millington's method</dt><dd>Standard way to combine different ground types along one path.</dd></div>
+      <div><dt>Great-circle path</dt><dd>Shortest route between two points on the earth's surface.</dd></div>
+      <div><dt>Wave tilt</dt><dd>Forward lean of the wavefront caused by ground losses. Larger over poor ground.</dd></div>
+      <div><dt>Effective earth radius k</dt><dd>Factor that models atmospheric bending. Standard k = 4/3; larger k means less curvature loss.</dd></div>
+      <div><dt>Recovery effect</dt><dd>Rise in field strength after a path crosses from land onto sea.</dd></div>
+    </dl>
+    <p class="lc-empty" id="glossEmpty" hidden>No term matches. Try a shorter word, such as “wave” or “sea”.</p>
+  </div>
 </section>
 
 <!-- ======================= QUIZ ======================= -->
@@ -2182,7 +2459,7 @@ footer{color:var(--muted)}
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v7.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -6635,7 +6912,90 @@ function bindBottomNav(){
 }
 function bindTabs(){
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
-  window.addEventListener("load",()=>{ if(currentTab==="lab"&&location.hash==="#lab") setTimeout(()=>window.scrollTo({top:0}),0); });
+/* ================= LEARN: a short course, one lesson at a time ================= */
+(function initLearn(){
+  const root=$("learn"); if(!root) return;
+  const KEY="gwlab-learn";
+  const L=[...root.querySelectorAll(".lesson")];
+  const read=()=>{ try{ return JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ return {}; } };
+  const write=o=>{ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} };
+  let st=read(); st.done=st.done||{};
+  let cur=Math.max(0,L.findIndex(a=>a.id===st.last));
+  const reduce=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+
+  /* the path: units as headings, lessons as steps */
+  const path=$("lcPath"); let unit="";
+  L.forEach((a,i)=>{
+    if(a.dataset.unit!==unit){ unit=a.dataset.unit; const h=document.createElement("li"); h.className="lp-unit"; h.textContent=unit; h.setAttribute("aria-hidden","true"); path.appendChild(h); }
+    const li=document.createElement("li"); const b=document.createElement("button"); b.type="button"; b.className="lp-item"; b.dataset.i=i;
+    b.innerHTML='<span class="lp-dot"><span class="n">'+(i+1)+'</span>'+check+'</span><span class="lp-t">'+a.querySelector("h3").textContent+'<small>'+a.dataset.unit+' · '+a.dataset.mins+' min</small></span>';
+    b.addEventListener("click",()=>show(i,true)); li.appendChild(b); path.appendChild(li);
+    /* eyebrow inside each lesson */
+    const eb=document.createElement("p"); eb.className="lx-eyebrow"; eb.textContent="Lesson "+(i+1)+" of "+L.length+" · "+a.dataset.unit+" · "+a.dataset.mins+" min read"; a.prepend(eb);
+    /* quick check: one answer, instant feedback, explanation */
+    const fs=a.querySelector(".qc"); if(!fs) return;
+    const btn=document.createElement("button"); btn.type="button"; btn.className="btn qc-go"; btn.textContent="Check answer"; btn.disabled=true;
+    const fb=document.createElement("p"); fb.className="qc-fb"; fb.setAttribute("role","status");
+    const why=fs.querySelector(".qc-why"); fs.insertBefore(btn,why); fs.insertBefore(fb,why);
+    fs.addEventListener("change",()=>{ btn.disabled=false; fs.classList.remove("is-right","is-wrong"); fb.textContent=""; fs.querySelectorAll("label").forEach(l=>l.classList.remove("right","wrong")); });
+    btn.addEventListener("click",()=>{
+      const pick=fs.querySelector("input:checked"); if(!pick) return;
+      const ok=pick.value===fs.dataset.correct;
+      pick.closest("label").classList.add(ok?"right":"wrong");
+      fs.classList.toggle("is-right",ok); fs.classList.toggle("is-wrong",!ok);
+      if(ok){ fb.textContent="Correct. Lesson complete."; why.hidden=false; fs.querySelectorAll("input").forEach(x=>x.disabled=true); btn.hidden=true;
+        st.done[a.id]=Date.now(); write(st); render(); $("lcNext2").focus({preventScroll:true}); }
+      else { fb.textContent="Not quite. Read the big idea again and try another answer."; }
+    });
+    if(st.done[a.id]){ const c=fs.querySelector('input[value="'+fs.dataset.correct+'"]'); if(c){ c.checked=true; c.closest("label").classList.add("right"); } fs.classList.add("is-right"); why.hidden=false; fs.querySelectorAll("input").forEach(x=>x.disabled=true); btn.hidden=true; fb.textContent="Completed."; }
+  });
+
+  function render(){
+    const n=L.filter(a=>st.done[a.id]).length, pct=Math.round(100*n/L.length);
+    $("lcPct").textContent=pct+"%"; $("lcCount").textContent=n+" of "+L.length+" lessons";
+    $("lcRing").setAttribute("aria-label",n+" of "+L.length+" lessons complete");
+    $("lcRingVal").style.strokeDashoffset=String(119.4*(1-n/L.length));
+    const nx=L.findIndex(a=>!st.done[a.id]);
+    $("lcNext").textContent= n===L.length ? "Course complete. Try the Quiz." : (n ? "Next: "+L[nx].querySelector("h3").textContent : "Start with lesson 1");
+    $("lcResume").textContent= n===L.length ? "Take the quiz" : (n ? "Continue" : "Start");
+    path.querySelectorAll(".lp-item").forEach(b=>{ const i=+b.dataset.i; b.classList.toggle("done",!!st.done[L[i].id]);
+      if(i===cur) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); });
+  }
+  function show(i,focus){
+    cur=Math.max(0,Math.min(L.length-1,i)); st.last=L[cur].id; write(st);
+    L.forEach((a,j)=>{ a.hidden=j!==cur; });
+    const a=L[cur];
+    if(!reduce()){ a.classList.remove("in"); void a.offsetWidth; a.classList.add("in"); }
+    $("lcPrev").disabled=cur===0;
+    $("lcNext2").innerHTML= cur===L.length-1 ? 'Go to the quiz <span aria-hidden="true">→</span>' : 'Next lesson <span aria-hidden="true">→</span>';
+    $("lcTry").textContent=a.dataset.tryLabel||"Try it";
+    render();
+    const item=path.querySelector('.lp-item[data-i="'+cur+'"]'); if(item&&item.scrollIntoView) item.scrollIntoView({block:"nearest",inline:"center",behavior:reduce()?"auto":"smooth"});
+    if(focus){ const h=a.querySelector("h3"); h.tabIndex=-1; h.focus({preventScroll:true}); const top=root.querySelector(".lc-reader").getBoundingClientRect().top+scrollY-120; if(scrollY>top) window.scrollTo({top,behavior:reduce()?"auto":"smooth"}); }
+  }
+  $("lcPrev").addEventListener("click",()=>show(cur-1,true));
+  $("lcNext2").addEventListener("click",()=>{ if(cur===L.length-1) go("quiz"); else show(cur+1,true); });
+  $("lcTry").addEventListener("click",()=>{ const t=(L[cur].dataset.try||"lab").split(":"); go(t[0]);
+    if(t[0]==="lab"&&t[1]!=null){ const chip=$("presets")&&$("presets").children[+t[1]]; if(chip) chip.click(); } });
+  $("lcResume").addEventListener("click",()=>{ const nx=L.findIndex(a=>!st.done[a.id]); if(nx<0){ go("quiz"); return; } setView(false); show(nx,true); });
+
+  /* lessons | glossary */
+  function setView(g){ $("lcLessons").hidden=g; $("lcGloss").hidden=!g; $("lcViewLessons").setAttribute("aria-pressed",String(!g)); $("lcViewGloss").setAttribute("aria-pressed",String(g)); if(g) $("glossQ").focus(); }
+  $("lcViewLessons").addEventListener("click",()=>setView(false));
+  $("lcViewGloss").addEventListener("click",()=>setView(true));
+  const items=[...$("glossList").children];
+  const filt=()=>{ const q=$("glossQ").value.trim().toLowerCase(); let k=0;
+    items.forEach(d=>{ const on=!q||d.textContent.toLowerCase().includes(q); d.hidden=!on; if(on) k++; });
+    $("glossCount").textContent=q? k+" of "+items.length+" terms" : items.length+" terms"; $("glossEmpty").hidden=k>0; };
+  $("glossQ").addEventListener("input",filt); filt();
+  /* keyboard: ← → move between lessons when focus is in the reader */
+  root.querySelector(".lc-reader").addEventListener("keydown",e=>{ if(e.target.closest("input,textarea,select")) return;
+    if(e.key==="ArrowRight"&&cur<L.length-1){ e.preventDefault(); e.stopPropagation(); show(cur+1,true); }
+    if(e.key==="ArrowLeft"&&cur>0){ e.preventDefault(); e.stopPropagation(); show(cur-1,true); } });
+  show(cur,false);
+})();
+  window.addEventListener("load",()=>{ if(location.hash==="#"+currentTab) setTimeout(()=>window.scrollTo({top:0}),0); });
   if($("heroGo")) $("heroGo").addEventListener("click",()=>{ const b=document.querySelector(".bandwrap"); if(b) b.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); const m=$("main-content"); if(m) m.focus({preventScroll:true}); });
   document.querySelector(".tabs").addEventListener("keydown",e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return; const i=TABS.indexOf(currentTab); const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length]; go(n); document.querySelector(`.tab[data-tab="${n}"]`).focus(); });
   window.addEventListener("hashchange",()=>go(location.hash.slice(1),true));
