@@ -1253,7 +1253,7 @@ body:not([data-tab="lab"]) .hero{display:none}
 
 /* ---- phone navigation: navy bar, lime pill on the current place ---- */
 .bnav{background:var(--navy);border-top:1px solid rgba(247,250,252,.08)}
-.bnav a{color:rgba(247,250,252,.66)}
+.bnav a{color:rgba(247,250,252,.86);font-weight:500}
 .bnav a[aria-current="page"]{color:var(--cloud)}
 .bnav a[aria-current="page"] svg{background:var(--lime);color:var(--navy)}
 
@@ -1264,6 +1264,49 @@ footer{color:var(--muted)}
 @media print{.hero{display:none!important}}
 .bandwrap{scroll-margin-top:var(--appbar-h,112px)}
 @media (max-width:760px){.bandwrap{scroll-margin-top:96px}}
+
+/* ---- v7.1: no settings chip in the masthead; the tabs read as buttons ---- */
+.appbar .scope{display:none!important}
+.appbar .tabs{gap:var(--sp-2);padding:var(--sp-2) 0 var(--sp-3)}
+.appbar .tabs .tab{min-height:40px;padding:0 var(--sp-4);border-radius:var(--r-pill);
+  border:1px solid rgba(247,250,252,.22);background:rgba(247,250,252,.07);
+  color:rgba(247,250,252,.92);font:500 var(--fs-ui)/1 var(--font-display);letter-spacing:.005em;
+  transition:background-color var(--dur-2) var(--ease-out),color var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out),transform var(--dur-1) var(--ease-out)}
+.appbar .tabs .tab[aria-selected="true"]{background:var(--lime);border-color:var(--lime);color:var(--navy);
+  font-weight:600;box-shadow:0 0 0 4px rgba(205,242,58,.16)}
+@media (hover:hover) and (pointer:fine){
+  .appbar .tabs .tab:not([aria-selected="true"]):hover{background:rgba(247,250,252,.16);border-color:rgba(247,250,252,.45);color:var(--cloud)}
+}
+.appbar .tabs .tab:active{transform:scale(.96)}
+@media (min-width:761px) and (max-width:1100px){
+  .appbar .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .appbar .tabs .tab{flex:0 0 auto;padding:0 var(--sp-3)}
+}
+
+/* ---- motion: one entrance on the Lab hero, then it stays still ---- */
+@keyframes gw-rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes gw-fade{from{opacity:0}to{opacity:1}}
+@keyframes gw-zoom{from{transform:scale(1.08)}to{transform:scale(1)}}
+@keyframes gw-pulse{0%{box-shadow:0 0 0 0 rgba(205,242,58,.55)}70%{box-shadow:0 0 0 14px rgba(205,242,58,0)}100%{box-shadow:0 0 0 0 rgba(205,242,58,0)}}
+@keyframes gw-wave{0%,100%{opacity:.35}50%{opacity:1}}
+.hero-bg{animation:gw-zoom 2.4s cubic-bezier(.23,1,.32,1) both}
+.hero-words dt{animation:gw-rise .8s cubic-bezier(.23,1,.32,1) both}
+.hero-words dd{animation:gw-fade .7s ease-out both}
+.hero-words > div:nth-child(1) dt{animation-delay:.10s}.hero-words > div:nth-child(1) dd{animation-delay:.45s}
+.hero-words > div:nth-child(2) dt{animation-delay:.22s}.hero-words > div:nth-child(2) dd{animation-delay:.57s}
+.hero-words > div:nth-child(3) dt{animation-delay:.34s}.hero-words > div:nth-child(3) dd{animation-delay:.69s}
+.hero-card{animation:gw-rise .7s .6s cubic-bezier(.23,1,.32,1) both}
+.hero-cta{animation:gw-rise .7s .7s cubic-bezier(.23,1,.32,1) both,gw-pulse 2.2s 1.6s ease-out 2}
+.hero-cta svg{transition:transform var(--dur-2) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.hero-cta:hover svg{transform:translate(3px,-3px)}}
+.appbar .brand svg path:nth-of-type(n+3){animation:gw-wave 2.4s ease-in-out infinite}
+.wrap:not([hidden]){animation:gw-fade .25s ease-out}
+@media (prefers-reduced-motion: reduce){
+  .hero-bg,.hero-words dt,.hero-card,.hero-cta,.appbar .brand svg path,.wrap:not([hidden]){animation:none!important}
+  .hero-words dd{animation:gw-fade .2s ease-out both!important}
+  .appbar .tabs .tab:active{transform:none}
+}
 </style>
 </head>
 <body data-tab="lab">
@@ -2139,7 +2182,7 @@ footer{color:var(--muted)}
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a></div>
-<footer><b>Groundwave Propagation Lab v7.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
