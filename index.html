@@ -6,6 +6,11 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="Interactive trainer for LF, MF and HF ground-wave and sky-wave radio propagation, with OpenStreetMap, terrain profiles and receiver planning.">
 <title>Groundwave Propagation Lab</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="assets/site.webmanifest">
+<meta name="theme-color" content="#102C40">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="assets/katex/katex.min.css">
@@ -1549,6 +1554,89 @@ footer{color:var(--muted)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .mapseg input:checked + label{background:var(--mark);color:var(--on-mark)}}
 .mxchecks li span{color:var(--bg)}
 .sitestat .staff-link{margin-left:auto;color:var(--muted);font-size:var(--fs-meta)}
+
+/* ---- v7.6: full-screen panels can be moved or hidden so the animation stays visible ---- */
+.ov-grip{display:none;flex:0 0 auto;width:28px;height:28px;padding:0;border:0;border-radius:6px;background:rgba(255,255,255,.1);color:#fff;cursor:grab;touch-action:none;place-items:center}
+.ov-grip svg{width:12px;height:12px;fill:currentColor}
+.ov-grip:active{cursor:grabbing}
+.ov-grip:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.stage-tr .ov-grip{width:44px;height:24px;background:rgba(10,17,30,.86);border-radius:8px 8px 0 0;margin-bottom:-4px}
+@media (min-width:701px){.ov-grip{display:grid}}
+.stage:fullscreen .ov-grip,.stage.is-expanded .ov-grip{display:grid}
+.hud-top{justify-content:flex-start}.hud-top .hud-d{margin-left:auto}
+.stage .moved{right:auto!important;bottom:auto!important}
+.stage.clean .rxhud,.stage.clean .stage-tr{display:none!important}
+.fsbar #fsPanels[aria-pressed="true"]{background:var(--lime);color:var(--navy);border-color:var(--lime)}
+
+/* ---- v7.6: equation editor ---- */
+.eqdlg{width:min(860px,96vw);max-width:none;max-height:92vh;padding:0;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel);color:var(--ink);overflow:auto}
+.eqdlg::backdrop{background:rgba(8,26,39,.6)}
+.eq-h{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--sp-3);padding:var(--sp-5) var(--sp-5) var(--sp-3);background:var(--navy);color:var(--cloud)}
+.eq-h h2{margin:0;font:600 24px/1.1 var(--font-display);letter-spacing:-.03em;color:var(--cloud)}
+.eq-eyebrow{margin:0 0 2px;font-size:var(--fs-meta);color:var(--lime);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.eq-h .iconbtn{background:rgba(247,250,252,.08);border-color:rgba(247,250,252,.25);color:var(--cloud)}
+.eq-tabs{display:flex;gap:var(--sp-2);padding:0 var(--sp-5) var(--sp-3);background:var(--navy)}
+.eq-tab{min-height:40px;padding:0 var(--sp-4);border-radius:var(--r-pill);border:1px solid rgba(247,250,252,.22);background:rgba(247,250,252,.07);color:var(--cloud);font:500 var(--fs-ui)/1 var(--font-display);cursor:pointer}
+.eq-tab[aria-selected="true"]{background:var(--lime);border-color:var(--lime);color:var(--navy);font-weight:600}
+.eq-tab:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.eq-b{display:grid;gap:var(--sp-4);padding:var(--sp-5)}
+.eq-lead{margin:0;color:var(--muted);font-size:var(--fs-dense);max-width:70ch}
+.eq-f{display:grid;gap:var(--sp-1);font-size:var(--fs-dense);font-weight:500}
+.eq-f textarea{font:400 16px/1.5 var(--font-mono);padding:var(--sp-3);border-radius:var(--r-sm);border:1px solid var(--control);background:var(--panel);color:var(--ink);resize:vertical;width:100%}
+.eq-inline{grid-template-columns:auto minmax(0,1fr);align-items:center;gap:var(--sp-3)}
+.eq-inline select{min-height:40px}
+.eq-pal{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.eq-pk{flex-basis:100%;font-size:var(--fs-meta);color:var(--muted);font-weight:500;margin-top:var(--sp-1)}
+.eq-pk:first-child{margin-top:0}
+.eq-pal button{min-width:40px;min-height:36px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--control);background:var(--field);color:var(--ink);font:400 16px/1 var(--font-math);cursor:pointer}
+@media (hover:hover){.eq-pal button:hover{border-color:var(--ink);background:var(--panel)}}
+.eq-prev{margin:0;display:grid;gap:var(--sp-2);padding:var(--sp-4);border-radius:var(--r-md);background:var(--field);border-left:3px solid var(--mark);min-height:84px}
+.eq-prev figcaption,.eq-plotw figcaption{font-size:var(--fs-meta);color:var(--muted);font-weight:500}
+.eq-tex{overflow-x:auto;color:var(--ink)}
+.eq-tex:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.eq-tex .katex-display{margin:0;text-align:left}
+.eq-tex .katex{font-size:1.3em}
+.eq-big .eq-tex .katex{font-size:1.6em}
+.eq-status{margin:0;font-size:var(--fs-dense);min-height:1.4em;color:var(--muted)}
+.eq-status.ok{color:var(--good-ink)}.eq-status.bad{color:var(--bad-ink)}
+.eq-status b{font-weight:600}
+.eq-plotw{margin:0;display:grid;gap:var(--sp-2)}
+#eqPlot{width:100%;height:220px;display:block}
+.eq-act{display:flex;flex-wrap:wrap;gap:var(--sp-2);justify-content:flex-end;padding-top:var(--sp-2);border-top:1px solid var(--line)}
+.eq-act .btn{min-height:44px;border-radius:var(--r-pill);padding:0 var(--sp-4)}
+.eq-saved{display:grid;gap:var(--sp-2)}
+.eq-saved h3{margin:0;font:600 var(--fs-ui)/1.3 var(--font-display)}
+.eq-saved ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--sp-2)}
+.eq-saved li{display:flex;gap:var(--sp-2);align-items:stretch}
+.eq-sv{flex:1;min-width:0;min-height:48px;padding:var(--sp-2) var(--sp-3);text-align:left;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--panel);color:var(--ink);cursor:pointer;overflow-x:auto}
+@media (hover:hover){.eq-sv:hover{border-color:var(--ink)}}
+.eq-empty{margin:0;font-size:var(--fs-dense);color:var(--muted)}
+.eq-present{position:fixed;inset:0;z-index:200;background:var(--navy);color:var(--cloud);display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) 24px max(24px,env(safe-area-inset-left,0px));gap:var(--sp-5);grid-template-rows:1fr auto}
+.eq-pres-tex{max-width:100%;overflow-x:auto;color:var(--cloud)}
+.eq-pres-tex .katex{font-size:clamp(28px,5vw,72px)}
+.eq-present .btn{background:rgba(247,250,252,.1);color:var(--cloud);border-color:rgba(247,250,252,.3);border-radius:var(--r-pill);min-height:44px}
+@media (max-width:760px){.eq-b{padding:var(--sp-4)}.eq-h{padding:var(--sp-4) var(--sp-4) var(--sp-3)}.eq-tabs{padding:0 var(--sp-4) var(--sp-3)}.eq-inline{grid-template-columns:minmax(0,1fr)}.eq-act .btn{flex:1 1 auto}}
+
+/* ---- v7.6: guided tour ---- */
+.gt{position:fixed;inset:0;z-index:150;pointer-events:none}
+.gt-spot{position:fixed;border-radius:12px;box-shadow:0 0 0 2px var(--lime),0 0 0 9999px rgba(8,26,39,.62);transition:left .25s var(--ease-out),top .25s var(--ease-out),width .25s var(--ease-out),height .25s var(--ease-out)}
+.gt-card{position:fixed;pointer-events:auto;width:min(380px,calc(100vw - 24px));display:grid;gap:var(--sp-2);padding:var(--sp-4) var(--sp-5);border-radius:var(--r-lg);background:var(--panel);color:var(--ink);border:1px solid var(--line);box-shadow:0 18px 48px rgba(0,0,0,.35);transition:left .25s var(--ease-out),top .25s var(--ease-out)}
+.gt-card:focus{outline:none}.gt-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gt-n{margin:0;font-size:var(--fs-meta);font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.gt-card h2{margin:0;font:600 20px/1.2 var(--font-display);letter-spacing:-.02em}
+.gt-card > p:not(.gt-n){margin:0;font-size:var(--fs-ui);line-height:1.55}
+.gt-dots{display:flex;gap:5px;margin:var(--sp-1) 0}
+.gt-dots i{width:7px;height:7px;border-radius:50%;background:var(--control);transition:background-color .2s,width .2s}
+.gt-dots i.on{width:20px;border-radius:4px;background:var(--ink)}
+.gt-row{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-sp{flex:1}
+.gt-row .btn{min-height:40px;border-radius:var(--r-pill)}
+.gt-row .btn.ghost{padding-left:0}
+.hero-tour{min-height:48px;padding:0 var(--sp-5);border-radius:var(--r-pill);border:1px solid rgba(247,250,252,.45);background:rgba(11,33,51,.5);color:var(--cloud);font:500 var(--fs-ui)/1 var(--font-display);cursor:pointer}
+@media (hover:hover){.hero-tour:hover{background:rgba(11,33,51,.75)}}
+.hero-tour:focus-visible{outline:2px solid var(--cloud);outline-offset:3px}
+@media (max-width:760px){.hero-tour{flex:1 1 100%}.gt-row .btn{min-height:44px}}
+@media (prefers-reduced-motion: reduce){.gt-spot,.gt-card{transition:none}}
 /* ---- v7.4 audit fixes ---- */
 /* status pills: tinted, with readable ink (were muted text on a solid fill, ~1:1) */
 .pill.good{background:color-mix(in srgb,var(--good) 14%,var(--panel));color:var(--good-ink)}
@@ -1636,6 +1724,7 @@ footer{color:var(--muted)}
     </dl>
   </div>
   <div class="hero-foot">
+    <button class="hero-tour" type="button" data-site-tour>Take the tour</button>
     <button class="hero-cta" id="heroGo" type="button">Start an experiment<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></button>
   </div>
 </section>
@@ -1651,7 +1740,7 @@ footer{color:var(--muted)}
   </aside>
   <aside class="firstrun" id="firstRun" hidden>
     <p><b>New here?</b> Pick an experiment below and change one setting at a time. The quick start walks through all eight tabs.</p>
-    <div class="row"><button class="btn primary sm" type="button" data-open-help="start">Open the quick start</button><button class="btn sm" type="button" id="frDismiss">Dismiss</button></div>
+    <div class="row"><button class="btn primary sm" type="button" data-site-tour>Take the 1-minute tour</button><button class="btn sm" type="button" data-open-help="start">Open the quick start</button><button class="btn sm" type="button" id="frDismiss">Dismiss</button></div>
   </aside>
   <section class="expbar panel">
     <div class="expbar-top">
@@ -1702,6 +1791,7 @@ footer{color:var(--muted)}
               <textarea id="expr" spellcheck="false"></textarea>
               <p class="hint">Variables: d (km), f (MHz), P (kW), sigma, er, A (Norton factor), lam (km). Functions: exp, log, sqrt, pow.</p>
               <p class="err" id="exprErr"></p>
+              <button class="btn sm" type="button" data-eqed="formula">Open the equation editor</button>
             </div>
             <div class="field">
               <label for="freq">Frequency <span class="v" id="freqV"></span></label>
@@ -1885,7 +1975,8 @@ footer{color:var(--muted)}
     <div class="stack">
       <div class="stage">
         <canvas id="anim" aria-label="Animated cross-section of ground and sky wave propagation. Scroll or pinch to zoom, drag to pan, drag the radio to move the receiver."></canvas>
-        <div class="stage-tr">
+        <div class="stage-tr" id="stageTools">
+          <button class="ov-grip" type="button" aria-label="Move zoom controls (drag, or use arrow keys)" title="Drag to move"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="3" cy="3" r="1.2"/><circle cx="9" cy="3" r="1.2"/><circle cx="3" cy="9" r="1.2"/><circle cx="9" cy="9" r="1.2"/><circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/></svg></button>
           <button class="iconbtn mapbtn" id="aZoomIn" type="button" aria-label="Zoom in">＋</button>
           <button class="iconbtn mapbtn" id="aZoomOut" type="button" aria-label="Zoom out">－</button>
           <button class="iconbtn mapbtn" id="aReset" type="button" aria-label="Reset view" data-tip="Reset view"><svg class=ic aria-hidden=true><use href=#i-reset /></svg></button>
@@ -1903,10 +1994,11 @@ footer{color:var(--muted)}
           <span class="fsclock mono" id="fsClock">12:00</span>
           <input type="range" id="fsHour" min="0" max="24" step="0.05" aria-label="Time of day">
           <label class="check"><input type="checkbox" id="fsLabels" checked> Labels</label>
+          <button class="btn" id="fsPanels" type="button" aria-pressed="false" title="Hide the readout and zoom buttons (H)">Hide panels</button>
           <button class="btn" id="fsExit" type="button">Exit full screen</button>
         </div>
         <div class="rxhud" id="rxHud" aria-live="polite">
-          <div class="hud-top"><span class="hud-q" id="hudQ">–</span><span class="mono hud-d" id="hudD">–</span></div>
+          <div class="hud-top"><button class="ov-grip" type="button" aria-label="Move signal readout (drag, or use arrow keys)" title="Drag to move"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="3" cy="3" r="1.2"/><circle cx="9" cy="3" r="1.2"/><circle cx="3" cy="9" r="1.2"/><circle cx="9" cy="9" r="1.2"/><circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/></svg></button><span class="hud-q" id="hudQ">–</span><span class="mono hud-d" id="hudD">–</span></div>
           <div class="hud-val mono" id="hudT">–</div>
           <div class="hud-row"><span class="hud-k"><i class="k-gw"></i>Ground</span><div class="hud-bar"><span id="hbG" class="b-gw"></span><b id="hbT"></b></div><span class="mono" id="hvG">–</span></div>
           <div class="hud-row"><span class="hud-k"><i class="k-sky"></i>Sky</span><div class="hud-bar"><span id="hbS" class="b-sky"></span><b id="hbT2"></b></div><span class="mono" id="hvS">–</span></div>
@@ -2198,7 +2290,7 @@ footer{color:var(--muted)}
 <section class="wrap" id="methods" role="tabpanel" aria-labelledby="tab-methods" hidden>
   <div class="intro"><div class="stack" style="gap:4px"><h2>Models &amp; equations</h2><p>Every number in this app comes from the equations below. Pick a model to see the calculation step by step, which checks pass, and where the model stops being valid. Lecturers can use this to discuss accuracy and limitations.</p></div></div>
   <section class="panel card mxcalc" aria-labelledby="mxH">
-    <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><div class="row"><button class="btn" id="mxCopy" type="button">Copy steps</button><button class="btn" id="mxPrint" type="button"><svg class=ic aria-hidden=true><use href=#i-print /></svg> Print / PDF report</button></div></div>
+    <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><div class="row"><button class="btn" type="button" data-eqed="latex">Equation editor</button><button class="btn" id="mxCopy" type="button">Copy steps</button><button class="btn" id="mxPrint" type="button"><svg class=ic aria-hidden=true><use href=#i-print /></svg> Print / PDF report</button></div></div>
     <div id="rptHead" class="rpthead"></div>
     <div class="mxctl">
       <label class="field"><span>Model</span><select id="mxModel"></select></label>
@@ -2938,6 +3030,75 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <div class="dlg-f"><button class="btn" type="button" id="fbCancel">Cancel</button><button class="btn primary" type="button" id="fbSend">Send feedback</button></div>
   </form>
 </dialog>
+<dialog id="eqDlg" class="eqdlg" aria-labelledby="eqTitle">
+  <div class="eq-h">
+    <div><p class="eq-eyebrow">For tutors</p><h2 id="eqTitle">Equation editor</h2></div>
+    <button class="iconbtn" id="eqClose" type="button" aria-label="Close equation editor"><svg class=ic aria-hidden=true><use href=#i-close /></svg></button>
+  </div>
+  <div class="eq-tabs" role="tablist" aria-label="Editor mode">
+    <button class="eq-tab" role="tab" id="eqTabF" aria-controls="eqPanF" aria-selected="true" data-eqtab="formula">Model formula</button>
+    <button class="eq-tab" role="tab" id="eqTabL" aria-controls="eqPanL" aria-selected="false" data-eqtab="latex" tabindex="-1">Write maths (LaTeX)</button>
+  </div>
+
+  <div class="eq-b" id="eqPanF" role="tabpanel" aria-labelledby="eqTabF">
+    <p class="eq-lead">Build a field-strength formula, see it typeset, check it, and plot it against the model selected in the Lab. <b>E</b> is in mV/m.</p>
+    <label class="eq-f" for="eqExpr"><span>Formula for E (mV/m)</span>
+      <textarea id="eqExpr" rows="2" spellcheck="false" autocomplete="off"></textarea></label>
+    <div class="eq-pal" role="group" aria-label="Insert into the formula">
+      <span class="eq-pk">Variables</span>
+      <button type="button" data-ins="d" title="distance, km">d</button><button type="button" data-ins="f" title="frequency, MHz">f</button><button type="button" data-ins="P" title="power, kW">P</button><button type="button" data-ins="sigma" title="conductivity, S/m">σ</button><button type="button" data-ins="er" title="relative permittivity">ε<sub>r</sub></button><button type="button" data-ins="A" title="Norton attenuation factor">A</button><button type="button" data-ins="lam" title="wavelength, km">λ</button><button type="button" data-ins="PI" title="pi">π</button>
+      <span class="eq-pk">Functions</span>
+      <button type="button" data-ins="sqrt(|)">√x</button><button type="button" data-ins="exp(|)">eˣ</button><button type="button" data-ins="log10(|)">log₁₀</button><button type="button" data-ins="log(|)">ln</button><button type="button" data-ins="pow(|, 2)">xʸ</button><button type="button" data-ins="abs(|)">|x|</button>
+      <span class="eq-pk">Operators</span>
+      <button type="button" data-ins=" + ">+</button><button type="button" data-ins=" - ">−</button><button type="button" data-ins="*">×</button><button type="button" data-ins="/">÷</button><button type="button" data-ins="(|)">( )</button>
+    </div>
+    <label class="eq-f eq-inline" for="eqTpl"><span>Start from</span>
+      <select id="eqTpl">
+        <option value="">Choose a template…</option>
+        <option value="300*sqrt(P)/d">Inverse distance, eq. (14) with F = 1</option>
+        <option value="300*sqrt(P)*A/d">Norton ground wave: 300·√P·A / d</option>
+        <option value="300*sqrt(P)/d * exp(-0.004*d*pow(f,0.7))">Empirical exponential decay</option>
+        <option value="300*sqrt(P)/d * (2+0.3*(PI*d/(lam*1.8e4*sigma/f)))/(2+(PI*d/(lam*1.8e4*sigma/f))+0.6*pow(PI*d/(lam*1.8e4*sigma/f),2))">Terman / handbook eq. (40), ε neglected</option>
+      </select></label>
+    <figure class="eq-prev" aria-live="polite"><figcaption>As typeset</figcaption><div id="eqTexF" class="eq-tex" tabindex="0" role="group" aria-label="Typeset formula"></div></figure>
+    <p class="eq-status" id="eqStat" role="status"></p>
+    <figure class="eq-plotw"><figcaption>Your formula against <b id="eqRefName">the selected model</b>, 1 kW reference settings from the Lab</figcaption>
+      <canvas id="eqPlot" role="img" aria-label="Plot of the formula against the selected model"></canvas>
+      <ul class="wg-leg" id="eqLeg"></ul></figure>
+    <div class="eq-act">
+      <button class="btn" type="button" id="eqCopyTexF">Copy LaTeX</button>
+      <button class="btn primary" type="button" id="eqUse">Add to the Lab as a model →</button>
+    </div>
+  </div>
+
+  <div class="eq-b" id="eqPanL" role="tabpanel" aria-labelledby="eqTabL" hidden>
+    <p class="eq-lead">Write any equation in LaTeX for notes, slides or the board. Use the palette, or load one of the handbook equations.</p>
+    <label class="eq-f" for="eqLatex"><span>LaTeX</span>
+      <textarea id="eqLatex" rows="3" spellcheck="false" autocomplete="off"></textarea></label>
+    <div class="eq-pal" role="group" aria-label="Insert LaTeX">
+      <span class="eq-pk">Structure</span>
+      <button type="button" data-tex="\frac{|}{}">a/b</button><button type="button" data-tex="\sqrt{|}">√</button><button type="button" data-tex="^{|}">xⁿ</button><button type="button" data-tex="_{|}">xₙ</button><button type="button" data-tex="\left( | \right)">( )</button><button type="button" data-tex="\sum_{i}">Σ</button><button type="button" data-tex="\int_{0}^{\infty}">∫</button><button type="button" data-tex="\log_{10}">log</button><button type="button" data-tex="\mathrm{j}">j</button><button type="button" data-tex="\mathrm{|}">text</button>
+      <span class="eq-pk">Greek</span>
+      <button type="button" data-tex="\alpha">α</button><button type="button" data-tex="\delta">δ</button><button type="button" data-tex="\varepsilon">ε</button><button type="button" data-tex="\eta">η</button><button type="button" data-tex="\lambda">λ</button><button type="button" data-tex="\mu">μ</button><button type="button" data-tex="\pi">π</button><button type="button" data-tex="\rho">ρ</button><button type="button" data-tex="\sigma">σ</button><button type="button" data-tex="\varphi">φ</button><button type="button" data-tex="\omega">ω</button><button type="button" data-tex="\Omega">Ω</button><button type="button" data-tex="\Delta">Δ</button><button type="button" data-tex="\Phi">Φ</button>
+      <span class="eq-pk">Relations</span>
+      <button type="button" data-tex=" = ">=</button><button type="button" data-tex=" \approx ">≈</button><button type="button" data-tex=" \le ">≤</button><button type="button" data-tex=" \ge ">≥</button><button type="button" data-tex=" \propto ">∝</button><button type="button" data-tex=" \cdot ">·</button><button type="button" data-tex=" \times ">×</button><button type="button" data-tex="^{\circ}">°</button>
+    </div>
+    <label class="eq-f eq-inline" for="eqHb"><span>Load from the handbook</span><select id="eqHb"><option value="">Choose an equation…</option></select></label>
+    <figure class="eq-prev eq-big" aria-live="polite"><figcaption>Preview</figcaption><div id="eqTexL" class="eq-tex" tabindex="0" role="group" aria-label="Typeset preview"></div></figure>
+    <p class="eq-status" id="eqStatL" role="status"></p>
+    <div class="eq-act">
+      <button class="btn" type="button" id="eqSave">Save</button>
+      <button class="btn" type="button" id="eqCopyTex">Copy LaTeX</button>
+      <button class="btn" type="button" id="eqCopyMml" title="Paste into Word, OneNote or Google Docs equation fields">Copy MathML (for Word)</button>
+      <button class="btn primary" type="button" id="eqPresent">Present full screen</button>
+    </div>
+    <section class="eq-saved" aria-labelledby="eqSavedH"><h3 id="eqSavedH">Saved on this device</h3><ul id="eqSavedList"></ul><p class="eq-empty" id="eqSavedEmpty">Nothing saved yet. Write an equation and press <b>Save</b> to keep it for your next class.</p></section>
+  </div>
+<div class="eq-present" id="eqPres" hidden role="dialog" aria-modal="true" aria-label="Equation, presented full screen">
+  <div class="eq-pres-tex" id="eqPresTex"></div>
+  <button class="btn" type="button" id="eqPresClose">Close (Esc)</button>
+</div>
+</dialog>
 <dialog id="helpDlg" aria-labelledby="helpTitle">
   <div class="dlg">
     <div class="dlg-h"><h2 id="helpTitle">Welcome to the Groundwave Propagation Lab</h2><button class="iconbtn" id="helpClose" type="button" aria-label="Close help"><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></div>
@@ -2987,7 +3148,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
       <p><b>Accuracy:</b> the Models tab lists every equation, the checks that pass or fail for your inputs, built-in verification tests, and a tool to compare predictions with your own measurements. Use certified planning software for licensing or frequency coordination.</p>
       <p class="hint">Map data © OpenStreetMap contributors · OpenTopoMap (CC-BY-SA) · Elevation: Copernicus DEM GLO-90 via Open-Meteo.</p>
     </div>
-    <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
+    <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn" type="button" data-site-tour>Take the guided tour</button><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
   </div>
 </dialog>
 <div class="wrap" style="padding-top:0">
@@ -3005,7 +3166,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v7.5</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.6</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4661,6 +4822,25 @@ function bindAnim(){
     try{ if(stage.requestFullscreen) await stage.requestFullscreen(); else throw 0; }catch(e){ stage.classList.add("is-expanded"); }
     setFullIcon(); };
   $("aFull").addEventListener("click",toggleFull);
+
+  /* movable overlays: drag a grip (or use arrow keys on it); positions are kept for this visit */
+  const stageEl=document.querySelector("#animation .stage");
+  const placeOv=(el,x,y)=>{ const sw=stageEl.clientWidth, sh=stageEl.clientHeight, w=el.offsetWidth, h=el.offsetHeight;
+    x=clamp(x,4,Math.max(4,sw-w-4)); y=clamp(y,4,Math.max(4,sh-h-4)); el.style.left=x+"px"; el.style.top=y+"px"; el.classList.add("moved");
+    try{ sessionStorage.setItem("gw-ov-"+el.id,JSON.stringify([x/sw,y/sh])); }catch(e){} };
+  const restoreOv=()=>{ ["rxHud","stageTools"].forEach(id=>{ const el=$(id); if(getComputedStyle(el).position!=="absolute") { el.classList.remove("moved"); el.style.left=el.style.top=""; return; }
+    try{ const v=JSON.parse(sessionStorage.getItem("gw-ov-"+id)||"null"); if(v) placeOv(el,v[0]*stageEl.clientWidth,v[1]*stageEl.clientHeight); }catch(e){} }); };
+  ["rxHud","stageTools"].forEach(id=>{ const el=$(id), g=el.querySelector(".ov-grip"); let st=null;
+    g.addEventListener("pointerdown",e=>{ e.preventDefault(); e.stopPropagation(); g.setPointerCapture(e.pointerId); const r=el.getBoundingClientRect(), sr=stageEl.getBoundingClientRect(); st={dx:e.clientX-r.left,dy:e.clientY-r.top,sr}; });
+    g.addEventListener("pointermove",e=>{ if(!st) return; placeOv(el,e.clientX-st.sr.left-st.dx,e.clientY-st.sr.top-st.dy); });
+    const end=()=>{ st=null; }; g.addEventListener("pointerup",end); g.addEventListener("pointercancel",end);
+    g.addEventListener("keydown",e=>{ const k={ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]}[e.key]; if(!k) return; e.preventDefault(); e.stopPropagation();
+      const r=el.getBoundingClientRect(), sr=stageEl.getBoundingClientRect(); placeOv(el,r.left-sr.left+k[0],r.top-sr.top+k[1]); });
+  });
+  const setPanels=hide=>{ stageEl.classList.toggle("clean",hide); $("fsPanels").setAttribute("aria-pressed",String(hide)); $("fsPanels").textContent=hide?"Show panels":"Hide panels"; };
+  $("fsPanels").addEventListener("click",()=>setPanels(!stageEl.classList.contains("clean")));
+  document.addEventListener("keydown",e=>{ if((e.key==="h"||e.key==="H")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&currentTab==="animation"&&!e.target.closest("input,textarea,select,[contenteditable]")) setPanels(!stageEl.classList.contains("clean")); });
+  document.addEventListener("fullscreenchange",()=>setTimeout(restoreOv,60)); window.addEventListener("resize",()=>{ clearTimeout(restoreOv.t); restoreOv.t=setTimeout(restoreOv,120); });
   // full-screen control bar
   const ff=$("fsFreq"); ff.innerHTML=A_FREQS.map(([l,f])=>`<option value="${f}">${l}Hz</option>`).join("");
   ff.addEventListener("change",e=>animSet({f:+e.target.value},true));
@@ -4703,10 +4883,10 @@ function pill(c,text,x,y,o={}){
   c.font=`${o.bold===false?500:600} ${o.size||12}px `+cssVar("--font-body");
   const w=c.measureText(text).width+14, h=(o.size||12)+10; let bx=o.align==="right"?x-w:o.align==="left"?x:x-w/2;
   bx=clamp(bx,6,c.canvas.clientWidth-w-6); const by=y-h/2;
-  if(o.to){ c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=1.2; c.beginPath(); c.moveTo(clamp(o.to[0],bx,bx+w),by+(o.to[1]>y?h:0)); c.lineTo(o.to[0],o.to[1]); c.stroke(); c.fillStyle=PAL.halo; c.beginPath(); c.arc(o.to[0],o.to[1],2.5,0,7); c.fill(); }
+  if(o.to){ c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=1.2; c.beginPath(); c.moveTo(clamp(o.to[0],bx,bx+w),by+(o.to[1]>y?h:0)); c.lineTo(o.to[0],o.to[1]); c.stroke(); c.fillStyle="#F7FAFC"; c.beginPath(); c.arc(o.to[0],o.to[1],2.5,0,7); c.fill(); }
   c.fillStyle=o.bg||SC.label; c.beginPath(); c.roundRect?c.roundRect(bx,by,w,h,6):c.rect(bx,by,w,h); c.fill();
   if(o.accent){ c.fillStyle=`rgb(${o.accent})`; c.fillRect(bx,by+4,3,h-8); }
-  c.fillStyle=o.fg||PAL.halo; c.textAlign="left"; c.textBaseline="middle"; c.fillText(text,bx+7+(o.accent?2:0),y+0.5); c.textBaseline="alphabetic";
+  c.fillStyle=o.fg||"#F7FAFC"; c.textAlign="left"; c.textBaseline="middle"; c.fillText(text,bx+7+(o.accent?2:0),y+0.5); c.textBaseline="alphabetic";
 }
 
 function drawAnim(dt){
@@ -4747,7 +4927,7 @@ function drawAnim(dt){
   const arcFill=(a,b,col)=>{ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((a+(b-a)*i/40)/RE,0); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=40;i>=0;i--){ const [x,y]=map((a+(b-a)*i/40)/RE,-260); c.lineTo(x,y);} c.closePath(); c.fillStyle=col; c.fill(); };
   const segs=pathSegs(p,Math.max(dB,1)); arcFill(Math.min(dA,0),0.3,effGround(segs[0].g,p).color);
   { let pos=0; segs.forEach(s=>{ arcFill(pos,pos+s.len+0.3,effGround(s.g,p).color); pos+=s.len; }); }
-  if(p.frozen){ c.strokeStyle=alphaOf(PAL.halo,.9); c.lineWidth=4; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0.5); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); }
+  if(p.frozen){ c.strokeStyle="rgba(255,255,255,.9)"; c.lineWidth=4; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0.5); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); }
   // ===== real terrain along a map path (Copernicus DEM + OpenStreetMap) =====
   const TR=p.path==="geo"&&p.terrain&&p.terrain.d&&p.terrain.d.length>1?p.terrain:null;
   let tAlt=()=>0, tEx=0, vEx=0;
@@ -4792,7 +4972,7 @@ function drawAnim(dt){
       if(wet!=="normal"||p.storm==="local"){ c.strokeStyle="rgba(170,205,255,.85)"; c.lineWidth=1.2; for(let k=0;k<6;k++){ const ry=((t/6+k*13+i*7)%70); c.beginPath(); c.moveTo(x-13+k*5,yy+14+ry); c.lineTo(x-15+k*5,yy+21+ry); c.stroke(); } }
       if(p.storm!=="none"&&i%2===0&&Math.floor(t/160+i)%6===0){ c.strokeStyle="#fff6a8"; c.lineWidth=2.4; c.beginPath(); c.moveTo(x,yy+12); c.lineTo(x-7,yy+34); c.lineTo(x+3,yy+34); c.lineTo(x-5,yy+60); c.stroke(); } }
   }
-  if(p.frozen){ c.fillStyle=alphaOf(PAL.halo,.9); for(let i=0;i<50;i++){ c.fillRect((i*71.3+t/30)%W,(i*37.1+t/14)%gTop,2,2);} }
+  if(p.frozen){ c.fillStyle="rgba(255,255,255,.9)"; for(let i=0;i<50;i++){ c.fillRect((i*71.3+t/30)%W,(i*37.1+t/14)%gTop,2,2);} }
 
   // analysis (zones), cached
   const aKey=JSON.stringify(m.p)+"|"+Math.round(AN.hour*4);
@@ -4885,7 +5065,7 @@ function drawAnim(dt){
   if(AN.rx>=dA&&AN.rx<=dB){
     const [rx,ry]=map(AN.rx/RE,tAlt(AN.rx)), ra=angAt(AN.rx);
     c.save(); c.translate(rx,ry); c.rotate(ra);
-    c.fillStyle="#16202e"; c.strokeStyle=PAL.halo; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
+    c.fillStyle="#16202e"; c.strokeStyle="#F7FAFC"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
     c.beginPath(); c.moveTo(7,-19); c.lineTo(13,-36); c.stroke(); c.fillStyle="#ffd23c"; c.beginPath(); c.arc(-5,-10,4,0,7); c.fill();
     c.restore();
     pill(c,`Receiver ${fmtD(AN.rx)} km · drag me`,rx,ry-58,{size:11.5});
@@ -7671,6 +7851,213 @@ function bindTabs(){
     if(e.key==="ArrowRight"&&cur<L.length-1){ e.preventDefault(); e.stopPropagation(); show(cur+1,true); }
     if(e.key==="ArrowLeft"&&cur>0){ e.preventDefault(); e.stopPropagation(); show(cur-1,true); } });
   show(cur,false);
+})();
+/* ================= EQUATION EDITOR (tutors) ================= */
+(function initEqEditor(){
+  const dlg=$("eqDlg"); if(!dlg) return;
+  const HB=[["(2) Ground wave as three terms","V = QI\\left[ Q_1\\,\\frac{e^{-\\mathrm{j}kr_1}}{r_1} + Q_2 R\\,\\frac{e^{-\\mathrm{j}kr_2}}{r_2} + S\\,\\frac{e^{-\\mathrm{j}kr_2}}{r_2} \\right]"],["(5) Attenuation function F","F = 1 - \\mathrm{j}\\sqrt{\\pi w}\\; e^{-w}\\, \\operatorname{erfc}\\!\\left(\\mathrm{j}\\sqrt{w}\\right)"],["(11) Numerical distance w","w = \\frac{-\\mathrm{j}kr\\,u^{2}}{2}\\left(1-u^{2}\\right) \\qquad \\text{(ground-based terminals)}"],["(7)–(8) u² and x","u^{2} = \\frac{1}{\\varepsilon_r - \\mathrm{j}x}, \\qquad x = \\frac{\\sigma}{\\omega\\varepsilon_0} = 1.8\\times10^{4}\\,\\frac{\\sigma}{f_{\\mathrm{MHz}}}"],["(14) Field of a short monopole","E_z = \\frac{300}{r}\\,\\sqrt{P}\\,F \\qquad [\\mathrm{mV/m},\\ \\mathrm{kW},\\ \\mathrm{km}]"],["(39) Numerical distance ρ","\\rho = -\\mathrm{j}\\,\\frac{\\pi R}{\\lambda}\\cdot\\frac{\\varepsilon' - 1}{\\varepsilon'^{2}}, \\qquad \\varepsilon' = \\varepsilon - \\mathrm{j}\\,60\\lambda\\sigma"],["(40) Approximate attenuation V","V \\approx \\frac{2 + 0.3\\rho}{2 + \\rho + 0.6\\rho^{2}}"],["(13) Wave tilt","\\frac{E_\\rho}{E_z} \\approx u = \\frac{1}{\\sqrt{K_r}}"],["(12) H from E","H_\\varphi = -\\frac{E}{Z_0}, \\qquad Z_0 = 120\\pi\\ \\Omega"],["(15) Flat-earth distance","d = \\frac{80}{\\sqrt[3]{f_{\\mathrm{MHz}}}} \\qquad [\\mathrm{km}]"],["(16) Near-field correction","\\Delta E = 10\\log_{10}\\!\\left[1 - \\frac{1}{(kr)^{2}} + \\frac{1}{(kr)^{4}}\\right]\\ \\mathrm{dB}"],["(20) Skin depth","\\delta = \\left\\{ \\omega\\sqrt{\\frac{\\mu_r\\mu_0\\varepsilon_r\\varepsilon_0}{2}}\\left[\\sqrt{1+\\left(\\frac{\\sigma}{\\omega\\varepsilon_r\\varepsilon_0}\\right)^{2}}-1\\right]^{1/2} \\right\\}^{-1}"],["(21) Sea-water conductivity","\\sigma_{\\mathrm{sea}} = 0.18\\,C^{0.93}\\left[1 + 0.02\\,(T-20)\\right]\\ \\mathrm{S/m}"],["(25) Weighted conductivity","\\sigma_{\\mathrm{weighted}} = \\frac{\\sum_i \\sigma_i d_i}{\\sum_i d_i}"],["(19) Surface impedance","\\eta = \\frac{\\sqrt{\\varepsilon - \\mathrm{j}\\,60\\sigma\\lambda - 1}}{\\varepsilon - \\mathrm{j}\\,60\\sigma\\lambda}"],["(22) Millington, forward","E_R = E_1(L_1) - E_2(L_1) + E_2(L_1+L_2) - E_3(L_1+L_2) + E_3(L_1+L_2+L_3)"],["(23) Millington, reverse","E_T = E_3(L_3) - E_2(L_3) + E_2(L_3+L_2) - E_1(L_3+L_2) + E_1(L_3+L_2+L_1)"],["(24) Millington, result","E_M = \\frac{E_R + E_T}{2} \\qquad [\\mathrm{dB}(\\mu\\mathrm{V/m})]"],["(43) Large and small scale","r(x) = m(x)\\cdot r_0(x)"],["(44) Terrain irregularity loss","L_{\\mathrm{Irr}} = \\left(-17.2\\log_{10} d + 25.1\\right)\\cdot\\log_{10}(2.84\\,h)\\ \\mathrm{dB}"],["(45) Indoor loss","L_{\\mathrm{indoor}} = -42.1 + 20.5\\log_{10} f_{\\mathrm{kHz}}\\ \\mathrm{dB}"],["(46) Indoor field","E_{\\mathrm{indoor}} = E_{\\mathrm{P.368}} + 42.1 - 20.5\\log_{10} f_{\\mathrm{kHz}}\\ \\ \\mathrm{dB}(\\mu\\mathrm{V/m})"],["§19.1 Ground-wave phase","\\Phi = nkd + \\Phi_S"],["§19.1 Secondary phase delay","t_s = \\frac{\\Phi_S\\,\\lambda}{2\\pi\\cdot 300} = \\frac{\\Phi_S\\cdot 10^{6}}{2\\pi f_{\\mathrm{Hz}}}\\qquad[\\mu\\mathrm{s}]"],["Secant law","f \\le f_o \\sec\\varphi \\qquad \\text{(secant law)}"],["D-layer absorption","L_D \\propto \\frac{1}{(f + f_H)^{2}} \\qquad \\text{(D-layer absorption)}"]];
+  const KATEX_SRC="assets/katex/katex.min.js";
+  let kReady=null;
+  const loadKatex=()=>kReady||(kReady=new Promise((res,rej)=>{ if(window.katex) return res(window.katex); const s=document.createElement("script"); s.src=KATEX_SRC; s.onload=()=>res(window.katex); s.onerror=()=>{ kReady=null; rej(new Error("load")); }; document.head.appendChild(s); }));
+  const tex=(t,el,display)=>{ try{ window.katex.render(t,el,{displayMode:display!==false,throwOnError:true,output:"htmlAndMathml"}); return null; }catch(e){ el.textContent=""; return (e.message||"").replace(/^KaTeX parse error: /,""); } };
+
+  /* ---- calculator syntax → LaTeX ---- */
+  const VARS={d:"d",f:"f",P:"P",A:"A",sigma:"\\sigma",er:"\\varepsilon_r",lam:"\\lambda",PI:"\\pi",E:"e"};
+  function parse(src){
+    const tk=[]; const re=/\s*(\d+\.?\d*(?:e[+-]?\d+)?|\.\d+(?:e[+-]?\d+)?|[A-Za-z_]\w*|\*\*|[-+*/(),])/gy; let m, i=0;
+    src=src.trim(); re.lastIndex=0;
+    while(re.lastIndex<src.length){ const at=re.lastIndex; m=re.exec(src); if(!m||m.index!==at){ if(/^\s*$/.test(src.slice(at))) break; throw new Error("Unexpected “"+src.slice(at).trim()[0]+"”"); } tk.push(m[1]); }
+    const peek=()=>tk[i], next=()=>tk[i++], eat=t=>{ if(tk[i]!==t) throw new Error(tk[i]?("Expected “"+t+"” before “"+tk[i]+"”"):("Missing “"+t+"”")); i++; };
+    function expr(){ let n=term(); while(peek()==="+"||peek()==="-"){ const o=next(); n={t:"bin",o,a:n,b:term()}; } return n; }
+    function term(){ let n=unary(); while(peek()==="*"||peek()==="/"){ const o=next(); n={t:"bin",o,a:n,b:unary()}; } return n; }
+    function unary(){ if(peek()==="-"){ next(); return {t:"neg",a:unary()}; } if(peek()==="+"){ next(); return unary(); } return power(); }
+    function power(){ const b=primary(); if(peek()==="**"){ next(); return {t:"pow",a:b,b:unary()}; } return b; }
+    function primary(){ const t=next(); if(t===undefined) throw new Error("The formula ends too early");
+      if(t==="("){ const n=expr(); eat(")"); return {t:"par",a:n}; }
+      if(/^[\d.]/.test(t)) return {t:"num",v:t};
+      if(/^[A-Za-z_]/.test(t)){ if(peek()==="("){ next(); const args=[]; if(peek()!==")"){ args.push(expr()); while(peek()===","){ next(); args.push(expr()); } } eat(")"); return {t:"fn",n:t,args}; } return {t:"id",n:t}; }
+      throw new Error("Unexpected “"+t+"”"); }
+    const n=expr(); if(i<tk.length) throw new Error("Unexpected “"+tk[i]+"”"); return n;
+  }
+  const PREC={bin:{"+":1,"-":1,"*":2,"/":3},neg:2,pow:4,num:5,id:5,fn:5,par:5};
+  const prec=n=>n.t==="bin"?PREC.bin[n.o]:PREC[n.t];
+  const strip=n=>n.t==="par"?strip(n.a):n;
+  const wrap=(n,min)=>{ n=strip(n); const s=T(n); return prec(n)<min?"\\left("+s+"\\right)":s; };
+  const num=v=>{ const m=/^(\d*\.?\d*)e([+-]?\d+)$/i.exec(v); return m?(m[1]+"\\times10^{"+(+m[2])+"}"):v; };
+  function T(n){
+    switch(n.t){
+      case "num": return num(n.v);
+      case "id": return VARS[n.n]||("\\mathrm{"+n.n+"}");
+      case "par": return "\\left("+T(n.a)+"\\right)";
+      case "neg": return "-"+wrap(n.a,2);
+      case "pow": return "{"+wrap(n.a,5)+"}^{"+T(strip(n.b))+"}";
+      case "bin":
+        if(n.o==="/") return "\\frac{"+T(strip(n.a))+"}{"+T(strip(n.b))+"}";
+        if(n.o==="*"){ const a=strip(n.a), b=strip(n.b); const sa=wrap(a,2), sb=wrap(b,2); const dot=(a.t==="num"&&b.t!=="num")||(b.t==="fn"&&b.n==="sqrt")||(a.t==="id"&&b.t==="id")?"\\,":"\\cdot "; return sa+(b.t==="num"?"\\times ":dot)+sb; }
+        return T(n.a)+" "+n.o+" "+(n.o==="-"?wrap(n.b,2):T(n.b));
+      case "fn": { const a=n.args.map(x=>T(strip(x)));
+        switch(n.n){
+          case "sqrt": return "\\sqrt{"+a[0]+"}";
+          case "cbrt": return "\\sqrt[3]{"+a[0]+"}";
+          case "exp": return "e^{"+sup(n.args[0])+"}";
+          case "pow": return "{"+wrap(n.args[0],5)+"}^{"+sup(n.args[1])+"}";
+          case "log": return "\\ln\\left("+a[0]+"\\right)";
+          case "log10": return "\\log_{10}\\left("+a[0]+"\\right)";
+          case "abs": return "\\left|"+a[0]+"\\right|";
+          case "sin": case "cos": case "tan": case "atan": case "asin": case "acos": case "sinh": case "cosh": case "tanh": return "\\"+(["atan","asin","acos"].includes(n.n)?"operatorname{"+n.n+"}":n.n)+"\\left("+a.join(", ")+"\\right)";
+          default: return "\\operatorname{"+n.n+"}\\left("+a.join(", ")+"\\right)";
+        } }
+    }
+  }
+  /* inside an exponent a slash reads better than a stacked fraction */
+  function sup(n){ n=strip(n); if(n.t==="bin"&&n.o==="/") return wrap(n.a,2)+"/"+wrap(n.b,4); if(n.t==="neg"&&strip(n.a).t==="bin"&&strip(n.a).o==="/") return "-"+sup(n.a); return T(n); }
+  const toTex=src=>"E = "+T(strip(parse(src)));
+
+  /* ---- shared editor bits ---- */
+  const insertAt=(ta,snip)=>{ const a=ta.selectionStart, b=ta.selectionEnd, sel=ta.value.slice(a,b); const k=snip.indexOf("|"); const ins=k<0?snip:snip.slice(0,k)+sel+snip.slice(k+1);
+    ta.setRangeText(ins,a,b,"end"); const caret=k<0?a+ins.length:a+k+sel.length; ta.setSelectionRange(caret,caret); ta.focus(); ta.dispatchEvent(new Event("input")); };
+  const copy=(txt,btn,label)=>{ const done=ok=>{ const o=btn.textContent; btn.textContent=ok?"Copied ✓":"Copy blocked"; setTimeout(()=>btn.textContent=label||o,1600); };
+    (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>done(true),()=>done(false)); };
+
+  /* ---- tabs ---- */
+  const tabs=[$("eqTabF"),$("eqTabL")];
+  const setTab=k=>{ tabs.forEach(t=>{ const on=t.dataset.eqtab===k; t.setAttribute("aria-selected",String(on)); t.tabIndex=on?0:-1; }); $("eqPanF").hidden=k!=="formula"; $("eqPanL").hidden=k!=="latex"; if(k==="formula") renderF(); else renderL(); };
+  tabs.forEach((t,i)=>{ t.addEventListener("click",()=>setTab(t.dataset.eqtab)); t.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ e.preventDefault(); const n=tabs[(i+1)%2]; n.focus(); setTab(n.dataset.eqtab); } }); });
+
+  /* ---- model formula mode ---- */
+  const exprTa=$("eqExpr");
+  function renderF(){
+    if(!window.katex) return;
+    const src=exprTa.value.trim(); const st=$("eqStat"); st.className="eq-status";
+    if(!src){ $("eqTexF").textContent=""; st.textContent="Type a formula, or start from a template."; drawPlot(null); $("eqUse").disabled=true; return; }
+    let terr=null; try{ terr=tex(toTex(src),$("eqTexF")); }catch(e){ terr=e.message; $("eqTexF").textContent=""; }
+    const c=compileExpr(src);
+    if(c.err||terr){ st.classList.add("bad"); st.textContent=c.err||("Can't read that formula: "+terr+"."); drawPlot(null); $("eqUse").disabled=true; return; }
+    const p=Object.assign({},sel().p,{type:"custom",expr:src}); const r=evalP(p,10,iono(p));
+    if(r.t===null){ st.classList.add("bad"); st.textContent="The formula gives no positive field at 10 km. Field strength must be greater than zero."; drawPlot(null); $("eqUse").disabled=true; return; }
+    st.classList.add("ok"); st.innerHTML="Works. At d = 10 km: <b>"+fmtNum(mVfromdB(r.t))+" mV/m</b> ("+r.t.toFixed(1)+" dB(µV/m)) with f = "+p.f+" MHz, P = "+p.P+" kW.";
+    drawPlot(p); $("eqUse").disabled=false;
+  }
+  const fmtNum=v=>v>=100?v.toFixed(0):v>=1?v.toFixed(2):v.toPrecision(3);
+  function drawPlot(p){
+    const cv=$("eqPlot"), r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; if(!r.width) return;
+    cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr); const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+    const W=r.width,H=r.height,L=46,R=14,Tp=10,B=26, cs=getComputedStyle(document.documentElement), ink=cs.getPropertyValue("--ink").trim(), mut=cs.getPropertyValue("--muted").trim(), line=cs.getPropertyValue("--line").trim();
+    const xs=d=>L+Math.log10(d)/3*(W-L-R), ys=v=>Tp+(1-(v-0)/120)*(H-Tp-B); c.clearRect(0,0,W,H); c.font="11px "+cs.getPropertyValue("--font-body"); c.fillStyle=mut; c.strokeStyle=line; c.lineWidth=1;
+    for(let v=0;v<=120;v+=20){ c.beginPath(); c.moveTo(L,ys(v)); c.lineTo(W-R,ys(v)); c.stroke(); c.textAlign="right"; c.fillText(v,L-6,ys(v)+4); }
+    [1,10,100,1000].forEach(d=>{ c.beginPath(); c.moveTo(xs(d),Tp); c.lineTo(xs(d),H-B); c.stroke(); c.textAlign="center"; c.fillText(d+" km",Math.min(xs(d),W-R-18),H-8); });
+    c.save(); c.translate(11,(H-B)/2); c.rotate(-Math.PI/2); c.textAlign="center"; c.fillText("dB(µV/m)",0,0); c.restore();
+    const ref=sel(); const line2=(pp,col,w,dash)=>{ const io=iono(pp); c.strokeStyle=col; c.lineWidth=w; c.setLineDash(dash||[]); c.beginPath(); let on=false;
+      for(let i=0;i<=150;i++){ const d=Math.pow(10,i/50); const v=evalP(pp,d,io).t; if(v===null||!isFinite(v)){ on=false; continue; } const y=ys(Math.max(-10,Math.min(130,v))); on?c.lineTo(xs(d),y):c.moveTo(xs(d),y); on=true; } c.stroke(); c.setLineDash([]); };
+    c.save(); c.beginPath(); c.rect(L,Tp,W-L-R,H-Tp-B); c.clip();
+    line2(ref.p,mut,1.6,[5,4]); if(p) line2(p,ink,2.6); c.restore();
+    $("eqRefName").textContent=ref.name;
+    $("eqLeg").innerHTML='<li><i style="--c:'+ink+'"></i>Your formula</li><li><i class="dash" style="--c:'+mut+'"></i>'+esc(ref.name)+'</li>';
+  }
+  exprTa.addEventListener("input",()=>{ clearTimeout(renderF.t); renderF.t=setTimeout(renderF,120); });
+  $("eqPanF").querySelectorAll("[data-ins]").forEach(b=>b.addEventListener("click",()=>insertAt(exprTa,b.dataset.ins)));
+  $("eqTpl").addEventListener("change",e=>{ if(!e.target.value) return; exprTa.value=e.target.value; e.target.value=""; renderF(); exprTa.focus(); });
+  $("eqCopyTexF").addEventListener("click",e=>{ try{ copy(toTex(exprTa.value),e.currentTarget,"Copy LaTeX"); }catch(err){ $("eqStat").textContent="Fix the formula first: "+err.message; } });
+  $("eqUse").addEventListener("click",()=>{ const src=exprTa.value.trim(); if(compileExpr(src).err) return;
+    const base=sel(); const m=mk("Tutor formula",Object.assign({},base.p,{type:"custom",expr:src})); models.push(m); selId=m.id;
+    dlg.close(); go("lab"); refreshAll(); });
+
+  /* ---- LaTeX mode ---- */
+  const lta=$("eqLatex"); const SKEY="gwlab-equations";
+  const hb=$("eqHb"); hb.innerHTML+=HB.map((h,i)=>'<option value="'+i+'">'+esc(h[0])+'</option>').join("");
+  hb.addEventListener("change",e=>{ if(e.target.value==="") return; lta.value=HB[+e.target.value][1]; e.target.value=""; renderL(); lta.focus(); });
+  function renderL(){ if(!window.katex) return; const t=lta.value.trim(), st=$("eqStatL"); st.className="eq-status";
+    if(!t){ $("eqTexL").textContent=""; st.textContent="Type LaTeX, use the palette, or load a handbook equation."; return; }
+    const err=tex(t,$("eqTexL")); if(err){ st.classList.add("bad"); st.textContent="Not valid LaTeX yet: "+err; } else st.textContent=""; }
+  lta.addEventListener("input",()=>{ clearTimeout(renderL.t); renderL.t=setTimeout(renderL,120); });
+  $("eqPanL").querySelectorAll("[data-tex]").forEach(b=>b.addEventListener("click",()=>insertAt(lta,b.dataset.tex)));
+  $("eqCopyTex").addEventListener("click",e=>copy(lta.value.trim(),e.currentTarget,"Copy LaTeX"));
+  $("eqCopyMml").addEventListener("click",e=>{ try{ const h=window.katex.renderToString(lta.value.trim(),{output:"mathml",displayMode:true}); const m=/<math[\s\S]*<\/math>/.exec(h); copy(m?m[0].replace(/<annotation[\s\S]*?<\/annotation>/,""):"",e.currentTarget,"Copy MathML (for Word)"); }catch(err){ $("eqStatL").textContent="Fix the LaTeX first."; } });
+  const readSaved=()=>{ try{ return JSON.parse(localStorage.getItem(SKEY)||"[]"); }catch(e){ return []; } };
+  const writeSaved=a=>{ try{ localStorage.setItem(SKEY,JSON.stringify(a)); }catch(e){} };
+  function renderSaved(){ const a=readSaved(), ul=$("eqSavedList"); $("eqSavedEmpty").hidden=a.length>0;
+    ul.innerHTML=a.map((t,i)=>'<li><button type="button" class="eq-sv" data-i="'+i+'" aria-label="Load saved equation '+(i+1)+'"></button><button type="button" class="iconbtn eq-del" data-i="'+i+'" aria-label="Delete saved equation '+(i+1)+'"><svg class=ic aria-hidden=true><use href=#i-trash /></svg></button></li>').join("");
+    ul.querySelectorAll(".eq-sv").forEach(b=>{ const t=a[+b.dataset.i]; if(tex(t,b,false)) b.textContent=t; b.addEventListener("click",()=>{ lta.value=t; renderL(); lta.focus(); }); });
+    ul.querySelectorAll(".eq-del").forEach(b=>b.addEventListener("click",()=>{ const x=readSaved(); x.splice(+b.dataset.i,1); writeSaved(x); renderSaved(); $("eqStatL").textContent="Removed from saved equations."; })); }
+  $("eqSave").addEventListener("click",()=>{ const t=lta.value.trim(); if(!t||tex(t,document.createElement("div"))){ $("eqStatL").textContent="Write a valid equation first."; return; }
+    const a=readSaved().filter(x=>x!==t); a.unshift(t); writeSaved(a.slice(0,30)); renderSaved(); $("eqStatL").textContent="Saved on this device."; });
+  const pres=$("eqPres");
+  $("eqPresent").addEventListener("click",()=>{ const t=lta.value.trim(); if(!t) return; if(tex(t,$("eqPresTex"))){ $("eqStatL").textContent="Fix the LaTeX first."; return; }
+    pres.hidden=false; $("eqPresClose").focus(); if(pres.requestFullscreen) pres.requestFullscreen().catch(()=>{}); });
+  const closePres=()=>{ if(document.fullscreenElement===pres) document.exitFullscreen().catch(()=>{}); pres.hidden=true; $("eqPresent").focus(); };
+  $("eqPresClose").addEventListener("click",closePres);
+  pres.addEventListener("keydown",e=>{ if(e.key==="Escape"){ e.preventDefault(); closePres(); } });
+  document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement&&!pres.hidden) { pres.hidden=true; } });
+
+  /* ---- open / close ---- */
+  let back=null;
+  function openEq(mode){ back=document.activeElement; const m=sel();
+    if(mode==="formula"){ exprTa.value=(m.p.type==="custom"&&m.p.expr)?m.p.expr:(exprTa.value||"300*sqrt(P)*A/d"); }
+    if(!lta.value) lta.value=HB[1][1];
+    try{ dlg.showModal(); }catch(e){ dlg.setAttribute("open",""); }
+    $("eqStat").textContent="Loading the maths typesetter…";
+    loadKatex().then(()=>{ setTab(mode==="latex"?"latex":"formula"); renderSaved(); })
+      .catch(()=>{ $("eqStat").textContent="The maths typesetter didn't load. Check your connection and open the editor again."; });
+    (mode==="latex"?lta:exprTa).focus(); }
+  $("eqClose").addEventListener("click",()=>dlg.close());
+  dlg.addEventListener("close",()=>{ if(back&&back.focus) back.focus(); });
+  dlg.addEventListener("click",e=>{ if(e.target===dlg) dlg.close(); });
+  document.querySelectorAll("[data-eqed]").forEach(b=>b.addEventListener("click",()=>openEq(b.dataset.eqed)));
+  window.openEqEditor=openEq;
+  window.addEventListener("resize",()=>{ if(dlg.open&&!$("eqPanF").hidden) renderF(); });
+})();
+/* ================= GUIDED TOUR: a short walk through the whole lab ================= */
+(function initSiteTour(){
+  const STEPS=[
+    {tab:"lab",sel:[".appbar .tabs",".bnav"],t:"Eight tools, one lab",x:"Switch between the Lab, Animation, Map, Terrain profile, Cellular, Models, Learn and Quiz here. On a phone they are in the bar at the bottom."},
+    {tab:"lab",sel:["#bandRuler"],t:"Pick a band",x:"Jump between LF, MF, HF, VHF and UHF. The line beside the bands says which mechanism carries the one you chose."},
+    {tab:"lab",sel:["#presets"],t:"Start with an experiment",x:"Each chip loads a ready-made comparison, such as MW by day and by night. Then change one setting at a time and watch the curves."},
+    {tab:"lab",sel:["#chart"],t:"Read the curves",x:"Field strength against distance for every model. The dashed line is the minimum usable signal; where a curve crosses it is the edge of reliable service."},
+    {tab:"animation",sel:["#animation .stage"],t:"Watch the wave travel",x:"Drag the radio to move the receiver, scroll to zoom, press F for full screen. In full screen, drag the panels by their handle or press H to hide them."},
+    {tab:"map",sel:["#mapCore .toolrow","#mapCore"],t:"Plan on a real map",x:"Search a place, add transmitters and receivers, and get a reception verdict for every site, with terrain along the path."},
+    {tab:"methods",sel:["[data-eqed=\"latex\"]","#mxH"],t:"See every equation",x:"Pick a model and a distance to see each step of the calculation. Tutors: the Equation editor typesets maths and turns a formula into a Lab model."},
+    {tab:"learn",sel:[".lc-head"],t:"Learn step by step",x:"17 short lessons based on the ITU-R Handbook on Ground Wave Propagation, each with a worked example, a quick check and a link back to the Lab."},
+    {tab:"quiz",sel:["#quiz .intro","#quiz"],t:"Check your understanding",x:"Practise with instant feedback, or switch to exam mode and export the results."},
+    {tab:"quiz",sel:["#helpBtn"],t:"Help is always here",x:"Open Help for the quick start and the accuracy notes. You can restart this tour from there at any time."}
+  ];
+  const root=document.createElement("div"); root.className="gt"; root.hidden=true;
+  root.innerHTML='<div class="gt-spot" aria-hidden="true"></div><div class="gt-card" role="dialog" aria-modal="false" aria-labelledby="gtT" aria-describedby="gtX" tabindex="-1">'+
+    '<p class="gt-n" id="gtN"></p><h2 id="gtT"></h2><p id="gtX"></p><div class="gt-dots" aria-hidden="true"></div>'+
+    '<div class="gt-row"><button class="btn ghost" type="button" id="gtSkip">End tour</button><span class="gt-sp"></span><button class="btn" type="button" id="gtBack">Back</button><button class="btn primary" type="button" id="gtNext">Next</button></div></div>';
+  document.body.appendChild(root);
+  const spot=root.querySelector(".gt-spot"), card=root.querySelector(".gt-card"); let i=0, target=null, back=null;
+  root.querySelector(".gt-dots").innerHTML=STEPS.map(()=>"<i></i>").join("");
+  const visible=el=>{ if(!el) return false; const r=el.getBoundingClientRect(); return r.width>0&&r.height>0&&getComputedStyle(el).visibility!=="hidden"; };
+  function place(){
+    if(root.hidden||!target) return;
+    const r=target.getBoundingClientRect(), pad=8, vw=innerWidth, vh=innerHeight;
+    const x=Math.max(4,r.left-pad), y=Math.max(4,r.top-pad), w=Math.min(vw-8,r.width+pad*2), h=Math.min(vh-8,r.height+pad*2);
+    Object.assign(spot.style,{left:x+"px",top:y+"px",width:w+"px",height:h+"px"});
+    const cw=card.offsetWidth, ch=card.offsetHeight, phone=vw<=760;
+    let cx, cy;
+    if(phone){ cx=(vw-cw)/2; const bn=document.querySelector(".bnav"); const bottom=vh-(bn&&visible(bn)?bn.offsetHeight:0)-12; cy=(y+h+ch+12<bottom)?y+h+12:(y-ch-12>8?y-ch-12:bottom-ch); }
+    else { cx=Math.min(Math.max(12,r.left),vw-cw-12); cy=(y+h+ch+16<vh)?y+h+12:(y-ch-12>8?y-ch-12:Math.max(12,vh-ch-12)); }
+    card.style.left=Math.max(8,cx)+"px"; card.style.top=Math.max(8,cy)+"px";
+  }
+  function show(n){
+    i=Math.max(0,Math.min(STEPS.length-1,n)); const s=STEPS[i];
+    if(currentTab!==s.tab) go(s.tab,true);
+    $("gtN").textContent="Step "+(i+1)+" of "+STEPS.length; $("gtT").textContent=s.t; $("gtX").textContent=s.x;
+    root.querySelectorAll(".gt-dots i").forEach((d,k)=>d.classList.toggle("on",k===i));
+    $("gtBack").disabled=i===0; $("gtNext").textContent=i===STEPS.length-1?"Finish":"Next";
+    setTimeout(()=>{ target=s.sel.map(q=>document.querySelector(q)).find(visible)||document.querySelector("#"+(s.tab==="map"?"map-tab":s.tab));
+      const r=target.getBoundingClientRect(); if(r.top<80||r.bottom>innerHeight-160) target.scrollIntoView({block:"center",behavior:"instant"in window?"instant":"auto"});
+      requestAnimationFrame(()=>{ place(); card.focus({preventScroll:true}); }); },160);
+  }
+  function start(){ back=document.activeElement; const hd=$("helpDlg"); if(hd&&hd.open) hd.close(); root.hidden=false; document.body.classList.add("touring"); show(0); }
+  function end(){ root.hidden=true; document.body.classList.remove("touring"); try{ localStorage.setItem("gwlab-tour-done","1"); }catch(e){} if(back&&back.focus&&document.contains(back)) back.focus(); }
+  $("gtNext").addEventListener("click",()=>{ if(i===STEPS.length-1) end(); else show(i+1); });
+  $("gtBack").addEventListener("click",()=>show(i-1));
+  $("gtSkip").addEventListener("click",end);
+  root.addEventListener("keydown",e=>{ if(e.key==="Escape"){ e.preventDefault(); end(); } if(e.key==="ArrowRight"&&!e.target.closest("button")){ e.preventDefault(); $("gtNext").click(); } if(e.key==="ArrowLeft"&&!e.target.closest("button")){ e.preventDefault(); if(i>0) show(i-1); } });
+  addEventListener("resize",place); addEventListener("scroll",place,{passive:true});
+  document.querySelectorAll("[data-site-tour]").forEach(b=>b.addEventListener("click",start));
+  window.startSiteTour=start;
 })();
   /* scrollable tables: focusable and named, so keyboard users can scroll them */
   const labelWraps=()=>document.querySelectorAll(".tablewrap").forEach(w=>{ if(w.hasAttribute("tabindex")) return; w.tabIndex=0; w.setAttribute("role","region");

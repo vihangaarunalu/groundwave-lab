@@ -3,7 +3,8 @@
 This folder is a complete static website. Upload it to any free static host to get a public link that anyone can open.
 
 - `index.html`: the whole app (Lab, Animation, Map & location, Cellular, Models, Learn, Quiz).
-- `assets/`: the mast photograph used on the home screen and the KaTeX stylesheet and fonts that typeset the equations. **Upload this folder together with `index.html`**, or the hero photo and the equations will not display correctly.
+- `assets/`: the favicon set, the mast photograph used on the home screen and the KaTeX stylesheet and fonts that typeset the equations. **Upload this folder together with `index.html`**, or the hero photo and the equations will not display correctly.
+- **Tutor tools**: an Equation editor (Models tab, or *Open the equation editor* under a custom formula in the Lab) typesets a formula as you type, checks and plots it, adds it to the Lab as a model, and writes free LaTeX with copy-as-MathML for Word and a full-screen *Present* view. A guided tour (hero, Help, or the first-run note) walks through every tab.
 - `feedback.html`: the staff Feedback inbox (passphrase protected; see SETUP.md).
 - `functions/api/`: the visit counter and feedback storage (Cloudflare Pages Functions).
 - `_headers`: security and caching headers for Cloudflare Pages.
