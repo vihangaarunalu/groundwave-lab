@@ -6,9 +6,11 @@
  *   Pages project → Settings → Bindings → Add → KV namespace
  *     Variable name: VISITS      KV namespace: groundwave-visits
  *
- * Staff access: a secret bound as FEEDBACK_KEY.
- *   Pages project → Settings → Variables and Secrets → Add → Secret
- *     Name: FEEDBACK_KEY         Value: a long passphrase you choose
+ * Staff access, either:
+ *   - nothing to set: the first time the admin opens /feedback.html it asks
+ *     them to create a passphrase (stored hashed in KV as "fb:admin"), or
+ *   - a secret FEEDBACK_KEY (Settings → Variables and Secrets), which then
+ *     takes precedence.
  *   Anyone with the passphrase can read and delete feedback at /feedback.html.
  *
  * Public (students):
@@ -16,7 +18,11 @@
  *                                  -> {"ok": true, "count": n}
  *   GET  /api/feedback             -> {"count": n}
  *
- * Staff (header  Authorization: Bearer <FEEDBACK_KEY>):
+ *   GET  /api/feedback?status=1    -> {"storage": true, "admin": "unset"|"passphrase"|"secret"}
+ *   POST /api/feedback?setup=1     body {"passphrase": "…"}   first time: creates it;
+ *                                  afterwards needs the current one in Authorization
+ *
+ * Staff (header  Authorization: Bearer <passphrase>):
  *   GET    /api/feedback?list=1[&cursor=…]  -> {"items":[…], "cursor": "…"|null, "count": n}
  *   PATCH  /api/feedback?id=fb:…   body {"reviewed": true|false}  -> {"ok": true}
  *   DELETE /api/feedback?id=fb:…   -> {"ok": true, "count": n}
@@ -46,28 +52,53 @@ async function readCount(kv) {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
-/* Compare the presented key with FEEDBACK_KEY in constant time (by hashing both). */
+/* ---- staff passphrase ----
+ * Either the FEEDBACK_KEY secret (if set in Cloudflare), or a passphrase the
+ * admin creates once on /feedback.html, stored in KV as "fb:admin" =
+ * {salt, hash}: a salted SHA-256, never the passphrase itself.
+ * To reset a forgotten passphrase: Cloudflare dashboard → Workers & Pages →
+ * KV → groundwave-visits → delete the key "fb:admin", then open
+ * /feedback.html and create a new one.
+ */
+const ADMIN_KEY = "fb:admin";
+const MIN_PASS = 12;
+const enc = new TextEncoder();
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+async function sha(text) { return hex(await crypto.subtle.digest("SHA-256", enc.encode(text))); }
+function sameHex(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i); return d === 0;
+}
+const presented = (request) => { const h = request.headers.get("Authorization") || ""; return h.startsWith("Bearer ") ? h.slice(7) : ""; };
+async function adminRecord(env) { try { return JSON.parse((await env.VISITS.get(ADMIN_KEY)) || "null"); } catch (e) { return null; } }
+async function mode(env) { if (env.FEEDBACK_KEY) return "secret"; return (await adminRecord(env)) ? "passphrase" : "unset"; }
+
 async function isStaff(request, env) {
-  if (!env.FEEDBACK_KEY) return false;
-  const h = request.headers.get("Authorization") || "";
-  const given = h.startsWith("Bearer ") ? h.slice(7) : "";
+  const given = presented(request);
   if (!given) return false;
-  const enc = new TextEncoder();
-  const [a, b] = await Promise.all([
-    crypto.subtle.digest("SHA-256", enc.encode(given)),
-    crypto.subtle.digest("SHA-256", enc.encode(env.FEEDBACK_KEY)),
-  ]);
-  const x = new Uint8Array(a), y = new Uint8Array(b);
-  let diff = 0;
-  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
-  return diff === 0;
+  if (env.FEEDBACK_KEY) return sameHex(await sha(given), await sha(env.FEEDBACK_KEY));
+  const rec = await adminRecord(env);
+  return !!rec && sameHex(await sha(rec.salt + ":" + given), rec.hash);
 }
 
 async function guard(request, env) {
   if (!env.VISITS) return json({ error: "KV binding VISITS is not set" }, 503);
-  if (!env.FEEDBACK_KEY) return json({ error: "Secret FEEDBACK_KEY is not set" }, 503);
+  if ((await mode(env)) === "unset") return json({ error: "No admin passphrase yet", setup: true }, 409);
   if (!(await isStaff(request, env))) return json({ error: "Wrong or missing passphrase" }, 401);
   return null;
+}
+
+/* Create the admin passphrase (first time), or change it (with the current one). */
+async function setPassphrase(request, env) {
+  if (env.FEEDBACK_KEY) return json({ error: "This site uses the FEEDBACK_KEY secret; change it in Cloudflare" }, 409);
+  const m = await mode(env);
+  if (m === "passphrase" && !(await isStaff(request, env))) return json({ error: "Wrong or missing passphrase" }, 401);
+  let body; try { body = JSON.parse(await request.text()); } catch (e) { return json({ error: "expected JSON" }, 400); }
+  const pass = typeof body.passphrase === "string" ? body.passphrase : "";
+  if (pass.length < MIN_PASS || pass.length > 200) return json({ error: "Use at least " + MIN_PASS + " characters" }, 400);
+  const salt = hex(crypto.getRandomValues(new Uint8Array(16)));
+  await env.VISITS.put(ADMIN_KEY, JSON.stringify({ salt, hash: await sha(salt + ":" + pass), at: new Date().toISOString() }));
+  return json({ ok: true });
 }
 
 const validId = (id) => typeof id === "string" && /^fb:20\d\d-[0-9T:.\-Z]+-[a-z0-9]{1,12}$/.test(id);
@@ -76,6 +107,7 @@ export async function onRequestGet({ request, env }) {
   if (!env.VISITS) return json({ error: "KV binding VISITS is not set" }, 503);
   const url = new URL(request.url);
 
+  if (url.searchParams.has("status")) return json({ storage: true, admin: await mode(env) });
   if (!url.searchParams.has("list")) return json({ count: await readCount(env.VISITS) });
 
   const denied = await guard(request, env);
@@ -97,6 +129,7 @@ export async function onRequestGet({ request, env }) {
 
 export async function onRequestPost({ request, env }) {
   if (!env.VISITS) return json({ error: "KV binding VISITS is not set" }, 503);
+  if (new URL(request.url).searchParams.has("setup")) return setPassphrase(request, env);
 
   let body;
   try {

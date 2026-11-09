@@ -79,6 +79,8 @@ input[type=password],input[type=search],input[type=text],select{min-height:44px;
 .check{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-dense);min-height:32px;cursor:pointer}
 .check input{width:18px;height:18px;accent-color:var(--ink)}
 .err{margin:0;color:var(--bad);font-size:var(--fs-dense);min-height:1.4em}
+.hint{font-weight:400;color:var(--muted)}
+.note{margin:0;font-size:var(--fs-meta);color:var(--muted);line-height:1.5}
 .setup{margin:0;padding:var(--sp-4);border-radius:var(--r-md);background:var(--field);font-size:var(--fs-dense);display:grid;gap:var(--sp-2)}
 .setup ol{margin:0;padding-left:1.3em;display:grid;gap:var(--sp-1)}
 code{font:500 13px/1.4 var(--font-mono);background:var(--field);padding:1px 5px;border-radius:4px}
@@ -151,6 +153,24 @@ dialog::backdrop{background:rgba(8,26,39,.55)}
   .btn{min-height:44px}
   .item .acts .btn{flex:1}
 }
+
+/* motion: presses, arrivals, list entries; off with reduced motion */
+@keyframes mo-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes mo-fade{from{opacity:0}to{opacity:1}}
+@keyframes mo-pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+.signin:not([hidden]),.stat,.tools,.empty:not([hidden]){animation:mo-in .24s var(--ease) both}
+.stat:nth-child(2){animation-delay:.04s}.stat:nth-child(3){animation-delay:.08s}
+.item{animation:mo-in .22s var(--ease) both}
+.item:nth-child(2){animation-delay:.03s}.item:nth-child(3){animation-delay:.06s}.item:nth-child(4){animation-delay:.09s}.item:nth-child(5){animation-delay:.12s}.item:nth-child(n+6){animation-delay:.15s}
+.pill.ok{animation:mo-pop .24s var(--ease)}
+dialog[open]{animation:mo-in .2s var(--ease)}dialog[open]::backdrop{animation:mo-fade .2s var(--ease)}
+.toast:not([hidden]){animation:mo-in .2s var(--ease)}
+.top a.back,.top button{transition:background-color .15s var(--ease),transform .12s var(--ease)}
+.top a.back:active,.top button:active,.check:active{transform:scale(.96)}
+@media (hover:hover){.btn:hover:not(:disabled){transform:translateY(-1px)}.btn:active:not(:disabled){transform:scale(.97)}}
+input,select{transition:border-color .15s var(--ease),box-shadow .15s var(--ease)}
+input:focus-visible,select:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.bar i{transition:width .5s var(--ease)}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -159,6 +179,7 @@ dialog::backdrop{background:rgba(8,26,39,.55)}
   <div class="brand"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 28 L15 8" stroke="currentColor" stroke-width="2"/><path d="M11 28 L15 8 L19 28" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 7 a9 9 0 0 1 14 0 M5 4 a13 13 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Groundwave Lab<small>Feedback inbox</small></div>
   <span class="sp"></span>
   <a class="back" href="./">← <span class="long">Back to the&nbsp;</span>lab</a>
+  <button type="button" id="changePass" hidden>Change passphrase</button>
   <button type="button" id="signOut" hidden>Sign out</button>
 </div></header>
 
@@ -177,10 +198,21 @@ dialog::backdrop{background:rgba(8,26,39,.55)}
       <b>Feedback storage is not switched on for this site yet.</b>
       <ol>
         <li>Cloudflare dashboard → your Pages project → <b>Settings → Bindings</b>: add KV namespace <code>VISITS</code> → <code>groundwave-visits</code>.</li>
-        <li><b>Settings → Variables and Secrets</b>: add a <b>Secret</b> named <code>FEEDBACK_KEY</code> with a long passphrase.</li>
-        <li><b>Deployments → Retry deployment</b>, then sign in here with that passphrase.</li>
+        <li><b>Deployments → Retry deployment</b>, then open this page again to create your admin passphrase.</li>
       </ol>
     </div>
+  </form>
+
+  <!-- first-time setup: create the admin passphrase -->
+  <form class="signin" id="create" hidden>
+    <h1>Create the admin passphrase</h1>
+    <p>No one has set up this inbox yet. Choose a passphrase now: from then on only someone who knows it can read student feedback. Keep it somewhere safe.</p>
+    <label class="field" for="np1"><span>New passphrase <span class="hint">(at least 12 characters, e.g. four random words)</span></span><input type="password" id="np1" autocomplete="new-password" minlength="12" required></label>
+    <label class="field" for="np2"><span>Type it again</span><input type="password" id="np2" autocomplete="new-password" minlength="12" required></label>
+    <label class="check" for="remember2"><input type="checkbox" id="remember2"> Remember on this device</label>
+    <p class="err" id="createErr" role="alert"></p>
+    <button class="btn primary" type="submit" id="createBtn">Create passphrase and open inbox</button>
+    <p class="note">Forgot it later? In Cloudflare open <b>Workers &amp; Pages → KV → groundwave-visits</b>, delete the key <code>fb:admin</code>, then come back here to create a new one. Feedback is not affected.</p>
   </form>
 
   <!-- inbox -->
@@ -209,6 +241,16 @@ dialog::backdrop{background:rgba(8,26,39,.55)}
   </section>
 </main>
 
+<dialog id="passDlg" aria-labelledby="passTitle">
+  <form class="dlg" id="passForm">
+    <h2 id="passTitle" style="font-size:var(--fs-h2)">Change the admin passphrase</h2>
+    <p>Anyone still using the old passphrase will be signed out.</p>
+    <label class="field" for="cp1"><span>New passphrase (at least 12 characters)</span><input type="password" id="cp1" autocomplete="new-password" minlength="12" required></label>
+    <label class="field" for="cp2"><span>Type it again</span><input type="password" id="cp2" autocomplete="new-password" minlength="12" required></label>
+    <p class="err" id="passErr" role="alert"></p>
+    <div class="row"><button class="btn" type="button" id="passCancel">Cancel</button><button class="btn primary" type="submit" id="passOk">Change passphrase</button></div>
+  </form>
+</dialog>
 <dialog id="delDlg" aria-labelledby="delTitle">
   <form method="dialog" class="dlg">
     <h2 id="delTitle" style="font-size:var(--fs-h2)">Delete this feedback?</h2>
@@ -256,17 +298,21 @@ dialog::backdrop{background:rgba(8,26,39,.55)}
     return page(null).then(function(){ S.items=all; $("loading").hidden=true; $("updated").textContent="Updated "+when(new Date().toISOString())+" · newest answers appear when you refresh"; render(); });
   }
 
+  var MODE="";
+  function showCreate(){ $("inbox").hidden=true; $("signin").hidden=true; $("signOut").hidden=true; $("changePass").hidden=true; $("create").hidden=false; $("np1").focus(); }
   function showSignin(msg, setup){
+    $("create").hidden=true; $("changePass").hidden=true;
     $("inbox").hidden=true; $("signOut").hidden=true; $("signin").hidden=false;
     $("signErr").textContent=msg||""; $("setupHelp").hidden=!setup; if(!setup) $("key").focus();
   }
   function open(key){
     S.key=key; $("signBtn").disabled=true; $("signBtn").textContent="Opening…";
     return loadAll().then(function(){
-      $("signin").hidden=true; $("inbox").hidden=false; $("signOut").hidden=DEMO;
+      $("signin").hidden=true; $("create").hidden=true; $("inbox").hidden=false; $("signOut").hidden=DEMO; $("changePass").hidden=DEMO||MODE!=="passphrase";
     }).catch(function(e){
       $("loading").hidden=true;
-      if(e.status===401){ forget(); showSignin("That passphrase didn't match. It's the FEEDBACK_KEY secret set in Cloudflare."); }
+      if(e.status===401){ forget(); showSignin("That passphrase didn't match. Check it and try again."); }
+      else if(e.status===409){ forget(); showCreate(); }
       else if(e.status===503){ showSignin("", true); }
       else showSignin("Couldn't reach the feedback store. Check your connection and try again.");
     }).then(function(){ $("signBtn").disabled=false; $("signBtn").textContent="Open inbox"; });
@@ -366,8 +412,30 @@ dialog::backdrop{background:rgba(8,26,39,.55)}
     return {};
   }
 
+  function post(qs, body, key){ return fetch(API+qs,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},key?{"Authorization":"Bearer "+key}:{}),body:JSON.stringify(body),cache:"no-store"})
+    .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if(!r.ok){ var e=new Error(j.error||("HTTP "+r.status)); e.status=r.status; throw e; } return j; }); }); }
+  function checkPair(a,b,err){ if(a.length<12){ err.textContent="Use at least 12 characters."; return false; } if(a!==b){ err.textContent="The two passphrases don't match."; return false; } err.textContent=""; return true; }
+  $("create").addEventListener("submit",function(e){ e.preventDefault(); var a=$("np1").value, b=$("np2").value; if(!checkPair(a,b,$("createErr"))) return;
+    $("createBtn").disabled=true; $("createBtn").textContent="Creating…";
+    post("?setup=1",{passphrase:a}).then(function(){ MODE="passphrase"; saveKey(a,$("remember2").checked); $("np1").value=$("np2").value=""; return open(a); })
+      .catch(function(err){ $("createErr").textContent= err.status===401 ? "Someone has just set a passphrase for this inbox. Sign in with it instead." : (err.message||"Couldn't save that. Try again."); if(err.status===401) setTimeout(function(){ showSignin(""); },1800); })
+      .then(function(){ $("createBtn").disabled=false; $("createBtn").textContent="Create passphrase and open inbox"; }); });
+  $("changePass").addEventListener("click",function(){ $("cp1").value=$("cp2").value=""; $("passErr").textContent=""; $("passDlg").showModal(); $("cp1").focus(); });
+  $("passCancel").addEventListener("click",function(){ $("passDlg").close(); $("changePass").focus(); });
+  $("passForm").addEventListener("submit",function(e){ e.preventDefault(); var a=$("cp1").value, b=$("cp2").value; if(!checkPair(a,b,$("passErr"))) return;
+    $("passOk").disabled=true;
+    post("?setup=1",{passphrase:a},S.key).then(function(){ var keep=false; try{ keep=!!localStorage.getItem(KEYNAME); }catch(x){} forget(); S.key=a; saveKey(a,keep); $("passDlg").close(); toast("Passphrase changed"); $("changePass").focus(); })
+      .catch(function(err){ $("passErr").textContent= err.status===401 ? "Your session has expired. Sign out and sign in again." : (err.message||"Couldn't change it. Try again."); })
+      .then(function(){ $("passOk").disabled=false; }); });
+
   if(DEMO){ $("demoNote").hidden=false; open("demo"); }
-  else { var k=store(); if(k){ $("remember").checked=true; open(k); } else showSignin(""); }
+  else {
+    fetch(API+"?status=1",{cache:"no-store"}).then(function(r){ return r.ok?r.json():Promise.reject(r); }).then(function(j){
+      MODE=j.admin||"";
+      if(MODE==="unset"){ forget(); showCreate(); return; }
+      var k=store(); if(k){ $("remember").checked=true; open(k); } else showSignin("");
+    }).catch(function(r){ if(r&&r.status===503) showSignin("",true); else { var k=store(); if(k) open(k); else showSignin(""); } });
+  }
 })();
 </script>
 </body>

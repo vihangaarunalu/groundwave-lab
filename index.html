@@ -1652,6 +1652,55 @@ footer{color:var(--muted)}
 /* the footer feedback link is a real target */
 .sitestat a{display:inline-flex;align-items:center;min-height:32px}
 @media (max-width:760px){.sitestat a{min-height:44px}}
+
+/* =======================================================================
+   v7.7 MOTION · every interaction answers. Only transform and opacity
+   animate; 120–220 ms; ease-out on enter. prefers-reduced-motion turns it
+   all off (see the block at the end).
+   ======================================================================= */
+@keyframes mo-pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes mo-in{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes mo-fade{from{opacity:0}to{opacity:1}}
+@keyframes mo-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes mo-check{0%{transform:scale(.6)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+/* press: everything you can tap gives under the finger */
+.btn,.chip,.iconbtn,.linkbtn,.tab,.mapbtn,.seg label,.lp-item,.lc-view,.eq-pal button,.eq-tab,.eq-sv,.bnav a,.bandruler .bands button,
+.hero-cta,.hero-tour,summary,.qc label,.model-row,.fstabs button,.pinbtn,.gt-row .btn,.ov-grip{
+  transition:transform var(--dur-1) var(--ease-out),background-color var(--dur-2) var(--ease-out),border-color var(--dur-2) var(--ease-out),color var(--dur-2) var(--ease-out),box-shadow var(--dur-2) var(--ease-out),opacity var(--dur-2) var(--ease-out)}
+.btn:active:not(:disabled),.chip:active,.iconbtn:active,.linkbtn:active,.tab:active,.mapbtn:active,.seg label:active,.lp-item:active,.lc-view:active,
+.eq-pal button:active,.eq-tab:active,.eq-sv:active,.bnav a:active,.bandruler .bands button:active,.hero-tour:active,summary:active,.qc label:active,.fstabs button:active{transform:scale(.96)}
+@media (hover:hover) and (pointer:fine){
+  .btn:hover:not(:disabled),.iconbtn:hover,.chip:hover{transform:translateY(-1px)}
+  .btn:active:not(:disabled),.iconbtn:active,.chip:active{transform:scale(.96)}
+}
+/* choosing: the thing you picked pops once */
+.chip[aria-pressed="true"],.chip.on,.tabs .tab[aria-selected="true"],.bandruler .bands button[aria-pressed="true"],.lc-view[aria-pressed="true"],
+.eq-tab[aria-selected="true"],.dlg-tabs .tab[aria-selected="true"],.seg input:checked + label,.mapseg input:checked + label{animation:mo-pop .22s var(--ease-out)}
+.bnav a[aria-current="page"] svg{animation:mo-pop .26s var(--ease-out)}
+input[type=checkbox]:checked,input[type=radio]:checked{animation:mo-check .2s var(--ease-out)}
+.lp-item.done .lp-dot{animation:mo-pop .3s var(--ease-out)}
+.qc label.right,.qc label.wrong{will-change:transform}
+/* arriving: dialogs, menus, panels, answers */
+dialog[open]{animation:mo-in .2s var(--ease-out)}
+dialog[open]::backdrop{animation:mo-fade .2s var(--ease-out)}
+.moresheet:not([hidden]){animation:mo-up .2s var(--ease-out)}
+details[open] > :not(summary){animation:mo-in .2s var(--ease-out)}
+.fbprompt:not([hidden]),.firstrun:not([hidden]){animation:mo-in .24s var(--ease-out)}
+.qc-why:not([hidden]),.qc-fb:not(:empty){animation:mo-fade .22s var(--ease-out)}
+.gt-card{animation:mo-in .22s var(--ease-out)}
+.eq-present:not([hidden]){animation:mo-fade .2s var(--ease-out)}
+.eq-saved li{animation:mo-in .22s var(--ease-out) both}
+.tile{transition:transform var(--dur-2) var(--ease-out)}
+.widget .wg-out b{transition:background-color var(--dur-2) var(--ease-out)}
+/* fields: focus slides the border in instead of snapping */
+input,select,textarea{transition:border-color var(--dur-2) var(--ease-out),box-shadow var(--dur-2) var(--ease-out)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+:focus-visible{transition:outline-offset var(--dur-1) var(--ease-out)}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after,dialog[open],dialog[open]::backdrop{animation:none!important}
+  .btn,.chip,.iconbtn,.tab,.lp-item,.qc label,summary,.bnav a{transition:background-color var(--dur-1),border-color var(--dur-1),color var(--dur-1)!important}
+  .btn:active,.chip:active,.iconbtn:active,.tab:active,.btn:hover,.iconbtn:hover,.chip:hover{transform:none!important}
+}
 </style>
 </head>
 <body data-tab="lab">
@@ -3166,7 +3215,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" data-tab="quiz">Quiz</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v7.6</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v7.7</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";

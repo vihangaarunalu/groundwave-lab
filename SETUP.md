@@ -54,12 +54,18 @@ Students' answers are stored in the same KV namespace and read on a staff
 page inside the site: **`https://<your-site>/feedback.html`** (also linked as
 "Feedback inbox (staff)" at the bottom of every page).
 
-It needs one secret, once:
+**The first time you open it**, it asks you to create the admin passphrase
+(at least 12 characters, e.g. four random words). Nothing to set in Cloudflare
+beyond the `VISITS` binding above. From then on only that passphrase opens the
+inbox; **Change passphrase** is in the inbox header.
 
-1. Pages project → **Settings → Variables and Secrets → Add**
-2. Type: **Secret**. Name: `FEEDBACK_KEY`. Value: a long passphrase (for
-   example four random words). Share it only with staff.
-3. Save, then **Deployments → Retry deployment**.
+Do this straight after deploying, so you are the one who sets it.
+
+- **Forgot it?** Cloudflare → Workers & Pages → KV → `groundwave-visits` →
+  delete the key `fb:admin`, then open `/feedback.html` and create a new one.
+  Student feedback is not touched.
+- **Prefer a Cloudflare secret?** Add a Secret `FEEDBACK_KEY` (Settings →
+  Variables and Secrets) and redeploy; it then replaces the passphrase.
 
 Open `/feedback.html`, enter the passphrase, and you get:
 
@@ -73,8 +79,7 @@ Open `/feedback.html`, enter the passphrase, and you get:
 - **Export CSV** (opens in Excel or Google Sheets).
 
 Without the passphrase nobody can list or delete feedback: students can only
-send it. To change the passphrase, edit the secret and redeploy. Anyone who
-ticked "Remember on this device" is signed out the next time they open the page.
+send it, and nobody can replace the passphrase without knowing the current one.
 
 The raw entries are still visible in **Workers & Pages → KV →
 groundwave-visits** (keys beginning `fb:20…`; `fb:count` is the total).
