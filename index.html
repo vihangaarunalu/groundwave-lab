@@ -1791,14 +1791,15 @@ h2.th{display:flex;align-items:center;gap:var(--sp-4)}
 :root{--dur-enter:550ms;--dur-intro:2400ms;--dur-ambient:18s;--dur-ambient-slow:46s}
 @keyframes hero-in{from{transform:scale(1.16)}to{transform:scale(1.06)}}
 @keyframes hero-kb{0%{transform:scale(1.06) translate3d(0,0,0)}50%{transform:scale(1.13) translate3d(-2.2%,-1.6%,0)}100%{transform:scale(1.06) translate3d(0,0,0)}}
-@keyframes hero-cloud{from{background-position:0 0,0 0}to{background-position:1400px 0,-900px 0}}
+@keyframes hero-cloud{from{transform:translate3d(-50%,0,0)}to{transform:translate3d(0,0,0)}}
 @keyframes bar-sweep{from{transform:translateX(-30%)}to{transform:translateX(130%)}}
 .hero-par{position:absolute;inset:-24px;z-index:-2;transform:translate3d(var(--px,0px),calc(var(--py,0px) + var(--sy,0px)),0);will-change:transform}
 .hero-par .hero-bg{z-index:auto;will-change:transform;
   animation:hero-in var(--dur-intro) var(--ease-out) both,hero-kb var(--dur-ambient) ease-in-out var(--dur-intro) infinite}
-.hero-clouds{position:absolute;inset:0;pointer-events:none;opacity:.55;mix-blend-mode:screen;
-  background:radial-gradient(38% 22% at 25% 30%,rgba(247,250,252,.22),transparent 70%),radial-gradient(30% 18% at 70% 18%,rgba(247,250,252,.16),transparent 70%);
-  background-size:1400px 100%,900px 100%;background-repeat:repeat-x;animation:hero-cloud var(--dur-ambient-slow) linear infinite}
+.hero-clouds{position:absolute;top:0;bottom:0;left:0;width:200%;pointer-events:none;opacity:.5;will-change:transform;
+  background:radial-gradient(19% 22% at 12% 30%,rgba(247,250,252,.2),transparent 70%),radial-gradient(15% 18% at 35% 18%,rgba(247,250,252,.15),transparent 70%),
+    radial-gradient(19% 22% at 62% 30%,rgba(247,250,252,.2),transparent 70%),radial-gradient(15% 18% at 85% 18%,rgba(247,250,252,.15),transparent 70%);
+  animation:hero-cloud var(--dur-ambient-slow) linear infinite}
 .hero-pause{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:48px;padding:0 var(--sp-4);border-radius:var(--r-pill);
   border:1px solid rgba(247,250,252,.35);background:rgba(11,33,51,.45);color:var(--cloud);font:500 var(--fs-dense)/1 var(--font-body);cursor:pointer;margin-right:auto}
 .hero-pause svg{width:16px;height:16px}
@@ -3348,7 +3349,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">鈥
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.3</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.4</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -3367,6 +3368,7 @@ var IS_DARK = false;
 var PAL = {};
 
 function refreshTheme(){
+  if(window.CSSV) CSSV.clear();
   var t = document.documentElement.dataset.theme;
   IS_DARK = t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches);
   var cs = getComputedStyle(document.documentElement);
@@ -4417,7 +4419,9 @@ function bindLab(){
 /* ================= CHART ================= */
 const chart=$("chart"), cctx=chart.getContext("2d");
 let chartGeom=null, curveCache=[];
-function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+/* theme values only change with the theme: read each once, clear on refreshTheme() */
+var CSSV=new Map();
+function cssVar(n){ let v=CSSV.get(n); if(v===undefined){ v=getComputedStyle(document.documentElement).getPropertyValue(n).trim(); CSSV.set(n,v); } return v; }
 function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; }
 function computeCurves(){
   const dmax=+$("range").value, N=320, lg=$("xscale").value==="log", ds=[], dmin=dmax<=100?0.1:1;
@@ -6184,7 +6188,16 @@ function setPoint(which,pt){
   MP.path=null; updateMap();
   const obj=which==="addtx"||which==="tx"?MP.tx:MP.rx; if(obj&&obj.autoName) autoName(obj);
 }
+var MAP_TABS=["map","terrain","mobile"];
 function updateMap(){
+  /* nothing on screen needs the map: do it when the browser is idle, never during an opening animation */
+  if(!MAP_TABS.includes(currentTab)){ MP.pending=true;
+    if(!MP.idleQ){ MP.idleQ=true; const run=()=>{ MP.idleQ=false; if(MP.pending&&!MAP_TABS.includes(currentTab)){ MP.pending=false; updateMapNow(); } };
+      (window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:6000}):f=>setTimeout(f,2500))(run); }
+    return; }
+  MP.pending=false; updateMapNow();
+}
+function updateMapNow(){
   if(MP.source==="loading"){ drawMap(); return; }
   ensureAnts(); computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderRelayTable(); renderActive(); renderMyCoverage(); saveState();
   $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
@@ -8271,6 +8284,9 @@ function bindTabs(){
   document.querySelectorAll("[data-site-tour]").forEach(b=>b.addEventListener("click",start));
   window.startSiteTour=start;
 })();
+  /* page watchers skip the parts that change many times a second (animation stage, tooltip, toasts) */
+  const LIVE=".stage,#tip,.fsbar,#toast,#rxHud,#lcPct,.wg-out,.eq-status";
+  const worthIt=ms=>ms.some(m=>{ const t=m.target.nodeType===1?m.target:m.target.parentElement; return t&&!t.closest(LIVE); });
   /* living pages: content rises in as it reaches the viewport; numbers count up */
   (function livingPages(){
     const rm=matchMedia("(prefers-reduced-motion: reduce)");
@@ -8280,7 +8296,7 @@ function bindTabs(){
     const scan=root=>{ (root||document).querySelectorAll(SEL).forEach(el=>{ if(el.dataset.rv) return; el.dataset.rv="1"; const r=el.getBoundingClientRect();
       if(r.height===0||r.top<innerHeight*0.92) return; el.classList.add("rv"); io.observe(el); }); };
     const later=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>scan()));
-    later(); new MutationObserver(()=>{ clearTimeout(scan.t); scan.t=setTimeout(later,80); }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]});
+    later(); new MutationObserver(ms=>{ if(!worthIt(ms)) return; clearTimeout(scan.t); scan.t=setTimeout(later,80); }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]});
     /* count numbers up when they change, in the learn progress ring */
     const count=(el,to,suffix)=>{ const from=parseFloat(el.dataset.n||"0")||0; el.dataset.n=to; if(from===to){ el.textContent=to+suffix; return; } const t0=performance.now();
       const step=now=>{ const u=Math.min(1,(now-t0)/600), e=1-Math.pow(1-u,3); el.textContent=Math.round(from+(to-from)*e)+suffix; if(u<1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
@@ -8330,7 +8346,7 @@ function bindTabs(){
     const cap=w.querySelector("caption"); let h=cap; if(!h){ let n=w; while(n&&!h){ let q=n.previousElementSibling; while(q&&!h){ h=q.matches("h2,h3,h4")?q:q.querySelector&&q.querySelector("h2,h3,h4"); q=q.previousElementSibling; } n=n.parentElement; } }
     w.setAttribute("aria-label",(h?h.textContent.trim().slice(0,60)+" (table)":"Table")); });
   document.querySelectorAll(".mathb").forEach(m=>{ const n=m.querySelector(".eqn"), f=m.querySelector(".m"); m.setAttribute("role","group"); m.setAttribute("aria-label","Equation "+(n?n.textContent.trim():"")); if(f) f.tabIndex=0; });
-  labelWraps(); new MutationObserver(()=>labelWraps()).observe(document.body,{childList:true,subtree:true});
+  labelWraps(); new MutationObserver(ms=>{ if(!worthIt(ms)) return; clearTimeout(labelWraps.t); labelWraps.t=setTimeout(labelWraps,120); }).observe(document.body,{childList:true,subtree:true});
   window.addEventListener("load",()=>{ if(location.hash==="#"+currentTab) setTimeout(()=>window.scrollTo({top:0}),0); });
   if($("heroGo")) $("heroGo").addEventListener("click",()=>{ const b=document.querySelector(".bandwrap"); if(b) b.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); const m=$("main-content"); if(m) m.focus({preventScroll:true}); });
   document.querySelector(".tabs").addEventListener("keydown",e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return; const i=TABS.indexOf(currentTab); const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length]; go(n); document.querySelector(`.tab[data-tab="${n}"]`).focus(); });
@@ -8393,7 +8409,7 @@ function init(){
   new ResizeObserver(()=>{ if(currentTab==="lab") drawChart(); if(currentTab==="map"||currentTab==="terrain"||currentTab==="mobile") { drawMap(); renderActive(); } }).observe(document.body);
   const mo=new MutationObserver(()=>{ refreshTheme(); if(currentTab==="lab") redraw(); if(typeof drawMap==="function"&&currentTab==="map") drawMap(); }); mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
   requestAnimationFrame(animTick);
-  loadLand();
+  if(MAP_TABS.includes(currentTab)) loadLand(); else (window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:4000}):f=>setTimeout(f,1500))(()=>loadLand());
 }
 init();
 
