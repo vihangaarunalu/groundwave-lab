@@ -1825,6 +1825,57 @@ body.still .hero-par{transform:none}
   .hero-par{transform:none!important}
 }
 @media print{.hero-clouds,.appbar::after{display:none}}
+/* ===== Digital shadow (WISDOM demo) ===== */
+.sh-demo{border:1px solid var(--line);border-left:4px solid var(--warn);background:var(--panel);border-radius:var(--r-sm);padding:10px 14px;font-size:var(--fs-meta);line-height:1.5;margin-bottom:var(--sp-4)}
+.sh-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:var(--sp-4);align-items:start}
+.sh-grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--sp-4);align-items:start}
+.sh-side{display:grid;gap:var(--sp-4)}
+.sh-side .panel,.sh-grid2 .panel{margin:0}
+.sh-mapwrap{position:relative;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;background:var(--bg)}
+#shMap{display:block;width:100%;height:480px;cursor:pointer;touch-action:manipulation}
+.sh-legend{position:absolute;left:8px;bottom:8px;display:flex;flex-wrap:wrap;gap:6px 12px;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 10px;font-size:12px;color:var(--ink)}
+.sh-legend span{display:inline-flex;align-items:center;gap:6px}
+.sh-legend i{width:11px;height:11px;border-radius:50%;display:inline-block;border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+.sh-legend i.g{background:#2E9E5B}.sh-legend i.w{background:#E0A526}.sh-legend i.b{background:#D2453A}
+.sh-legend i.s{background:#102C40;border-radius:3px;border-color:#CDF23A}
+.sh-detail:empty{display:none}
+.sh-detail{border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 14px;margin-top:var(--sp-2);font-size:var(--fs-meta);line-height:1.55}
+.sh-detail h3{font-size:var(--fs-ui);margin:0 0 4px}
+.sh-detail .row{margin-top:6px}
+.sh-height{font-family:var(--font-mono);font-size:13px;line-height:1.5;margin:6px 0 0}
+.sh-height b{color:var(--ink)}
+.sh-small{font-size:var(--fs-meta)}
+.sh-fit:empty{display:none}
+.sh-fit{margin-top:var(--sp-3);font-size:var(--fs-meta);line-height:1.55;border-top:1px solid var(--line);padding-top:var(--sp-3)}
+.sh-fit ul{margin:4px 0 0;padding-left:18px}
+.sh-feeds{display:grid;gap:6px;font-size:var(--fs-meta);margin-bottom:var(--sp-3)}
+.sh-feed{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.sh-feed span:last-child{font-family:var(--font-mono);text-align:right}
+.sh-sens{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:var(--fs-meta);margin-top:8px}
+.sh-sens canvas{grid-column:1/-1;width:100%;height:34px;display:block}
+.sh-sens .v{font-family:var(--font-mono)}
+.sh-chips{flex-wrap:wrap;gap:8px}
+.sh-chips .chip[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.sh-whatnote:empty{display:none}
+.sh-whatnote{font-size:var(--fs-meta);margin:var(--sp-2) 0 0;line-height:1.55}
+.sh-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.sh-file:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
+#shTable td,#shTable th{white-space:nowrap}
+#shTable td.num{font-family:var(--font-mono);text-align:right}
+#shTable tr.sel td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+#shTable .st{display:inline-flex;align-items:center;gap:6px}
+#shTable .st i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.sh-task{margin:0;padding-left:20px;display:grid;gap:10px;font-size:var(--fs-meta);line-height:1.5}
+.sh-task textarea{width:100%;font:inherit;margin-top:4px}
+.sh-mods{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:var(--fs-meta)}
+.sh-mods li{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:var(--r-sm);padding:7px 10px}
+.sh-mods li.pilot{border-color:var(--accent)}
+.sh-mods li.future{border-style:dashed;color:var(--muted)}
+.sh-mods .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.sh-attr{margin-top:4px}
+@media (max-width:980px){.sh-grid,.sh-grid2{grid-template-columns:1fr}#shMap{height:380px}}
+.linkish{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
+.ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 </style>
 </head>
 <body data-tab="lab">
@@ -1878,9 +1929,10 @@ body.still .hero-par{transform:none}
       <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map"><span class="n">3</span>Map</button>
       <button class="tab" role="tab" id="tab-terrain" aria-controls="terrain-tab" data-tab="terrain"><span class="n">4</span>Terrain profile</button>
       <button class="tab" role="tab" id="tab-mobile" aria-controls="mobile-tab" data-tab="mobile"><span class="n">5</span>Cellular</button>
-      <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods"><span class="n">6</span>Models</button>
-      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">7</span>Learn</button>
-      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">8</span>Quiz</button>
+      <button class="tab" role="tab" id="tab-shadow" aria-controls="shadow-tab" data-tab="shadow"><span class="n">6</span>Shadow</button>
+      <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods"><span class="n">7</span>Models</button>
+      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">8</span>Learn</button>
+      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">9</span>Quiz</button>
     </nav>
     <button class="scope" id="scopeChip" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>&#8212;</b></button>
     <button class="iconbtn themebtn fbtop" id="fbTop" type="button" aria-haspopup="dialog" aria-label="Give feedback" title="Tell us how it went"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg><span class="lbl-t">Feedback</span></button>
@@ -2257,12 +2309,13 @@ body.still .hero-par{transform:none}
       <div class="field"><label for="mapModel">Station settings</label><select id="mapModel"></select></div>
     </div>
     <div class="route2">
-      <div class="field"><label for="txH">Selected transmitter mast (m)</label><input type="number" id="txH" min="1" max="1000" step="1" value="120"></div>
-      <div class="field"><label for="rxH">Selected receiver antenna (m)</label><input type="number" id="rxH" min="0" max="500" step="1" value="10"></div>
+      <div class="field"><label for="txH">Transmitter mast above ground (m)</label><input type="number" id="txH" min="1" max="1000" step="1" value="120"></div>
+      <div class="field"><label for="rxH">Receiver antenna above ground (m)</label><input type="number" id="rxH" min="0" max="500" step="1" value="10"></div>
       <div class="field"><label for="mapLand">Land along the path is mostly</label><select id="mapLand"></select></div>
       <div class="field"><label for="mapEnv">Receiver surroundings</label><select id="mapEnv"><option value="rural">Rural / open</option><option value="suburban">Suburban</option><option value="urban">Urban</option><option value="industrial">Dense urban / large city</option></select></div>
       <div class="field" style="align-self:end;gap:6px"><label class="check"><input type="checkbox" id="useTerrain" checked> Include terrain shadowing</label><label class="check"><input type="checkbox" id="useBuildings" checked> Include buildings &amp; peaks (OSM)</label></div>
     </div>
+    <p class="hint ht-note" id="htNote" aria-live="polite"></p>
     <details class="acc plain">
       <summary>Coordinates &amp; manual ground height</summary>
       <div class="acc-body">
@@ -2465,6 +2518,84 @@ body.still .hero-par{transform:none}
     <canvas id="profile" aria-label="Signal strength along the path"></canvas>
     <div class="row"><button class="btn primary" id="toLab2" type="button">Open in Lab</button><button class="btn" id="toAnim2" type="button">Animate this path</button><button class="btn" id="toMap" type="button">← Back to map</button><a class="btn ghost" id="osmLink" href="https://www.openstreetmap.org/" target="_blank" rel="noopener">View on openstreetmap.org ↗</a></div>
   </section>
+</section>
+
+<!-- ======================= DIGITAL SHADOW (WISDOM demo) ======================= -->
+<section class="wrap" id="shadow-tab" role="tabpanel" aria-labelledby="tab-shadow" hidden>
+  <div class="screenhead"><h2 class="th"><span class="ti ti-shadow" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M8 50H56"/><path class="d" pathLength="1" style="--d:.2s" d="M12 44C20 30 28 26 34 30S48 40 54 22"/><path class="dash" d="M12 40C20 28 28 22 34 26S48 34 54 18"/><circle class="dot" cx="34" cy="28" r="3.2"/></svg></span>Digital shadow</h2><p>WISDOM compares what the model predicts with what was measured, finds where they disagree, and calibrates the model to match reality.</p></div>
+  <div class="sh-demo" role="note"><b>Demo with sample data.</b> Sensor and walk-test readings are simulated from the model plus realistic impairments (buildings, system losses, noise). Ground heights, weather and space weather are live. Real sensor stations come in the funded WISDOM project.</div>
+
+  <div class="sh-grid">
+    <section class="panel card sh-mapcard" aria-labelledby="shMapH">
+      <div class="chart-head"><h2 id="shMapH">Model against reality</h2>
+        <div class="seg" role="radiogroup" aria-label="Map click does">
+          <input type="radio" name="shMode" id="shModeI" value="inspect" checked><label for="shModeI">Inspect</label>
+          <input type="radio" name="shMode" id="shModeA" value="add"><label for="shModeA">Add a measurement</label>
+        </div>
+      </div>
+      <div class="sh-mapwrap"><canvas id="shMap" aria-label="Map of the transmitter, sensor stations and measurement points, coloured by how well the model matches the measurement"></canvas>
+        <div class="sh-legend" aria-hidden="true"><span><i class="g"></i>Match &lt; 3 dB</span><span><i class="w"></i>3–6 dB</span><span><i class="b"></i>&gt; 6 dB: impairment missed</span><span><i class="s"></i>Sensor station</span></div>
+      </div>
+      <p class="hint" id="shHint">Click a dot to see its numbers. Choose “Add a measurement” and click the map to add a walk-test reading.</p>
+      <div class="sh-detail" id="shDetail" aria-live="polite"></div>
+      <p class="hint sh-attr" id="shAttrib"></p>
+    </section>
+
+    <aside class="sh-side">
+      <section class="panel card" aria-labelledby="shCalH">
+        <h2 id="shCalH">Calibrate</h2>
+        <div class="tiles" id="shErr"></div>
+        <div class="row"><button class="btn primary" id="shCal" type="button">Calibrate the model</button><button class="btn" id="shReset" type="button">Reset</button></div>
+        <div class="sh-fit" id="shFit" aria-live="polite"></div>
+      </section>
+      <section class="panel card" aria-labelledby="shTxH">
+        <h2 id="shTxH">Transmitter</h2>
+        <p class="muted sh-small" id="shTxName"></p>
+        <div class="field"><label for="shMast">Mast height above ground (m)</label><input type="number" id="shMast" min="1" max="600" step="1"></div>
+        <p class="sh-height" id="shTxHeight"></p>
+        <p class="hint">Uses the transmitter selected on the Map tab. Ground height comes from the Copernicus elevation model, so a site on a hill or mountain starts higher.</p>
+      </section>
+      <section class="panel card" aria-labelledby="shLiveH">
+        <h2 id="shLiveH">Live data interfaces</h2>
+        <div class="sh-feeds" id="shFeeds"></div>
+        <div id="shSensors"></div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="panel card" aria-labelledby="shWhatH">
+    <div class="chart-head"><h2 id="shWhatH">What if…</h2><span class="muted sh-small">Runs on the calibrated shadow</span></div>
+    <div class="row sh-chips" id="shWhat">
+      <button class="chip" type="button" aria-pressed="false" data-w="mast">Raise mast +30 m</button>
+      <button class="chip" type="button" aria-pressed="false" data-w="humid">Humid evening (k = 2)</button>
+      <button class="chip" type="button" aria-pressed="false" data-w="indoor">Indoor + outdoor (P.2109)</button>
+      <button class="chip" type="button" aria-pressed="false" data-w="rain">Heavy rain</button>
+    </div>
+    <p class="sh-whatnote" id="shWhatNote" aria-live="polite"></p>
+  </section>
+
+  <section class="panel card" aria-labelledby="shDataH">
+    <div class="chart-head"><h2 id="shDataH">Measurements</h2>
+      <div class="row"><button class="btn" type="button" id="shSample">Load sample walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label></div></div>
+    <p class="hint">CSV columns: <code>lat, lon, level</code> (dBµV/m), optional <code>built</code> (1 = behind buildings) and <code>height</code> (antenna height above ground, m).</p>
+    <div class="tablewrap"><table class="fs" id="shTable"></table></div>
+  </section>
+
+  <div class="sh-grid2">
+    <section class="panel card" aria-labelledby="shTaskH">
+      <h2 id="shTaskH">Lab task: predict, measure, explain</h2>
+      <ol class="sh-task">
+        <li><label for="shGuess">Predict the signal at <b>Sensor 2</b> (dBµV/m)</label><div class="row"><input type="number" id="shGuess" step="0.1" style="width:120px"><button class="btn" id="shCheck" type="button">Check</button></div></li>
+        <li>Compare your guess with the model and the measurement. <span id="shCheckOut" aria-live="polite"></span></li>
+        <li><label for="shWhy">Why are the model and the measurement different?</label><textarea id="shWhy" rows="2" placeholder="e.g. buildings, the hill, cable loss…"></textarea></li>
+        <li>Press <b>Calibrate the model</b> and see how much the error drops.</li>
+      </ol>
+    </section>
+    <section class="panel card" aria-labelledby="shModH">
+      <h2 id="shModH">Modules</h2>
+      <ul class="sh-mods" id="shMods"></ul>
+    </section>
+  </div>
 </section>
 
 <!-- ======================= MODELS & EQUATIONS ======================= -->
@@ -3344,6 +3475,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 <div class="moresheet" id="moreSheet" hidden>
   <button type="button" data-tab="mobile"><svg class=ic aria-hidden=true><use href=#i-signal /></svg> Mobile planner</button>
   <button type="button" data-tab="terrain">Terrain profile</button>
+  <button type="button" data-tab="shadow">Digital shadow</button>
   <button type="button" data-tab="learn">Learn</button>
   <button type="button" data-tab="quiz">Quiz</button>
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
@@ -6218,6 +6350,8 @@ function renderActive(){
   const p=paramsFor(P,MP.rx,r.T), pr=r.pred, T=r.T;
   $("strip").innerHTML=P.segs.map((s,i)=>{ const st=i?P.segs[i-1].end:0; return `<span title="${s.g} ${fmtD(st)}–${fmtD(s.end)} km" style="flex:${Math.max(s.end-st,0.001)};background:${s.g==="sea"?"#2a62a8":"#8a7a4c"}"></span>`; }).join("");
   drawProfile(p); drawTerrain(P,T);
+  { const hn=$("htNote"), mob=MP.layer==="mobile", rh=mob?1.5:MP.rx.h;
+    if(hn) hn.innerHTML=T?`Antenna tops above sea level · TX: ground <b>${Math.round(T.txE)} m</b> + mast <b>${MP.txH} m</b> = <b>${Math.round(T.txE+MP.txH)} m</b> · RX: ground <b>${Math.round(T.rxE)} m</b> + antenna <b>${rh} m</b> = <b>${Math.round(T.rxE+rh)} m</b>${T.manual?" (ground typed by hand)":" (ground from Copernicus DEM)"}`:"Ground heights loading…"; }
   $("profName").textContent=`T${MP.ti+1} ${MP.tx.name} → R${MP.ai+1} ${MP.rx.name}`;
   const sunEl=toDeg(Math.asin(clamp(P.cosMid,-1,1))), ph=phaseOf(P.cosMid), phTxt={day:"daytime",dusk:"twilight",night:"night"}[ph];
   const via=pr.g!==null&&(pr.s===null||pr.g>=pr.s)?"mostly by ground wave":"mostly by sky wave";
@@ -7841,12 +7975,12 @@ function bindQuiz(){ const topics=[...new Set(QUIZ.map(q=>q.topic))]; $("qTopic"
   $("qMode").addEventListener("change",renderQuiz); $("qTopic").addEventListener("change",renderQuiz); $("qSubmit").addEventListener("click",submitQuiz); (function(){const b=$("qExport"); b.dataset.lbl=b.textContent; let top=false; try{top=window.top===window.self;}catch(e){} if(!top) b.textContent=b.dataset.lbl="Copy results (CSV)"; b.addEventListener("click",exportQuiz);})(); $("qPrint").addEventListener("click",()=>window.print()); }
 
 /* ================= TABS ================= */
-const TABS=["lab","animation","map","terrain","mobile","methods","learn","quiz"];
+const TABS=["lab","animation","map","terrain","mobile","shadow","methods","learn","quiz"];
 let currentTab="lab";
 function go(t,noHash){
   if(!TABS.includes(t)) t="lab"; if(typeof FS!=="undefined"&&FS.on) setMapFs(false); currentTab=t; document.body.dataset.tab=t;
   document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
-  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz"; $("mobile-tab").hidden=t!=="mobile";
+  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz"; $("mobile-tab").hidden=t!=="mobile"; $("shadow-tab").hidden=t!=="shadow";
   if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
   if(t==="lab") redraw();
   if(t==="map"||t==="terrain") setLayer("bcast");
@@ -7854,6 +7988,7 @@ function go(t,noHash){
   if(t==="map"||t==="terrain"||t==="mobile") updateMap();
   if(t==="animation"){ syncRx(); if(window.animIntro) animIntro(); }
   if(t==="methods") renderMethods();
+  if(t==="shadow"&&window.shadowShow) shadowShow();
   document.querySelectorAll(".bnav a").forEach(a=>a.setAttribute("aria-current",a.dataset.tab===t?"page":"false"));
   window.scrollTo({top:0});
 }
@@ -8413,6 +8548,210 @@ function init(){
 }
 init();
 
+</script>
+<script>
+"use strict";
+/* =====================================================================
+   WISDOM digital shadow (demo). Compares model predictions (ITU-R P.1812
+   with the real ground heights at both ends) against measurements, then
+   calibrates the model by least squares. Sample readings are simulated:
+   model + hidden impairments + noise, and labelled as a demo on screen.
+   ===================================================================== */
+(function(){
+  const SH={f:100, P:10, pts:[], sel:-1, cal:null, what:{}, gTx:null, built:false, view:null, mode:"inspect", tries:0, timer:null, seed:7, nextId:1};
+  const COL={g:"#2E9E5B",w:"#E0A526",b:"#D2453A"};
+  /* hidden "reality": what the sample measurements are built from */
+  const TRUTH={bias:-3.4, bld:-8.6, slope:-3.2, noise:1.6};
+  const near=x=>Math.round(x*10)/10;
+  function rng(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+  const gauss=r=>{ let u=0,v=0; while(!u) u=r(); while(!v) v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+  const tx=()=>{ const S=MP.S.bcast; return S.txs[S.ti]||S.txs[0]; };
+  function dest(p,km,brg){ const d=km/RE, b=toRad(brg), la=toRad(p.lat), lo=toRad(p.lon);
+    const la2=Math.asin(Math.sin(la)*Math.cos(d)+Math.cos(la)*Math.sin(d)*Math.cos(b));
+    const lo2=lo+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(la),Math.cos(d)-Math.sin(la)*Math.sin(la2));
+    return {lat:toDeg(la2),lon:toDeg(lo2)}; }
+
+  /* ---------- model ---------- */
+  function model(pt,w){ w=w||{}; const T=tx(), dk=Math.max(hav(T,pt),0.2), n=11;
+    const gT=SH.gTx??0, gR=pt.g??0, hT=T.h+(w.mast?30:0);
+    const prof={d:Array.from({length:n},(_,i)=>dk*i/(n-1)), h:Array.from({length:n},(_,i)=>gT+(gR-gT)*i/(n-1))};
+    let Lb; try{ Lb=p1812(dk,{f:SH.f,htx:hT,hrx:pt.h,refr:w.humid?"super":"standard"},prof).Lb50; }catch(e){ Lb=NaN; }
+    if(!isFinite(Lb)) Lb=32.44+20*Math.log10(SH.f)+20*Math.log10(dk)+10;
+    let E=199.36+20*Math.log10(SH.f/1000)-Lb+10*Math.log10(SH.P);
+    if(w.indoor&&!pt.sensor) E-=p2109(SH.f,0.5,false);
+    return E; }
+  function calTerm(pt){ const c=SH.cal; if(!c) return 0; return c.b[0]+c.b[1]*(pt.built?1:0)+c.b[2]*Math.log10(Math.max(hav(tx(),pt),0.2)); }
+  const pred=pt=>model(pt,SH.what)+calTerm(pt);
+  const predBase=pt=>model(pt,{})+calTerm(pt);
+  function truth(pt,r){ const dk=Math.max(hav(tx(),pt),0.2);
+    return model(pt,{})+TRUTH.bias+(pt.built?TRUTH.bld:0)+TRUTH.slope*(Math.log10(dk)-0.6)+TRUTH.noise*gauss(r); }
+  const status=d=>{ const a=Math.abs(d); return a<3?"g":a<6?"w":"b"; };
+  const SLBL={g:"Match",w:"Close",b:"Impairment missed"};
+
+  /* ---------- sample data around the Map-tab transmitter ---------- */
+  function buildSample(){
+    const T=tx(), r=rng(SH.seed); SH.pts=[]; SH.cal=null; SH.sel=-1; SH.nextId=1;
+    [["Sensor 1 · rooftop",2.6,72,0],["Sensor 2 · rooftop",5.4,104,1],["Sensor 3 · rooftop",8.8,48,0]].forEach(([nm,km,b,bl])=>{
+      SH.pts.push({id:SH.nextId++,name:nm,...dest(T,km,b),h:15,sensor:true,built:!!bl,src:"sensor"}); });
+    for(let i=0;i<14;i++){ const km=1.4+i*0.82, b=86+18*Math.sin(i*0.9)+ (r()-0.5)*10;
+      SH.pts.push({id:SH.nextId++,name:"Walk test "+(i+1),...dest(T,km,b),h:1.5,sensor:false,built:r()<0.42,src:"walk"}); }
+    measureAll(); }
+  const prng=p=>rng(SH.seed*1000+p.id);
+  function measureAll(){ SH.pts.forEach(p=>{ if(p.src!=="csv") p.meas=truth(p,prng(p)); }); }
+
+  /* ---------- ground heights (Copernicus DEM via the Map tab's fetchElev) ---------- */
+  async function heights(){ const T=tx(), list=[T,...SH.pts.filter(p=>p.g==null)];
+    let e=null; try{ e=await fetchElev(list.map(p=>({lat:p.lat,lon:p.lon}))); }catch(x){}
+    if(e){ SH.gTx=e[0]??0; list.slice(1).forEach((p,i)=>{ p.g=e[i+1]??0; }); SH.demOk=true; } else { SH.gTx=SH.gTx??0; list.slice(1).forEach(p=>{ if(p.g==null) p.g=0; }); SH.demOk=false; }
+    measureAll(); render(); }
+
+  /* ---------- calibration: least squares on residual = measured − model ---------- */
+  function calibrate(){
+    const rows=SH.pts.filter(p=>isFinite(p.meas)); if(rows.length<4){ toastMsg("Add at least 4 measurements to calibrate."); return; }
+    const X=rows.map(p=>[1,p.built?1:0,Math.log10(Math.max(hav(tx(),p),0.2))]), y=rows.map(p=>p.meas-model(p,{}));
+    const A=[[0,0,0],[0,0,0],[0,0,0]], v=[0,0,0];
+    X.forEach((x,k)=>{ for(let i=0;i<3;i++){ v[i]+=x[i]*y[k]; for(let j=0;j<3;j++) A[i][j]+=x[i]*x[j]; } });
+    for(let i=0;i<3;i++) A[i][i]+=1e-6;
+    let b=solve3(A,v); if(!b||b.some(x=>!isFinite(x))){ const m=y.reduce((s,a)=>s+a,0)/y.length; b=[m,0,0]; }
+    SH.cal={b,n:rows.length}; render(); }
+  function solve3(A,v){ const M=A.map((r,i)=>[...r,v[i]]);
+    for(let c=0;c<3;c++){ let p=c; for(let r=c+1;r<3;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r; [M[c],M[p]]=[M[p],M[c]];
+      if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<3;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<4;k++) M[r][k]-=f*M[c][k]; } }
+    return M.map((r,i)=>r[3]/M[i][i]); }
+  function rms(fn){ const r=SH.pts.filter(p=>isFinite(p.meas)).map(p=>p.meas-fn(p)); if(!r.length) return NaN; return Math.sqrt(r.reduce((s,a)=>s+a*a,0)/r.length); }
+  const rawModel=p=>model(p,{});
+  function toastMsg(t){ const h=$("shHint"); h.textContent=t; }
+
+  /* ---------- map ---------- */
+  let C=null, ctx=null;
+  function fitView(){ const W=C.clientWidth||800,H=C.clientHeight||480, pts=[tx(),...SH.pts];
+    let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity; pts.forEach(s=>{ const x=wx(s.lon,0),y=wy(s.lat,0); a=Math.min(a,x); c=Math.max(c,x); b=Math.min(b,y); d=Math.max(d,y); });
+    const z=clamp(Math.log2(Math.min(W*0.8/Math.max(c-a,1e-9),H*0.78/Math.max(d-b,1e-9))),3,16);
+    SH.view={lon:ilon((a+c)/2,0),lat:ilat((b+d)/2,0),z}; }
+  const P=(lon,lat)=>{ const W=C.clientWidth,H=C.clientHeight,v=SH.view; return [W/2+wx(lon,v.z)-wx(v.lon,v.z),H/2+wy(lat,v.z)-wy(v.lat,v.z)]; };
+  const U=(x,y)=>{ const W=C.clientWidth,H=C.clientHeight,v=SH.view; return {lon:ilon(wx(v.lon,v.z)+x-W/2,v.z),lat:ilat(wy(v.lat,v.z)+y-H/2,v.z)}; };
+  function draw(){
+    if(!C||C.offsetParent===null) return; const W=C.clientWidth,H=C.clientHeight,dpr=window.devicePixelRatio||1;
+    if(C.width!==Math.round(W*dpr)||C.height!==Math.round(H*dpr)){ C.width=W*dpr; C.height=H*dpr; }
+    if(!SH.view) fitView(); const c=ctx; c.setTransform(dpr,0,0,dpr,0,0); c.fillStyle="#E6EDF2"; c.fillRect(0,0,W,H);
+    let missing=0; const base=TILE.base==="vector"?"light":TILE.base, prov=PROVIDERS[base];
+    if(prov&&prov.url){ const v=SH.view, tz=clamp(Math.round(v.z),0,prov.max), sc=Math.pow(2,v.z-tz), ts=TS*sc, n=Math.pow(2,tz), cX=wx(v.lon,tz), cY=wy(v.lat,tz);
+      const x0=Math.floor((cX-W/2/sc)/TS), x1=Math.floor((cX+W/2/sc)/TS), y0=Math.max(0,Math.floor((cY-H/2/sc)/TS)), y1=Math.min(n-1,Math.floor((cY+H/2/sc)/TS));
+      const keep=TILE.base; TILE.base=base;
+      for(let ty=y0;ty<=y1;ty++) for(let tx_=x0;tx_<=x1;tx_++){ const xx=((tx_%n)+n)%n, im=getTile(tz,xx,ty), sx=W/2+(tx_*TS-cX)*sc, sy=H/2+(ty*TS-cY)*sc;
+        if(im) c.drawImage(im,Math.floor(sx),Math.floor(sy),Math.ceil(ts)+1,Math.ceil(ts)+1); else missing++; }
+      TILE.base=keep; $("shAttrib").innerHTML="Map "+prov.attr; }
+    if(missing&&SH.tries<60){ SH.tries++; clearTimeout(SH.retry); SH.retry=setTimeout(draw,300); } else if(!missing) SH.tries=0;
+    c.fillStyle="rgba(16,44,64,.10)"; c.fillRect(0,0,W,H);
+    const T=tx(), [tX,tY]=P(T.lon,T.lat);
+    // rays to sensors
+    c.setLineDash([4,5]); c.lineWidth=1.4; c.strokeStyle="rgba(16,44,64,.55)";
+    SH.pts.filter(p=>p.sensor).forEach(p=>{ const [x,y]=P(p.lon,p.lat); c.beginPath(); c.moveTo(tX,tY); c.lineTo(x,y); c.stroke(); }); c.setLineDash([]);
+    // transmitter
+    c.fillStyle="#102C40"; c.strokeStyle="#CDF23A"; c.lineWidth=2.5;
+    c.beginPath(); c.moveTo(tX,tY-16); c.lineTo(tX-9,tY+8); c.lineTo(tX+9,tY+8); c.closePath(); c.fill(); c.stroke();
+    label(c,"TX · "+T.name,tX-14,tY+26);
+    SH.pts.forEach((p,i)=>{ const [x,y]=P(p.lon,p.lat), d=isFinite(p.meas)?p.meas-pred(p):NaN, st=isFinite(d)?status(d):"w", r=p.sensor?9:7;
+      c.lineWidth=i===SH.sel?3.5:2; c.strokeStyle=i===SH.sel?"#102C40":"#fff"; c.fillStyle=COL[st];
+      c.beginPath(); if(p.sensor){ c.rect(x-r,y-r,2*r,2*r); } else c.arc(x,y,r,0,7); c.fill(); c.stroke();
+      if(p.sensor){ c.strokeStyle="#CDF23A"; c.lineWidth=2; c.strokeRect(x-r-3,y-r-3,2*r+6,2*r+6); label(c,p.name.split(" · ")[0],x+14,y+4); }
+      p._x=x; p._y=y; });
+  }
+  function label(c,t,x,y){ c.font="600 12px "+(cssVar("--font-body")||"sans-serif"); const w=c.measureText(t).width;
+    c.fillStyle="rgba(247,250,252,.92)"; c.fillRect(x-4,y-12,w+8,17); c.fillStyle="#102C40"; c.fillText(t,x,y); }
+  function hit(x,y){ let best=-1,bd=196; SH.pts.forEach((p,i)=>{ const d=(p._x-x)**2+(p._y-y)**2; if(d<bd){ bd=d; best=i; } }); return best; }
+
+  /* ---------- panels ---------- */
+  const fx=v=>isFinite(v)?v.toFixed(1):"—";
+  function hLine(g,h,who){ if(g==null) return `${who}: ground height loading…`;
+    return `${who}: ground <b>${Math.round(g)} m</b>${SH.demOk===false?" (DEM offline, sea level assumed)":""} + antenna <b>${near(h)} m</b> = <b>${near(Math.round(g)+h)} m</b> above sea level`; }
+  function renderDetail(){ const el=$("shDetail"), p=SH.pts[SH.sel]; if(!p){ el.innerHTML=""; return; }
+    const m=pred(p), d=p.meas-m, st=status(d), dk=hav(tx(),p);
+    const why=p.built?"Behind buildings: shadowing loss the open-ground model does not include.":Math.abs(d)>=3?"System loss or local clutter the model does not include.":"Open path; the model matches well.";
+    el.innerHTML=`<h3>${esc(p.name)} <span class="muted">· ${fmtD(dk)} km from the transmitter</span></h3>
+      <div>Predicted <b>${fx(m)} dBµV/m</b> · measured <b>${fx(p.meas)} dBµV/m</b> · difference <b style="color:${COL[st]}">${d>0?"+":""}${fx(d)} dB</b> (${SLBL[st]})</div>
+      <div class="muted">${why}</div>
+      <p class="sh-height">${hLine(p.g,p.h,p.sensor?"Sensor":"Receiver")}</p>
+      <div class="row"><label for="shPtH">Antenna height above ground (m)</label><input type="number" id="shPtH" min="0.5" max="300" step="0.5" value="${p.h}" style="width:90px">${p.src!=="csv"?`<label class="check"><input type="checkbox" id="shPtB" ${p.built?"checked":""}> Behind buildings</label>`:""}</div>`;
+    $("shPtH").addEventListener("change",e=>{ p.h=clamp(+e.target.value||1.5,0.5,300); if(p.src!=="csv") p.meas=truth(p,prng(p)); render(); });
+    const pb=$("shPtB"); if(pb) pb.addEventListener("change",e=>{ p.built=e.target.checked; p.meas=truth(p,prng(p)); render(); }); }
+  function renderErr(){ const before=rms(rawModel), after=SH.cal?rms(predBase):NaN, n=SH.pts.filter(p=>isFinite(p.meas)).length;
+    const cls=v=>!isFinite(v)?"info":v<3?"good":v<6?"warn":"bad";
+    $("shErr").innerHTML=`<div class="tile ${cls(before)}"><span class="k">Error before</span><span class="val">±${fx(before)} dB</span><span class="sub">RMS over ${n} readings</span></div>
+      <div class="tile ${SH.cal?cls(after):"info"}"><span class="k">After calibration</span><span class="val">${SH.cal?"±"+fx(after)+" dB":"—"}</span><span class="sub">${SH.cal?Math.round(100*(1-after/before))+"% lower":"press Calibrate"}</span></div>`;
+    const c=SH.cal; $("shFit").innerHTML=c?`<b>What calibration found</b> (least squares over ${c.n} readings):<ul>
+      <li>System offset <b>${c.b[0]>0?"+":""}${fx(c.b[0])} dB</b>: real power, cable or antenna losses the model did not know.</li>
+      <li>Building shadowing <b>${fx(c.b[1])} dB</b> at points behind buildings.</li>
+      <li>Distance trend <b>${fx(c.b[2])} dB per decade</b> of distance.</li></ul>`:"";
+    $("shReset").disabled=!SH.cal; }
+  function renderTx(){ const T=tx(); $("shTxName").textContent=`${T.name} · demo FM station ${SH.f} MHz, ${SH.P} kW ERP`; $("shMast").value=T.h;
+    $("shTxHeight").innerHTML=hLine(SH.gTx,T.h,"Transmitter"); }
+  function renderTable(){ const rows=SH.pts.map((p,i)=>{ const m=pred(p), d=p.meas-m, st=status(d);
+      return `<tr data-i="${i}" class="${i===SH.sel?"sel":""}"><td><button class="linkish" type="button" data-i="${i}">${esc(p.name)}</button></td><td class="num">${fmtD(hav(tx(),p))}</td><td class="num">${p.g==null?"…":Math.round(p.g)}</td><td class="num">${near(p.h)}</td><td class="num">${fx(m)}</td><td class="num">${fx(p.meas)}</td><td class="num">${d>0?"+":""}${fx(d)}</td><td><span class="st"><i style="background:${COL[st]}"></i>${SLBL[st]}</span></td></tr>`; }).join("");
+    $("shTable").innerHTML=`<caption class="muted" style="text-align:left;caption-side:top;padding-bottom:6px">${SH.pts.length} readings · model ${SH.cal?"calibrated":"not calibrated"}${Object.values(SH.what).some(Boolean)?" · what-if on":""}</caption><tr><th>Point</th><th>Distance (km)</th><th>Ground (m)</th><th>Antenna (m)</th><th>Model (dBµV/m)</th><th>Measured</th><th>Difference (dB)</th><th>Status</th></tr>`+rows; }
+  function renderWhat(){ const on=Object.keys(SH.what).filter(k=>SH.what[k]);
+    document.querySelectorAll("#shWhat .chip").forEach(b=>b.setAttribute("aria-pressed",String(!!SH.what[b.dataset.w])));
+    if(!on.length){ $("shWhatNote").textContent=""; return; }
+    const ref=SH.pts.find(p=>p.name==="Walk test 5")||SH.pts.find(p=>!p.sensor)||SH.pts[0], a=predBase(ref), b=pred(ref);
+    const notes={mast:"A taller mast lifts the antenna above more obstacles.",humid:"Warm, humid air bends VHF waves further (super-refraction, k = 2).",indoor:"Walk-test receivers move indoors; ITU-R P.2109 adds the median building entry loss.",rain:"At 100 MHz rain costs almost nothing. Rain loss matters for 5G/6G mmWave (ITU-R P.838): about 10 dB per km at 28 GHz in a heavy tropical storm."};
+    $("shWhatNote").innerHTML=`At ${esc(ref.name)}: <b>${fx(a)} → ${fx(b)} dBµV/m</b> (${b-a>=0?"+":""}${fx(b-a)} dB). `+on.map(k=>notes[k]).join(" "); }
+  function renderMods(){ const L=[["Ground wave, LF/MF","live"],["HF sky wave","live"],["VHF/UHF terrain (this demo)","live"],["Cellular 4G/5G","live"],["Indoor + outdoor (P.2109)","pilot"],["5G/6G WSN and IoT","pilot"],["5G/6G urban outdoor","future"],["Indoor environments","future"],["Built environment, smart campus","future"],["mmWave and sub-THz 6G","future"],["RIS and beamforming","future"],["Satellite and non-terrestrial","future"]];
+    const T={live:"Live",pilot:"Pilot",future:"Future"}; $("shMods").innerHTML=L.map(([n,s])=>`<li class="${s}"><span>${n}</span><span class="tag">${T[s]}</span></li>`).join(""); }
+  function render(){ renderTx(); renderErr(); renderDetail(); renderTable(); renderWhat(); draw(); }
+
+  /* ---------- live data interfaces ---------- */
+  async function feeds(){ const T=tx(), el=$("shFeeds"), row=(k,v)=>`<div class="sh-feed"><span>${k}</span><span>${v}</span></div>`;
+    el.innerHTML=row("Weather (Open-Meteo)","loading…")+row("Space weather (NOAA)","loading…");
+    let w="unavailable", s="unavailable";
+    try{ const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${T.lat.toFixed(3)}&longitude=${T.lon.toFixed(3)}&current=temperature_2m,relative_humidity_2m,precipitation&hourly=soil_moisture_0_to_1cm&forecast_days=1&timezone=auto`);
+      const j=await r.json(), cu=j.current||{}, hr=new Date().getHours(), sm=j.hourly&&j.hourly.soil_moisture_0_to_1cm?j.hourly.soil_moisture_0_to_1cm[hr]:null;
+      w=`${fx(cu.temperature_2m)} °C · ${Math.round(cu.relative_humidity_2m)}% RH · rain ${fx(cu.precipitation)} mm${sm!=null?` · soil ${Math.round(sm*100)}%`:""}`; }catch(e){}
+    try{ const r=await fetch("https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json",{cache:"no-store"}); const j=await r.json();
+      const L=j.filter(x=>x.energy==="0.1-0.8nm"&&x.flux>0), last=L[L.length-1]; if(last) s=`X-ray class ${fluxClass(last.flux)}`; }catch(e){}
+    el.innerHTML=row("Weather (Open-Meteo, live)",w)+row("Space weather (NOAA, live)",s)+row("Ground heights","Copernicus DEM"+(SH.demOk===false?" (offline)":"")); }
+  function sensors(){ const box=$("shSensors"); const S=SH.pts.filter(p=>p.sensor);
+    box.innerHTML=S.map((p,i)=>`<div class="sh-sens"><span>${esc(p.name)} <span class="muted">(simulated)</span></span><span class="v" id="shSv${i}">${fx(p.meas)} dBµV/m</span><canvas id="shSc${i}" aria-label="${esc(p.name)}: last 24 hours"></canvas></div>`).join("");
+    S.forEach((p,i)=>spark($("shSc"+i),p)); }
+  function spark(cv,p){ const W=cv.clientWidth||300,H=34,dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+    const r=rng(SH.seed+p.id*31), v=Array.from({length:96},(_,k)=>p.meas+1.2*Math.sin(k/96*2*Math.PI*1+p.id)+0.6*gauss(r)), lo=Math.min(...v)-0.5, hi=Math.max(...v)+0.5;
+    c.strokeStyle=cssVar("--accent")||"#0F6FA8"; c.lineWidth=1.5; c.beginPath(); v.forEach((y,k)=>{ const X=k/(v.length-1)*W, Y=H-2-(y-lo)/(hi-lo)*(H-4); k?c.lineTo(X,Y):c.moveTo(X,Y); }); c.stroke(); }
+  function tick(){ if(currentTab!=="shadow"||document.hidden) return; const r=rng(Date.now()&0xffff);
+    SH.pts.filter(p=>p.sensor).forEach((p,i)=>{ const v=p.meas+0.4*gauss(r), el=$("shSv"+i); if(el) el.textContent=fx(v)+" dBµV/m"; }); }
+
+  /* ---------- CSV ---------- */
+  function parseCSV(text){ const out=[]; text.split(/\r?\n/).forEach(line=>{ const c=line.split(/[,;\t]/).map(s=>s.trim()); if(c.length<3) return;
+      const la=+c[0], lo=+c[1], lv=+c[2]; if(!isFinite(la)||!isFinite(lo)||!isFinite(lv)||Math.abs(la)>90||Math.abs(lo)>180) return;
+      out.push({id:SH.nextId++,name:"Upload "+(out.length+1),lat:la,lon:lo,meas:lv,built:c[3]==="1",h:isFinite(+c[4])&&c[4]!==""?+c[4]:1.5,sensor:false,src:"csv"}); });
+    return out; }
+
+  /* ---------- wiring ---------- */
+  function bind(){ C=$("shMap"); ctx=C.getContext("2d");
+    document.querySelectorAll('input[name="shMode"]').forEach(r=>r.addEventListener("change",e=>{ SH.mode=e.target.value; toastMsg(SH.mode==="add"?"Click the map to add a walk-test reading there (simulated measurement).":"Click a dot to see its numbers."); }));
+    C.addEventListener("click",e=>{ const b=C.getBoundingClientRect(), x=e.clientX-b.left, y=e.clientY-b.top, i=hit(x,y);
+      if(SH.mode==="add"&&i<0){ const q=U(x,y), r=rng(Date.now()&0xffff), p={id:SH.nextId++,name:"Student "+(SH.pts.filter(p=>p.src==="click").length+1),...q,h:1.5,sensor:false,built:r()<0.4,src:"click",g:null};
+        p.meas=NaN; SH.pts.push(p); SH.sel=SH.pts.length-1; heights(); return; }
+      SH.sel=i; render(); });
+    $("shCal").addEventListener("click",calibrate);
+    $("shReset").addEventListener("click",()=>{ SH.cal=null; render(); });
+    $("shMast").addEventListener("change",e=>{ const T=tx(); T.h=clamp(+e.target.value||1,1,600); if($("txH")&&MP.layer==="bcast") $("txH").value=T.h; if(MP.res) MP.res.clear(); measureAll(); render(); });
+    document.querySelectorAll("#shWhat .chip").forEach(b=>b.addEventListener("click",()=>{ SH.what[b.dataset.w]=!SH.what[b.dataset.w]; render(); }));
+    $("shSample").addEventListener("click",()=>{ SH.seed++; buildSample(); SH.view=null; heights(); render(); });
+    $("shFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; const add=parseCSV(await f.text()); e.target.value="";
+      if(!add.length){ toastMsg("No readings found. Use lat, lon, level per line."); return; }
+      SH.pts.push(...add.map(p=>({...p,g:null}))); SH.view=null; toastMsg(`Added ${add.length} uploaded readings.`); heights(); });
+    $("shTable").addEventListener("click",e=>{ const b=e.target.closest("button[data-i]"); if(!b) return; SH.sel=+b.dataset.i; render(); C.scrollIntoView({block:"nearest",behavior:"smooth"}); });
+    $("shCheck").addEventListener("click",()=>{ const p=SH.pts.find(p=>p.name.startsWith("Sensor 2")), g=+$("shGuess").value; if(!p) return;
+      const m=pred(p); $("shCheckOut").innerHTML=isFinite(g)&&$("shGuess").value!==""?`Your guess <b>${fx(g)}</b> · model <b>${fx(m)}</b> · measured <b>${fx(p.meas)}</b> dBµV/m. You were ${fx(Math.abs(g-p.meas))} dB from reality; the model was ${fx(Math.abs(m-p.meas))} dB.`:"Type a number first."; });
+    window.addEventListener("resize",()=>{ if(currentTab==="shadow"){ SH.view=null; draw(); } });
+    renderMods(); setInterval(tick,3000); }
+  let started=false, txKey="";
+  window.shadowShow=function(){ if(!started){ started=true; bind(); }
+    const T=tx(), k=T.lat.toFixed(4)+","+T.lon.toFixed(4);
+    if(k!==txKey){ txKey=k; SH.gTx=null; buildSample(); SH.view=null; render(); heights().then(()=>{ sensors(); }); feeds(); }
+    else { render(); sensors(); } };
+
+  if(currentTab==="shadow") window.shadowShow();
+})();
 </script>
 </body>
 </html>
