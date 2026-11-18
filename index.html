@@ -2385,6 +2385,7 @@ body.still .hero-par{transform:none}
         <input type="radio" name="clickset" id="modeMe" value="me" class="mob-only"><label for="modeMe" class="mob-only"><svg class=ic aria-hidden=true><use href=#i-pin /></svg> Mark me</label>
         <input type="radio" name="clickset" id="modeDel" value="del"><label for="modeDel" class="dellbl"><svg class=ic aria-hidden=true><use href=#i-close /></svg> Remove</label>
       </div>
+      <button class="btn" id="txSetBtn" type="button" data-kbd="S" data-tiptext="Transmitter settings"><svg class=ic aria-hidden=true><use href=#i-gear /></svg> <span id="txSetLbl">T1 settings</span></button>
       <button class="btn" id="gpsBtn" type="button" hidden><svg class=ic aria-hidden=true><use href=#i-target /></svg> My location</button>
       <button class="btn mob-only" id="findTowers" type="button" title="Search OpenStreetMap for mobile towers within 8 km of the selected test point"><svg class=ic aria-hidden=true><use href=#i-signal /></svg> Find towers (OSM)</button>
       <label class="covsel"><span>Units</span><select class="unit-pick" id="unitPickM"><option value="auto">Auto (FM/TV: both)</option><option value="lin">µV/m · mV/m</option><option value="db">dBµV/m</option><option value="rx">dBµV at receiver</option></select></label>
@@ -3343,7 +3344,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <h2 id="keysTitle">Keyboard shortcuts</h2>
   <div class="keysgrid">
     <section><h3>Everywhere</h3><dl><dt><kbd>1</kbd>–<kbd>9</kbd></dt><dd>Open a tab (Lab … Quiz)</dd><dt><kbd>?</kbd></dt><dd>This list</dd><dt><kbd>T</kbd></dt><dd>Light / dark theme</dd><dt><kbd>Esc</kbd></dt><dd>Close a box or dialog</dd></dl></section>
-    <section><h3>Map and Cellular</h3><dl><dt><kbd>S</kbd></dt><dd>Quick settings beside the selected transmitter</dd><dt><kbd>P</kbd></dt><dd>All transmitter settings</dd><dt><kbd>A</kbd></dt><dd>Aim the beam</dd><dt><kbd>Shift</kbd> + <kbd>←</kbd>/<kbd>→</kbd></dt><dd>Turn the beam 5° (<kbd>Alt</kbd> for 1°)</dd><dt><kbd>F2</kbd></dt><dd>Rename the selected pin</dd><dt><kbd>Del</kbd></dt><dd>Delete the selected pin</dd><dt><kbd>F</kbd></dt><dd>Full-screen map</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
+    <section><h3>Map and Cellular</h3><dl><dt><kbd>S</kbd></dt><dd>Transmitter settings, opened beside the transmitter (or right-click a transmitter pin)</dd><dt><kbd>P</kbd></dt><dd>All transmitter settings</dd><dt><kbd>A</kbd></dt><dd>Aim the beam</dd><dt><kbd>Shift</kbd> + <kbd>←</kbd>/<kbd>→</kbd></dt><dd>Turn the beam 5° (<kbd>Alt</kbd> for 1°)</dd><dt><kbd>F2</kbd></dt><dd>Rename the selected pin</dd><dt><kbd>Del</kbd></dt><dd>Delete the selected pin</dd><dt><kbd>F</kbd></dt><dd>Full-screen map</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
     <section><h3>Animation</h3><dl><dt><kbd>Space</kbd></dt><dd>Play / pause</dd><dt><kbd>F</kbd></dt><dd>Full screen</dd><dt><kbd>H</kbd></dt><dd>Hide or show the panels</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
     <section><h3>Digital shadow</h3><dl><dt><kbd>C</kbd></dt><dd>Calibrate the model</dd><dt><kbd>M</kbd></dt><dd>Switch between inspect and add a measurement</dd></dl></section>
   </div>
@@ -6037,10 +6038,12 @@ function drawMap(){
     const pt=arrOf(s.kind)[s.i], box=$("pinTools"), bt=$("pinDel");
     if(pt){ const [x,y]=proj(pt.lon,pt.lat), off=beamsOf(s).length?BEAM.R+22:8; // keep the buttons clear of the beam handles
       box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+off)+"px";
-      $("pinPanel").innerHTML=s.kind==="rx"?`<svg class=ic aria-hidden=true><use href=#i-gear /></svg> T${MP.ti+1} panel`:"<svg class=ic aria-hidden=true><use href=#i-gear /></svg> Panel";
-      $("pinAim").hidden=s.kind==="rx"; $("pinSet").hidden=s.kind==="rx";
+      $("pinPanel").innerHTML="<svg class=ic aria-hidden=true><use href=#i-gear /></svg> Panel"; $("pinPanel").hidden=s.kind==="rx";
+      $("pinSet").innerHTML=`<svg class=ic aria-hidden=true><use href=#i-gear /></svg> ${s.kind==="rx"?`T${MP.ti+1} settings`:"Settings"}`;
+      $("pinAim").hidden=s.kind==="rx"; $("pinSet").hidden=false;
       const can=s.kind==="relay"||arrOf(s.kind).length>1; bt.hidden=!can; bt.innerHTML=`<svg class=ic aria-hidden=true><use href=#i-close /></svg> Delete`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?(MP.layer==="mobile"?"tower":"transmitter"):s.kind==="relay"?"relay":(MP.layer==="mobile"?"test point":"receiver")} ${pt.name}`);
-      $("pinRen").setAttribute("aria-label",`Rename ${pt.name}`); MP.toolSel=s; } }
+      $("pinRen").setAttribute("aria-label",`Rename ${pt.name}`); MP.toolSel=s; }
+    const tl=$("txSetLbl"); if(tl) tl.textContent=`T${MP.ti+1} settings`; }
   const msg=$("mapMsg");
   if(MP.source==="loading"){ msg.hidden=false; msg.textContent="Loading map data…"; }
   else if(TILE.blockedMsg&&TILE.base==="vector"){ msg.hidden=false; msg.textContent="Map tiles can\'t load here because this page blocks outside images. Open the lab from its public website (or the downloadable copy) for the full OpenStreetMap and terrain. (Click to hide)"; }
@@ -6734,14 +6737,18 @@ function bindMap(){
   const renSave=()=>{ const box=$("renBox"); const arr=arrOf(box.dataset.kind); const pt=arr[+box.dataset.i]; const v=$("renInput").value.trim(); if(pt&&v){ pt.name=v; pt.autoName=false; } box.hidden=true; updateMap(); };
   $("pinRen").addEventListener("click",e=>{ e.stopPropagation(); renOpen(); });
   $("pinAim").addEventListener("click",e=>{ e.stopPropagation(); openAimBox(); });
-  $("pinSet").addEventListener("click",e=>{ e.stopPropagation(); openQuick(); });
+  const openTxSettings=()=>{ const s=MP.toolSel; if(!s||s.kind==="rx") MP.lastSel={kind:"tx",i:MP.ti}; drawMap(); openQuick(); };
+  $("pinSet").addEventListener("click",e=>{ e.stopPropagation(); openTxSettings(); });
+  $("txSetBtn").addEventListener("click",()=>{ MP.lastSel={kind:"tx",i:MP.ti}; drawMap(); openQuick(); });
+  mapC.addEventListener("contextmenu",e=>{ const r=mapC.getBoundingClientRect(), h=hitPin(e.clientX-r.left,e.clientY-r.top); if(!h||h.kind==="rx") return;
+    e.preventDefault(); if(h.kind==="tx"&&h.i!==MP.ti){ MP.ti=h.i; MP.lastSel=h; updateMap(); } else { MP.lastSel=h; drawMap(); } openQuick(); });
   $("pinPanel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx"){ openAui("tx",MP.ti); } else openAui(s.kind,s.i); });
   $("renSave").addEventListener("click",renSave); $("renCancel").addEventListener("click",()=>$("renBox").hidden=true);
   $("renInput").addEventListener("keydown",e=>{ if(e.key==="Enter") renSave(); if(e.key==="Escape") $("renBox").hidden=true; });
   mapC.addEventListener("keydown",e=>{ if(e.key==="F2"){ e.preventDefault(); renOpen(); }
     if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&(e.shiftKey||e.altKey)){ if(nudgeBeam((e.key==="ArrowRight"?1:-1)*(e.altKey?1:5))) e.preventDefault(); }
     if(e.key==="a"||e.key==="A"){ e.preventDefault(); openAimBox(); }
-    if(e.key==="s"||e.key==="S"){ e.preventDefault(); openQuick(); }
+    if(e.key==="s"||e.key==="S"){ e.preventDefault(); const s=MP.toolSel; if(!s||s.kind==="rx") MP.lastSel={kind:"tx",i:MP.ti}; drawMap(); openQuick(); }
     if(e.key==="p"||e.key==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("tx",MP.ti); else openAui(s.kind,s.i); } });
   $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
   mapC.tabIndex=0;
@@ -8878,7 +8885,7 @@ init();
     if(k==="?"){ e.preventDefault(); openKeys(); return; }
     if(k==="t"||k==="T"){ e.preventDefault(); click("themeBtn"); return; }
     if(onMap&&t!==mapC){
-      if(k==="s"||k==="S"){ e.preventDefault(); openQuick(); return; }
+      if(k==="s"||k==="S"){ e.preventDefault(); $("txSetBtn").click(); return; }
       if(k==="a"||k==="A"){ e.preventDefault(); openAimBox(); return; }
       if(k==="p"||k==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("tx",MP.ti); else openAui(s.kind,s.i); return; } }
     if(onMap&&(k==="+"||k==="=")){ e.preventDefault(); click("zoomIn"); return; }
