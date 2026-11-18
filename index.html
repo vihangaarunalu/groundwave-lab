@@ -1871,11 +1871,34 @@ body.still .hero-par{transform:none}
 .sh-mods li{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:var(--r-sm);padding:7px 10px}
 .sh-mods li.pilot{border-color:var(--accent)}
 .sh-mods li.future{border-style:dashed;color:var(--muted)}
-.sh-mods .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.sh-mods .tag{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .sh-attr{margin-top:4px}
 @media (max-width:980px){.sh-grid,.sh-grid2{grid-template-columns:1fr}#shMap{height:380px}}
-.linkish{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
+.linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
+
+/* ===== quick settings + shortcut tooltips ===== */
+.qsbox{width:330px;max-height:min(560px,calc(100% - 16px));overflow:auto;display:grid;gap:var(--sp-2)}
+.qsbox .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2)}
+.qsbox .field input,.qsbox .field select{width:100%}
+.qsbox .antpre{display:none}
+.qsbox .antparams{display:grid;grid-template-columns:1fr;gap:var(--sp-2)}
+.qsbox .antparams .field{display:grid;gap:4px}
+.qsbox input[type=number],.qsbox select{min-height:36px;height:36px;padding:4px 8px}
+.qsbox .hint{font-size:12px;line-height:1.4}
+.qsbox .field:has(.antpre){display:none}
+.qspolar{width:100%;height:190px;display:block}
+.qsht{margin:0}
+#kbTip{position:fixed;z-index:1000;pointer-events:none;display:flex;align-items:center;gap:6px;background:#102C40;color:#F7FAFC;border:1px solid rgba(205,242,58,.45);border-radius:8px;padding:6px 9px;font:500 13px/1.2 var(--font-body);box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:280px;opacity:0;transform:translateY(-3px);transition:opacity var(--dur-1) var(--ease-out),transform var(--dur-1) var(--ease-out)}
+#kbTip.on{opacity:1;transform:none}
+#kbTip[hidden]{display:none}
+#kbTip kbd{background:#CDF23A;color:#102C40;border:0;border-radius:4px;padding:2px 6px;font:700 12px/1.2 var(--font-mono);min-width:20px;text-align:center}
+@media (prefers-reduced-motion:reduce){#kbTip{transition:none;transform:none}}
+.keysdlg{max-width:min(760px,calc(100vw - 32px))}
+.keysgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--sp-4)}
+.keysgrid h3{font-size:var(--fs-ui);margin:0 0 6px}
+.keysgrid dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 12px;margin:0;font-size:var(--fs-meta);align-items:center}
+.keysgrid dt{white-space:nowrap}.keysgrid dd{margin:0}
 </style>
 </head>
 <body data-tab="lab">
@@ -1924,20 +1947,20 @@ body.still .hero-par{transform:none}
       <h1><span class="bfull">Groundwave Propagation Lab</span><span class="bshort">Groundwave Lab</span><small>Radio propagation simulator · LF to UHF</small></h1>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
-      <button class="tab" role="tab" id="tab-lab" aria-controls="lab" data-tab="lab"><span class="n">1</span>Lab</button>
-      <button class="tab" role="tab" id="tab-animation" aria-controls="animation" data-tab="animation"><span class="n">2</span>Animation</button>
-      <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map"><span class="n">3</span>Map</button>
-      <button class="tab" role="tab" id="tab-terrain" aria-controls="terrain-tab" data-tab="terrain"><span class="n">4</span>Terrain profile</button>
-      <button class="tab" role="tab" id="tab-mobile" aria-controls="mobile-tab" data-tab="mobile"><span class="n">5</span>Cellular</button>
-      <button class="tab" role="tab" id="tab-shadow" aria-controls="shadow-tab" data-tab="shadow"><span class="n">6</span>Shadow</button>
-      <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods"><span class="n">7</span>Models</button>
-      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn"><span class="n">8</span>Learn</button>
-      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz"><span class="n">9</span>Quiz</button>
+      <button class="tab" role="tab" id="tab-lab" aria-controls="lab" data-tab="lab" data-kbd="1" data-tiptext="Lab"><span class="n">1</span>Lab</button>
+      <button class="tab" role="tab" id="tab-animation" aria-controls="animation" data-tab="animation" data-kbd="2" data-tiptext="Animation"><span class="n">2</span>Animation</button>
+      <button class="tab" role="tab" id="tab-map" aria-controls="map-tab" data-tab="map" data-kbd="3" data-tiptext="Map"><span class="n">3</span>Map</button>
+      <button class="tab" role="tab" id="tab-terrain" aria-controls="terrain-tab" data-tab="terrain" data-kbd="4" data-tiptext="Terrain profile"><span class="n">4</span>Terrain profile</button>
+      <button class="tab" role="tab" id="tab-mobile" aria-controls="mobile-tab" data-tab="mobile" data-kbd="5" data-tiptext="Cellular"><span class="n">5</span>Cellular</button>
+      <button class="tab" role="tab" id="tab-shadow" aria-controls="shadow-tab" data-tab="shadow" data-kbd="6" data-tiptext="Digital shadow"><span class="n">6</span>Shadow</button>
+      <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods" data-kbd="7" data-tiptext="Models"><span class="n">7</span>Models</button>
+      <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn" data-kbd="8" data-tiptext="Learn"><span class="n">8</span>Learn</button>
+      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz" data-kbd="9" data-tiptext="Quiz"><span class="n">9</span>Quiz</button>
     </nav>
     <button class="scope" id="scopeChip" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>&#8212;</b></button>
     <button class="iconbtn themebtn fbtop" id="fbTop" type="button" aria-haspopup="dialog" aria-label="Give feedback" title="Tell us how it went"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg><span class="lbl-t">Feedback</span></button>
     <button class="iconbtn themebtn" id="helpBtn" type="button" aria-haspopup="dialog" title="Help and quick start">? Help</button>
-    <button class="iconbtn themebtn" id="themeBtn" type="button" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
+    <button class="iconbtn themebtn" id="themeBtn" type="button" data-kbd="T" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
   </div>
 </header>
 <section class="hero" aria-label="Introduction">
@@ -2194,7 +2217,7 @@ body.still .hero-par{transform:none}
     <div class="row">
       <button class="btn primary" id="tourBtn" type="button"><svg class=ic aria-hidden=true><use href=#i-play /></svg> Guided tour</button>
       <label class="check"><input type="checkbox" id="explainT" checked> Show labels</label>
-      <button class="btn" id="playBtn" type="button"><svg class=ic aria-hidden=true><use href=#i-pause /></svg> Pause</button>
+      <button class="btn" id="playBtn" type="button" data-kbd="Space" data-tiptext="Play / pause"><svg class=ic aria-hidden=true><use href=#i-pause /></svg> Pause</button>
       <div class="field"><label for="speed">Speed</label><input type="range" id="speed" min="0.25" max="3" step="0.25" value="1" style="width:110px"></div>
     </div>
   </section>
@@ -2205,10 +2228,10 @@ body.still .hero-par{transform:none}
         <canvas id="anim" aria-label="Animated cross-section of ground and sky wave propagation. Scroll or pinch to zoom, drag to pan, drag the radio to move the receiver."></canvas>
         <div class="stage-tr" id="stageTools">
           <button class="ov-grip" type="button" aria-label="Move zoom controls (drag, or use arrow keys)" title="Drag to move"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="3" cy="3" r="1.2"/><circle cx="9" cy="3" r="1.2"/><circle cx="3" cy="9" r="1.2"/><circle cx="9" cy="9" r="1.2"/><circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/></svg></button>
-          <button class="iconbtn mapbtn" id="aZoomIn" type="button" aria-label="Zoom in">＋</button>
-          <button class="iconbtn mapbtn" id="aZoomOut" type="button" aria-label="Zoom out">－</button>
+          <button class="iconbtn mapbtn" id="aZoomIn" type="button" aria-label="Zoom in" data-kbd="+">＋</button>
+          <button class="iconbtn mapbtn" id="aZoomOut" type="button" aria-label="Zoom out" data-kbd="−">－</button>
           <button class="iconbtn mapbtn" id="aReset" type="button" aria-label="Reset view" data-tip="Reset view"><svg class=ic aria-hidden=true><use href=#i-reset /></svg></button>
-          <button class="iconbtn mapbtn" id="aFull" type="button" aria-label="Full screen" data-tip="Full screen (F)"><svg class=ic aria-hidden=true><use href=#i-expand /></svg></button>
+          <button class="iconbtn mapbtn" id="aFull" type="button" aria-label="Full screen" data-tiptext="Full screen" data-kbd="F"><svg class=ic aria-hidden=true><use href=#i-expand /></svg></button>
         </div>
         <div class="tourbox" id="tourBox" hidden>
           <p class="tourstep" id="tourStep"></p>
@@ -2217,13 +2240,13 @@ body.still .hero-par{transform:none}
           <div class="row"><button class="btn" id="tourBack" type="button">← Back</button><button class="btn primary" id="tourNext" type="button">Next →</button><button class="btn ghost" id="tourClose" type="button">Close tour</button></div>
         </div>
         <div class="fsbar" role="toolbar" aria-label="Full-screen controls">
-          <button class="btn" id="fsPlay" type="button"><svg class=ic aria-hidden=true><use href=#i-pause /></svg></button>
+          <button class="btn" id="fsPlay" type="button" data-kbd="Space" data-tiptext="Play / pause"><svg class=ic aria-hidden=true><use href=#i-pause /></svg></button>
           <label class="sr" for="fsFreq">Frequency</label><select id="fsFreq"></select>
           <span class="fsclock mono" id="fsClock">12:00</span>
           <input type="range" id="fsHour" min="0" max="24" step="0.05" aria-label="Time of day">
           <label class="sr" for="unitPickF">Units</label><select class="unit-pick" id="unitPickF" title="Field strength units"><option value="auto">Units: auto</option><option value="lin">µV/m · mV/m</option><option value="db">dBµV/m</option><option value="rx">dBµV at receiver</option></select>
           <label class="check"><input type="checkbox" id="fsLabels" checked> Labels</label>
-          <button class="btn" id="fsPanels" type="button" aria-pressed="false" title="Hide the readout and zoom buttons (H)">Hide panels</button>
+          <button class="btn" id="fsPanels" type="button" aria-pressed="false" data-tiptext="Hide the readout and zoom buttons" data-kbd="H">Hide panels</button>
           <button class="btn" id="fsExit" type="button">Exit full screen</button>
         </div>
         <div class="rxhud" id="rxHud" aria-live="polite">
@@ -2373,9 +2396,9 @@ body.still .hero-par{transform:none}
   <div class="mapbox">
     <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
     <div class="map-tr">
-      <button class="iconbtn mapbtn fsbtn" id="mapFs" type="button" aria-label="Full screen map" data-tip="Full screen (F)"><svg class=ic aria-hidden=true><use href=#i-expand /></svg></button>
-      <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in" data-tip="Zoom in">＋</button>
-      <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out" data-tip="Zoom out">－</button>
+      <button class="iconbtn mapbtn fsbtn" id="mapFs" type="button" aria-label="Full screen map" data-tiptext="Full screen" data-kbd="F"><svg class=ic aria-hidden=true><use href=#i-expand /></svg></button>
+      <button class="iconbtn mapbtn" id="zoomIn" type="button" aria-label="Zoom in" data-kbd="+">＋</button>
+      <button class="iconbtn mapbtn" id="zoomOut" type="button" aria-label="Zoom out" data-kbd="−">－</button>
       <button class="iconbtn mapbtn" id="zoomRx" type="button" aria-label="Zoom to the selected receiver (street level)" data-tip="Zoom to the selected receiver">⌖</button>
       <button class="iconbtn mapbtn" id="fitBtn" type="button" aria-label="Fit all sites" data-tip="Fit all sites"><svg class=ic aria-hidden=true><use href=#i-fit /></svg></button>
       <button class="iconbtn mapbtn" id="mapReset" type="button" aria-label="Reset all sites" data-tip="Reset all sites">↺</button>
@@ -2390,8 +2413,9 @@ body.still .hero-par{transform:none}
       </select>
     </div>
     <div class="map-br" id="attrib"></div>
-    <div class="pintools" id="pinTools" hidden><button class="pinbtn" id="pinAim" type="button" hidden><svg class=ic aria-hidden=true><use href=#i-compass /></svg> Aim</button><button class="pinbtn" id="pinPanel" type="button"><svg class=ic aria-hidden=true><use href=#i-gear /></svg> Panel</button><button class="pinbtn" id="pinRen" type="button"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Rename</button><button class="pinbtn del" id="pinDel" type="button"><svg class=ic aria-hidden=true><use href=#i-close /></svg> Delete</button></div>
+    <div class="pintools" id="pinTools" hidden><button class="pinbtn" id="pinSet" type="button" hidden data-kbd="S" data-tiptext="Quick settings"><svg class=ic aria-hidden=true><use href=#i-gear /></svg> Settings</button><button class="pinbtn" id="pinAim" type="button" hidden data-kbd="A" data-tiptext="Aim the beam"><svg class=ic aria-hidden=true><use href=#i-compass /></svg> Aim</button><button class="pinbtn" id="pinPanel" type="button" data-kbd="P" data-tiptext="All transmitter settings"><svg class=ic aria-hidden=true><use href=#i-gear /></svg> Panel</button><button class="pinbtn" id="pinRen" type="button" data-kbd="F2" data-tiptext="Rename"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Rename</button><button class="pinbtn del" id="pinDel" type="button" data-kbd="Del" data-tiptext="Delete"><svg class=ic aria-hidden=true><use href=#i-close /></svg> Delete</button></div>
     <div class="aimbox" id="aimBox" hidden role="dialog" aria-label="Aim the antenna"></div>
+    <div class="aimbox qsbox" id="txQuick" hidden role="dialog" aria-label="Transmitter quick settings"></div>
     <div class="renbox" id="renBox" hidden role="dialog" aria-label="Rename pin">
       <label for="renInput" class="lbl">Pin name</label>
       <input type="text" id="renInput" maxlength="60">
@@ -2530,7 +2554,7 @@ body.still .hero-par{transform:none}
       <div class="chart-head"><h2 id="shMapH">Model against reality</h2>
         <div class="seg" role="radiogroup" aria-label="Map click does">
           <input type="radio" name="shMode" id="shModeI" value="inspect" checked><label for="shModeI">Inspect</label>
-          <input type="radio" name="shMode" id="shModeA" value="add"><label for="shModeA">Add a measurement</label>
+          <input type="radio" name="shMode" id="shModeA" value="add"><label for="shModeA" data-kbd="M" data-tiptext="Add a measurement">Add a measurement</label>
         </div>
       </div>
       <div class="sh-mapwrap"><canvas id="shMap" aria-label="Map of the transmitter, sensor stations and measurement points, coloured by how well the model matches the measurement"></canvas>
@@ -2545,7 +2569,7 @@ body.still .hero-par{transform:none}
       <section class="panel card" aria-labelledby="shCalH">
         <h2 id="shCalH">Calibrate</h2>
         <div class="tiles" id="shErr"></div>
-        <div class="row"><button class="btn primary" id="shCal" type="button">Calibrate the model</button><button class="btn" id="shReset" type="button">Reset</button></div>
+        <div class="row"><button class="btn primary" id="shCal" type="button" data-kbd="C">Calibrate the model</button><button class="btn" id="shReset" type="button">Reset</button></div>
         <div class="sh-fit" id="shFit" aria-live="polite"></div>
       </section>
       <section class="panel card" aria-labelledby="shTxH">
@@ -3315,6 +3339,17 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <div class="auitop"><div><h2 id="auiTitle">Transmitter</h2></div><button class="iconbtn" id="auiClose" type="button" aria-label="Close panel" data-tip="Close panel"><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></div>
   <div class="auibody" id="auiBody"></div>
 </aside>
+<dialog id="keysDlg" class="cfm keysdlg" aria-labelledby="keysTitle">
+  <h2 id="keysTitle">Keyboard shortcuts</h2>
+  <div class="keysgrid">
+    <section><h3>Everywhere</h3><dl><dt><kbd>1</kbd>–<kbd>9</kbd></dt><dd>Open a tab (Lab … Quiz)</dd><dt><kbd>?</kbd></dt><dd>This list</dd><dt><kbd>T</kbd></dt><dd>Light / dark theme</dd><dt><kbd>Esc</kbd></dt><dd>Close a box or dialog</dd></dl></section>
+    <section><h3>Map and Cellular</h3><dl><dt><kbd>S</kbd></dt><dd>Quick settings beside the selected transmitter</dd><dt><kbd>P</kbd></dt><dd>All transmitter settings</dd><dt><kbd>A</kbd></dt><dd>Aim the beam</dd><dt><kbd>Shift</kbd> + <kbd>←</kbd>/<kbd>→</kbd></dt><dd>Turn the beam 5° (<kbd>Alt</kbd> for 1°)</dd><dt><kbd>F2</kbd></dt><dd>Rename the selected pin</dd><dt><kbd>Del</kbd></dt><dd>Delete the selected pin</dd><dt><kbd>F</kbd></dt><dd>Full-screen map</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
+    <section><h3>Animation</h3><dl><dt><kbd>Space</kbd></dt><dd>Play / pause</dd><dt><kbd>F</kbd></dt><dd>Full screen</dd><dt><kbd>H</kbd></dt><dd>Hide or show the panels</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
+    <section><h3>Digital shadow</h3><dl><dt><kbd>C</kbd></dt><dd>Calibrate the model</dd><dt><kbd>M</kbd></dt><dd>Switch between inspect and add a measurement</dd></dl></section>
+  </div>
+  <p class="hint">Hover over or tab to a button to see its shortcut. Shortcuts are off while you type in a box.</p>
+  <div class="row cfmrow"><button class="btn primary" id="keysClose" type="button">Close</button></div>
+</dialog>
 <dialog id="cfmDlg" class="cfm" aria-labelledby="cfmTitle" aria-describedby="cfmBody">
   <h2 id="cfmTitle"></h2><p id="cfmBody"></p>
   <div class="row cfmrow"><button class="btn" id="cfmCancel" type="button">Cancel</button><button class="btn danger" id="cfmOk" type="button"></button></div>
@@ -3461,7 +3496,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
       <p><b>Accuracy:</b> the Models tab lists every equation, the checks that pass or fail for your inputs, built-in verification tests, and a tool to compare predictions with your own measurements. Use certified planning software for licensing or frequency coordination.</p>
       <p class="hint">Map data © OpenStreetMap contributors · OpenTopoMap (CC-BY-SA) · Elevation: Copernicus DEM GLO-90 via Open-Meteo.</p>
     </div>
-    <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn motion-toggle" type="button" aria-pressed="false"><svg class=ic aria-hidden=true><use href=#i-pause /></svg><span class="mt-l">Pause motion</span></button><button class="btn" type="button" data-site-tour>Take the guided tour</button><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
+    <div class="dlg-f"><label class="check"><input type="checkbox" id="helpNoShow"> Don't show this at start</label><button class="btn motion-toggle" type="button" aria-pressed="false"><svg class=ic aria-hidden=true><use href=#i-pause /></svg><span class="mt-l">Pause motion</span></button><button class="btn" type="button" data-site-tour>Take the guided tour</button><button class="btn" type="button" id="keysOpen" data-kbd="?" data-tiptext="Keyboard shortcuts">Keyboard shortcuts</button><button class="btn primary" id="helpGo" type="button">Start exploring</button></div>
   </div>
 </dialog>
 <div class="wrap" style="padding-top:0">
@@ -3481,7 +3516,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.4</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.5</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4184,6 +4219,8 @@ const ANT_TYPES={
             {k:"nf",label:"Null fill (%)",min:0,max:30,step:1,def:10}]},
   yagi:{name:"Yagi–Uda (relay / link)",band:"vu",std:"ITU-R BS.1195 §6.4.2",
     params:[{k:"el",label:"Number of elements",min:3,max:24,step:1,def:6},
+            {k:"refl",label:"Reflector element",opts:[[1,"Yes, behind the driven element"],[0,"No reflector"]],def:1,hint:"The reflector sits behind the driven element and sends the back signal forward. Without it the back lobe is only 6–8 dB down."},
+            {k:"fb",label:"Front-to-back ratio (dB)",min:6,max:30,step:1,def:20,hint:"How far the back lobe is below the main beam. A well-built reflector gives 15–25 dB."},
             {k:"az",label:"Beam azimuth (° from N)",min:0,max:359,step:1,def:0},
             {k:"tilt",label:"Tilt (° down)",min:-10,max:10,step:0.5,def:0}]},
   lpda:{name:"Log-periodic dipole array",band:"vu",std:"ITU-R BS.1195 §6.4.3",
@@ -4209,12 +4246,17 @@ function antField(a,az,D){
     case "dip": return dipF(D);
     case "bays": return dipF(D)*stackAF(a.n,a.sp,a.tilt,D,a.nf);
     case "panel": { const dp=((az-a.az)%360+540)%360-180, Ah=-Math.min(12*Math.pow(dp/a.hbw,2),a.fb); return Math.pow(10,Ah/20)*dipF(D)*stackAF(a.n,1,a.tilt,D,a.nf); }
-    case "yagi": case "lpda": { const G=antPeakFormula(a), bw=Math.sqrt(41253/Math.pow(10,G/10)), dp=((az-a.az)%360+540)%360-180, dv=D+(a.tilt||0);
+    case "yagi": { const G=antPeakFormula(a), bw=Math.sqrt(41253/Math.pow(10,G/10)), dp=((az-a.az)%360+540)%360-180, dv=D+(a.tilt||0), fb=yagiFB(a), db=180-Math.abs(dp);
+      const main=Math.pow(10,-Math.min(12*(dp*dp+dv*dv)/(bw*bw),Math.max(fb+5,25))/20);
+      const back=Math.pow(10,-(fb+Math.min(12*(db*db+dv*dv)/Math.pow(1.8*bw,2),15))/20);
+      return Math.max(main,back); }
+    case "lpda": { const G=antPeakFormula(a), bw=Math.sqrt(41253/Math.pow(10,G/10)), dp=((az-a.az)%360+540)%360-180, dv=D+(a.tilt||0);
       return Math.pow(10,-Math.min(12*(dp*dp+dv*dv)/(bw*bw),20)/20); }
   }
   return 1;
 }
-function antPeakFormula(a){ return a.type==="yagi"?8.6*Math.log10(a.el)+3.5:a.g; } // Yagi: 3 el ≈ 7.6, 6 ≈ 10.2, 10 ≈ 12.1 dBi
+function yagiFB(a){ const fb=a.fb??20; return (a.refl??1)?fb:Math.min(fb,8); }
+function antPeakFormula(a){ return a.type==="yagi"?8.6*Math.log10(a.el)+3.5-((a.refl??1)?0:1.5):a.g; } // Yagi: 3 el ≈ 7.6, 6 ≈ 10.2, 10 ≈ 12.1 dBi
 /* directivity by numerical integration: LF/MF antennas radiate into the upper half-space over a perfect ground, VHF/UHF into the full sphere */
 const ANT_CACHE=new Map();
 function antStats(a){
@@ -5996,7 +6038,7 @@ function drawMap(){
     if(pt){ const [x,y]=proj(pt.lon,pt.lat), off=beamsOf(s).length?BEAM.R+22:8; // keep the buttons clear of the beam handles
       box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+off)+"px";
       $("pinPanel").innerHTML=s.kind==="rx"?`<svg class=ic aria-hidden=true><use href=#i-gear /></svg> T${MP.ti+1} panel`:"<svg class=ic aria-hidden=true><use href=#i-gear /></svg> Panel";
-      $("pinAim").hidden=s.kind==="rx";
+      $("pinAim").hidden=s.kind==="rx"; $("pinSet").hidden=s.kind==="rx";
       const can=s.kind==="relay"||arrOf(s.kind).length>1; bt.hidden=!can; bt.innerHTML=`<svg class=ic aria-hidden=true><use href=#i-close /></svg> Delete`; bt.setAttribute("aria-label",`Delete ${s.kind==="tx"?(MP.layer==="mobile"?"tower":"transmitter"):s.kind==="relay"?"relay":(MP.layer==="mobile"?"test point":"receiver")} ${pt.name}`);
       $("pinRen").setAttribute("aria-label",`Rename ${pt.name}`); MP.toolSel=s; } }
   const msg=$("mapMsg");
@@ -6305,7 +6347,7 @@ function pathModel(){
 }
 /* every broadcast station carries an antenna, so it can be aimed straight after a click */
 function ensureAnts(){ if(MP.layer!=="bcast") return; const f=baseModel().p.f;
-  MP.txs.forEach(t=>{ if(!t.ant||!ANT_TYPES[t.ant.type]||ANT_TYPES[t.ant.type].band!==antBand(f)) t.ant=antDefault(f<30?"mono":"bays"); });
+  MP.txs.forEach(t=>{ const ft=t.f||f; if(!t.ant||!ANT_TYPES[t.ant.type]||ANT_TYPES[t.ant.type].band!==antBand(ft)) t.ant=antDefault(ft<30?"mono":"bays"); });
   MP.relays.forEach(r=>{ if(!r.ant||!ANT_TYPES[r.ant.type]||ANT_TYPES[r.ant.type].band!=="vu") { r.ant=antDefault("panel"); r.ant.az=Math.round(bearing(relaySource(r),r)); } }); }
 function setPoint(which,pt){
   if(pt.auto){ delete pt.auto; pt.autoName=true; }
@@ -6692,12 +6734,15 @@ function bindMap(){
   const renSave=()=>{ const box=$("renBox"); const arr=arrOf(box.dataset.kind); const pt=arr[+box.dataset.i]; const v=$("renInput").value.trim(); if(pt&&v){ pt.name=v; pt.autoName=false; } box.hidden=true; updateMap(); };
   $("pinRen").addEventListener("click",e=>{ e.stopPropagation(); renOpen(); });
   $("pinAim").addEventListener("click",e=>{ e.stopPropagation(); openAimBox(); });
+  $("pinSet").addEventListener("click",e=>{ e.stopPropagation(); openQuick(); });
   $("pinPanel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx"){ openAui("tx",MP.ti); } else openAui(s.kind,s.i); });
   $("renSave").addEventListener("click",renSave); $("renCancel").addEventListener("click",()=>$("renBox").hidden=true);
   $("renInput").addEventListener("keydown",e=>{ if(e.key==="Enter") renSave(); if(e.key==="Escape") $("renBox").hidden=true; });
   mapC.addEventListener("keydown",e=>{ if(e.key==="F2"){ e.preventDefault(); renOpen(); }
     if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&(e.shiftKey||e.altKey)){ if(nudgeBeam((e.key==="ArrowRight"?1:-1)*(e.altKey?1:5))) e.preventDefault(); }
-    if(e.key==="a"||e.key==="A"){ e.preventDefault(); openAimBox(); } });
+    if(e.key==="a"||e.key==="A"){ e.preventDefault(); openAimBox(); }
+    if(e.key==="s"||e.key==="S"){ e.preventDefault(); openQuick(); }
+    if(e.key==="p"||e.key==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("tx",MP.ti); else openAui(s.kind,s.i); } });
   $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
   mapC.tabIndex=0;
   mapC.addEventListener("keydown",e=>{ if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removePin(MP.lastSel||{kind:"rx",i:MP.ai}); MP.lastSel={kind:"rx",i:MP.ai}; } });
@@ -7207,6 +7252,45 @@ function beamsOf(sel){
   return [{az:((a.az%360)+360)%360,label:"↻",name:"Beam direction",set:v=>{ a.az=((Math.round(v)%360)+360)%360; },col:sel.kind==="relay"?"#1d8a8a":"#d13b4f"}];
 }
 function selStation(){ const s=MP.lastSel&&MP.lastSel.kind!=="rx"?MP.lastSel:{kind:"tx",i:MP.ti}; return stationOf(s)?s:null; }
+/* ---- quick settings beside the selected transmitter pin ---- */
+const QS={sel:null,back:null,g:null};
+function qsFreq(st,kind){ return kind==="relay"?st.f:(st.f||baseModel().p.f); }
+function openQuick(){
+  const sel=selStation(); if(!sel) return; QS.sel=sel; QS.back=document.activeElement; $("aimBox").hidden=true;
+  const st=stationOf(sel), box=$("txQuick"), [x,y]=proj(st.lon,st.lat), W=mapC.clientWidth, H=mapC.clientHeight;
+  const right=x+340<W, left=x-340>0;
+  if(right||left){ box.style.left=(right?x+176:x-176)+"px"; box.style.top=clamp(y-120,8,Math.max(8,H-420))+"px"; }
+  else { box.style.left=clamp(x,160,W-160)+"px"; box.style.top=clamp(y+40,8,Math.max(8,H-420))+"px"; }
+  box.hidden=false; renderQuick(); const f=box.querySelector("input,select"); if(f) f.focus();
+  QS.g=null; fetchElev([{lat:st.lat,lon:st.lon}]).then(e=>{ QS.g=e&&e[0]!=null?e[0]:undefined; qsHeight(); }).catch(()=>{ QS.g=undefined; qsHeight(); });
+}
+function closeQuick(){ const box=$("txQuick"); if(box.hidden) return; box.hidden=true; if(QS.back&&QS.back.focus&&document.contains(QS.back)) QS.back.focus(); else mapC.focus(); }
+function qsHeight(){ const st=stationOf(QS.sel), el=$("qsHt"); if(!st||!el) return;
+  el.innerHTML=QS.g===undefined?`Ground height unavailable right now · mast <b>${st.h} m</b> above ground`:QS.g===null?"Ground height loading…":`ground <b>${Math.round(QS.g)} m</b> + mast <b>${st.h} m</b> = antenna top <b>${Math.round(QS.g+st.h)} m</b> above sea level`; }
+function qsChanged(full){ const st=stationOf(QS.sel); if(!st) return; st.aui=true; MP.res.clear(); if(QS.sel.kind==="tx"&&QS.sel.i===MP.ti&&$("txH")) $("txH").value=st.h; if(full) renderQuick(); else qsLive(); updateMap(); }
+function qsLive(){ const st=stationOf(QS.sel); if(!st||MP.layer==="mobile") return; const f=qsFreq(st,QS.sel.kind), a=st.ant||antFor(f), stt=antStats(a), cv=$("qsPolar");
+  if(cv) drawPolar(cv,a,a.az); const bw=antBeamwidths(a), fb=a.type==="yagi"?yagiFB(a):a.type==="panel"?a.fb:null;
+  $("qsAnt").innerHTML=`Gain <b>${stt.Gmax.toFixed(1)} dBi</b> · beam ${bw.h>=359?"all round":bw.h.toFixed(0)+"°"}${fb!=null?` · back lobe <b>${fb} dB</b> below the beam`:""}`; qsHeight(); }
+function renderQuick(){
+  const box=$("txQuick"), sel=QS.sel, st=stationOf(sel); if(!st){ box.hidden=true; return; } const mob=MP.layer==="mobile";
+  const head=`<div class="aimhead"><b><svg class=ic aria-hidden=true><use href=#i-gear /></svg> ${esc(sel.kind==="relay"?"Relay Y"+(sel.i+1):(mob?"Tower T":"T")+(sel.i+1))} · ${esc(st.name)}</b><button class="iconbtn" id="qsClose" type="button" aria-label="Close quick settings" data-kbd="Esc" data-tiptext="Close"><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></div>`;
+  const ht=`<div class="field"><label for="qsH">Mast height above ground (m)</label><input type="number" id="qsH" min="1" max="600" step="1" value="${st.h}"></div><p class="sh-height qsht" id="qsHt"></p>`;
+  const foot=`<div class="row"><button class="btn sm" id="qsAll" type="button" data-kbd="P" data-tiptext="All transmitter settings">All settings</button>${beamsOf(sel).length?`<button class="btn sm" id="qsAim" type="button" data-kbd="A" data-tiptext="Aim the beam">Aim beam</button>`:""}</div>`;
+  if(mob){ box.innerHTML=head+ht+`<p class="hint">Sector antennas, tilt and EIRP are under All settings.</p>`+foot; }
+  else { const f=qsFreq(st,sel.kind), P=sel.kind==="relay"?(st.tpo||st.P):(st.tpo||baseModel().p.P), a=st.ant||antFor(f);
+    box.innerHTML=head+`<div class="two"><div class="field"><label for="qsF">Frequency (MHz)</label><input type="number" id="qsF" min="0.03" max="3000" step="0.001" value="${f}"></div>
+      <div class="field"><label for="qsP">Output power (kW)</label><input type="number" id="qsP" min="0.001" max="2000" step="0.01" value="${+(+P).toFixed(3)}"></div></div>`+ht+
+      `<div class="qsant" id="qsAntForm">${antFormHTML(a,f,"qs")}</div><canvas id="qsPolar" class="qspolar" aria-label="Horizontal antenna pattern"></canvas><p class="hint" id="qsAnt" aria-live="polite"></p>`+foot; }
+  $("qsClose").addEventListener("click",closeQuick);
+  $("qsH").addEventListener("change",e=>{ st.h=clamp(+e.target.value||1,1,600); qsChanged(false); });
+  $("qsAll").addEventListener("click",()=>{ box.hidden=true; openAui(sel.kind,sel.i); });
+  const aim=$("qsAim"); if(aim) aim.addEventListener("click",()=>{ box.hidden=true; openAimBox(); });
+  if(!mob){ const f=qsFreq(st,sel.kind);
+    $("qsF").addEventListener("change",e=>{ const v=clamp(+e.target.value||f,sel.kind==="relay"?30:0.03,3000); st.f=v; if(ANT_TYPES[(st.ant||{}).type]&&ANT_TYPES[st.ant.type].band!==antBand(v)) st.ant=antFor(v); qsChanged(true); });
+    $("qsP").addEventListener("change",e=>{ st.tpo=clamp(+e.target.value||1,0.001,2000); if(sel.kind==="relay") st.P=st.tpo; qsChanged(false); });
+    bindAntForm($("qsAntForm"),()=>st.ant||antFor(f),(na,full)=>{ st.ant=na; qsChanged(full); },f); }
+  qsLive(); if(window.kbTipBind) kbTipBind(box);
+}
 function drawBeamHandles(c,W,H){
   const sel=selStation(); if(!sel) return; const bs=beamsOf(sel); if(!bs.length) return;
   const st=stationOf(sel), [x,y]=proj(st.lon,st.lat), R=BEAM.R;
@@ -7304,7 +7388,7 @@ function antFormHTML(a,f,idp){
   const preHTML=pre.length?`<div class="field"><label>Start from a typical build</label>
     <div class="chips antpre">${pre.map(q=>`<button class="chip" type="button" data-preset="${q.id}" title="${esc(q.why)}">${esc(q.name)}</button>`).join("")}</div></div>`:"";
   return preHTML+`<div class="field"><label for="${idp}type">Antenna type</label><select id="${idp}type" data-ak="type">${types.map(([k,v])=>`<option value="${k}"${k===a.type?" selected":""}>${esc(v.name)}</option>`).join("")}</select><span class="hint">${esc(T.std)}</span></div>
-  <div class="antparams">${T.params.map(q=>`<div class="field"><label for="${idp}${q.k}">${esc(q.label)} <span class="v">${a[q.k]??q.def}</span></label><input type="${q.max-q.min>40||q.step<1?"range":"number"}" id="${idp}${q.k}" data-ak="${q.k}" min="${q.min}" max="${q.max}" step="${q.step}" value="${a[q.k]??q.def}">${q.hint?`<span class="hint">${esc(q.hint)}</span>`:""}</div>`).join("")}</div>`;
+  <div class="antparams">${T.params.map(q=>q.opts?`<div class="field"><label for="${idp}${q.k}">${esc(q.label)}</label><select id="${idp}${q.k}" data-ak="${q.k}">${q.opts.map(([v,l])=>`<option value="${v}"${(a[q.k]??q.def)==v?" selected":""}>${esc(l)}</option>`).join("")}</select>${q.hint?`<span class="hint">${esc(q.hint)}</span>`:""}</div>`:`<div class="field"><label for="${idp}${q.k}">${esc(q.label)} <span class="v">${a[q.k]??q.def}</span></label><input type="${q.max-q.min>40||q.step<1?"range":"number"}" id="${idp}${q.k}" data-ak="${q.k}" min="${q.min}" max="${q.max}" step="${q.step}" value="${a[q.k]??q.def}">${q.hint?`<span class="hint">${esc(q.hint)}</span>`:""}</div>`).join("")}</div>`;
 }
 function bindAntForm(root,getAnt,setAnt,f){
   root.querySelectorAll("[data-preset]").forEach(b=>{
@@ -7317,7 +7401,7 @@ function bindAntForm(root,getAnt,setAnt,f){
   root.querySelectorAll("[data-ak]").forEach(el=>{
     const h=()=>{ const k=el.dataset.ak; let a=getAnt();
       if(k==="type"){ a=antDefault(el.value); setAnt(a,true); return; }
-      a[k]=+el.value; const lab=root.querySelector(`label[for="${el.id}"] .v`); if(lab) lab.textContent=el.value; setAnt(a,false); };
+      a[k]=+el.value; const lab=root.querySelector(`label[for="${el.id}"] .v`); if(lab) lab.textContent=el.value; setAnt(a,el.tagName==="SELECT"); };
     el.addEventListener(el.tagName==="SELECT"?"change":"input",h); });
 }
 /* polar (azimuth) and elevation pattern plots */
@@ -8752,6 +8836,62 @@ init();
 
   if(currentTab==="shadow") window.shadowShow();
 })();
+
+/* ===== shortcut tooltips: hover or keyboard focus shows the name and the key ===== */
+(function(){
+  const tip=document.createElement("div"); tip.id="kbTip"; tip.setAttribute("role","tooltip"); tip.hidden=true; document.body.appendChild(tip);
+  let cur=null, tm=null;
+  function prep(el){ if(el.dataset.kbPrep) return; el.dataset.kbPrep="1";
+    if(!el.dataset.tiptext){ const t=el.getAttribute("data-tip")||el.getAttribute("title"); if(t) el.dataset.tiptext=t.replace(/\s*\([^)]*\)\s*$/,""); }
+    el.removeAttribute("title"); el.removeAttribute("data-tip");
+    const k=el.dataset.kbd; if(k) el.setAttribute("aria-keyshortcuts",k==="Space"?"Space":k==="Del"?"Delete":k==="Esc"?"Escape":k==="−"?"-":k); }
+  window.kbTipBind=root=>(root||document).querySelectorAll("[data-kbd]").forEach(prep);
+  const label=el=>el.dataset.tiptext||el.getAttribute("aria-label")||el.textContent.replace(/\s+/g," ").trim();
+  function show(el){ prep(el); cur=el; const k=el.dataset.kbd;
+    tip.innerHTML=`<span>${esc(label(el))}</span>`+k.split(" ").map(x=>`<kbd>${esc(x)}</kbd>`).join("");
+    tip.hidden=false; tip.classList.remove("on"); const r=el.getBoundingClientRect(), w=tip.offsetWidth, h=tip.offsetHeight;
+    let top=r.bottom+8; if(top+h>innerHeight-8) top=r.top-h-8; tip.style.top=Math.max(8,top)+"px";
+    tip.style.left=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8)+"px"; requestAnimationFrame(()=>tip.classList.add("on")); }
+  function hide(){ clearTimeout(tm); cur=null; tip.classList.remove("on"); tip.hidden=true; }
+  document.addEventListener("mouseover",e=>{ const el=e.target.closest&&e.target.closest("[data-kbd]"); if(el===cur) return; clearTimeout(tm); if(!el){ hide(); return; } tm=setTimeout(()=>show(el),300); });
+  document.addEventListener("focusin",e=>{ const el=e.target.closest&&e.target.closest("[data-kbd]"); if(el&&el.matches(":focus-visible")) show(el); else if(cur) hide(); });
+  document.addEventListener("focusout",hide); document.addEventListener("pointerdown",hide,true); window.addEventListener("scroll",hide,true);
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&cur) hide(); });
+  kbTipBind(document);
+  new MutationObserver(ms=>{ for(const m of ms) for(const n of m.addedNodes) if(n.nodeType===1&&(n.matches("[data-kbd]")||n.querySelector("[data-kbd]"))){ kbTipBind(n.parentNode||n); } }).observe(document.body,{childList:true,subtree:true});
+})();
+
+/* ===== global keyboard shortcuts ===== */
+(function(){
+  const dlg=$("keysDlg"), back={el:null};
+  const openKeys=()=>{ if(dlg.open) return; back.el=document.activeElement; const h=$("helpDlg"); if(h&&h.open) h.close(); dlg.showModal(); $("keysClose").focus(); };
+  $("keysClose").addEventListener("click",()=>dlg.close()); dlg.addEventListener("close",()=>{ if(back.el&&back.el.focus&&document.contains(back.el)) back.el.focus(); });
+  $("keysOpen").addEventListener("click",openKeys);
+  const click=id=>{ const b=$(id); if(b&&b.offsetParent!==null) b.click(); };
+  document.addEventListener("keydown",e=>{
+    if(e.ctrlKey||e.metaKey||e.altKey) return;
+    if(e.key==="Escape"){ const q=$("txQuick"); if(q&&!q.hidden){ e.preventDefault(); closeQuick(); } return; }
+    const t=e.target; if(t&&t.closest&&t.closest("input,textarea,select,[contenteditable],dialog")) return;
+    if(document.querySelector("dialog[open]")) return;
+    const k=e.key, tab=currentTab, onMap=tab==="map"||tab==="mobile";
+    if(/^[1-9]$/.test(k)){ e.preventDefault(); go(TABS[+k-1]); return; }
+    if(k==="?"){ e.preventDefault(); openKeys(); return; }
+    if(k==="t"||k==="T"){ e.preventDefault(); click("themeBtn"); return; }
+    if(onMap&&t!==mapC){
+      if(k==="s"||k==="S"){ e.preventDefault(); openQuick(); return; }
+      if(k==="a"||k==="A"){ e.preventDefault(); openAimBox(); return; }
+      if(k==="p"||k==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("tx",MP.ti); else openAui(s.kind,s.i); return; } }
+    if(onMap&&(k==="+"||k==="=")){ e.preventDefault(); click("zoomIn"); return; }
+    if(onMap&&(k==="-"||k==="_")){ e.preventDefault(); click("zoomOut"); return; }
+    if(tab==="animation"&&(k==="+"||k==="=")){ e.preventDefault(); click("aZoomIn"); return; }
+    if(tab==="animation"&&(k==="-"||k==="_")){ e.preventDefault(); click("aZoomOut"); return; }
+    if(tab==="shadow"&&(k==="c"||k==="C")){ e.preventDefault(); click("shCal"); return; }
+    if(tab==="shadow"&&(k==="m"||k==="M")){ e.preventDefault(); const a=$("shModeA"), i=$("shModeI"), r=a.checked?i:a; r.checked=true; r.dispatchEvent(new Event("change",{bubbles:true})); return; }
+  });
+  // leaving the map tab closes the quick box
+  document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{ const q=$("txQuick"); if(q) q.hidden=true; }));
+})();
+
 </script>
 </body>
 </html>
