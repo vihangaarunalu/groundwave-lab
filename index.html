@@ -1903,6 +1903,7 @@ body.still .hero-par{transform:none}
 #shTable th[aria-sort=ascending] button::after{content:"▲"}
 #shTable th[aria-sort=descending] button::after{content:"▼"}
 @media (max-width:980px){.sh-steps{grid-template-columns:1fr 1fr}}
+.aui-top{grid-column:1/-1;margin:2px 0 0}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -3563,7 +3564,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.6</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.6.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -7534,7 +7535,7 @@ function renderAui(){
     <div class="field"><label for="auiTpo">Transmitter output power (kW)</label><input type="number" id="auiTpo" min="0.001" max="2000" step="0.01" value="${+(t.tpo||P).toFixed(3)}"></div>
     <div class="field"><label for="auiEff">PA efficiency (%)</label><input type="number" id="auiEff" min="10" max="95" step="1" value="${t.paeff??(f<30?86:f<300?72:38)}"></div>
     <div class="field"><label for="auiLic">Licensed ERP (kW, optional)</label><input type="number" id="auiLic" min="0" step="0.1" value="${t.erpLic||""}"></div>
-    <div class="field"><label for="auiH">Antenna height on mast (m)</label><input type="number" id="auiH" min="1" max="600" step="1" value="${t.h}"></div></div></section>
+    <div class="field"><label for="auiH">Antenna height on mast (m, above ground)</label><input type="number" id="auiH" min="1" max="600" step="1" value="${t.h}"></div><div class="field"><label for="auiG">Ground height above sea level (m)</label><input type="text" id="auiG" readonly aria-readonly="true" value="loading…"><span class="hint">From the Copernicus elevation map at this site</span></div><p class="sh-height aui-top" id="auiTop" aria-live="polite"></p></div></section>
   <section class="auisec"><h3>Feeder &amp; match</h3><div class="two">
     <div class="field"><label for="auiFeed">Transmission line</label><select id="auiFeed">${Object.entries(FEEDERS).map(([k,v])=>`<option value="${k}"${(t.feeder||(f<30?"open":"ldf7"))===k?" selected":""}>${esc(v.name)}</option>`).join("")}</select></div>
     <div class="field"><label for="auiLen">Line length (m)</label><input type="number" id="auiLen" min="1" max="1000" step="1" value="${t.flen??((t.h||30)+20)}"></div>
@@ -7556,7 +7557,7 @@ function renderAui(){
   num("auiLen",v=>{ t.flen=clamp(v,1,1000); });
   num("auiVswr",v=>{ t.vswr=clamp(v,1,5); });
   bindAntForm($("auiAnt"),()=>t.ant||antFor(f),(na,full)=>{ t.ant=na; auiChanged(full); },f);
-  renderAuiLive();
+  renderAuiLive(); auiHeight(t);
 }
 function renderAuiLive(){
   const t=auiStation(); if(!t||MP.layer==="mobile") return; const {f,P}=auiParams(t), v=txPanelValues(t,{f,P}), a=t.ant||antFor(f), bw=antBeamwidths(a);
@@ -7570,6 +7571,12 @@ function renderAuiLive(){
   $("auiSize").textContent=`Size at ${fmtF(f)}: ${antSize(a,f)}.`;
   requestAnimationFrame(()=>{ drawPolar($("auiPolar"),a); drawElev($("auiElev"),a); });
 }
+/* ground height at the site, and the antenna top above sea level, under the mast field */
+function auiHeight(t){ const gEl=$("auiG"), top=$("auiTop"); if(!gEl||!top) return;
+  const show=g=>{ if(!$("auiG")) return; if(g==null){ gEl.value="unavailable"; top.innerHTML=`Antenna top: mast <b>${t.h} m</b> above ground (ground height unavailable right now)`; return; }
+    gEl.value=Math.round(g).toLocaleString("en"); top.innerHTML=`Antenna top = ground <b>${Math.round(g).toLocaleString("en")} m</b> + mast <b>${t.h} m</b> = <b>${Math.round(g+t.h).toLocaleString("en")} m above sea level</b>`; };
+  const k=ekey(t.lat,t.lon); if(ELEV.cache.has(k)){ show(ELEV.cache.get(k)); return; }
+  top.textContent="Ground height loading…"; fetchElev([{lat:t.lat,lon:t.lon}]).then(e=>show(e&&e[0]!=null?e[0]:null)).catch(()=>show(null)); }
 function renderAuiTower(t){
   const tech=MP.cov.tech, T=CELL_TECH[tech], eirp=t.eirp??Math.round(dBm(cellParams(tech,t.h).P));
   const a={type:"sector",hbw:t.hbw||65};
@@ -7584,7 +7591,7 @@ function renderAuiTower(t){
     <div class="field"><label for="auiAz">Azimuth of sector 1 (° from N)</label><input type="number" id="auiAz" min="0" max="359" step="5" value="${t.az||0}"></div>
     <div class="field"><label for="auiMt">Mechanical tilt (°)</label><input type="number" id="auiMt" min="-5" max="15" step="1" value="${t.tilt??2}"></div>
     <div class="field"><label for="auiEt">Electrical tilt (°)</label><input type="number" id="auiEt" min="0" max="12" step="1" value="${t.etilt||0}"></div>
-    <div class="field"><label for="auiH">Antenna height (m)</label><input type="number" id="auiH" min="5" max="300" step="1" value="${t.h}"></div>
+    <div class="field"><label for="auiH">Antenna height (m, above ground)</label><input type="number" id="auiH" min="5" max="300" step="1" value="${t.h}"></div><div class="field"><label for="auiG">Ground height above sea level (m)</label><input type="text" id="auiG" readonly aria-readonly="true" value="loading…"><span class="hint">From the Copernicus elevation map at this site</span></div><p class="sh-height aui-top" id="auiTop" aria-live="polite"></p>
     <div class="field"><label for="auiEirp">EIRP per sector (dBm)</label><input type="number" id="auiEirp" min="20" max="90" step="1" value="${eirp}"></div></div>
     <div class="auiplots"><div><canvas id="auiPolar" aria-label="Sector pattern"></canvas></div></div></section>
   <p class="hint">Sector pattern A_h = −min(12(φ/φ3dB)², 30 dB), vertical −min(12((θ − tilt)/10°)², 20 dB), combined −min(−(A_h + A_v), 30 dB).</p>`;
@@ -7595,6 +7602,7 @@ function renderAuiTower(t){
     const cx=W/2,cy=H/2,R=Math.min(W,H)/2-18; c.strokeStyle=cssVar("--line"); for(const db of [0,-10,-20,-30]){ c.beginPath(); c.arc(cx,cy,R*(1+db/30),0,7); c.stroke(); }
     c.beginPath(); for(let i=0;i<=360;i+=2){ const g=antGain(t,i,(t.tilt??2)+(t.etilt||0)), r=R*Math.max(0,1+g/30); const x=cx+r*Math.sin(rad(i)),y=cy-r*Math.cos(rad(i)); i?c.lineTo(x,y):c.moveTo(x,y); }
     c.closePath(); c.fillStyle=hexA(TECH_COL[tech]||"#2f6fdf",0.2); c.fill(); c.strokeStyle=TECH_COL[tech]||"#2f6fdf"; c.lineWidth=2; c.stroke(); });
+  auiHeight(t);
 }
 function bindAui(){
   $("auiClose").addEventListener("click",closeAui);
