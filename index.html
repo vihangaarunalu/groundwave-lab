@@ -1874,6 +1874,35 @@ body.still .hero-par{transform:none}
 .sh-mods .tag{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .sh-attr{margin-top:4px}
 @media (max-width:980px){.sh-grid,.sh-grid2{grid-template-columns:1fr}#shMap{height:380px}}
+.sh-steps{list-style:none;margin:0 0 var(--sp-4);padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-2)}
+.sh-steps button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px;font:inherit;cursor:pointer;min-height:56px}
+.sh-steps button:hover{border-color:var(--accent)}
+.sh-steps button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sh-steps .n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:2px solid var(--line);font-size:13px}
+.sh-steps b{display:block;font-size:var(--fs-ui)}
+.sh-steps small{display:block;color:var(--muted);font-size:12px;line-height:1.3}
+.sh-steps li.done .n{background:var(--good);border-color:var(--good);color:#fff}
+.sh-steps li.now button{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.sh-steps li.now .n{border-color:var(--accent);color:var(--accent)}
+.sh-search{display:flex;gap:var(--sp-2);margin-bottom:var(--sp-2)}
+.sh-search input{flex:1;min-width:0;min-height:38px}
+.sh-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sh-hits{list-style:none;margin:0 0 var(--sp-2);padding:0;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--panel);max-height:200px;overflow:auto}
+.sh-hits button{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:8px 12px;font:inherit;font-size:var(--fs-meta);color:var(--ink);cursor:pointer;min-height:36px}
+.sh-hits button:hover,.sh-hits button:focus-visible{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.sh-zoom{position:absolute;right:8px;top:8px;display:grid;gap:6px}
+.sh-zoom .iconbtn{width:36px;height:36px;font-size:18px;font-weight:700}
+#shMap.panning{cursor:grabbing}
+.sh-site{font-size:var(--fs-ui);font-weight:600;margin:0 0 var(--sp-2)}
+.sh-site small{display:block;font-weight:400;color:var(--muted);font-size:12px;font-family:var(--font-mono)}
+.sh-two{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2)}
+.sh-two input{width:100%}
+.sh-scatter{width:100%;height:220px;display:block;margin-top:var(--sp-3)}
+#shTable th button{background:none;border:0;font:inherit;font-weight:600;color:inherit;cursor:pointer;padding:0;min-height:24px}
+#shTable th button::after{content:"";margin-left:4px}
+#shTable th[aria-sort=ascending] button::after{content:"▲"}
+#shTable th[aria-sort=descending] button::after{content:"▼"}
+@media (max-width:980px){.sh-steps{grid-template-columns:1fr 1fr}}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2547,41 +2576,57 @@ body.still .hero-par{transform:none}
 
 <!-- ======================= DIGITAL SHADOW (WISDOM demo) ======================= -->
 <section class="wrap" id="shadow-tab" role="tabpanel" aria-labelledby="tab-shadow" hidden>
-  <div class="screenhead"><h2 class="th"><span class="ti ti-shadow" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M8 50H56"/><path class="d" pathLength="1" style="--d:.2s" d="M12 44C20 30 28 26 34 30S48 40 54 22"/><path class="dash" d="M12 40C20 28 28 22 34 26S48 34 54 18"/><circle class="dot" cx="34" cy="28" r="3.2"/></svg></span>Digital shadow</h2><p>WISDOM compares what the model predicts with what was measured, finds where they disagree, and calibrates the model to match reality.</p></div>
-  <div class="sh-demo" role="note"><b>Demo with sample data.</b> Sensor and walk-test readings are simulated from the model plus realistic impairments (buildings, system losses, noise). Ground heights, weather and space weather are live. Real sensor stations come in the funded WISDOM project.</div>
+  <div class="screenhead"><h2 class="th"><span class="ti ti-shadow" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M8 50H56"/><path class="d" pathLength="1" style="--d:.2s" d="M12 44C20 30 28 26 34 30S48 40 54 22"/><path class="dash" d="M12 40C20 28 28 22 34 26S48 34 54 18"/><circle class="dot" cx="34" cy="28" r="3.2"/></svg></span>Digital shadow</h2><p>Compare the model with real measurements, see where they disagree, and let the model learn from the difference.</p></div>
+  <div class="sh-demo" role="note"><b>Demo with sample data.</b> Sensor and walk-test readings are simulated from the model plus realistic impairments. Ground heights, weather and space weather are live. Real sensor stations come in the funded WISDOM project.</div>
+
+  <ol class="sh-steps" id="shSteps" aria-label="How to use the digital shadow">
+    <li data-step="1"><button type="button" data-goto="shSiteH"><span class="n">1</span><span><b>Place the station</b><small>Search, or click the map</small></span></button></li>
+    <li data-step="2"><button type="button" data-goto="shDataH"><span class="n">2</span><span><b>Get measurements</b><small>Sample, upload or click</small></span></button></li>
+    <li data-step="3"><button type="button" data-goto="shCalH"><span class="n">3</span><span><b>Compare and calibrate</b><small>Red dots = model wrong</small></span></button></li>
+    <li data-step="4"><button type="button" data-goto="shWhatH"><span class="n">4</span><span><b>Try what-if</b><small>On the calibrated model</small></span></button></li>
+  </ol>
 
   <div class="sh-grid">
     <section class="panel card sh-mapcard" aria-labelledby="shMapH">
       <div class="chart-head"><h2 id="shMapH">Model against reality</h2>
-        <div class="seg" role="radiogroup" aria-label="Map click does">
-          <input type="radio" name="shMode" id="shModeI" value="inspect" checked><label for="shModeI">Inspect</label>
-          <input type="radio" name="shMode" id="shModeA" value="add"><label for="shModeA" data-kbd="M" data-tiptext="Add a measurement">Add a measurement</label>
+        <div class="seg sh-modes" role="radiogroup" aria-label="Clicking the map will">
+          <input type="radio" name="shMode" id="shModeI" value="inspect" checked><label for="shModeI" data-kbd="I" data-tiptext="Inspect a point">Inspect</label>
+          <input type="radio" name="shMode" id="shModeA" value="add"><label for="shModeA" data-kbd="M" data-tiptext="Add a measurement">Add reading</label>
+          <input type="radio" name="shMode" id="shModeS" value="site"><label for="shModeS" data-kbd="L" data-tiptext="Move the station">Move station</label>
         </div>
       </div>
-      <div class="sh-mapwrap"><canvas id="shMap" aria-label="Map of the transmitter, sensor stations and measurement points, coloured by how well the model matches the measurement"></canvas>
-        <div class="sh-legend" aria-hidden="true"><span><i class="g"></i>Match &lt; 3 dB</span><span><i class="w"></i>3–6 dB</span><span><i class="b"></i>&gt; 6 dB: impairment missed</span><span><i class="s"></i>Sensor station</span></div>
+      <form class="sh-search" id="shSearch" role="search"><label for="shQ" class="sh-vh">Find a place for the station</label><input type="search" id="shQ" placeholder="Search a place, e.g. University of Moratuwa" autocomplete="off"><button class="btn" type="submit">Search</button></form>
+      <ul class="sh-hits" id="shHits" hidden></ul>
+      <div class="sh-mapwrap"><canvas id="shMap" tabindex="0" aria-label="Map of the station, sensor stations and measurement points, coloured by how well the model matches the measurement. Drag to pan, scroll to zoom."></canvas>
+        <div class="sh-zoom"><button class="iconbtn mapbtn" type="button" id="shZin" aria-label="Zoom in" data-kbd="+">+</button><button class="iconbtn mapbtn" type="button" id="shZout" aria-label="Zoom out" data-kbd="−">−</button><button class="iconbtn mapbtn" type="button" id="shFitB" aria-label="Fit all points" data-kbd="0" data-tiptext="Fit all points">⤢</button></div>
+        <div class="sh-legend" aria-hidden="true"><span><i class="g"></i>Match &lt; 3 dB</span><span><i class="w"></i>3–6 dB</span><span><i class="b"></i>&gt; 6 dB</span><span><i class="s"></i>Sensor</span></div>
       </div>
-      <p class="hint" id="shHint">Click a dot to see its numbers. Choose “Add a measurement” and click the map to add a walk-test reading.</p>
+      <p class="hint" id="shHint" aria-live="polite">Click a dot to see its numbers. Drag to move the map, scroll to zoom.</p>
       <div class="sh-detail" id="shDetail" aria-live="polite"></div>
       <p class="hint sh-attr" id="shAttrib"></p>
     </section>
 
     <aside class="sh-side">
+      <section class="panel card" aria-labelledby="shSiteH">
+        <h2 id="shSiteH">Station</h2>
+        <p class="sh-site" id="shSiteName"></p>
+        <div class="field"><label for="shBand">Service</label><select id="shBand"></select></div>
+        <div class="sh-two">
+          <div class="field"><label for="shPow">Power (kW ERP)</label><input type="number" id="shPow" min="0.001" max="1000" step="0.01"></div>
+          <div class="field"><label for="shMast">Mast above ground (m)</label><input type="number" id="shMast" min="1" max="600" step="1"></div>
+        </div>
+        <p class="sh-height" id="shTxHeight"></p>
+        <div class="row"><button class="btn sm" type="button" id="shUseMap">Use the Map tab transmitter</button></div>
+      </section>
       <section class="panel card" aria-labelledby="shCalH">
         <h2 id="shCalH">Calibrate</h2>
         <div class="tiles" id="shErr"></div>
-        <div class="row"><button class="btn primary" id="shCal" type="button" data-kbd="C">Calibrate the model</button><button class="btn" id="shReset" type="button">Reset</button></div>
+        <div class="row"><button class="btn primary" id="shCal" type="button" data-kbd="C">Calibrate the model</button><button class="btn" id="shReset" type="button">Undo</button></div>
+        <canvas id="shScatter" class="sh-scatter" aria-label="Measured against predicted level for every reading, before and after calibration"></canvas>
         <div class="sh-fit" id="shFit" aria-live="polite"></div>
       </section>
-      <section class="panel card" aria-labelledby="shTxH">
-        <h2 id="shTxH">Transmitter</h2>
-        <p class="muted sh-small" id="shTxName"></p>
-        <div class="field"><label for="shMast">Mast height above ground (m)</label><input type="number" id="shMast" min="1" max="600" step="1"></div>
-        <p class="sh-height" id="shTxHeight"></p>
-        <p class="hint">Uses the transmitter selected on the Map tab. Ground height comes from the Copernicus elevation model, so a site on a hill or mountain starts higher.</p>
-      </section>
       <section class="panel card" aria-labelledby="shLiveH">
-        <h2 id="shLiveH">Live data interfaces</h2>
+        <h2 id="shLiveH">Live data</h2>
         <div class="sh-feeds" id="shFeeds"></div>
         <div id="shSensors"></div>
       </section>
@@ -2589,11 +2634,12 @@ body.still .hero-par{transform:none}
   </div>
 
   <section class="panel card" aria-labelledby="shWhatH">
-    <div class="chart-head"><h2 id="shWhatH">What if…</h2><span class="muted sh-small">Runs on the calibrated shadow</span></div>
+    <div class="chart-head"><h2 id="shWhatH">What if…</h2><span class="muted sh-small">Runs on the calibrated model; the dots recolour</span></div>
     <div class="row sh-chips" id="shWhat">
       <button class="chip" type="button" aria-pressed="false" data-w="mast">Raise mast +30 m</button>
+      <button class="chip" type="button" aria-pressed="false" data-w="power">Double the power</button>
       <button class="chip" type="button" aria-pressed="false" data-w="humid">Humid evening (k = 2)</button>
-      <button class="chip" type="button" aria-pressed="false" data-w="indoor">Indoor + outdoor (P.2109)</button>
+      <button class="chip" type="button" aria-pressed="false" data-w="indoor">Receivers indoors (P.2109)</button>
       <button class="chip" type="button" aria-pressed="false" data-w="rain">Heavy rain</button>
     </div>
     <p class="sh-whatnote" id="shWhatNote" aria-live="polite"></p>
@@ -2601,8 +2647,8 @@ body.still .hero-par{transform:none}
 
   <section class="panel card" aria-labelledby="shDataH">
     <div class="chart-head"><h2 id="shDataH">Measurements</h2>
-      <div class="row"><button class="btn" type="button" id="shSample">Load sample walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label></div></div>
-    <p class="hint">CSV columns: <code>lat, lon, level</code> (dBµV/m), optional <code>built</code> (1 = behind buildings) and <code>height</code> (antenna height above ground, m).</p>
+      <div class="row"><button class="btn" type="button" id="shSample">New sample walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label><button class="btn" type="button" id="shExport">Export CSV</button><button class="btn" type="button" id="shClear">Clear</button></div></div>
+    <p class="hint">CSV columns: <code>lat, lon, level</code> (dBµV/m), optional <code>built</code> (1 = behind buildings) and <code>height</code> (antenna above ground, m). Sort by clicking a column heading.</p>
     <div class="tablewrap"><table class="fs" id="shTable"></table></div>
   </section>
 
@@ -3346,7 +3392,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <section><h3>Everywhere</h3><dl><dt><kbd>1</kbd>–<kbd>9</kbd></dt><dd>Open a tab (Lab … Quiz)</dd><dt><kbd>?</kbd></dt><dd>This list</dd><dt><kbd>T</kbd></dt><dd>Light / dark theme</dd><dt><kbd>Esc</kbd></dt><dd>Close a box or dialog</dd></dl></section>
     <section><h3>Map and Cellular</h3><dl><dt><kbd>S</kbd></dt><dd>Transmitter settings, opened beside the transmitter (or right-click a transmitter pin)</dd><dt><kbd>P</kbd></dt><dd>All transmitter settings</dd><dt><kbd>A</kbd></dt><dd>Aim the beam</dd><dt><kbd>Shift</kbd> + <kbd>←</kbd>/<kbd>→</kbd></dt><dd>Turn the beam 5° (<kbd>Alt</kbd> for 1°)</dd><dt><kbd>F2</kbd></dt><dd>Rename the selected pin</dd><dt><kbd>Del</kbd></dt><dd>Delete the selected pin</dd><dt><kbd>F</kbd></dt><dd>Full-screen map</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
     <section><h3>Animation</h3><dl><dt><kbd>Space</kbd></dt><dd>Play / pause</dd><dt><kbd>F</kbd></dt><dd>Full screen</dd><dt><kbd>H</kbd></dt><dd>Hide or show the panels</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
-    <section><h3>Digital shadow</h3><dl><dt><kbd>C</kbd></dt><dd>Calibrate the model</dd><dt><kbd>M</kbd></dt><dd>Switch between inspect and add a measurement</dd></dl></section>
+    <section><h3>Digital shadow</h3><dl><dt><kbd>C</kbd></dt><dd>Calibrate the model</dd><dt><kbd>I</kbd> / <kbd>M</kbd> / <kbd>L</kbd></dt><dd>Map click: inspect / add a reading / move the station</dd><dt><kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd></dt><dd>Zoom in / out / fit all points</dd><dt>Drag, arrow keys</dt><dd>Move the map</dd></dl></section>
   </div>
   <p class="hint">Hover over or tab to a button to see its shortcut. Shortcuts are off while you type in a box.</p>
   <div class="row cfmrow"><button class="btn primary" id="keysClose" type="button">Close</button></div>
@@ -5923,6 +5969,19 @@ function getTile(z,x,y){
   return im.complete&&im.naturalWidth?im:null;
 }
 
+/* height badge beside the selected transmitter: ground (sea level) + mast = antenna top */
+const TXH={pending:""};
+function txGround(t){ const k=ekey(t.lat,t.lon); if(ELEV.cache.has(k)) return ELEV.cache.get(k);
+  const r=MP.res&&MP.rx?MP.res.get(MP.rx.id):null; if(r&&r.T&&isFinite(r.T.txE)&&t===MP.tx) return r.T.txE;
+  if(TXH.pending!==k){ TXH.pending=k; fetchElev([{lat:t.lat,lon:t.lon}]).then(()=>scheduleMapDraw()).catch(()=>{}); } return null; }
+function drawTxHeight(c,W,H){ const t=MP.tx; if(!t) return; const [x,y]=proj(t.lon,t.lat); if(x<0||y<0||x>W||y>H) return;
+  const g=txGround(t), h=t.h, l1=g==null?`Mast ${h} m`:`Top ${Math.round(g+h).toLocaleString("en")} m above sea level`, l2=g==null?"ground height loading…":`ground ${Math.round(g).toLocaleString("en")} m + mast ${h} m`;
+  c.font="700 12px "+cssVar("--font-body"); const w1=c.measureText(l1).width; c.font="500 11px "+cssVar("--font-body"); const w2=c.measureText(l2).width;
+  const w=Math.max(w1,w2)+18, hh=38; let bx=x-w-16, by=y-58; if(bx<4) bx=x+16; by=clamp(by,4,H-hh-4);
+  c.fillStyle="rgba(16,44,64,.92)"; c.strokeStyle="#CDF23A"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(bx,by,w,hh,7):c.rect(bx,by,w,hh); c.fill(); c.stroke();
+  c.fillStyle="#CDF23A"; c.beginPath(); c.moveTo(bx+9,by+10); c.lineTo(bx+5,by+18); c.lineTo(bx+13,by+18); c.closePath(); c.fill();
+  c.textAlign="left"; c.textBaseline="middle"; c.fillStyle="#F7FAFC"; c.font="700 12px "+cssVar("--font-body"); c.fillText(l1,bx+18,by+13);
+  c.font="500 11px "+cssVar("--font-body"); c.fillStyle="#C9D7E2"; c.fillText(l2,bx+9,by+28); c.textBaseline="alphabetic"; }
 function drawMap(){
   resetLabels();   // label collision state is per frame
   const W=mapC.clientWidth,H=mapC.clientHeight; if(!W) return; if(!MP.view) MP.view=defaultView("sites");
@@ -6030,6 +6089,7 @@ function drawMap(){
   if(MP.layer==="mobile") drawCellDots(c,W,H);
   MP.txs.forEach((t,i)=>{ if(i!==MP.ti) pin(t,"#e0828f","T"+(i+1),false,v.z>4.5?t.name:""); });
   pin(MP.tx,"#d13b4f","T"+(MP.ti+1),true,MP.tx.name); pin(MP.rx,"#1f5fd1",(MP.layer==="mobile"?"P":"R")+(MP.ai+1),true,MP.rx.name);
+  drawTxHeight(c,W,H);
   if(MP.layer==="mobile") drawMe(c);
   drawBeamHandles(c,W,H);
   // floating rename/delete tools beside the selected pin
@@ -8519,7 +8579,7 @@ function bindTabs(){
     if(rm.matches||!("IntersectionObserver" in window)) return;
     const SEL=".wrap > .panel, .wrap > section.panel, .lab .panel.card, .tiles .tile, .mxcard, .q, .lesson .lx-sec, .lesson .widget, .lesson .qc, .keyfacts li, .gloss-grid > div, .lc-refs section, .concepts details, .learn .panel";
     const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{rootMargin:"0px 0px -6% 0px",threshold:0.06});
-    const scan=root=>{ (root||document).querySelectorAll(SEL).forEach(el=>{ if(el.dataset.rv) return; el.dataset.rv="1"; const r=el.getBoundingClientRect();
+    const scan=root=>{ (root||document).querySelectorAll(SEL).forEach(el=>{ if(el.dataset.rv||el.closest("#shErr")) return; el.dataset.rv="1"; const r=el.getBoundingClientRect();
       if(r.height===0||r.top<innerHeight*0.92) return; el.classList.add("rv"); io.observe(el); }); };
     const later=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>scan()));
     later(); new MutationObserver(ms=>{ if(!worthIt(ms)) return; clearTimeout(scan.t); scan.t=setTimeout(later,80); }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]});
@@ -8649,78 +8709,84 @@ init();
    model + hidden impairments + noise, and labelled as a demo on screen.
    ===================================================================== */
 (function(){
-  const SH={f:100, P:10, pts:[], sel:-1, cal:null, what:{}, gTx:null, built:false, view:null, mode:"inspect", tries:0, timer:null, seed:7, nextId:1};
+  const BANDS=[["fm","FM radio · 100 MHz",100,10,1],["tv","TV · 600 MHz",600,50,1],["lte9","4G · 900 MHz",900,0.2,0.3],["lte18","4G · 1800 MHz",1800,0.2,0.22],["nr35","5G · 3.5 GHz",3500,0.2,0.15]];
+  const SH={band:"fm",f:100,P:10,ds:1,pts:[],sel:-1,cal:null,what:{},gTx:null,view:null,mode:"inspect",tries:0,seed:7,nextId:1,site:null,demOk:null,sort:null};
   const COL={g:"#2E9E5B",w:"#E0A526",b:"#D2453A"};
-  /* hidden "reality": what the sample measurements are built from */
-  const TRUTH={bias:-3.4, bld:-8.6, slope:-3.2, noise:1.6};
+  const TRUTH={bias:-3.4, bld:-8.6, slope:-3.2, noise:1.6};   // hidden "reality" behind the sample readings
   const near=x=>Math.round(x*10)/10;
   function rng(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
   const gauss=r=>{ let u=0,v=0; while(!u) u=r(); while(!v) v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
-  const tx=()=>{ const S=MP.S.bcast; return S.txs[S.ti]||S.txs[0]; };
+  const tx=()=>SH.site;
+  function mapTx(){ const S=MP.S.bcast; return S.txs[S.ti]||S.txs[0]; }
   function dest(p,km,brg){ const d=km/RE, b=toRad(brg), la=toRad(p.lat), lo=toRad(p.lon);
     const la2=Math.asin(Math.sin(la)*Math.cos(d)+Math.cos(la)*Math.sin(d)*Math.cos(b));
     const lo2=lo+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(la),Math.cos(d)-Math.sin(la)*Math.sin(la2));
     return {lat:toDeg(la2),lon:toDeg(lo2)}; }
+  const prng=p=>rng(SH.seed*1000+p.id);
 
   /* ---------- model ---------- */
-  function model(pt,w){ w=w||{}; const T=tx(), dk=Math.max(hav(T,pt),0.2), n=11;
+  function model(pt,w){ w=w||{}; const T=tx(), dk=Math.max(hav(T,pt),0.05), n=11;
     const gT=SH.gTx??0, gR=pt.g??0, hT=T.h+(w.mast?30:0);
     const prof={d:Array.from({length:n},(_,i)=>dk*i/(n-1)), h:Array.from({length:n},(_,i)=>gT+(gR-gT)*i/(n-1))};
-    let Lb; try{ Lb=p1812(dk,{f:SH.f,htx:hT,hrx:pt.h,refr:w.humid?"super":"standard"},prof).Lb50; }catch(e){ Lb=NaN; }
+    let Lb; try{ Lb=p1812(Math.max(dk,0.25),{f:SH.f,htx:hT,hrx:pt.h,refr:w.humid?"super":"standard"},dk>=0.25?prof:null).Lb50; }catch(e){ Lb=NaN; }
     if(!isFinite(Lb)) Lb=32.44+20*Math.log10(SH.f)+20*Math.log10(dk)+10;
-    let E=199.36+20*Math.log10(SH.f/1000)-Lb+10*Math.log10(SH.P);
+    let E=199.36+20*Math.log10(SH.f/1000)-Lb+10*Math.log10(SH.P*(w.power?2:1));
     if(w.indoor&&!pt.sensor) E-=p2109(SH.f,0.5,false);
+    if(w.rain&&SH.f>=1000){ try{ E-=rainLoss(dk,{f:SH.f,storm:"local"}); }catch(e){} }
     return E; }
-  function calTerm(pt){ const c=SH.cal; if(!c) return 0; return c.b[0]+c.b[1]*(pt.built?1:0)+c.b[2]*Math.log10(Math.max(hav(tx(),pt),0.2)); }
+  function calTerm(pt){ const c=SH.cal; if(!c) return 0; return c.b[0]+c.b[1]*(pt.built?1:0)+c.b[2]*Math.log10(Math.max(hav(tx(),pt),0.05)); }
   const pred=pt=>model(pt,SH.what)+calTerm(pt);
   const predBase=pt=>model(pt,{})+calTerm(pt);
-  function truth(pt,r){ const dk=Math.max(hav(tx(),pt),0.2);
-    return model(pt,{})+TRUTH.bias+(pt.built?TRUTH.bld:0)+TRUTH.slope*(Math.log10(dk)-0.6)+TRUTH.noise*gauss(r); }
+  const rawModel=p=>model(p,{});
+  function truth(pt,r){ const dk=Math.max(hav(tx(),pt),0.05);
+    return model(pt,{})+TRUTH.bias+(pt.built?TRUTH.bld:0)+TRUTH.slope*(Math.log10(dk/SH.ds)-0.6)+TRUTH.noise*gauss(r); }
   const status=d=>{ const a=Math.abs(d); return a<3?"g":a<6?"w":"b"; };
   const SLBL={g:"Match",w:"Close",b:"Impairment missed"};
 
-  /* ---------- sample data around the Map-tab transmitter ---------- */
+  /* ---------- sample data around the station ---------- */
   function buildSample(){
-    const T=tx(), r=rng(SH.seed); SH.pts=[]; SH.cal=null; SH.sel=-1; SH.nextId=1;
+    const T=tx(), r=rng(SH.seed), k=SH.ds; SH.pts=SH.pts.filter(p=>p.src==="csv"); SH.cal=null; SH.sel=-1;
     [["Sensor 1 · rooftop",2.6,72,0],["Sensor 2 · rooftop",5.4,104,1],["Sensor 3 · rooftop",8.8,48,0]].forEach(([nm,km,b,bl])=>{
-      SH.pts.push({id:SH.nextId++,name:nm,...dest(T,km,b),h:15,sensor:true,built:!!bl,src:"sensor"}); });
-    for(let i=0;i<14;i++){ const km=1.4+i*0.82, b=86+18*Math.sin(i*0.9)+ (r()-0.5)*10;
-      SH.pts.push({id:SH.nextId++,name:"Walk test "+(i+1),...dest(T,km,b),h:1.5,sensor:false,built:r()<0.42,src:"walk"}); }
+      SH.pts.push({id:SH.nextId++,name:nm,...dest(T,km*k,b),h:15,sensor:true,built:!!bl,src:"sensor",g:null}); });
+    for(let i=0;i<14;i++){ const km=(1.4+i*0.82)*k, b=86+18*Math.sin(i*0.9)+(r()-0.5)*10;
+      SH.pts.push({id:SH.nextId++,name:"Walk test "+(i+1),...dest(T,km,b),h:1.5,sensor:false,built:r()<0.42,src:"walk",g:null}); }
     measureAll(); }
-  const prng=p=>rng(SH.seed*1000+p.id);
   function measureAll(){ SH.pts.forEach(p=>{ if(p.src!=="csv") p.meas=truth(p,prng(p)); }); }
 
-  /* ---------- ground heights (Copernicus DEM via the Map tab's fetchElev) ---------- */
-  async function heights(){ const T=tx(), list=[T,...SH.pts.filter(p=>p.g==null)];
-    let e=null; try{ e=await fetchElev(list.map(p=>({lat:p.lat,lon:p.lon}))); }catch(x){}
-    if(e){ SH.gTx=e[0]??0; list.slice(1).forEach((p,i)=>{ p.g=e[i+1]??0; }); SH.demOk=true; } else { SH.gTx=SH.gTx??0; list.slice(1).forEach(p=>{ if(p.g==null) p.g=0; }); SH.demOk=false; }
-    measureAll(); render(); }
+  /* ---------- ground heights (Copernicus DEM) ---------- */
+  async function heights(){ const T=tx(), list=SH.pts.filter(p=>p.g==null);
+    let e=null; try{ e=await fetchElev([{lat:T.lat,lon:T.lon},...list.map(p=>({lat:p.lat,lon:p.lon}))]); }catch(x){}
+    if(e){ SH.gTx=e[0]??0; list.forEach((p,i)=>{ p.g=e[i+1]??0; }); SH.demOk=true; }
+    else { SH.gTx=SH.gTx??0; list.forEach(p=>{ p.g=0; }); SH.demOk=false; }
+    measureAll(); render(); sensors(); }
 
   /* ---------- calibration: least squares on residual = measured − model ---------- */
   function calibrate(){
-    const rows=SH.pts.filter(p=>isFinite(p.meas)); if(rows.length<4){ toastMsg("Add at least 4 measurements to calibrate."); return; }
-    const X=rows.map(p=>[1,p.built?1:0,Math.log10(Math.max(hav(tx(),p),0.2))]), y=rows.map(p=>p.meas-model(p,{}));
+    const rows=SH.pts.filter(p=>isFinite(p.meas)); if(rows.length<4){ hint("Add at least 4 measurements first, then calibrate."); return; }
+    const X=rows.map(p=>[1,p.built?1:0,Math.log10(Math.max(hav(tx(),p),0.05))]), y=rows.map(p=>p.meas-model(p,{}));
     const A=[[0,0,0],[0,0,0],[0,0,0]], v=[0,0,0];
     X.forEach((x,k)=>{ for(let i=0;i<3;i++){ v[i]+=x[i]*y[k]; for(let j=0;j<3;j++) A[i][j]+=x[i]*x[j]; } });
     for(let i=0;i<3;i++) A[i][i]+=1e-6;
     let b=solve3(A,v); if(!b||b.some(x=>!isFinite(x))){ const m=y.reduce((s,a)=>s+a,0)/y.length; b=[m,0,0]; }
-    SH.cal={b,n:rows.length}; render(); }
+    SH.cal={b,n:rows.length}; render(); hint("Calibrated. The dots now compare the measurements with the corrected model."); }
   function solve3(A,v){ const M=A.map((r,i)=>[...r,v[i]]);
     for(let c=0;c<3;c++){ let p=c; for(let r=c+1;r<3;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r; [M[c],M[p]]=[M[p],M[c]];
       if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<3;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<4;k++) M[r][k]-=f*M[c][k]; } }
     return M.map((r,i)=>r[3]/M[i][i]); }
   function rms(fn){ const r=SH.pts.filter(p=>isFinite(p.meas)).map(p=>p.meas-fn(p)); if(!r.length) return NaN; return Math.sqrt(r.reduce((s,a)=>s+a*a,0)/r.length); }
-  const rawModel=p=>model(p,{});
-  function toastMsg(t){ const h=$("shHint"); h.textContent=t; }
+  const hint=t=>{ $("shHint").textContent=t; };
 
-  /* ---------- map ---------- */
+  /* ---------- map: tiles, pan, zoom ---------- */
   let C=null, ctx=null;
   function fitView(){ const W=C.clientWidth||800,H=C.clientHeight||480, pts=[tx(),...SH.pts];
     let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity; pts.forEach(s=>{ const x=wx(s.lon,0),y=wy(s.lat,0); a=Math.min(a,x); c=Math.max(c,x); b=Math.min(b,y); d=Math.max(d,y); });
-    const z=clamp(Math.log2(Math.min(W*0.8/Math.max(c-a,1e-9),H*0.78/Math.max(d-b,1e-9))),3,16);
+    const z=clamp(Math.log2(Math.min(W*0.8/Math.max(c-a,1e-9),H*0.78/Math.max(d-b,1e-9))),3,17);
     SH.view={lon:ilon((a+c)/2,0),lat:ilat((b+d)/2,0),z}; }
   const P=(lon,lat)=>{ const W=C.clientWidth,H=C.clientHeight,v=SH.view; return [W/2+wx(lon,v.z)-wx(v.lon,v.z),H/2+wy(lat,v.z)-wy(v.lat,v.z)]; };
   const U=(x,y)=>{ const W=C.clientWidth,H=C.clientHeight,v=SH.view; return {lon:ilon(wx(v.lon,v.z)+x-W/2,v.z),lat:ilat(wy(v.lat,v.z)+y-H/2,v.z)}; };
+  function zoomAt(dz,x,y){ const W=C.clientWidth,H=C.clientHeight; if(x==null){ x=W/2; y=H/2; } const q=U(x,y);
+    SH.view.z=clamp(SH.view.z+dz,3,18); const [nx,ny]=P(q.lon,q.lat), c=U(W/2+(nx-x),H/2+(ny-y)); SH.view.lon=c.lon; SH.view.lat=c.lat; draw(); }
+  let drawQ=false; const drawSoon=()=>{ if(drawQ) return; drawQ=true; requestAnimationFrame(()=>{ drawQ=false; draw(); }); };
   function draw(){
     if(!C||C.offsetParent===null) return; const W=C.clientWidth,H=C.clientHeight,dpr=window.devicePixelRatio||1;
     if(C.width!==Math.round(W*dpr)||C.height!==Math.round(H*dpr)){ C.width=W*dpr; C.height=H*dpr; }
@@ -8735,60 +8801,92 @@ init();
     if(missing&&SH.tries<60){ SH.tries++; clearTimeout(SH.retry); SH.retry=setTimeout(draw,300); } else if(!missing) SH.tries=0;
     c.fillStyle="rgba(16,44,64,.10)"; c.fillRect(0,0,W,H);
     const T=tx(), [tX,tY]=P(T.lon,T.lat);
-    // rays to sensors
     c.setLineDash([4,5]); c.lineWidth=1.4; c.strokeStyle="rgba(16,44,64,.55)";
     SH.pts.filter(p=>p.sensor).forEach(p=>{ const [x,y]=P(p.lon,p.lat); c.beginPath(); c.moveTo(tX,tY); c.lineTo(x,y); c.stroke(); }); c.setLineDash([]);
-    // transmitter
-    c.fillStyle="#102C40"; c.strokeStyle="#CDF23A"; c.lineWidth=2.5;
-    c.beginPath(); c.moveTo(tX,tY-16); c.lineTo(tX-9,tY+8); c.lineTo(tX+9,tY+8); c.closePath(); c.fill(); c.stroke();
-    label(c,"TX · "+T.name,tX-14,tY+26);
     SH.pts.forEach((p,i)=>{ const [x,y]=P(p.lon,p.lat), d=isFinite(p.meas)?p.meas-pred(p):NaN, st=isFinite(d)?status(d):"w", r=p.sensor?9:7;
       c.lineWidth=i===SH.sel?3.5:2; c.strokeStyle=i===SH.sel?"#102C40":"#fff"; c.fillStyle=COL[st];
-      c.beginPath(); if(p.sensor){ c.rect(x-r,y-r,2*r,2*r); } else c.arc(x,y,r,0,7); c.fill(); c.stroke();
+      c.beginPath(); if(p.sensor) c.rect(x-r,y-r,2*r,2*r); else c.arc(x,y,r,0,7); c.fill(); c.stroke();
       if(p.sensor){ c.strokeStyle="#CDF23A"; c.lineWidth=2; c.strokeRect(x-r-3,y-r-3,2*r+6,2*r+6); label(c,p.name.split(" · ")[0],x+14,y+4); }
       p._x=x; p._y=y; });
+    // station on top, with its height badge
+    c.fillStyle="#102C40"; c.strokeStyle="#CDF23A"; c.lineWidth=2.5;
+    c.beginPath(); c.moveTo(tX,tY-16); c.lineTo(tX-9,tY+8); c.lineTo(tX+9,tY+8); c.closePath(); c.fill(); c.stroke();
+    const g=SH.gTx; label(c,`${T.name} · top ${g==null?"…":Math.round(g+T.h)} m ASL`,tX-14,tY+26);
   }
   function label(c,t,x,y){ c.font="600 12px "+(cssVar("--font-body")||"sans-serif"); const w=c.measureText(t).width;
-    c.fillStyle="rgba(247,250,252,.92)"; c.fillRect(x-4,y-12,w+8,17); c.fillStyle="#102C40"; c.fillText(t,x,y); }
+    x=clamp(x,4,C.clientWidth-w-8); c.fillStyle="rgba(247,250,252,.94)"; c.fillRect(x-4,y-12,w+8,17); c.fillStyle="#102C40"; c.fillText(t,x,y); }
   function hit(x,y){ let best=-1,bd=196; SH.pts.forEach((p,i)=>{ const d=(p._x-x)**2+(p._y-y)**2; if(d<bd){ bd=d; best=i; } }); return best; }
+
+  /* ---------- station ---------- */
+  function setSite(q,name){ const old=SH.site; SH.site={name:name||"Station",lat:q.lat,lon:q.lon,h:old?old.h:120}; SH.gTx=null; SH.seed++; buildSample(); SH.view=null;
+    render(); heights(); feeds(); if(!name) reverseName(q.lat,q.lon).then(nm=>{ if(nm&&SH.site.lat===q.lat){ SH.site.name=nm; renderSite(); draw(); } }); }
+  function setBand(k){ const b=BANDS.find(x=>x[0]===k)||BANDS[0]; SH.band=b[0]; SH.f=b[2]; SH.P=b[3]; SH.ds=b[4]; }
+  async function search(q){ const ul=$("shHits"); ul.hidden=false; ul.innerHTML=`<li><button type="button" disabled>Searching…</button></li>`;
+    try{ const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=en&q=${encodeURIComponent(q)}`); const j=await r.json();
+      if(!j.length){ ul.innerHTML=`<li><button type="button" disabled>No places found. Try another name, or click the map in “Move station”.</button></li>`; return; }
+      ul.innerHTML=j.map((h,i)=>`<li><button type="button" data-h="${i}">${esc(h.display_name)}</button></li>`).join("");
+      ul.querySelectorAll("button[data-h]").forEach(b=>b.addEventListener("click",()=>{ const h=j[+b.dataset.h]; ul.hidden=true; $("shQ").value="";
+        setSite({lat:+h.lat,lon:+h.lon},h.name||h.display_name.split(",")[0]); hint("Station placed. Sample readings were made around it."); }));
+      ul.querySelector("button[data-h]").focus();
+    }catch(e){ ul.innerHTML=`<li><button type="button" disabled>Search is unavailable right now. Choose “Move station” and click the map instead.</button></li>`; } }
 
   /* ---------- panels ---------- */
   const fx=v=>isFinite(v)?v.toFixed(1):"—";
   function hLine(g,h,who){ if(g==null) return `${who}: ground height loading…`;
-    return `${who}: ground <b>${Math.round(g)} m</b>${SH.demOk===false?" (DEM offline, sea level assumed)":""} + antenna <b>${near(h)} m</b> = <b>${near(Math.round(g)+h)} m</b> above sea level`; }
+    return `${who}: ground <b>${Math.round(g)} m</b>${SH.demOk===false?" (offline: sea level assumed)":""} + mast <b>${near(h)} m</b> = top <b>${near(Math.round(g)+h)} m</b> above sea level`; }
   function renderDetail(){ const el=$("shDetail"), p=SH.pts[SH.sel]; if(!p){ el.innerHTML=""; return; }
     const m=pred(p), d=p.meas-m, st=status(d), dk=hav(tx(),p);
-    const why=p.built?"Behind buildings: shadowing loss the open-ground model does not include.":Math.abs(d)>=3?"System loss or local clutter the model does not include.":"Open path; the model matches well.";
-    el.innerHTML=`<h3>${esc(p.name)} <span class="muted">· ${fmtD(dk)} km from the transmitter</span></h3>
-      <div>Predicted <b>${fx(m)} dBµV/m</b> · measured <b>${fx(p.meas)} dBµV/m</b> · difference <b style="color:${COL[st]}">${d>0?"+":""}${fx(d)} dB</b> (${SLBL[st]})</div>
+    const why=!isFinite(d)?"":p.built?"Behind buildings: shadowing loss the open-ground model does not include.":Math.abs(d)>=3?"System loss or local clutter the model does not include.":"Open path; the model matches well.";
+    el.innerHTML=`<h3>${esc(p.name)} <span class="muted">· ${fmtD(dk)} km from the station</span></h3>
+      <div>Model <b>${fx(m)}</b> · measured <b>${fx(p.meas)}</b> dBµV/m · difference <b style="color:${COL[st]}">${d>0?"+":""}${fx(d)} dB</b> (${SLBL[st]})</div>
       <div class="muted">${why}</div>
       <p class="sh-height">${hLine(p.g,p.h,p.sensor?"Sensor":"Receiver")}</p>
-      <div class="row"><label for="shPtH">Antenna height above ground (m)</label><input type="number" id="shPtH" min="0.5" max="300" step="0.5" value="${p.h}" style="width:90px">${p.src!=="csv"?`<label class="check"><input type="checkbox" id="shPtB" ${p.built?"checked":""}> Behind buildings</label>`:""}</div>`;
+      <div class="row"><label for="shPtH">Antenna above ground (m)</label><input type="number" id="shPtH" min="0.5" max="300" step="0.5" value="${p.h}" style="width:90px">${p.src!=="csv"?`<label class="check"><input type="checkbox" id="shPtB" ${p.built?"checked":""}> Behind buildings</label>`:""}<button class="btn sm" type="button" id="shPtDel">Remove</button></div>`;
     $("shPtH").addEventListener("change",e=>{ p.h=clamp(+e.target.value||1.5,0.5,300); if(p.src!=="csv") p.meas=truth(p,prng(p)); render(); });
-    const pb=$("shPtB"); if(pb) pb.addEventListener("change",e=>{ p.built=e.target.checked; p.meas=truth(p,prng(p)); render(); }); }
+    const pb=$("shPtB"); if(pb) pb.addEventListener("change",e=>{ p.built=e.target.checked; p.meas=truth(p,prng(p)); render(); });
+    $("shPtDel").addEventListener("click",()=>{ SH.pts.splice(SH.sel,1); SH.sel=-1; render(); }); }
   function renderErr(){ const before=rms(rawModel), after=SH.cal?rms(predBase):NaN, n=SH.pts.filter(p=>isFinite(p.meas)).length;
     const cls=v=>!isFinite(v)?"info":v<3?"good":v<6?"warn":"bad";
     $("shErr").innerHTML=`<div class="tile ${cls(before)}"><span class="k">Error before</span><span class="val">±${fx(before)} dB</span><span class="sub">RMS over ${n} readings</span></div>
-      <div class="tile ${SH.cal?cls(after):"info"}"><span class="k">After calibration</span><span class="val">${SH.cal?"±"+fx(after)+" dB":"—"}</span><span class="sub">${SH.cal?Math.round(100*(1-after/before))+"% lower":"press Calibrate"}</span></div>`;
-    const c=SH.cal; $("shFit").innerHTML=c?`<b>What calibration found</b> (least squares over ${c.n} readings):<ul>
-      <li>System offset <b>${c.b[0]>0?"+":""}${fx(c.b[0])} dB</b>: real power, cable or antenna losses the model did not know.</li>
+      <div class="tile ${SH.cal?cls(after):"info"}"><span class="k">After calibration</span><span class="val">${SH.cal?"±"+fx(after)+" dB":"—"}</span><span class="sub">${SH.cal?Math.max(0,Math.round(100*(1-after/before)))+"% lower":"press Calibrate"}</span></div>`;
+    const c=SH.cal; $("shFit").innerHTML=c?`<b>What the model learned</b> from ${c.n} readings:<ul>
+      <li>System offset <b>${c.b[0]>0?"+":""}${fx(c.b[0])} dB</b>: real power, cable or antenna losses.</li>
       <li>Building shadowing <b>${fx(c.b[1])} dB</b> at points behind buildings.</li>
-      <li>Distance trend <b>${fx(c.b[2])} dB per decade</b> of distance.</li></ul>`:"";
-    $("shReset").disabled=!SH.cal; }
-  function renderTx(){ const T=tx(); $("shTxName").textContent=`${T.name} · demo FM station ${SH.f} MHz, ${SH.P} kW ERP`; $("shMast").value=T.h;
-    $("shTxHeight").innerHTML=hLine(SH.gTx,T.h,"Transmitter"); }
-  function renderTable(){ const rows=SH.pts.map((p,i)=>{ const m=pred(p), d=p.meas-m, st=status(d);
-      return `<tr data-i="${i}" class="${i===SH.sel?"sel":""}"><td><button class="linkish" type="button" data-i="${i}">${esc(p.name)}</button></td><td class="num">${fmtD(hav(tx(),p))}</td><td class="num">${p.g==null?"…":Math.round(p.g)}</td><td class="num">${near(p.h)}</td><td class="num">${fx(m)}</td><td class="num">${fx(p.meas)}</td><td class="num">${d>0?"+":""}${fx(d)}</td><td><span class="st"><i style="background:${COL[st]}"></i>${SLBL[st]}</span></td></tr>`; }).join("");
-    $("shTable").innerHTML=`<caption class="muted" style="text-align:left;caption-side:top;padding-bottom:6px">${SH.pts.length} readings · model ${SH.cal?"calibrated":"not calibrated"}${Object.values(SH.what).some(Boolean)?" · what-if on":""}</caption><tr><th>Point</th><th>Distance (km)</th><th>Ground (m)</th><th>Antenna (m)</th><th>Model (dBµV/m)</th><th>Measured</th><th>Difference (dB)</th><th>Status</th></tr>`+rows; }
+      <li>Distance trend <b>${fx(c.b[2])} dB</b> per tenfold distance.</li></ul>`:"";
+    $("shReset").disabled=!SH.cal; scatter(); }
+  function scatter(){ const cv=$("shScatter"); if(!cv||cv.offsetParent===null) return; const W=cv.clientWidth,H=cv.clientHeight,dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr;
+    const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+    const rows=SH.pts.filter(p=>isFinite(p.meas)); if(!rows.length) return;
+    const all=rows.flatMap(p=>[p.meas,rawModel(p),SH.cal?predBase(p):p.meas]); let lo=Math.floor(Math.min(...all)/10)*10, hi=Math.ceil(Math.max(...all)/10)*10; if(hi-lo<20) hi=lo+20;
+    const L=46,R=8,T=8,B=30, sx=v=>L+(v-lo)/(hi-lo)*(W-L-R), sy=v=>H-B-(v-lo)/(hi-lo)*(H-T-B);
+    c.strokeStyle=cssVar("--line"); c.fillStyle=cssVar("--muted"); c.font="11px "+cssVar("--font-mono"); c.lineWidth=1;
+    for(let v=lo;v<=hi;v+=10){ c.beginPath(); c.moveTo(L,sy(v)); c.lineTo(W-R,sy(v)); c.stroke(); c.textAlign="right"; c.fillText(v,L-4,sy(v)+4); c.textAlign="center"; c.fillText(v,sx(v),H-B+14); }
+    c.strokeStyle=cssVar("--ink"); c.setLineDash([5,4]); c.beginPath(); c.moveTo(sx(lo),sy(lo)); c.lineTo(sx(hi),sy(hi)); c.stroke(); c.setLineDash([]);
+    rows.forEach(p=>{ c.strokeStyle="#8A99A8"; c.lineWidth=1.5; c.beginPath(); c.arc(sx(rawModel(p)),sy(p.meas),4,0,7); c.stroke(); });
+    if(SH.cal) rows.forEach(p=>{ c.fillStyle=COL[status(p.meas-predBase(p))]; c.beginPath(); c.arc(sx(predBase(p)),sy(p.meas),4,0,7); c.fill(); });
+    c.fillStyle=cssVar("--muted"); c.textAlign="left"; c.fillText("predicted (dBµV/m) →",L,H-2); c.save(); c.translate(9,T+4); c.rotate(Math.PI/2); c.textAlign="left"; c.fillText("measured →",0,0); c.restore();
+    c.textAlign="right"; c.fillText(SH.cal?"○ before  ● after":"○ before calibration",W-R,T+10); }
+  function renderSite(){ const T=tx(); $("shSiteName").innerHTML=`${esc(T.name)}<small>${T.lat.toFixed(4)}°, ${T.lon.toFixed(4)}°</small>`;
+    $("shBand").value=SH.band; $("shPow").value=SH.P; $("shMast").value=T.h; $("shTxHeight").innerHTML=hLine(SH.gTx,T.h,"Station"); }
+  function sortRows(){ const s=SH.sort, idx=SH.pts.map((p,i)=>i); if(!s) return idx;
+    const val={name:i=>SH.pts[i].name,dist:i=>hav(tx(),SH.pts[i]),diff:i=>Math.abs(SH.pts[i].meas-pred(SH.pts[i]))}[s.k];
+    return idx.sort((a,b)=>{ const x=val(a),y=val(b); return (x>y?1:x<y?-1:0)*s.dir; }); }
+  function renderTable(){ const th=(k,t)=>{ const s=SH.sort&&SH.sort.k===k?(SH.sort.dir>0?"ascending":"descending"):"none"; return `<th aria-sort="${s}"><button type="button" data-sort="${k}">${t}</button></th>`; };
+    const rows=sortRows().map(i=>{ const p=SH.pts[i], m=pred(p), d=p.meas-m, st=status(d);
+      return `<tr class="${i===SH.sel?"sel":""}"><td><button class="linkish" type="button" data-i="${i}">${esc(p.name)}</button></td><td class="num">${fmtD(hav(tx(),p))}</td><td class="num">${p.g==null?"…":Math.round(p.g)}</td><td class="num">${near(p.h)}</td><td class="num">${fx(m)}</td><td class="num">${fx(p.meas)}</td><td class="num">${d>0?"+":""}${fx(d)}</td><td><span class="st"><i style="background:${COL[st]}"></i>${SLBL[st]}</span></td></tr>`; }).join("");
+    $("shTable").innerHTML=`<caption class="muted" style="text-align:left;caption-side:top;padding-bottom:6px">${SH.pts.length} readings · model ${SH.cal?"calibrated":"not calibrated"}${Object.values(SH.what).some(Boolean)?" · what-if on":""}</caption><tr>${th("name","Point")}${th("dist","Distance (km)")}<th>Ground (m)</th><th>Antenna (m)</th><th>Model (dBµV/m)</th><th>Measured</th>${th("diff","Difference (dB)")}<th>Status</th></tr>`+rows; }
   function renderWhat(){ const on=Object.keys(SH.what).filter(k=>SH.what[k]);
     document.querySelectorAll("#shWhat .chip").forEach(b=>b.setAttribute("aria-pressed",String(!!SH.what[b.dataset.w])));
     if(!on.length){ $("shWhatNote").textContent=""; return; }
-    const ref=SH.pts.find(p=>p.name==="Walk test 5")||SH.pts.find(p=>!p.sensor)||SH.pts[0], a=predBase(ref), b=pred(ref);
-    const notes={mast:"A taller mast lifts the antenna above more obstacles.",humid:"Warm, humid air bends VHF waves further (super-refraction, k = 2).",indoor:"Walk-test receivers move indoors; ITU-R P.2109 adds the median building entry loss.",rain:"At 100 MHz rain costs almost nothing. Rain loss matters for 5G/6G mmWave (ITU-R P.838): about 10 dB per km at 28 GHz in a heavy tropical storm."};
+    const ref=SH.pts.find(p=>p.name==="Walk test 5")||SH.pts.find(p=>!p.sensor)||SH.pts[0]; if(!ref){ $("shWhatNote").textContent=""; return; }
+    const a=predBase(ref), b=pred(ref);
+    const notes={mast:"A taller mast lifts the antenna above more obstacles.",power:"Double the power adds 3 dB everywhere.",humid:"Warm, humid air bends the waves further (super-refraction, k = 2).",indoor:"Walk-test receivers move indoors; ITU-R P.2109 adds the median building entry loss.",rain:SH.f<1000?"Below 1 GHz rain costs almost nothing. Switch the service to 5G 3.5 GHz, or think of 28 GHz mmWave, where a tropical storm costs about 10 dB per km (ITU-R P.838).":"Rain loss from ITU-R P.838 at 100 mm/h."};
     $("shWhatNote").innerHTML=`At ${esc(ref.name)}: <b>${fx(a)} → ${fx(b)} dBµV/m</b> (${b-a>=0?"+":""}${fx(b-a)} dB). `+on.map(k=>notes[k]).join(" "); }
+  function renderSteps(){ const n=SH.pts.filter(p=>isFinite(p.meas)).length, done=[!!SH.site, n>=4, !!SH.cal, Object.values(SH.what).some(Boolean)];
+    const now=done.indexOf(false); document.querySelectorAll("#shSteps li").forEach((li,i)=>{ li.classList.toggle("done",done[i]); li.classList.toggle("now",i===now); }); }
   function renderMods(){ const L=[["Ground wave, LF/MF","live"],["HF sky wave","live"],["VHF/UHF terrain (this demo)","live"],["Cellular 4G/5G","live"],["Indoor + outdoor (P.2109)","pilot"],["5G/6G WSN and IoT","pilot"],["5G/6G urban outdoor","future"],["Indoor environments","future"],["Built environment, smart campus","future"],["mmWave and sub-THz 6G","future"],["RIS and beamforming","future"],["Satellite and non-terrestrial","future"]];
     const T={live:"Live",pilot:"Pilot",future:"Future"}; $("shMods").innerHTML=L.map(([n,s])=>`<li class="${s}"><span>${n}</span><span class="tag">${T[s]}</span></li>`).join(""); }
-  function render(){ renderTx(); renderErr(); renderDetail(); renderTable(); renderWhat(); draw(); }
+  function render(){ renderSite(); renderErr(); renderDetail(); renderTable(); renderWhat(); renderSteps(); draw(); }
 
   /* ---------- live data interfaces ---------- */
   async function feeds(){ const T=tx(), el=$("shFeeds"), row=(k,v)=>`<div class="sh-feed"><span>${k}</span><span>${v}</span></div>`;
@@ -8804,43 +8902,69 @@ init();
     box.innerHTML=S.map((p,i)=>`<div class="sh-sens"><span>${esc(p.name)} <span class="muted">(simulated)</span></span><span class="v" id="shSv${i}">${fx(p.meas)} dBµV/m</span><canvas id="shSc${i}" aria-label="${esc(p.name)}: last 24 hours"></canvas></div>`).join("");
     S.forEach((p,i)=>spark($("shSc"+i),p)); }
   function spark(cv,p){ const W=cv.clientWidth||300,H=34,dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
-    const r=rng(SH.seed+p.id*31), v=Array.from({length:96},(_,k)=>p.meas+1.2*Math.sin(k/96*2*Math.PI*1+p.id)+0.6*gauss(r)), lo=Math.min(...v)-0.5, hi=Math.max(...v)+0.5;
+    const r=rng(SH.seed+p.id*31), v=Array.from({length:96},(_,k)=>p.meas+1.2*Math.sin(k/96*2*Math.PI+p.id)+0.6*gauss(r)), lo=Math.min(...v)-0.5, hi=Math.max(...v)+0.5;
     c.strokeStyle=cssVar("--accent")||"#0F6FA8"; c.lineWidth=1.5; c.beginPath(); v.forEach((y,k)=>{ const X=k/(v.length-1)*W, Y=H-2-(y-lo)/(hi-lo)*(H-4); k?c.lineTo(X,Y):c.moveTo(X,Y); }); c.stroke(); }
   function tick(){ if(currentTab!=="shadow"||document.hidden) return; const r=rng(Date.now()&0xffff);
-    SH.pts.filter(p=>p.sensor).forEach((p,i)=>{ const v=p.meas+0.4*gauss(r), el=$("shSv"+i); if(el) el.textContent=fx(v)+" dBµV/m"; }); }
+    SH.pts.filter(p=>p.sensor).forEach((p,i)=>{ const el=$("shSv"+i); if(el) el.textContent=fx(p.meas+0.4*gauss(r))+" dBµV/m"; }); }
 
   /* ---------- CSV ---------- */
   function parseCSV(text){ const out=[]; text.split(/\r?\n/).forEach(line=>{ const c=line.split(/[,;\t]/).map(s=>s.trim()); if(c.length<3) return;
       const la=+c[0], lo=+c[1], lv=+c[2]; if(!isFinite(la)||!isFinite(lo)||!isFinite(lv)||Math.abs(la)>90||Math.abs(lo)>180) return;
-      out.push({id:SH.nextId++,name:"Upload "+(out.length+1),lat:la,lon:lo,meas:lv,built:c[3]==="1",h:isFinite(+c[4])&&c[4]!==""?+c[4]:1.5,sensor:false,src:"csv"}); });
+      out.push({id:SH.nextId++,name:"Upload "+(out.length+1),lat:la,lon:lo,meas:lv,built:c[3]==="1",h:isFinite(+c[4])&&c[4]!==""?+c[4]:1.5,sensor:false,src:"csv",g:null}); });
     return out; }
+  function exportCSV(){ const lines=["name,lat,lon,ground_m,antenna_m,model_dBuV_m,measured_dBuV_m,difference_dB,built"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,p.lat.toFixed(5),p.lon.toFixed(5),p.g==null?"":Math.round(p.g),p.h,fx(pred(p)),fx(p.meas),fx(p.meas-pred(p)),p.built?1:0].join(",")));
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-shadow.csv"; document.body.appendChild(a); a.click(); a.remove(); hint("Exported "+SH.pts.length+" readings as wisdom-shadow.csv."); }
 
   /* ---------- wiring ---------- */
+  function setMode(m){ SH.mode=m; const r=$({inspect:"shModeI",add:"shModeA",site:"shModeS"}[m]); if(r) r.checked=true; C.style.cursor=m==="inspect"?"pointer":"crosshair";
+    hint(m==="add"?"Click the map to add a reading there (simulated measurement).":m==="site"?"Click the map where the station should stand.":"Click a dot to see its numbers. Drag to move the map, scroll to zoom."); }
+  function onMapClick(x,y){ const i=hit(x,y), q=U(x,y);
+    if(SH.mode==="site"){ setSite(q,null); setMode("inspect"); hint("Station moved. Sample readings were made around it."); return; }
+    if(SH.mode==="add"&&i<0){ const r=rng(Date.now()&0xffff), p={id:SH.nextId++,name:"Student "+(SH.pts.filter(p=>p.src==="click").length+1),...q,h:1.5,sensor:false,built:r()<0.4,src:"click",g:null};
+      SH.pts.push(p); SH.sel=SH.pts.length-1; p.meas=truth(p,prng(p)); render(); heights(); return; }
+    SH.sel=i; render(); }
   function bind(){ C=$("shMap"); ctx=C.getContext("2d");
-    document.querySelectorAll('input[name="shMode"]').forEach(r=>r.addEventListener("change",e=>{ SH.mode=e.target.value; toastMsg(SH.mode==="add"?"Click the map to add a walk-test reading there (simulated measurement).":"Click a dot to see its numbers."); }));
-    C.addEventListener("click",e=>{ const b=C.getBoundingClientRect(), x=e.clientX-b.left, y=e.clientY-b.top, i=hit(x,y);
-      if(SH.mode==="add"&&i<0){ const q=U(x,y), r=rng(Date.now()&0xffff), p={id:SH.nextId++,name:"Student "+(SH.pts.filter(p=>p.src==="click").length+1),...q,h:1.5,sensor:false,built:r()<0.4,src:"click",g:null};
-        p.meas=NaN; SH.pts.push(p); SH.sel=SH.pts.length-1; heights(); return; }
-      SH.sel=i; render(); });
+    $("shBand").innerHTML=BANDS.map(b=>`<option value="${b[0]}">${b[1]}</option>`).join("");
+    document.querySelectorAll('input[name="shMode"]').forEach(r=>r.addEventListener("change",e=>setMode(e.target.value)));
+    let drag=null;
+    C.addEventListener("pointerdown",e=>{ drag={x:e.clientX,y:e.clientY,lon:SH.view.lon,lat:SH.view.lat,moved:false}; C.setPointerCapture(e.pointerId); });
+    C.addEventListener("pointermove",e=>{ if(!drag) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(!drag.moved&&Math.hypot(dx,dy)<5) return;
+      drag.moved=true; C.classList.add("panning"); const z=SH.view.z; SH.view.lon=ilon(wx(drag.lon,z)-dx,z); SH.view.lat=ilat(wy(drag.lat,z)-dy,z); drawSoon(); });
+    C.addEventListener("pointerup",e=>{ const d=drag; drag=null; C.classList.remove("panning"); if(!d||d.moved) return; const b=C.getBoundingClientRect(); onMapClick(e.clientX-b.left,e.clientY-b.top); });
+    C.addEventListener("pointercancel",()=>{ drag=null; C.classList.remove("panning"); });
+    C.addEventListener("wheel",e=>{ e.preventDefault(); const b=C.getBoundingClientRect(); zoomAt(e.deltaY<0?0.5:-0.5,e.clientX-b.left,e.clientY-b.top); },{passive:false});
+    C.addEventListener("keydown",e=>{ const s=60, z=SH.view.z; const mv=(dx,dy)=>{ e.preventDefault(); SH.view.lon=ilon(wx(SH.view.lon,z)+dx,z); SH.view.lat=ilat(wy(SH.view.lat,z)+dy,z); draw(); };
+      if(e.key==="ArrowLeft") mv(-s,0); if(e.key==="ArrowRight") mv(s,0); if(e.key==="ArrowUp") mv(0,-s); if(e.key==="ArrowDown") mv(0,s); });
+    $("shZin").addEventListener("click",()=>zoomAt(1)); $("shZout").addEventListener("click",()=>zoomAt(-1)); $("shFitB").addEventListener("click",()=>{ SH.view=null; draw(); });
+    $("shSearch").addEventListener("submit",e=>{ e.preventDefault(); const q=$("shQ").value.trim(); if(q.length>1) search(q); });
+    $("shQ").addEventListener("keydown",e=>{ if(e.key==="Escape") $("shHits").hidden=true; });
+    $("shUseMap").addEventListener("click",()=>{ const t=mapTx(); SH.site=null; setSite({lat:t.lat,lon:t.lon},t.name); SH.site.h=t.h; render(); });
+    $("shBand").addEventListener("change",e=>{ setBand(e.target.value); SH.seed++; buildSample(); SH.view=null; render(); heights(); hint("Service changed. New sample readings were made for this band."); });
+    $("shPow").addEventListener("change",e=>{ SH.P=clamp(+e.target.value||SH.P,0.001,1000); measureAll(); render(); });
+    $("shMast").addEventListener("change",e=>{ tx().h=clamp(+e.target.value||1,1,600); measureAll(); render(); });
     $("shCal").addEventListener("click",calibrate);
-    $("shReset").addEventListener("click",()=>{ SH.cal=null; render(); });
-    $("shMast").addEventListener("change",e=>{ const T=tx(); T.h=clamp(+e.target.value||1,1,600); if($("txH")&&MP.layer==="bcast") $("txH").value=T.h; if(MP.res) MP.res.clear(); measureAll(); render(); });
+    $("shReset").addEventListener("click",()=>{ SH.cal=null; render(); hint("Calibration undone."); });
     document.querySelectorAll("#shWhat .chip").forEach(b=>b.addEventListener("click",()=>{ SH.what[b.dataset.w]=!SH.what[b.dataset.w]; render(); }));
-    $("shSample").addEventListener("click",()=>{ SH.seed++; buildSample(); SH.view=null; heights(); render(); });
+    $("shSample").addEventListener("click",()=>{ SH.seed++; buildSample(); render(); heights(); hint("New sample walk test made around the station."); });
+    $("shExport").addEventListener("click",exportCSV);
+    $("shClear").addEventListener("click",async()=>{ if(!SH.pts.length) return; if(!await confirmAction("Clear all readings?",`This removes the ${SH.pts.length} readings in the table. The station stays where it is.`,"Clear readings")) return; SH.pts=[]; SH.cal=null; SH.sel=-1; render(); sensors(); });
     $("shFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; const add=parseCSV(await f.text()); e.target.value="";
-      if(!add.length){ toastMsg("No readings found. Use lat, lon, level per line."); return; }
-      SH.pts.push(...add.map(p=>({...p,g:null}))); SH.view=null; toastMsg(`Added ${add.length} uploaded readings.`); heights(); });
-    $("shTable").addEventListener("click",e=>{ const b=e.target.closest("button[data-i]"); if(!b) return; SH.sel=+b.dataset.i; render(); C.scrollIntoView({block:"nearest",behavior:"smooth"}); });
-    $("shCheck").addEventListener("click",()=>{ const p=SH.pts.find(p=>p.name.startsWith("Sensor 2")), g=+$("shGuess").value; if(!p) return;
+      if(!add.length){ hint("No readings found. Each line needs lat, lon, level."); return; }
+      SH.pts.push(...add); SH.view=null; hint(`Added ${add.length} uploaded readings.`); render(); heights(); });
+    $("shTable").addEventListener("click",e=>{ const s=e.target.closest("button[data-sort]"); if(s){ const k=s.dataset.sort; SH.sort=SH.sort&&SH.sort.k===k?{k,dir:-SH.sort.dir}:{k,dir:k==="diff"?-1:1}; renderTable(); return; }
+      const b=e.target.closest("button[data-i]"); if(!b) return; SH.sel=+b.dataset.i; const p=SH.pts[SH.sel]; if(p){ SH.view.lon=p.lon; SH.view.lat=p.lat; } render(); C.scrollIntoView({block:"nearest",behavior:"smooth"}); });
+    $("shSteps").addEventListener("click",e=>{ const b=e.target.closest("button[data-goto]"); if(!b) return; const t=$(b.dataset.goto); if(t){ t.scrollIntoView({block:"start",behavior:"smooth"}); }
+      if(b.dataset.goto==="shSiteH") $("shQ").focus(); });
+    $("shCheck").addEventListener("click",()=>{ const p=SH.pts.find(p=>p.name.startsWith("Sensor 2")), g=+$("shGuess").value; if(!p){ $("shCheckOut").textContent="Make a sample walk test first."; return; }
       const m=pred(p); $("shCheckOut").innerHTML=isFinite(g)&&$("shGuess").value!==""?`Your guess <b>${fx(g)}</b> · model <b>${fx(m)}</b> · measured <b>${fx(p.meas)}</b> dBµV/m. You were ${fx(Math.abs(g-p.meas))} dB from reality; the model was ${fx(Math.abs(m-p.meas))} dB.`:"Type a number first."; });
-    window.addEventListener("resize",()=>{ if(currentTab==="shadow"){ SH.view=null; draw(); } });
+    window.addEventListener("resize",()=>{ if(currentTab==="shadow"){ draw(); scatter(); } });
+    document.addEventListener("keydown",e=>{ if(currentTab!=="shadow"||e.ctrlKey||e.metaKey||e.altKey) return; const t=e.target; if(t&&t.closest&&t.closest("input,textarea,select,dialog")) return; if(document.querySelector("dialog[open]")) return;
+      const k=e.key.toLowerCase(); if(k==="i") setMode("inspect"); else if(k==="l") setMode("site"); else if(k==="0"){ SH.view=null; draw(); } else if(k==="+"||k==="=") zoomAt(1); else if(k==="-") zoomAt(-1); });
     renderMods(); setInterval(tick,3000); }
-  let started=false, txKey="";
-  window.shadowShow=function(){ if(!started){ started=true; bind(); }
-    const T=tx(), k=T.lat.toFixed(4)+","+T.lon.toFixed(4);
-    if(k!==txKey){ txKey=k; SH.gTx=null; buildSample(); SH.view=null; render(); heights().then(()=>{ sensors(); }); feeds(); }
-    else { render(); sensors(); } };
-
+  let started=false;
+  window.shadowShow=function(){ if(!started){ started=true; bind(); const t=mapTx(); SH.site={name:t.name,lat:t.lat,lon:t.lon,h:t.h}; setBand(SH.band); buildSample(); render(); heights(); feeds(); return; }
+    render(); sensors(); };
+  window.shadowMode=setMode;
   if(currentTab==="shadow") window.shadowShow();
 })();
 
@@ -8893,7 +9017,7 @@ init();
     if(tab==="animation"&&(k==="+"||k==="=")){ e.preventDefault(); click("aZoomIn"); return; }
     if(tab==="animation"&&(k==="-"||k==="_")){ e.preventDefault(); click("aZoomOut"); return; }
     if(tab==="shadow"&&(k==="c"||k==="C")){ e.preventDefault(); click("shCal"); return; }
-    if(tab==="shadow"&&(k==="m"||k==="M")){ e.preventDefault(); const a=$("shModeA"), i=$("shModeI"), r=a.checked?i:a; r.checked=true; r.dispatchEvent(new Event("change",{bubbles:true})); return; }
+    if(tab==="shadow"&&(k==="m"||k==="M")){ e.preventDefault(); if(window.shadowMode) shadowMode($("shModeA").checked?"inspect":"add"); return; }
   });
   // leaving the map tab closes the quick box
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{ const q=$("txQuick"); if(q) q.hidden=true; }));
