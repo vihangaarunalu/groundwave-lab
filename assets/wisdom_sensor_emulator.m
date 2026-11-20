@@ -26,6 +26,8 @@ KEY      = '';               % only if the site has a MEASURE_KEY secret
 PERIOD   = 3;                % seconds between uploads
 DURATION = 300;              % total run time in seconds
 SRC      = 'matlab';         % shown on the website as "emulated . matlab"
+USE_CURL = false;            % true = send with Windows curl. Switches on by itself if
+                             % MATLAB's built-in certificates are too old (e.g. R2017a)
 
 %% ---- transmitter the shadow will model (set it to your site) ----
 TX.name   = 'Campus FM test';
@@ -97,11 +99,23 @@ while toc(t0) < DURATION
   end
   body = struct('tx', TX, 'readings', rd);
   try
-    res = webwrite(url, jsonencode(body), opts);
+    res = sendJson(url, jsonencode(body), opts, KEY, USE_CURL);
     sent = sent + numel(rd);
     fprintf('%5.0f s  sent %2d readings  (total stored %d)\n', toc(t0), numel(rd), res.total);
   catch err
-    fprintf(2,'Upload failed: %s\n', err.message);
+    if ~USE_CURL && (~isempty(strfind(err.message,'certificate')) || ~isempty(strfind(err.message,'SSL')) || ~isempty(strfind(err.message,'secure connection')))
+      USE_CURL = true;          % old MATLAB certificate store: use Windows curl instead
+      fprintf('MATLAB''s certificates are out of date; switching to curl.\n');
+      try
+        res = sendJson(url, jsonencode(body), opts, KEY, USE_CURL);
+        sent = sent + numel(rd);
+        fprintf('%5.0f s  sent %2d readings  (total stored %d)\n', toc(t0), numel(rd), res.total);
+      catch err2
+        fprintf(2,'Upload failed (curl): %s\n', err2.message);
+      end
+    else
+      fprintf(2,'Upload failed: %s\n', err.message);
+    end
   end
   pause(PERIOD);
 end
@@ -113,3 +127,25 @@ fprintf('Injected: building/indoor loss %g/%g dB, receiver bias %+g dB, path-los
         BLD_DB, IND_DB, BIAS, N_EXP, -10*N_EXP, SIGMA);
 fprintf('Compare with "What the model learned" in the Digital shadow tab after pressing Calibrate.\n');
 fprintf('A backup of every reading is in wisdom_emulated_log.csv (use Upload CSV if the live link is down).\n');
+
+%% ---- helper: send one JSON batch, with MATLAB's webwrite or with curl ----
+function res = sendJson(url, body, opts, key, useCurl)
+  if ~useCurl
+    res = webwrite(url, body, opts);
+    return
+  end
+  f = [tempname '.json'];
+  fid = fopen(f, 'w'); fwrite(fid, body, 'char'); fclose(fid);
+  hdr = '';
+  if ~isempty(key), hdr = sprintf(' -H "Authorization: Bearer %s"', key); end
+  cmd = sprintf('curl -s -S -X POST -H "Content-Type: application/json"%s --data-binary "@%s" "%s"', hdr, f, url);
+  [status, out] = system(cmd);
+  delete(f);
+  if status ~= 0
+    error('curl failed (%d): %s', status, strtrim(out));
+  end
+  res = jsondecode(out);
+  if isfield(res, 'error')
+    error('server: %s', res.error);
+  end
+end
