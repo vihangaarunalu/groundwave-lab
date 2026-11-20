@@ -24,7 +24,7 @@
  *   POST /api/measure?ch=wisdom-lab1
  *        body {"tx":{...optional station...}, "readings":[{...}, ...]}
  *        or a single reading object
- *        reading: {t, sensor, lat, lon, f_mhz, level, h, built, fixed, src}
+ *        reading: {t, sensor, lat, lon, f_mhz, level, h, built, indoor, fixed, src}
  *          level = field strength in dBµV/m; h = antenna height above ground, m
  *          src   = "matlab" | "scilab" | "octave" | "sdr" | ...
  *        -> {"ok": true, "stored": n, "total": m}
@@ -60,8 +60,9 @@ async function ensureTables(d) {
     d.prepare("CREATE INDEX IF NOT EXISTS readings_ch_id ON readings (ch, id)"),
     d.prepare("CREATE TABLE IF NOT EXISTS stations (ch TEXT PRIMARY KEY, tx TEXT, updated INTEGER)"),
   ]);
+  try { await d.prepare("ALTER TABLE readings ADD COLUMN indoor INTEGER").run(); } catch (e) { /* already there */ }
 }
-const rowOut = (r) => ({ id: r.id, rt: r.rt, t: r.t, sensor: r.sensor, lat: r.lat, lon: r.lon, level: r.level, f_mhz: r.f_mhz, h: r.h, built: !!r.built, fixed: !!r.fixed, src: r.src });
+const rowOut = (r) => ({ id: r.id, rt: r.rt, t: r.t, sensor: r.sensor, lat: r.lat, lon: r.lon, level: r.level, f_mhz: r.f_mhz, h: r.h, built: !!r.built, indoor: !!r.indoor, fixed: !!r.fixed, src: r.src });
 const num = (v, lo, hi) => { const x = Number(v); return Number.isFinite(x) && x >= lo && x <= hi ? x : null; };
 const str = (v, n) => (typeof v === "string" ? v.replace(/[^\w .:+\-·()/]/g, "").slice(0, n) : "");
 
@@ -78,6 +79,7 @@ function cleanReading(r, now) {
     f_mhz: num(r.f_mhz, 0.01, 100000),
     h: num(r.h, 0, 1000) ?? 1.5,
     built: r.built === true || r.built === 1 || r.built === "1",
+    indoor: r.indoor === true || r.indoor === 1 || r.indoor === "1",
     fixed: r.fixed === true || r.fixed === 1 || r.fixed === "1",
     src: str(r.src, 16) || "unknown",
   };
@@ -129,8 +131,8 @@ export async function onRequestPost({ request, env }) {
     const tx = cleanTx(body.tx);
     if (!add.length && !tx) return json({ error: "No valid readings: each needs lat, lon and level (dBµV/m)" }, 400);
     await ensureTables(d);
-    const ins = d.prepare("INSERT INTO readings (ch, rt, t, sensor, lat, lon, level, f_mhz, h, built, fixed, src) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    const ops = add.map((r) => ins.bind(ch, r.rt, r.t, r.sensor, r.lat, r.lon, r.level, r.f_mhz, r.h, r.built ? 1 : 0, r.fixed ? 1 : 0, r.src));
+    const ins = d.prepare("INSERT INTO readings (ch, rt, t, sensor, lat, lon, level, f_mhz, h, built, indoor, fixed, src) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    const ops = add.map((r) => ins.bind(ch, r.rt, r.t, r.sensor, r.lat, r.lon, r.level, r.f_mhz, r.h, r.built ? 1 : 0, r.indoor ? 1 : 0, r.fixed ? 1 : 0, r.src));
     if (tx) ops.push(d.prepare("INSERT INTO stations (ch, tx, updated) VALUES (?, ?, ?) ON CONFLICT(ch) DO UPDATE SET tx = excluded.tx, updated = excluded.updated").bind(ch, JSON.stringify(tx), now));
     if (Math.random() < 0.02) ops.push(d.prepare("DELETE FROM readings WHERE rt < ?").bind(now - TTL * 1000));
     if (ops.length) await d.batch(ops);
