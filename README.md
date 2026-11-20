@@ -121,5 +121,19 @@ MATLAB sensor emulator (software-in-the-loop), later the real SDR sensors.
   `CHANNEL` to the name in the Live link panel, press Connect on the page,
   then Run. It uses an independent model with injected losses and sensor
   errors, and prints what the calibration should recover.
-- Reading format: `{sensor, lat, lon, level (dBµV/m), h, built, fixed, src}`;
+- Reading format: `{sensor, lat, lon, level (dBµV/m), h, built, indoor, fixed, src}`;
   optional `tx: {name, lat, lon, h, f_mhz, erp_kw}` sets the modelled station.
+
+### Digital shadow v9 features
+- Drag the tower, sensors and walk points; add sensors (N) or walk points (M) by clicking.
+- Real buildings from OpenStreetMap (zoom to street level): for every point the path from
+  the tower is checked for buildings (rooftop diffraction, ITU-R P.526 knife edge, two
+  strongest edges) and indoor points get building entry loss (ITU-R P.2109). Click a
+  building to set its real height and construction type (saved in the browser).
+- Calibration learns offset, extra building loss, extra indoor loss and distance trend;
+  optional hold-out (30% of points never used for fitting); saved results with CSV export.
+- Planning mode: moving the tower away from where uploaded/live data were measured shows
+  predictions only, until "Back to the measured station".
+- Saved layouts (station, sensors, walk route) in the browser.
+- MATLAB emulator: exact sensor coordinates (`P_TABLE`), separate indoor flag, and
+  `SYNC_TX` follows the tower when it is dragged on the website while connected.

@@ -1936,6 +1936,20 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .sh-linkrow{align-items:flex-end;gap:var(--sp-3);flex-wrap:wrap}
 .sh-linkrow .field{min-width:220px}
 .sh-linkstat{margin:var(--sp-2) 0 0;font-size:13px;min-height:1.2em}
+
+.sh-bldrow{align-items:center;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-2)}
+.sh-bldrow .hint{margin:0}
+.sh-plan{border:1px solid var(--warn);border-left-width:4px;border-radius:var(--r-sm);padding:8px 12px;margin:0 0 var(--sp-2);font-size:var(--fs-meta);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sh-plan[hidden]{display:none}
+.sh-path{border-top:1px solid var(--line);margin-top:6px;padding-top:6px}
+.sh-path ul{margin:4px 0;padding-left:18px}
+.sh-ptform{display:grid;grid-template-columns:max-content minmax(0,1fr) max-content minmax(0,1fr);gap:6px 10px;align-items:center;margin:8px 0}
+.sh-ptform input,.sh-ptform select{width:100%;min-height:34px}
+@media (max-width:640px){.sh-ptform{grid-template-columns:max-content minmax(0,1fr)}}
+.sh-layout{border-top:1px solid var(--line);margin-top:var(--sp-3);padding-top:var(--sp-3);display:grid;gap:var(--sp-2)}
+.sh-layout select{width:100%}
+.sh-resrow{margin-top:var(--sp-2);gap:6px;flex-wrap:wrap}
+.sh-restab td,.sh-restab th{font-size:12px;padding:4px 6px}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2648,12 +2662,15 @@ body:not(.an-scene) #animation .sc-only{display:none}
       <div class="chart-head"><h2 id="shMapH">Model against reality</h2>
         <div class="seg sh-modes" role="radiogroup" aria-label="Clicking the map will">
           <input type="radio" name="shMode" id="shModeI" value="inspect" checked><label for="shModeI" data-kbd="I" data-tiptext="Inspect a point">Inspect</label>
-          <input type="radio" name="shMode" id="shModeA" value="add"><label for="shModeA" data-kbd="M" data-tiptext="Add a measurement">Add reading</label>
+          <input type="radio" name="shMode" id="shModeA" value="add"><label for="shModeA" data-kbd="M" data-tiptext="Add a walk-test point">Add walk point</label>
+          <input type="radio" name="shMode" id="shModeN" value="addS"><label for="shModeN" data-kbd="N" data-tiptext="Add a fixed sensor">Add sensor</label>
           <input type="radio" name="shMode" id="shModeS" value="site"><label for="shModeS" data-kbd="L" data-tiptext="Move the station">Move station</label>
         </div>
       </div>
       <form class="sh-search" id="shSearch" role="search"><label for="shQ" class="sh-vh">Find a place for the station</label><input type="search" id="shQ" placeholder="Place, or coordinates 6.795, 79.900, or a Google Maps link" autocomplete="off"><button class="btn" type="submit">Search</button></form>
       <ul class="sh-hits" id="shHits" hidden></ul>
+      <div class="row sh-bldrow"><label class="check"><input type="checkbox" id="shBldOn" checked> Real buildings (OpenStreetMap)</label><button class="btn sm" type="button" id="shBldLoad">Load buildings here</button><span class="hint" id="shBldStat" aria-live="polite">Zoom in to street level to load the real buildings.</span></div>
+      <p class="sh-plan" id="shPlan" hidden><b>Planning mode.</b> The tower is not where these measurements were taken, so the dots show predictions only and calibration is paused. <button class="btn sm" type="button" id="shPlanBack">Back to the measured station</button></p>
       <div class="sh-mapwrap"><canvas id="shMap" tabindex="0" aria-label="Map of the station, sensor stations and measurement points, coloured by how well the model matches the measurement. Drag to pan, scroll to zoom."></canvas>
         <div class="sh-zoom"><button class="iconbtn mapbtn" type="button" id="shZin" aria-label="Zoom in" data-kbd="+">+</button><button class="iconbtn mapbtn" type="button" id="shZout" aria-label="Zoom out" data-kbd="−">−</button><button class="iconbtn mapbtn" type="button" id="shFitB" aria-label="Fit all points" data-kbd="0" data-tiptext="Fit all points">⤢</button></div>
         <div class="sh-legend" aria-hidden="true"><span><i class="g"></i>Match &lt; 3 dB</span><span><i class="w"></i>3–6 dB</span><span><i class="b"></i>&gt; 6 dB</span><span><i class="s"></i>Sensor</span></div>
@@ -2674,13 +2691,21 @@ body:not(.an-scene) #animation .sc-only{display:none}
         </div>
         <p class="sh-height" id="shTxHeight"></p>
         <div class="row"><button class="btn sm" type="button" id="shUseMap">Use the Map tab transmitter</button></div>
+        <div class="sh-layout">
+          <div class="field"><label for="shLay">Saved layouts</label><select id="shLay"></select></div>
+          <div class="row"><button class="btn sm" type="button" id="shLayLoad">Load</button><button class="btn sm" type="button" id="shLayDel">Delete</button></div>
+          <div class="field"><label for="shLayName">Save the current station, sensors and walk route as</label><div class="row"><input type="text" id="shLayName" maxlength="40" placeholder="e.g. OUSL campus" style="flex:1;min-width:0"><button class="btn sm" type="button" id="shLaySave">Save</button></div></div>
+        </div>
       </section>
       <section class="panel card" aria-labelledby="shCalH">
         <h2 id="shCalH">Calibrate</h2>
         <div class="tiles" id="shErr"></div>
         <div class="row"><button class="btn primary" id="shCal" type="button" data-kbd="C">Calibrate the model</button><button class="btn" id="shReset" type="button">Undo</button></div>
+        <label class="check"><input type="checkbox" id="shHold"> Keep 30% of the points aside for testing (hold-out)</label>
         <canvas id="shScatter" class="sh-scatter" aria-label="Measured against predicted level for every reading, before and after calibration"></canvas>
         <div class="sh-fit" id="shFit" aria-live="polite"></div>
+        <div class="row sh-resrow"><button class="btn sm" type="button" id="shSave">Save this result</button><button class="btn sm" type="button" id="shResExp">Export results</button><button class="btn sm" type="button" id="shResClr">Clear results</button></div>
+        <div id="shRes"></div>
       </section>
       <section class="panel card" aria-labelledby="shLiveH">
         <h2 id="shLiveH">Live data</h2>
@@ -2724,7 +2749,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
   <section class="panel card" aria-labelledby="shDataH">
     <div class="chart-head"><h2 id="shDataH">Measurements</h2>
       <div class="row"><button class="btn" type="button" id="shSample">New sample walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label><button class="btn" type="button" id="shExport">Export CSV</button><button class="btn" type="button" id="shClear">Clear</button></div></div>
-    <p class="hint">CSV columns: <code>lat, lon, level</code> (dBµV/m), optional <code>built</code> (1 = behind buildings) and <code>height</code> (antenna above ground, m). Sort by clicking a column heading.</p>
+    <p class="hint">CSV columns: <code>lat, lon, level</code> (dBµV/m), then optional <code>built</code> (1 = behind buildings, 0 = clear), <code>height</code> (antenna above ground, m), <code>indoor</code> (1/0) and <code>fixed</code> (1 = fixed sensor). Sort by clicking a column heading.</p>
     <div class="tablewrap"><table class="fs" id="shTable"></table></div>
   </section>
 
@@ -3468,7 +3493,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <section><h3>Everywhere</h3><dl><dt><kbd>1</kbd>–<kbd>9</kbd></dt><dd>Open a tab (Lab … Quiz)</dd><dt><kbd>?</kbd></dt><dd>This list</dd><dt><kbd>G</kbd></dt><dd>Guide to the page you are on</dd><dt><kbd>T</kbd></dt><dd>Light / dark theme</dd><dt><kbd>Esc</kbd></dt><dd>Close a box or dialog</dd></dl></section>
     <section><h3>Map and Cellular</h3><dl><dt><kbd>S</kbd></dt><dd>Transmitter settings, opened beside the transmitter (or right-click a transmitter pin)</dd><dt><kbd>P</kbd></dt><dd>All transmitter settings</dd><dt><kbd>A</kbd></dt><dd>Aim the beam</dd><dt><kbd>Shift</kbd> + <kbd>←</kbd>/<kbd>→</kbd></dt><dd>Turn the beam 5° (<kbd>Alt</kbd> for 1°)</dd><dt><kbd>F2</kbd></dt><dd>Rename the selected pin</dd><dt><kbd>Del</kbd></dt><dd>Delete the selected pin</dd><dt><kbd>F</kbd></dt><dd>Full-screen map</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
     <section><h3>Animation</h3><dl><dt><kbd>Space</kbd></dt><dd>Play / pause</dd><dt><kbd>F</kbd></dt><dd>Full screen</dd><dt><kbd>H</kbd></dt><dd>Hide or show the panels</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
-    <section><h3>Digital shadow</h3><dl><dt><kbd>C</kbd></dt><dd>Calibrate the model</dd><dt><kbd>I</kbd> / <kbd>M</kbd> / <kbd>L</kbd></dt><dd>Map click: inspect / add a reading / move the station</dd><dt><kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd></dt><dd>Zoom in / out / fit all points</dd><dt>Drag, arrow keys</dt><dd>Move the map</dd></dl></section>
+    <section><h3>Digital shadow</h3><dl><dt><kbd>C</kbd></dt><dd>Calibrate the model</dd><dt><kbd>I</kbd> / <kbd>M</kbd> / <kbd>N</kbd> / <kbd>L</kbd></dt><dd>Map click: inspect / add a walk point / add a sensor / move the station</dd><dt><kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd></dt><dd>Zoom in / out / fit all points</dd><dt>Drag, arrow keys</dt><dd>Move the map</dd></dl></section>
   </div>
   <p class="hint">Hover over or tab to a button to see its shortcut. Shortcuts are off while you type in a box.</p>
   <div class="row cfmrow"><button class="btn primary" id="keysClose" type="button">Close</button></div>
@@ -3639,7 +3664,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.9.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v9.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -9120,7 +9145,7 @@ init();
   const BANDS=[["fm","FM radio · 100 MHz",100,10,1],["tv","TV · 600 MHz",600,50,1],["lte9","4G · 900 MHz",900,0.2,0.3],["lte18","4G · 1800 MHz",1800,0.2,0.22],["nr35","5G · 3.5 GHz",3500,0.2,0.15]];
   const SH={band:"fm",f:100,P:10,ds:1,pts:[],sel:-1,cal:null,what:{},gTx:null,view:null,mode:"inspect",tries:0,seed:7,nextId:1,site:null,demOk:null,sort:null};
   const COL={g:"#2E9E5B",w:"#E0A526",b:"#D2453A"};
-  const TRUTH={bias:-3.4, bld:-8.6, slope:-3.2, noise:1.6};   // hidden "reality" behind the sample readings
+  const TRUTH={bias:-3.4, bld:-8.6, ind:-3.5, slope:-3.2, noise:1.6};   // hidden "reality" behind the sample readings
   const near=x=>Math.round(x*10)/10;
   function rng(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
   const gauss=r=>{ let u=0,v=0; while(!u) u=r(); while(!v) v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
@@ -9139,15 +9164,17 @@ init();
     let Lb; try{ Lb=p1812(Math.max(dk,0.25),{f:SH.f,htx:hT,hrx:pt.h,refr:w.humid?"super":"standard"},dk>=0.25?prof:null).Lb50; }catch(e){ Lb=NaN; }
     if(!isFinite(Lb)) Lb=32.44+20*Math.log10(SH.f)+20*Math.log10(dk)+10;
     let E=199.36+20*Math.log10(SH.f/1000)-Lb+10*Math.log10(SH.P*(w.power?2:1));
-    if(w.indoor&&!pt.sensor) E-=p2109(SH.f,0.5,false);
+    if(SH.bld.on&&pt.ana) E-=pt.ana.Lb;                                         // real buildings on the path
+    if(pt.indoor) E-=(pt.ana&&pt.ana.indoor)?pt.ana.indoor.L:p2109(SH.f,0.5,false); // building entry (ITU-R P.2109)
+    if(w.indoor&&!pt.sensor&&!pt.indoor) E-=p2109(SH.f,0.5,false);
     if(w.rain&&SH.f>=1000){ try{ E-=rainLoss(dk,{f:SH.f,storm:"local"}); }catch(e){} }
     return E; }
-  function calTerm(pt){ const c=SH.cal; if(!c) return 0; return c.b[0]+c.b[1]*(pt.built?1:0)+c.b[2]*Math.log10(Math.max(hav(tx(),pt),0.05)); }
+  function calTerm(pt){ const c=SH.cal; if(!c) return 0; return FEAT.reduce((s,f,i)=>s+(c.b[i]||0)*f[1](pt),0); }
   const pred=pt=>model(pt,SH.what)+calTerm(pt);
   const predBase=pt=>model(pt,{})+calTerm(pt);
   const rawModel=p=>model(p,{});
   function truth(pt,r){ const dk=Math.max(hav(tx(),pt),0.05);
-    return model(pt,{})+TRUTH.bias+(pt.built?TRUTH.bld:0)+TRUTH.slope*(Math.log10(dk/SH.ds)-0.6)+TRUTH.noise*gauss(r); }
+    return model(pt,{})+TRUTH.bias+(pt.built?TRUTH.bld:0)+(pt.indoor?TRUTH.ind:0)+TRUTH.slope*(Math.log10(dk/SH.ds)-0.6)+TRUTH.noise*gauss(r); }
   const status=d=>{ const a=Math.abs(d); return a<3?"g":a<6?"w":"b"; };
   const SLBL={g:"Match",w:"Close",b:"Impairment missed"};
 
@@ -9159,29 +9186,94 @@ init();
     for(let i=0;i<14;i++){ const km=(1.4+i*0.82)*k, b=86+18*Math.sin(i*0.9)+(r()-0.5)*10;
       SH.pts.push({id:SH.nextId++,name:"Walk test "+(i+1),...dest(T,km,b),h:1.5,sensor:false,built:r()<0.42,src:"walk",g:null}); }
     measureAll(); }
-  function measureAll(){ SH.pts.forEach(p=>{ if(p.src!=="csv"&&p.src!=="live") p.meas=truth(p,prng(p)); }); }
+  const isReal=p=>p.src==="csv"||p.src==="live";
+  function measureAll(){ SH.pts.forEach(p=>{ if(!isReal(p)) p.meas=truth(p,prng(p)); }); }
+
+  /* ---------- real buildings (OpenStreetMap) and the path from the tower to each point ---------- */
+  SH.bld={list:[],bb:null,loading:false,on:true}; SH.bOver={}; SH.selB=null; SH.ref=null; SH.hold=false; SH.results=[];
+  try{ SH.bOver=JSON.parse(localStorage.getItem("gwlab-shadow-bover")||"{}")||{}; SH.results=JSON.parse(localStorage.getItem("gwlab-shadow-results")||"[]")||[]; }catch(e){}
+  const OVERPASS=["https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+  const bH=b=>{ const o=SH.bOver[b.id]; return o&&isFinite(o.h)?o.h:b.h; };
+  const bType=b=>{ const o=SH.bOver[b.id]; return o&&o.type?o.type:"traditional"; };
+  function bldStat(t){ const el=$("shBldStat"); if(el) el.textContent=t; }
+  let bldTimer=null; function bldSoon(){ clearTimeout(bldTimer); bldTimer=setTimeout(()=>loadBuildings(false),900); }
+  async function loadBuildings(force){
+    if(!SH.bld.on||!C||!SH.view) return; const W=C.clientWidth,H=C.clientHeight; if(!W) return;
+    if(SH.view.z<14.5){ bldStat(SH.bld.list.length?`${SH.bld.list.length} buildings loaded · zoom in to load more`:"Zoom in to street level (+) to load the real buildings here."); return; }
+    const a=U(0,0), b=U(W,H), s=Math.min(a.lat,b.lat), n=Math.max(a.lat,b.lat), w=Math.min(a.lon,b.lon), e=Math.max(a.lon,b.lon), bb=SH.bld.bb;
+    if(!force&&bb&&s>=bb[0]&&n<=bb[2]&&w>=bb[1]&&e<=bb[3]) return;
+    if(SH.bld.loading) return; SH.bld.loading=true; bldStat("Loading buildings from OpenStreetMap…");
+    const ds=(n-s)*0.25, dw=(e-w)*0.25, box=[s-ds,w-dw,n+ds,e+dw];
+    const q=`[out:json][timeout:25];way["building"](${box.map(v=>v.toFixed(5)).join(",")});out tags geom 3000;`;
+    let j=null; for(const ep of OVERPASS){ try{ const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),15000);
+        const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ctl.signal}); clearTimeout(to); if(!r.ok) continue; j=await r.json(); break; }catch(x){} }
+    SH.bld.loading=false;
+    if(!j){ bldStat("The OpenStreetMap building server is busy. Press “Load buildings here” again in a minute."); return; }
+    const seen=new Set(SH.bld.list.map(x=>x.id));
+    (j.elements||[]).forEach(el=>{ if(!el.geometry||el.geometry.length<3) return; const id="w"+el.id; if(seen.has(id)) return; seen.add(id); const t=el.tags||{}, hh=buildingHeight(t);
+      const poly=el.geometry.map(g=>[g.lat,g.lon]); let a0=90,a1=-90,o0=180,o1=-180; poly.forEach(([la,lo])=>{ a0=Math.min(a0,la); a1=Math.max(a1,la); o0=Math.min(o0,lo); o1=Math.max(o1,lo); });
+      SH.bld.list.push({id,name:t.name||(t.building&&t.building!=="yes"?t.building[0].toUpperCase()+t.building.slice(1):"Building"),h:hh.h,est:hh.est,poly,bb:[a0,o0,a1,o1]}); });
+    SH.bld.bb=bb?[Math.min(bb[0],box[0]),Math.min(bb[1],box[1]),Math.max(bb[2],box[2]),Math.max(bb[3],box[3])]:box;
+    bldStat(SH.bld.list.length?`${SH.bld.list.length} buildings from OpenStreetMap${SH.bld.list.some(x=>x.est)?" · heights without data are estimated (click a building to set its real height)":""}`:"No buildings are mapped here in OpenStreetMap.");
+    analyseAll(); measureAll(); render(); }
+  const XY=(lat,lon,o)=>[(lon-o.lon)*Math.cos(toRad(o.lat))*111320,(lat-o.lat)*110540];
+  function inPolyXY(P0,poly){ let c=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const [xi,yi]=poly[i],[xj,yj]=poly[j]; if(((yi>P0[1])!==(yj>P0[1]))&&(P0[0]<(xj-xi)*(P0[1]-yi)/((yj-yi)||1e-12)+xi)) c=!c; } return c; }
+  function segT(A,B,Cc,D){ const r=[B[0]-A[0],B[1]-A[1]], q=[D[0]-Cc[0],D[1]-Cc[1]], den=r[0]*q[1]-r[1]*q[0]; if(Math.abs(den)<1e-9) return null;
+    const w=[Cc[0]-A[0],Cc[1]-A[1]], t=(w[0]*q[1]-w[1]*q[0])/den, u=(w[0]*r[1]-w[1]*r[0])/den; return t>=0&&t<=1&&u>=0&&u<=1?t:null; }
+  function buildingAt(lat,lon){ const o={lat,lon}; for(const b of SH.bld.list){ if(lat<b.bb[0]||lat>b.bb[2]||lon<b.bb[1]||lon>b.bb[3]) continue; if(inPolyXY([0,0],b.poly.map(q=>XY(q[0],q[1],o)))) return b; } return null; }
+  /* Rooftop diffraction for every building the tower–point line crosses (ITU-R P.526 knife edge),
+     the two strongest edges added (a simplified multiple-edge method), and building entry (ITU-R P.2109)
+     when the point is inside a building. Heights: OpenStreetMap height or floors × 3.2 m, editable. */
+  function analysePt(p){
+    const T=tx(); if(!T||!SH.bld.list.length){ p.ana=null; if(p.manB==null&&p.autoFlag) p.built=false; if(p.manI==null&&p.autoFlag) p.indoor=false; return; }
+    const o={lat:T.lat,lon:T.lon}, A=[0,0], B=XY(p.lat,p.lon,o), D=Math.hypot(B[0],B[1]); if(D<2){ p.ana=null; return; }
+    const lam=300/SH.f, gT=SH.gTx??0, gR=p.g??gT, hT=gT+T.h, hR=gR+p.h;
+    const la0=Math.min(T.lat,p.lat)-0.0008, la1=Math.max(T.lat,p.lat)+0.0008, lo0=Math.min(T.lon,p.lon)-0.0008, lo1=Math.max(T.lon,p.lon)+0.0008;
+    let home=null; const edges=[];
+    for(const b of SH.bld.list){ if(b.bb[2]<la0||b.bb[0]>la1||b.bb[3]<lo0||b.bb[1]>lo1) continue;
+      const poly=b.poly.map(q=>XY(q[0],q[1],o));
+      if(!home&&inPolyXY(B,poly)){ home=b; continue; }
+      if(inPolyXY(A,poly)) continue;
+      let t=null; for(let i=0;i<poly.length-1;i++){ const v=segT(A,B,poly[i],poly[i+1]); if(v!==null&&(t===null||v<t)) t=v; }
+      if(t===null) continue; const d1=t*D, d2=D-d1; if(d1<1||d2<1) continue;
+      const top=gT+(gR-gT)*t+bH(b), ray=hT+(hR-hT)*t, ho=top-ray, nu=ho*Math.sqrt(2*D/(lam*d1*d2)), L=nu>-0.78?J(nu):0;
+      edges.push({id:b.id,name:b.name,h:bH(b),fromRx:d2,ho,nu,L,lat:T.lat+(p.lat-T.lat)*t,lon:T.lon+(p.lon-T.lon)*t}); }
+    edges.sort((a,b)=>b.L-a.L);
+    const Lb=Math.min(40,(edges[0]?edges[0].L:0)+(edges[1]?edges[1].L:0));
+    const indoor=home?{id:home.id,name:home.name,type:bType(home),L:p2109(SH.f,0.5,bType(home)==="modern")}:null;
+    p.ana={edges,Lb,los:!edges.some(e=>e.ho>0),indoor}; p.autoFlag=true;
+    if(p.manB==null) p.built=Lb>=3; if(p.manI==null) p.indoor=!!home; }
+  function analyseAll(){ SH.pts.forEach(analysePt); }
+  const sim=p=>!isReal(p);
+  const planning=()=>!!(SH.ref&&SH.pts.some(isReal)&&(hav(SH.ref,tx())>0.005||Math.abs(SH.ref.h-tx().h)>0.5));
 
   /* ---------- ground heights (Copernicus DEM) ---------- */
   async function heights(){ const T=tx(), list=SH.pts.filter(p=>p.g==null);
     let e=null; try{ e=await fetchElev([{lat:T.lat,lon:T.lon},...list.map(p=>({lat:p.lat,lon:p.lon}))]); }catch(x){}
     if(e){ SH.gTx=e[0]??0; list.forEach((p,i)=>{ p.g=e[i+1]??0; }); SH.demOk=true; }
     else { SH.gTx=SH.gTx??0; list.forEach(p=>{ p.g=0; }); SH.demOk=false; }
-    measureAll(); render(); sensors(); }
+    analyseAll(); measureAll(); render(); sensors(); }
 
   /* ---------- calibration: least squares on residual = measured − model ---------- */
+  const FEAT=[["offset",p=>1],["built",p=>p.built?1:0],["indoor",p=>p.indoor?1:0],["trend",p=>Math.log10(Math.max(hav(tx(),p),0.05))]];
+  const isTest=p=>SH.hold&&((Math.imul(p.id,2654435761)>>>0)%10)>=7;
   function calibrate(){
-    const rows=SH.pts.filter(p=>isFinite(p.meas)); if(rows.length<4){ hint("Add at least 4 measurements first, then calibrate."); return; }
-    const X=rows.map(p=>[1,p.built?1:0,Math.log10(Math.max(hav(tx(),p),0.05))]), y=rows.map(p=>p.meas-model(p,{}));
-    const A=[[0,0,0],[0,0,0],[0,0,0]], v=[0,0,0];
-    X.forEach((x,k)=>{ for(let i=0;i<3;i++){ v[i]+=x[i]*y[k]; for(let j=0;j<3;j++) A[i][j]+=x[i]*x[j]; } });
-    for(let i=0;i<3;i++) A[i][i]+=1e-6;
-    let b=solve3(A,v); if(!b||b.some(x=>!isFinite(x))){ const m=y.reduce((s,a)=>s+a,0)/y.length; b=[m,0,0]; }
-    SH.cal={b,n:rows.length}; render(); hint("Calibrated. The dots now compare the measurements with the corrected model."); }
-  function solve3(A,v){ const M=A.map((r,i)=>[...r,v[i]]);
-    for(let c=0;c<3;c++){ let p=c; for(let r=c+1;r<3;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r; [M[c],M[p]]=[M[p],M[c]];
-      if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<3;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<4;k++) M[r][k]-=f*M[c][k]; } }
-    return M.map((r,i)=>r[3]/M[i][i]); }
-  function rms(fn){ const r=SH.pts.filter(p=>isFinite(p.meas)).map(p=>p.meas-fn(p)); if(!r.length) return NaN; return Math.sqrt(r.reduce((s,a)=>s+a*a,0)/r.length); }
+    if(planning()){ hint("Planning mode: the tower is not where these measurements were taken. Press “Back to the measured station” to calibrate."); return; }
+    const all=SH.pts.filter(p=>isFinite(p.meas)), rows=all.filter(p=>!isTest(p)); if(rows.length<4){ hint("Add at least 4 measurements (not counting test points) first, then calibrate."); return; }
+    const y=rows.map(p=>p.meas-model(p,{}));
+    const cols=FEAT.map((f,i)=>i).filter(i=>{ if(i===0) return true; const v=rows.map(p=>FEAT[i][1](p)); return Math.max(...v)-Math.min(...v)>1e-9; });
+    const m=cols.length, A=cols.map(()=>new Array(m).fill(0)), v=new Array(m).fill(0);
+    rows.forEach((p,k)=>{ const x=cols.map(c=>FEAT[c][1](p)); for(let i=0;i<m;i++){ v[i]+=x[i]*y[k]; for(let j=0;j<m;j++) A[i][j]+=x[i]*x[j]; } });
+    for(let i=0;i<m;i++) A[i][i]+=1e-6;
+    let bv=solveN(A,v); const full=[0,0,0,0];
+    if(!bv||bv.some(x=>!isFinite(x))) full[0]=y.reduce((s,a)=>s+a,0)/y.length; else cols.forEach((c,k)=>full[c]=bv[k]);
+    SH.cal={b:full,cols,n:rows.length,nTest:all.length-rows.length}; render(); hint("Calibrated. The dots now compare the measurements with the corrected model."); }
+  function solveN(A,v){ const n=v.length, M=A.map((r,i)=>[...r,v[i]]);
+    for(let c=0;c<n;c++){ let p=c; for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r; [M[c],M[p]]=[M[p],M[c]];
+      if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<n;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; } }
+    return M.map((r,i)=>r[n]/M[i][i]); }
+  const rmsOn=(fn,set)=>set.length?Math.sqrt(set.reduce((s,p)=>s+(p.meas-fn(p))**2,0)/set.length):NaN;
+  function rms(fn){ return rmsOn(fn,SH.pts.filter(p=>isFinite(p.meas))); }
   const hint=t=>{ $("shHint").textContent=t; };
 
   /* ---------- map: tiles, pan, zoom ---------- */
@@ -9193,7 +9285,7 @@ init();
   const P=(lon,lat)=>{ const W=C.clientWidth,H=C.clientHeight,v=SH.view; return [W/2+wx(lon,v.z)-wx(v.lon,v.z),H/2+wy(lat,v.z)-wy(v.lat,v.z)]; };
   const U=(x,y)=>{ const W=C.clientWidth,H=C.clientHeight,v=SH.view; return {lon:ilon(wx(v.lon,v.z)+x-W/2,v.z),lat:ilat(wy(v.lat,v.z)+y-H/2,v.z)}; };
   function zoomAt(dz,x,y){ const W=C.clientWidth,H=C.clientHeight; if(x==null){ x=W/2; y=H/2; } const q=U(x,y);
-    SH.view.z=clamp(SH.view.z+dz,3,18); const [nx,ny]=P(q.lon,q.lat), c=U(W/2+(nx-x),H/2+(ny-y)); SH.view.lon=c.lon; SH.view.lat=c.lat; draw(); }
+    SH.view.z=clamp(SH.view.z+dz,3,19); const [nx,ny]=P(q.lon,q.lat), c=U(W/2+(nx-x),H/2+(ny-y)); SH.view.lon=c.lon; SH.view.lat=c.lat; draw(); bldSoon(); }
   let drawQ=false; const drawSoon=()=>{ if(drawQ) return; drawQ=true; requestAnimationFrame(()=>{ drawQ=false; draw(); }); };
   function draw(){
     if(!C||C.offsetParent===null) return; const W=C.clientWidth,H=C.clientHeight,dpr=window.devicePixelRatio||1;
@@ -9208,11 +9300,19 @@ init();
       TILE.base=keep; $("shAttrib").innerHTML="Map "+prov.attr; }
     if(missing&&SH.tries<60){ SH.tries++; clearTimeout(SH.retry); SH.retry=setTimeout(draw,300); } else if(!missing) SH.tries=0;
     c.fillStyle="rgba(16,44,64,.10)"; c.fillRect(0,0,W,H);
-    const T=tx(), [tX,tY]=P(T.lon,T.lat);
+    const T=tx(), [tX,tY]=P(T.lon,T.lat), selP=SH.pts[SH.sel];
+    if(SH.bld.on&&SH.bld.list.length&&SH.view.z>=13.5){ const vb=[U(0,H).lat,U(0,0).lon,U(0,0).lat,U(W,0).lon];
+      SH.bld.list.forEach(b=>{ if(b.bb[2]<vb[0]||b.bb[0]>vb[2]||b.bb[3]<vb[1]||b.bb[1]>vb[3]) return; const hh=bH(b), sel=SH.selB===b.id||(selP&&selP.ana&&selP.ana.indoor&&selP.ana.indoor.id===b.id), hitE=selP&&selP.ana&&selP.ana.edges.some(e=>e.id===b.id&&e.L>0.5);
+        c.beginPath(); b.poly.forEach((q,i)=>{ const [x,y]=P(q[1],q[0]); i?c.lineTo(x,y):c.moveTo(x,y); }); c.closePath();
+        c.fillStyle=`rgba(${hitE?"226,96,66":"16,44,64"},${clamp(0.18+hh/80,0.2,0.62)})`; c.fill(); c.lineWidth=sel?2.6:1; c.strokeStyle=sel?"#CDF23A":"rgba(16,44,64,.7)"; c.stroke(); }); }
+    if(selP){ const [px,py]=P(selP.lon,selP.lat), a=selP.ana, col=!a?"rgba(16,44,64,.6)":a.los?"#2E9E5B":a.Lb<10?"#E0A526":"#D2453A";
+      c.strokeStyle=col; c.lineWidth=3; c.setLineDash(a?[]:[6,5]); c.beginPath(); c.moveTo(tX,tY); c.lineTo(px,py); c.stroke(); c.setLineDash([]);
+      if(a) a.edges.filter(e=>e.L>0.5).slice(0,3).forEach(e=>{ const [ex,ey]=P(e.lon,e.lat); c.fillStyle="#D2453A"; c.strokeStyle="#fff"; c.lineWidth=2; c.beginPath(); c.arc(ex,ey,5,0,7); c.fill(); c.stroke(); label(c,`${e.name} ${Math.round(e.h)} m · −${e.L.toFixed(0)} dB`,ex+9,ey-8); }); }
     c.setLineDash([4,5]); c.lineWidth=1.4; c.strokeStyle="rgba(16,44,64,.55)";
     SH.pts.filter(p=>p.sensor).forEach(p=>{ const [x,y]=P(p.lon,p.lat); c.beginPath(); c.moveTo(tX,tY); c.lineTo(x,y); c.stroke(); }); c.setLineDash([]);
+    const plan=planning();
     SH.pts.forEach((p,i)=>{ const [x,y]=P(p.lon,p.lat), d=isFinite(p.meas)?p.meas-pred(p):NaN, st=isFinite(d)?status(d):"w", r=p.sensor?9:7;
-      c.lineWidth=i===SH.sel?3.5:2; c.strokeStyle=i===SH.sel?"#102C40":"#fff"; c.fillStyle=COL[st];
+      c.lineWidth=i===SH.sel?3.5:2; c.strokeStyle=i===SH.sel?"#102C40":"#fff"; c.fillStyle=plan&&isReal(p)?"#8A99A8":COL[st];
       c.beginPath(); if(p.sensor) c.rect(x-r,y-r,2*r,2*r); else c.arc(x,y,r,0,7); c.fill(); c.stroke();
       if(p.sensor){ c.strokeStyle="#CDF23A"; c.lineWidth=2; c.strokeRect(x-r-3,y-r-3,2*r+6,2*r+6); label(c,p.name.split(" · ")[0],x+14,y+4); }
       p._x=x; p._y=y; });
@@ -9232,6 +9332,7 @@ init();
   async function search(q){ const ul=$("shHits"); ul.hidden=false; ul.innerHTML=`<li><button type="button" disabled>Searching…</button></li>`;
     let j=[]; try{ j=await geoSearch(q); }catch(e){}
     if(!j.length){ ul.innerHTML=`<li><button type="button" disabled>${esc(GEO_TIP)}</button></li>`; return; }
+    if(j.length===1&&j[0].label==="Coordinates"){ ul.hidden=true; $("shQ").value=""; setSite({lat:j[0].lat,lon:j[0].lon},null); hint("Station placed at those coordinates."); return; }
     ul.innerHTML=j.map((h,i)=>`<li><button type="button" data-h="${i}"><b>${esc(h.name)}</b>${h.label?` · ${esc(h.label)}`:""}</button></li>`).join("");
     ul.querySelectorAll("button[data-h]").forEach(b=>b.addEventListener("click",()=>{ const h=j[+b.dataset.h]; ul.hidden=true; $("shQ").value="";
       setSite({lat:h.lat,lon:h.lon},h.name); hint("Station placed. Sample readings were made around it."); }));
@@ -9241,26 +9342,69 @@ init();
   const fx=v=>isFinite(v)?v.toFixed(1):"—";
   function hLine(g,h,who){ if(g==null) return `${who}: ground height loading…`;
     return `${who}: ground <b>${Math.round(g)} m</b>${SH.demOk===false?" (offline: sea level assumed)":""} + mast <b>${near(h)} m</b> = top <b>${near(Math.round(g)+h)} m</b> above sea level`; }
-  function renderDetail(){ const el=$("shDetail"), p=SH.pts[SH.sel]; if(!p){ el.innerHTML=""; return; }
-    const m=pred(p), d=p.meas-m, st=status(d), dk=hav(tx(),p);
-    const why=!isFinite(d)?"":p.built?"Behind buildings: shadowing loss the open-ground model does not include.":Math.abs(d)>=3?"System loss or local clutter the model does not include.":"Open path; the model matches well.";
-    el.innerHTML=`<h3>${esc(p.name)} <span class="muted">· ${fmtD(dk)} km from the station</span></h3>
-      <div>Model <b>${fx(m)}</b> · measured <b>${fx(p.meas)}</b> dBµV/m · difference <b style="color:${COL[st]}">${d>0?"+":""}${fx(d)} dB</b> (${SLBL[st]})</div>
-      <div class="muted">${why}</div>
+  function renderDetail(){ const el=$("shDetail"), p=SH.pts[SH.sel];
+    if(!p&&SH.selB){ const bd=SH.bld.list.find(x=>x.id===SH.selB); if(!bd){ el.innerHTML=""; return; }
+      el.innerHTML=`<h3>${esc(bd.name)} <span class="muted">· building from OpenStreetMap</span></h3>
+        <div class="muted">${bd.est?"Its height is not in OpenStreetMap, so it is estimated. Type the real height if you know it.":"Height from OpenStreetMap."}</div>
+        <div class="row"><label for="shBH">Height (m)</label><input type="number" id="shBH" min="2" max="300" step="0.5" value="${near(bH(bd))}" style="width:90px">
+          <label for="shBT">Construction</label><select id="shBT"><option value="traditional"${bType(bd)==="traditional"?" selected":""}>Traditional (brick, plain glass)</option><option value="modern"${bType(bd)==="modern"?" selected":""}>Modern energy-efficient (coated glass)</option></select></div>`;
+      const save=()=>{ SH.bOver[bd.id]={h:clamp(+$("shBH").value||bd.h,2,300),type:$("shBT").value}; try{ localStorage.setItem("gwlab-shadow-bover",JSON.stringify(SH.bOver)); }catch(e){} analyseAll(); measureAll(); render(); };
+      $("shBH").addEventListener("change",save); $("shBT").addEventListener("change",save); return; }
+    if(!p){ el.innerHTML=""; return; }
+    const m=pred(p), d=p.meas-m, st=status(d), dk=hav(tx(),p), a=p.ana, plan=planning()&&isReal(p);
+    const why=!isFinite(d)?"":plan?"Measured with the original station: not compared while the tower is moved.":p.indoor?"Indoors: the walls weaken the signal (building entry loss).":p.built?"Behind buildings: their rooftops block part of the signal.":Math.abs(d)>=3?"System loss or local clutter the model does not include.":"Open path; the model matches well.";
+    const path=!SH.bld.list.length?`<p class="muted">Zoom in and load the real buildings to see which ones are in the way.</p>`
+      :!a?`<p class="muted">Point too close to the tower for a path check.</p>`
+      :`<div class="sh-path"><b>Path from the tower:</b> ${a.los?"clear line of sight":"line of sight blocked"} · ${a.edges.length} building${a.edges.length===1?"":"s"} crossed${a.edges.length?":":""}
+        ${a.edges.length?`<ul>${a.edges.slice(0,4).map(e=>`<li>${esc(e.name)}, ${Math.round(e.h)} m tall, ${Math.round(e.fromRx)} m before the point: ${e.ho>0?Math.round(e.ho)+" m above the line of sight":Math.round(-e.ho)+" m below it"} · ν ${e.nu.toFixed(2)} · ${e.L>0.05?"−"+e.L.toFixed(1)+" dB":"no loss"}</li>`).join("")}</ul>`:""}
+        <div>Rooftop diffraction (ITU-R P.526, two strongest edges): <b>−${a.Lb.toFixed(1)} dB</b>${a.indoor?` · inside <b>${esc(a.indoor.name)}</b>: building entry (ITU-R P.2109, ${a.indoor.type}) <b>−${a.indoor.L.toFixed(1)} dB</b>`:""}</div></div>`;
+    const flag=(id,lbl,man,auto)=>`<label for="${id}">${lbl}</label><select id="${id}"><option value="auto"${man==null?" selected":""}>Auto${a?` (${auto?"yes":"no"})`:""}</option><option value="1"${man===true?" selected":""}>Yes</option><option value="0"${man===false?" selected":""}>No</option></select>`;
+    el.innerHTML=`<h3>${esc(p.name)} <span class="muted">· ${fmtD(dk)} km from the station${sim(p)?" · drag it to move":""}</span></h3>
+      <div>${plan?"Prediction":"Model"} <b>${fx(m)}</b>${plan?" dBµV/m":` · measured <b>${fx(p.meas)}</b> dBµV/m · difference <b style="color:${COL[st]}">${d>0?"+":""}${fx(d)} dB</b> (${SLBL[st]})`}</div>
+      <div class="muted">${why}</div>${path}
       <p class="sh-height">${hLine(p.g,p.h,p.sensor?"Sensor":"Receiver")}</p>
-      <div class="row"><label for="shPtH">Antenna above ground (m)</label><input type="number" id="shPtH" min="0.5" max="300" step="0.5" value="${p.h}" style="width:90px">${p.src!=="csv"?`<label class="check"><input type="checkbox" id="shPtB" ${p.built?"checked":""}> Behind buildings</label>`:""}<button class="btn sm" type="button" id="shPtDel">Remove</button></div>`;
-    $("shPtH").addEventListener("change",e=>{ p.h=clamp(+e.target.value||1.5,0.5,300); if(p.src!=="csv") p.meas=truth(p,prng(p)); render(); });
-    const pb=$("shPtB"); if(pb) pb.addEventListener("change",e=>{ p.built=e.target.checked; p.meas=truth(p,prng(p)); render(); });
-    $("shPtDel").addEventListener("click",()=>{ SH.pts.splice(SH.sel,1); SH.sel=-1; render(); }); }
-  function renderErr(){ const before=rms(rawModel), after=SH.cal?rms(predBase):NaN, n=SH.pts.filter(p=>isFinite(p.meas)).length;
+      <div class="sh-ptform">
+        <label for="shPtN">Name</label><input type="text" id="shPtN" value="${esc(p.name)}" maxlength="50">
+        <label for="shPtK">Type</label><select id="shPtK"><option value="s"${p.sensor?" selected":""}>Fixed sensor</option><option value="w"${p.sensor?"":" selected"}>Walk-test point</option></select>
+        <label for="shPtH">Antenna above ground (m)</label><input type="number" id="shPtH" min="0.5" max="300" step="0.5" value="${p.h}">
+        ${p.indoor?`<label for="shPtF">Floor (0 = ground)</label><input type="number" id="shPtF" min="0" max="80" step="1" value="${p.floor??Math.max(0,Math.round((p.h-1.2)/3.2))}">`:""}
+        ${flag("shPtB","Behind buildings",p.manB,a?a.Lb>=3:false)}
+        ${flag("shPtI","Indoors",p.manI,a?!!a.indoor:false)}
+      </div>
+      <div class="row"><button class="btn sm" type="button" id="shPtDel">Remove this point</button></div>`;
+    const changed=()=>{ analysePt(p); if(sim(p)) p.meas=truth(p,prng(p)); render(); };
+    $("shPtN").addEventListener("change",e=>{ p.name=e.target.value.trim()||p.name; render(); });
+    $("shPtK").addEventListener("change",e=>{ p.sensor=e.target.value==="s"; render(); sensors(); });
+    $("shPtH").addEventListener("change",e=>{ p.h=clamp(+e.target.value||1.5,0.5,300); changed(); });
+    const fl=$("shPtF"); if(fl) fl.addEventListener("change",e=>{ p.floor=clamp(Math.round(+e.target.value||0),0,80); p.h=+(p.floor*3.2+1.2).toFixed(1); changed(); });
+    const pick=v=>v==="auto"?null:v==="1";
+    $("shPtB").addEventListener("change",e=>{ p.manB=pick(e.target.value); if(p.manB!=null) p.built=p.manB; changed(); });
+    $("shPtI").addEventListener("change",e=>{ p.manI=pick(e.target.value); if(p.manI!=null) p.indoor=p.manI; changed(); });
+    $("shPtDel").addEventListener("click",()=>{ SH.pts.splice(SH.sel,1); SH.sel=-1; render(); sensors(); }); }
+  function renderErr(){ const all=SH.pts.filter(p=>isFinite(p.meas)), tr=all.filter(p=>!isTest(p)), te=all.filter(isTest), plan=planning();
+    $("shPlan").hidden=!plan;
+    const before=rmsOn(rawModel,tr), after=SH.cal?rmsOn(predBase,tr):NaN, tb=rmsOn(rawModel,te), ta=SH.cal?rmsOn(predBase,te):NaN;
     const cls=v=>!isFinite(v)?"info":v<3?"good":v<6?"warn":"bad";
-    $("shErr").innerHTML=`<div class="tile ${cls(before)}"><span class="k">Error before</span><span class="val">±${fx(before)} dB</span><span class="sub">RMS over ${n} readings</span></div>
-      <div class="tile ${SH.cal?cls(after):"info"}"><span class="k">After calibration</span><span class="val">${SH.cal?"±"+fx(after)+" dB":"—"}</span><span class="sub">${SH.cal?Math.max(0,Math.round(100*(1-after/before)))+"% lower":"press Calibrate"}</span></div>`;
-    const c=SH.cal; $("shFit").innerHTML=c?`<b>What the model learned</b> from ${c.n} readings:<ul>
+    $("shErr").innerHTML=plan?`<div class="tile info"><span class="k">Planning mode</span><span class="val">—</span><span class="sub">errors are shown for the measured station</span></div>`
+      :`<div class="tile ${cls(before)}"><span class="k">Error before</span><span class="val">±${fx(before)} dB</span><span class="sub">RMS over ${tr.length} readings${SH.hold?" (training)":""}</span></div>
+      <div class="tile ${SH.cal?cls(after):"info"}"><span class="k">After calibration</span><span class="val">${SH.cal?"±"+fx(after)+" dB":"—"}</span><span class="sub">${SH.cal?Math.max(0,Math.round(100*(1-after/before)))+"% lower":"press Calibrate"}</span></div>
+      ${SH.hold?`<div class="tile ${SH.cal?cls(ta):"info"}"><span class="k">Test points (not used)</span><span class="val">${SH.cal?"±"+fx(ta)+" dB":"±"+fx(tb)+" dB"}</span><span class="sub">${te.length} points · before ±${fx(tb)} dB</span></div>`:""}`;
+    const c=SH.cal, used=i=>c&&c.cols.includes(i);
+    $("shFit").innerHTML=c?`<b>What the model learned</b> from ${c.n} readings${c.nTest?` (${c.nTest} kept for testing)`:""}:<ul>
       <li>System offset <b>${c.b[0]>0?"+":""}${fx(c.b[0])} dB</b>: real power, cable or antenna losses.</li>
-      <li>Building shadowing <b>${fx(c.b[1])} dB</b> at points behind buildings.</li>
-      <li>Distance trend <b>${fx(c.b[2])} dB</b> per tenfold distance.</li></ul>`:"";
-    $("shReset").disabled=!SH.cal; scatter(); }
+      ${used(1)?`<li>Behind buildings: extra <b>${fx(c.b[1])} dB</b> beyond what the building model predicts.</li>`:""}
+      ${used(2)?`<li>Indoors: extra <b>${fx(c.b[2])} dB</b> beyond the ITU-R P.2109 entry loss.</li>`:""}
+      ${used(3)?`<li>Distance trend <b>${fx(c.b[3])} dB</b> per tenfold distance.</li>`:""}</ul>`:"";
+    $("shReset").disabled=!c; $("shSave").disabled=!c; renderResults(); scatter(); }
+  function renderResults(){ const el=$("shRes"); if(!el) return; const R=SH.results;
+    $("shResExp").disabled=!R.length; $("shResClr").disabled=!R.length;
+    el.innerHTML=R.length?`<div class="tablewrap"><table class="fs sh-restab"><tr><th>#</th><th>Points</th><th>Before</th><th>After</th><th>Test</th><th>Offset</th><th>Bldg</th><th>Indoor</th><th>Trend</th></tr>${R.map((r,i)=>`<tr><td>${i+1}</td><td class="num">${r.n}${r.nTest?"+"+r.nTest:""}</td><td class="num">±${fx(r.before)}</td><td class="num">±${fx(r.after)}</td><td class="num">${isFinite(r.testAfter)?"±"+fx(r.testAfter):"—"}</td><td class="num">${fx(r.b[0])}</td><td class="num">${fx(r.b[1])}</td><td class="num">${fx(r.b[2])}</td><td class="num">${fx(r.b[3])}</td></tr>`).join("")}</table></div>`:""; }
+  function saveResult(){ const c=SH.cal; if(!c) return; const all=SH.pts.filter(p=>isFinite(p.meas)), tr=all.filter(p=>!isTest(p)), te=all.filter(isTest);
+    SH.results.push({at:new Date().toISOString(),station:tx().name,f:SH.f,n:c.n,nTest:c.nTest,before:rmsOn(rawModel,tr),after:rmsOn(predBase,tr),testBefore:rmsOn(rawModel,te),testAfter:c.nTest?rmsOn(predBase,te):NaN,b:c.b.slice(),buildings:SH.bld.list.length});
+    try{ localStorage.setItem("gwlab-shadow-results",JSON.stringify(SH.results)); }catch(e){} renderResults(); hint(`Result ${SH.results.length} saved. Export results to get them all as a CSV file.`); }
+  function exportResults(){ const f=v=>isFinite(v)?v.toFixed(2):"";
+    const lines=["run,time,station,f_MHz,n_train,n_test,rms_before_dB,rms_after_dB,test_rms_before_dB,test_rms_after_dB,offset_dB,building_extra_dB,indoor_extra_dB,trend_dB_per_decade,buildings_loaded"].concat(SH.results.map((r,i)=>[i+1,r.at,`"${String(r.station).replace(/"/g,"'")}"`,r.f,r.n,r.nTest,f(r.before),f(r.after),f(r.testBefore),f(r.testAfter),f(r.b[0]),f(r.b[1]),f(r.b[2]),f(r.b[3]),r.buildings].join(",")));
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-calibration-results.csv"; document.body.appendChild(a); a.click(); a.remove(); }
   function scatter(){ const cv=$("shScatter"); if(!cv||cv.offsetParent===null) return; const W=cv.clientWidth,H=cv.clientHeight,dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr;
     const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
     const rows=SH.pts.filter(p=>isFinite(p.meas)); if(!rows.length) return;
@@ -9280,8 +9424,8 @@ init();
     return idx.sort((a,b)=>{ const x=val(a),y=val(b); return (x>y?1:x<y?-1:0)*s.dir; }); }
   function renderTable(){ const th=(k,t)=>{ const s=SH.sort&&SH.sort.k===k?(SH.sort.dir>0?"ascending":"descending"):"none"; return `<th aria-sort="${s}"><button type="button" data-sort="${k}">${t}</button></th>`; };
     const rows=sortRows().map(i=>{ const p=SH.pts[i], m=pred(p), d=p.meas-m, st=status(d);
-      return `<tr class="${i===SH.sel?"sel":""}"><td><button class="linkish" type="button" data-i="${i}">${esc(p.name)}</button></td><td class="num">${fmtD(hav(tx(),p))}</td><td class="num">${p.g==null?"…":Math.round(p.g)}</td><td class="num">${near(p.h)}</td><td class="num">${fx(m)}</td><td class="num">${fx(p.meas)}</td><td class="num">${d>0?"+":""}${fx(d)}</td><td><span class="st"><i style="background:${COL[st]}"></i>${SLBL[st]}</span></td></tr>`; }).join("");
-    $("shTable").innerHTML=`<caption class="muted" style="text-align:left;caption-side:top;padding-bottom:6px">${SH.pts.length} readings · model ${SH.cal?"calibrated":"not calibrated"}${Object.values(SH.what).some(Boolean)?" · what-if on":""}</caption><tr>${th("name","Point")}${th("dist","Distance (km)")}<th>Ground (m)</th><th>Antenna (m)</th><th>Model (dBµV/m)</th><th>Measured</th>${th("diff","Difference (dB)")}<th>Status</th></tr>`+rows; }
+      return `<tr class="${i===SH.sel?"sel":""}"><td><button class="linkish" type="button" data-i="${i}">${esc(p.name)}</button></td><td class="num">${fmtD(hav(tx(),p))}</td><td class="num">${p.g==null?"…":Math.round(p.g)}</td><td class="num">${near(p.h)}</td><td class="num">${p.ana?"−"+p.ana.Lb.toFixed(1):p.built?"yes":"—"}${p.indoor?" · in":""}</td><td class="num">${fx(m)}</td><td class="num">${fx(p.meas)}</td><td class="num">${d>0?"+":""}${fx(d)}</td><td><span class="st"><i style="background:${COL[st]}"></i>${SLBL[st]}</span></td></tr>`; }).join("");
+    $("shTable").innerHTML=`<caption class="muted" style="text-align:left;caption-side:top;padding-bottom:6px">${SH.pts.length} readings · model ${SH.cal?"calibrated":"not calibrated"}${Object.values(SH.what).some(Boolean)?" · what-if on":""}</caption><tr>${th("name","Point")}${th("dist","Distance (km)")}<th>Ground (m)</th><th>Antenna (m)</th><th>Buildings (dB)</th><th>Model (dBµV/m)</th><th>Measured</th>${th("diff","Difference (dB)")}<th>Status</th></tr>`+rows; }
   function renderWhat(){ const on=Object.keys(SH.what).filter(k=>SH.what[k]);
     document.querySelectorAll("#shWhat .chip").forEach(b=>b.setAttribute("aria-pressed",String(!!SH.what[b.dataset.w])));
     if(!on.length){ $("shWhatNote").textContent=""; return; }
@@ -9317,9 +9461,10 @@ init();
   /* ---------- CSV ---------- */
   function parseCSV(text){ const out=[]; text.split(/\r?\n/).forEach(line=>{ const c=line.split(/[,;\t]/).map(s=>s.trim()); if(c.length<3) return;
       const la=+c[0], lo=+c[1], lv=+c[2]; if(!isFinite(la)||!isFinite(lo)||!isFinite(lv)||Math.abs(la)>90||Math.abs(lo)>180) return;
-      out.push({id:SH.nextId++,name:"Upload "+(out.length+1),lat:la,lon:lo,meas:lv,built:c[3]==="1",h:isFinite(+c[4])&&c[4]!==""?+c[4]:1.5,sensor:false,src:"csv",g:null}); });
+      const fl=v=>v==="1"?true:v==="0"?false:null, mb=fl(c[3]), mi=fl(c[5]);
+      out.push({id:SH.nextId++,name:"Upload "+(out.length+1),lat:la,lon:lo,meas:lv,manB:mb,built:!!mb,manI:mi,indoor:!!mi,h:isFinite(+c[4])&&c[4]!==""?+c[4]:1.5,sensor:c[6]==="1",src:"csv",g:null}); });
     return out; }
-  function exportCSV(){ const lines=["name,lat,lon,ground_m,antenna_m,model_dBuV_m,measured_dBuV_m,difference_dB,built"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,p.lat.toFixed(5),p.lon.toFixed(5),p.g==null?"":Math.round(p.g),p.h,fx(pred(p)),fx(p.meas),fx(p.meas-pred(p)),p.built?1:0].join(",")));
+  function exportCSV(){ const lines=["name,lat,lon,ground_m,antenna_m,fixed,built,indoor,building_loss_dB,entry_loss_dB,model_dBuV_m,measured_dBuV_m,difference_dB"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,p.lat.toFixed(6),p.lon.toFixed(6),p.g==null?"":Math.round(p.g),p.h,p.sensor?1:0,p.built?1:0,p.indoor?1:0,p.ana?p.ana.Lb.toFixed(1):"",p.ana&&p.ana.indoor?p.ana.indoor.L.toFixed(1):"",fx(pred(p)),fx(p.meas),fx(p.meas-pred(p))].join(",")));
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-shadow.csv"; document.body.appendChild(a); a.click(); a.remove(); hint("Exported "+SH.pts.length+" readings as wisdom-shadow.csv."); }
 
   /* ---------- live link: /api/measure (MATLAB emulator now, SDR sensors later) ---------- */
@@ -9330,8 +9475,9 @@ init();
     const live=SH.pts.filter(p=>p.src==="live"), age=LV.last?Math.round((Date.now()-LV.last)/1000):null;
     st.className="pill "+(LV.err?"bad":age!==null&&age<20?"good":"warn"); st.textContent=LV.err?"Problem":age!==null&&age<20?"● Live":"Waiting for data";
     el.textContent=LV.err?LV.err:`Channel ${LV.ch} · ${live.length} points · ${LV.n} readings received${age!==null?` · last ${age} s ago`:" · none yet"}${LV.store==="kv"?" · basic storage (some readings may be lost; connect the D1 database)":LV.store==="d1"?" · database storage":""}`; }
-  function applyTx(tx){ const k=JSON.stringify(tx); if(k===LV.txKey) return; LV.txKey=k;
-    SH.site={name:tx.name||"Transmitter",lat:tx.lat,lon:tx.lon,h:tx.h||30}; SH.gTx=null; SH.view=null;
+  function applyTx(tx){ const k=JSON.stringify(tx); if(k===LV.txKey) return; const first=!LV.txKey; LV.txKey=k;
+    SH.site={name:tx.name||"Transmitter",lat:tx.lat,lon:tx.lon,h:tx.h||30}; SH.gTx=null; if(first) SH.view=null;
+    SH.ref={lat:tx.lat,lon:tx.lon,h:tx.h||30};
     if(tx.f_mhz){ SH.f=tx.f_mhz; const b=BANDS.find(x=>Math.abs(x[2]-tx.f_mhz)<0.01); const sel=$("shBand");
       if(b){ SH.band=b[0]; } else { let o=sel.querySelector('option[value="custom"]'); if(!o){ o=document.createElement("option"); o.value="custom"; sel.appendChild(o); } o.textContent="From data · "+fmtF(tx.f_mhz); SH.band="custom"; } }
     if(tx.erp_kw) SH.P=tx.erp_kw; }
@@ -9339,7 +9485,8 @@ init();
     list.forEach(r=>{ LV.n++; LV.last=Date.now(); let p=SH.pts.find(q=>q.src==="live"&&q.liveKey===r.sensor);
       if(!p){ p={id:SH.nextId++,liveKey:r.sensor,src:"live",g:null}; SH.pts.push(p); added=true; }
       if(p.lat!==r.lat||p.lon!==r.lon) p.g=null;
-      Object.assign(p,{name:`${r.sensor} · ${srcLabel(r.src)}`,origin:r.src,lat:r.lat,lon:r.lon,h:r.h,built:!!r.built,sensor:!!r.fixed,meas:r.level}); });
+      Object.assign(p,{name:`${r.sensor} · ${srcLabel(r.src)}`,origin:r.src,lat:r.lat,lon:r.lon,h:r.h,sensor:!!r.fixed,meas:r.level});
+      if(r.built) { p.manB=true; p.built=true; } if(r.indoor){ p.manI=true; p.indoor=true; } });
     return added; }
   async function poll(){ if(!LV.on) return;
     try{ const r=await fetch(`/api/measure?ch=${encodeURIComponent(LV.ch)}&since=${LV.since}&after=${LV.after}`,{cache:"no-store"}); const j=await r.json().catch(()=>({}));
@@ -9347,7 +9494,7 @@ init();
       if(j.tx) applyTx(j.tx); LV.store=j.store||"";
       const list=(j.readings||[]); if(j.cursor!==undefined) LV.after=j.cursor; if(list.length){ LV.since=Math.max(...list.map(x=>x.rt));
         if($("shReplace").checked&&SH.pts.some(p=>p.src!=="live"&&p.src!=="csv")){ SH.pts=SH.pts.filter(p=>p.src==="live"||p.src==="csv"); SH.cal=null; SH.sel=-1; }
-        const added=takeReadings(list); if(added) SH.view=null; render(); sensors(); if(SH.pts.some(p=>p.g==null)) heights(); }
+        const added=takeReadings(list); if(added&&!SH.view) SH.view=null; analyseAll(); render(); sensors(); if(SH.pts.some(p=>p.g==null)) heights(); }
     }catch(e){ LV.err="Cannot reach the live link (offline?)"; }
     liveStat(); }
   function connect(on){ LV.on=on; clearInterval(LV.timer); LV.err="";
@@ -9357,27 +9504,36 @@ init();
     liveStat(); }
 
   /* ---------- wiring ---------- */
-  function setMode(m){ SH.mode=m; const r=$({inspect:"shModeI",add:"shModeA",site:"shModeS"}[m]); if(r) r.checked=true; C.style.cursor=m==="inspect"?"pointer":"crosshair";
-    hint(m==="add"?"Click the map to add a reading there (simulated measurement).":m==="site"?"Click the map where the station should stand, or drag the tower.":"Drag the tower to move it. Click a dot to see its numbers. Drag the map to pan, scroll to zoom."); }
+  function setMode(m){ SH.mode=m; const r=$({inspect:"shModeI",add:"shModeA",addS:"shModeN",site:"shModeS"}[m]); if(r) r.checked=true; C.style.cursor=m==="inspect"?"pointer":"crosshair";
+    hint(m==="add"?"Click the map to add a walk-test point there (simulated reading).":m==="addS"?"Click the map to place a fixed sensor (e.g. on a rooftop, or inside a building).":m==="site"?"Click the map where the station should stand, or drag the tower.":"Drag the tower, a sensor or a walk point to move it. Click a dot or a building to see its details. Drag the map to pan, scroll to zoom."); }
   function onMapClick(x,y){ const i=hit(x,y), q=U(x,y);
     if(SH.mode==="site"){ setSite(q,null); setMode("inspect"); hint("Station moved. Sample readings were made around it."); return; }
-    if(SH.mode==="add"&&i<0){ const r=rng(Date.now()&0xffff), p={id:SH.nextId++,name:"Student "+(SH.pts.filter(p=>p.src==="click").length+1),...q,h:1.5,sensor:false,built:r()<0.4,src:"click",g:null};
-      SH.pts.push(p); SH.sel=SH.pts.length-1; p.meas=truth(p,prng(p)); render(); heights(); return; }
-    SH.sel=i; render(); }
+    if((SH.mode==="add"||SH.mode==="addS")&&i<0){ const S=SH.mode==="addS", n=SH.pts.filter(p=>p.sensor===S&&p.src==="click").length+1, inB=buildingAt(q.lat,q.lon);
+      const p={id:SH.nextId++,name:S?`Sensor ${n}${inB?" · "+inB.name:""}`:`Walk point ${n}`,...q,h:S?(inB?1.2:15):1.5,floor:S&&inB?0:undefined,sensor:S,built:false,src:"click",g:null};
+      if(!SH.bld.list.length){ const r=rng(Date.now()&0xffff); p.built=r()<0.4; }
+      SH.pts.push(p); SH.sel=SH.pts.length-1; SH.selB=null; analysePt(p); p.meas=truth(p,prng(p)); render(); heights(); sensors(); return; }
+    if(i<0&&SH.bld.list.length){ const b=buildingAt(q.lat,q.lon); SH.sel=-1; SH.selB=b?b.id:null; render(); return; }
+    SH.sel=i; SH.selB=null; render(); }
   function bind(){ C=$("shMap"); ctx=C.getContext("2d");
     $("shBand").innerHTML=BANDS.map(b=>`<option value="${b[0]}">${b[1]}</option>`).join("");
     document.querySelectorAll('input[name="shMode"]').forEach(r=>r.addEventListener("change",e=>setMode(e.target.value)));
     let drag=null;
     const local=e=>{ const b=C.getBoundingClientRect(); return [e.clientX-b.left,e.clientY-b.top]; };
     const onStation=(x,y)=>{ const T=tx(); if(!T||!SH.view) return false; const [sx,sy]=P(T.lon,T.lat); return Math.hypot(x-sx,y-(sy-4))<20; };
-    C.addEventListener("pointerdown",e=>{ const [x,y]=local(e); drag={x:e.clientX,y:e.clientY,lon:SH.view.lon,lat:SH.view.lat,moved:false,site:onStation(x,y)}; C.setPointerCapture(e.pointerId); });
+    C.addEventListener("pointerdown",e=>{ const [x,y]=local(e), site=onStation(x,y), pi=site?-1:hit(x,y);
+      drag={x:e.clientX,y:e.clientY,lon:SH.view.lon,lat:SH.view.lat,moved:false,site,pt:pi>=0?pi:null}; C.setPointerCapture(e.pointerId); });
     C.addEventListener("pointermove",e=>{ const [x,y]=local(e);
-      if(!drag){ C.style.cursor=onStation(x,y)?"grab":SH.mode==="inspect"?"pointer":"crosshair"; return; }
+      if(!drag){ C.style.cursor=onStation(x,y)||(hit(x,y)>=0&&sim(SH.pts[hit(x,y)]))?"grab":SH.mode==="inspect"?"pointer":"crosshair"; return; }
       const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(!drag.moved&&Math.hypot(dx,dy)<5) return; drag.moved=true;
       if(drag.site){ C.style.cursor="grabbing"; const q=U(x,y); SH.site.lat=q.lat; SH.site.lon=q.lon; drawSoon(); return; }
+      if(drag.pt!=null){ const pp=SH.pts[drag.pt]; if(pp&&sim(pp)){ C.style.cursor="grabbing"; const q=U(x,y); pp.lat=q.lat; pp.lon=q.lon; SH.sel=drag.pt; drawSoon(); return; }
+        if(pp&&!drag.warned){ drag.warned=true; hint("Measured points stay where they were measured, so they cannot be dragged."); } }
       C.classList.add("panning"); const z=SH.view.z; SH.view.lon=ilon(wx(drag.lon,z)-dx,z); SH.view.lat=ilat(wy(drag.lat,z)-dy,z); drawSoon(); });
     C.addEventListener("pointerup",e=>{ const d=drag; drag=null; C.classList.remove("panning"); C.style.cursor="";
-      if(d&&d.site&&d.moved){ const T=SH.site; T.name="Station (moved)"; SH.gTx=null; SH.cal=null; measureAll(); render(); heights(); feeds();
+      if(d&&d.pt!=null&&d.moved&&SH.pts[d.pt]&&sim(SH.pts[d.pt])){ const pp=SH.pts[d.pt]; pp.g=null; SH.sel=d.pt; analysePt(pp); pp.meas=truth(pp,prng(pp)); render(); heights(); hint(`${pp.name} moved. Its path, buildings and reading updated.`); return; }
+      if(d&&d.moved&&!d.site&&d.pt==null) bldSoon();
+      if(d&&d.site&&d.moved){ const T=SH.site; T.name="Station (moved)"; SH.gTx=null; SH.cal=null; analyseAll(); measureAll(); render(); heights(); feeds();
+        if(LV.on) fetch(`/api/measure?ch=${encodeURIComponent(LV.ch)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tx:{name:"Station moved on the website",lat:T.lat,lon:T.lon,h:T.h,f_mhz:SH.f,erp_kw:SH.P}})}).catch(()=>{});
         reverseName(T.lat,T.lon).then(nm=>{ if(nm&&SH.site===T){ T.name=nm; renderSite(); draw(); } });
         hint("Station moved. The readings stay where they were measured; the predictions and colours updated. Press Calibrate again."); return; }
       if(!d||d.moved) return; const [x,y]=local(e); onMapClick(x,y); });
@@ -9385,7 +9541,7 @@ init();
     C.addEventListener("wheel",e=>{ e.preventDefault(); const b=C.getBoundingClientRect(); zoomAt(e.deltaY<0?0.5:-0.5,e.clientX-b.left,e.clientY-b.top); },{passive:false});
     C.addEventListener("keydown",e=>{ const s=60, z=SH.view.z; const mv=(dx,dy)=>{ e.preventDefault(); SH.view.lon=ilon(wx(SH.view.lon,z)+dx,z); SH.view.lat=ilat(wy(SH.view.lat,z)+dy,z); draw(); };
       if(e.key==="ArrowLeft") mv(-s,0); if(e.key==="ArrowRight") mv(s,0); if(e.key==="ArrowUp") mv(0,-s); if(e.key==="ArrowDown") mv(0,s); });
-    $("shZin").addEventListener("click",()=>zoomAt(1)); $("shZout").addEventListener("click",()=>zoomAt(-1)); $("shFitB").addEventListener("click",()=>{ SH.view=null; draw(); });
+    $("shZin").addEventListener("click",()=>zoomAt(1)); $("shZout").addEventListener("click",()=>zoomAt(-1)); $("shFitB").addEventListener("click",()=>{ SH.view=null; draw(); bldSoon(); });
     $("shSearch").addEventListener("submit",e=>{ e.preventDefault(); const q=$("shQ").value.trim(); if(q.length>1) search(q); });
     $("shQ").addEventListener("keydown",e=>{ if(e.key==="Escape") $("shHits").hidden=true; });
     $("shUseMap").addEventListener("click",()=>{ const t=mapTx(); SH.site=null; setSite({lat:t.lat,lon:t.lon},t.name); SH.site.h=t.h; render(); });
@@ -9393,14 +9549,30 @@ init();
     $("shPow").addEventListener("change",e=>{ SH.P=clamp(+e.target.value||SH.P,0.001,1000); measureAll(); render(); });
     $("shMast").addEventListener("change",e=>{ tx().h=clamp(+e.target.value||1,1,600); measureAll(); render(); });
     $("shCal").addEventListener("click",calibrate);
+    $("shBldOn").addEventListener("change",e=>{ SH.bld.on=e.target.checked; analyseAll(); measureAll(); render(); if(SH.bld.on) loadBuildings(false); else bldStat("Real buildings are off: the model uses open ground."); });
+    $("shBldLoad").addEventListener("click",()=>{ if(SH.view&&SH.view.z<14.5){ const T=SH.pts[SH.sel]||tx(); SH.view={lon:T.lon,lat:T.lat,z:16}; draw(); } loadBuildings(true); });
+    $("shHold").addEventListener("change",e=>{ SH.hold=e.target.checked; SH.cal=null; render(); hint(SH.hold?"30% of the points are kept aside: calibration never sees them, and the Test tile shows how well it predicts them.":"All points are used for calibration."); });
+    $("shSave").addEventListener("click",saveResult); $("shResExp").addEventListener("click",exportResults);
+    $("shResClr").addEventListener("click",async()=>{ if(!await confirmAction("Clear saved results?",`This removes the ${SH.results.length} saved calibration results.`,"Clear results")) return; SH.results=[]; try{ localStorage.removeItem("gwlab-shadow-results"); }catch(e){} renderResults(); });
+    $("shPlanBack").addEventListener("click",()=>{ const r=SH.ref; if(!r) return; SH.site={...SH.site,lat:r.lat,lon:r.lon,h:r.h}; SH.gTx=null; analyseAll(); measureAll(); render(); heights(); hint("Back at the station where the measurements were taken."); });
+    const LKEY="gwlab-shadow-layouts", lays=()=>{ try{ return JSON.parse(localStorage.getItem(LKEY)||"{}")||{}; }catch(e){ return {}; } };
+    const layList=()=>{ const L=lays(), k=Object.keys(L); $("shLay").innerHTML=k.length?k.map(n=>`<option>${esc(n)}</option>`).join(""):`<option value="">No saved layouts yet</option>`; $("shLayLoad").disabled=$("shLayDel").disabled=!k.length; };
+    $("shLaySave").addEventListener("click",()=>{ const n=$("shLayName").value.trim(); if(!n){ $("shLayName").focus(); hint("Type a name for the layout first."); return; } const L=lays();
+      L[n]={site:{...tx()},band:SH.band,f:SH.f,P:SH.P,view:SH.view,pts:SH.pts.map(p=>({name:p.name,lat:p.lat,lon:p.lon,h:p.h,floor:p.floor,sensor:p.sensor,src:p.src==="csv"?"csv":"click",meas:p.src==="csv"?p.meas:undefined,manB:p.manB,manI:p.manI,built:p.built,indoor:p.indoor}))};
+      try{ localStorage.setItem(LKEY,JSON.stringify(L)); }catch(e){ hint("Could not save in this browser."); return; } layList(); $("shLay").value=n; $("shLayName").value=""; hint(`Layout “${n}” saved in this browser.`); });
+    $("shLayLoad").addEventListener("click",()=>{ const n=$("shLay").value, l=lays()[n]; if(!l) return;
+      SH.site={...l.site}; SH.band=l.band; SH.f=l.f; SH.P=l.P; SH.gTx=null; SH.cal=null; SH.sel=-1; SH.selB=null; SH.ref=l.pts.some(p=>p.src==="csv")?{lat:l.site.lat,lon:l.site.lon,h:l.site.h}:null;
+      SH.pts=l.pts.map(p=>({...p,id:SH.nextId++,g:null})); SH.view=l.view||null; analyseAll(); measureAll(); render(); heights(); feeds(); sensors(); loadBuildings(false); hint(`Layout “${n}” loaded.`); });
+    $("shLayDel").addEventListener("click",async()=>{ const n=$("shLay").value; if(!n) return; if(!await confirmAction("Delete this layout?",`The saved layout “${n}” will be removed from this browser.`,"Delete layout")) return; const L=lays(); delete L[n]; try{ localStorage.setItem(LKEY,JSON.stringify(L)); }catch(e){} layList(); });
+    layList();
     $("shReset").addEventListener("click",()=>{ SH.cal=null; render(); hint("Calibration undone."); });
     document.querySelectorAll("#shWhat .chip").forEach(b=>b.addEventListener("click",()=>{ SH.what[b.dataset.w]=!SH.what[b.dataset.w]; render(); }));
     $("shSample").addEventListener("click",()=>{ SH.seed++; buildSample(); render(); heights(); hint("New sample walk test made around the station."); });
     $("shExport").addEventListener("click",exportCSV);
-    $("shClear").addEventListener("click",async()=>{ if(!SH.pts.length) return; if(!await confirmAction("Clear all readings?",`This removes the ${SH.pts.length} readings in the table. The station stays where it is.`,"Clear readings")) return; SH.pts=[]; SH.cal=null; SH.sel=-1; render(); sensors(); });
+    $("shClear").addEventListener("click",async()=>{ if(!SH.pts.length) return; if(!await confirmAction("Clear all readings?",`This removes the ${SH.pts.length} readings in the table. The station stays where it is.`,"Clear readings")) return; SH.pts=[]; SH.ref=null; SH.cal=null; SH.sel=-1; render(); sensors(); });
     $("shFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; const add=parseCSV(await f.text()); e.target.value="";
       if(!add.length){ hint("No readings found. Each line needs lat, lon, level."); return; }
-      SH.pts.push(...add); SH.view=null; hint(`Added ${add.length} uploaded readings.`); render(); heights(); });
+      SH.pts.push(...add); if(!SH.ref) SH.ref={lat:tx().lat,lon:tx().lon,h:tx().h}; SH.view=null; hint(`Added ${add.length} uploaded readings. They belong to the station shown now; moving the tower later switches to planning mode.`); analyseAll(); render(); heights(); });
     $("shTable").addEventListener("click",e=>{ const s=e.target.closest("button[data-sort]"); if(s){ const k=s.dataset.sort; SH.sort=SH.sort&&SH.sort.k===k?{k,dir:-SH.sort.dir}:{k,dir:k==="diff"?-1:1}; renderTable(); return; }
       const b=e.target.closest("button[data-i]"); if(!b) return; SH.sel=+b.dataset.i; const p=SH.pts[SH.sel]; if(p){ SH.view.lon=p.lon; SH.view.lat=p.lat; } render(); C.scrollIntoView({block:"nearest",behavior:"smooth"}); });
     $("shSteps").addEventListener("click",e=>{ const b=e.target.closest("button[data-goto]"); if(!b) return; const t=$(b.dataset.goto); if(t){ t.scrollIntoView({block:"start",behavior:"smooth"}); }
@@ -9409,7 +9581,7 @@ init();
       const m=pred(p); $("shCheckOut").innerHTML=isFinite(g)&&$("shGuess").value!==""?`Your guess <b>${fx(g)}</b> · model <b>${fx(m)}</b> · measured <b>${fx(p.meas)}</b> dBµV/m. You were ${fx(Math.abs(g-p.meas))} dB from reality; the model was ${fx(Math.abs(m-p.meas))} dB.`:"Type a number first."; });
     window.addEventListener("resize",()=>{ if(currentTab==="shadow"){ draw(); scatter(); } });
     document.addEventListener("keydown",e=>{ if(currentTab!=="shadow"||e.ctrlKey||e.metaKey||e.altKey) return; const t=e.target; if(t&&t.closest&&t.closest("input,textarea,select,dialog")) return; if(document.querySelector("dialog[open]")) return;
-      const k=e.key.toLowerCase(); if(k==="i") setMode("inspect"); else if(k==="l") setMode("site"); else if(k==="0"){ SH.view=null; draw(); } else if(k==="+"||k==="=") zoomAt(1); else if(k==="-") zoomAt(-1); });
+      const k=e.key.toLowerCase(); if(k==="i") setMode("inspect"); else if(k==="l") setMode("site"); else if(k==="n") setMode("addS"); else if(k==="0"){ SH.view=null; draw(); } else if(k==="+"||k==="=") zoomAt(1); else if(k==="-") zoomAt(-1); });
     renderMods(); setInterval(tick,3000);
     { let ch=""; try{ ch=localStorage.getItem("gwlab-live-ch")||""; }catch(e){} if(!ch) ch="wisdom-"+Math.random().toString(36).slice(2,6);
       $("shCh").value=ch; $("shChEcho").textContent=ch; $("shCh").addEventListener("input",e=>$("shChEcho").textContent=e.target.value.trim().toLowerCase()); }
