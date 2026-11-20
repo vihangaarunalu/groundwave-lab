@@ -2455,7 +2455,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
   <div class="maptools">
     <form class="mapsearch" id="mapSearch" role="search">
       <label for="mapQ" class="searchlbl">Find a place</label>
-      <input type="search" id="mapQ" placeholder="e.g. Kandy, Galle Face, University of Peradeniya" autocomplete="off">
+      <input type="search" id="mapQ" placeholder="Place, or 6.795, 79.900, or a Google Maps link" autocomplete="off">
       <button class="btn primary" type="submit">Search</button>
       <ul class="hits" id="mapHits" role="listbox" hidden></ul>
     </form>
@@ -2652,7 +2652,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
           <input type="radio" name="shMode" id="shModeS" value="site"><label for="shModeS" data-kbd="L" data-tiptext="Move the station">Move station</label>
         </div>
       </div>
-      <form class="sh-search" id="shSearch" role="search"><label for="shQ" class="sh-vh">Find a place for the station</label><input type="search" id="shQ" placeholder="Search a place, e.g. University of Moratuwa" autocomplete="off"><button class="btn" type="submit">Search</button></form>
+      <form class="sh-search" id="shSearch" role="search"><label for="shQ" class="sh-vh">Find a place for the station</label><input type="search" id="shQ" placeholder="Place, or coordinates 6.795, 79.900, or a Google Maps link" autocomplete="off"><button class="btn" type="submit">Search</button></form>
       <ul class="sh-hits" id="shHits" hidden></ul>
       <div class="sh-mapwrap"><canvas id="shMap" tabindex="0" aria-label="Map of the station, sensor stations and measurement points, coloured by how well the model matches the measurement. Drag to pan, scroll to zoom."></canvas>
         <div class="sh-zoom"><button class="iconbtn mapbtn" type="button" id="shZin" aria-label="Zoom in" data-kbd="+">+</button><button class="iconbtn mapbtn" type="button" id="shZout" aria-label="Zoom out" data-kbd="−">−</button><button class="iconbtn mapbtn" type="button" id="shFitB" aria-label="Fit all points" data-kbd="0" data-tiptext="Fit all points">⤢</button></div>
@@ -3639,7 +3639,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.9.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.9.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -6966,17 +6966,40 @@ const MODE_HINT={addtx:()=>MP.layer==="mobile"?"Click the map to place a new tow
   tx:()=>MP.layer==="mobile"?"Click the map to move the selected tower.":"Click the map to move the selected transmitter.", rx:()=>"Click the map to move the selected "+(MP.layer==="mobile"?"test point.":"receiver."),
   me:()=>"Click your home on the map.", del:()=>"Click a pin to remove it.",
   select:()=>"Click a pin to select it, drag to pan, scroll to zoom. Nothing is placed until you choose a button above."};
-/* ---------- place search (OpenStreetMap Nominatim, max 1 request per second) ---------- */
+/* ---------- place search ----------
+   1. coordinates or a Google Maps link go straight there;
+   2. OpenStreetMap Nominatim, Sri Lanka first (exact names);
+   3. Photon (typo-tolerant, partial names), biased to Sri Lanka;
+   4. Nominatim worldwide. Results are merged and de-duplicated. */
+const GEO_LK={lat:7.8,lon:80.7,box:"79.4,5.8,82.1,10.0"};
+function parseCoords(q){
+  const t=decodeURIComponent(q).trim();
+  let m=t.match(/@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/)||t.match(/[?&](?:q|ll|query)=(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/)||t.match(/^\s*(-?\d{1,2}(?:\.\d+)?)\s*[,; ]\s*(-?\d{1,3}(?:\.\d+)?)\s*$/);
+  if(!m) return null; const lat=+m[1], lon=+m[2]; if(!(Math.abs(lat)<=90&&Math.abs(lon)<=180)) return null;
+  return {name:`${lat.toFixed(5)}, ${lon.toFixed(5)}`,label:"Coordinates",lat,lon}; }
+async function geoSearch(q){
+  const c=parseCoords(q); if(c) return [c];
+  const out=[], seen=new Set(), push=h=>{ const k=h.lat.toFixed(3)+","+h.lon.toFixed(3)+"|"+h.name.toLowerCase(); if(seen.has(k)) return; seen.add(k); out.push(h); };
+  const nom=async extra=>{ try{ const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&accept-language=en&q=${encodeURIComponent(q)}${extra}`,{headers:{"Accept":"application/json"}}); const j=await r.json();
+      j.forEach(h=>push({name:h.name||h.display_name.split(",")[0],label:h.display_name.split(",").slice(1,4).join(",").trim(),lat:+h.lat,lon:+h.lon})); }catch(e){} };
+  const pho=async extra=>{ try{ const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&lang=en${extra}`); const j=await r.json();
+      (j.features||[]).forEach(f=>{ const p=f.properties||{}, g=f.geometry&&f.geometry.coordinates; if(!g) return; push({name:p.name||p.street||p.city||q,label:[p.street&&p.name?p.street:"",p.city||p.town||p.village||p.district,p.county||p.state,p.country].filter(Boolean).join(", "),lat:+g[1],lon:+g[0]}); }); }catch(e){} };
+  await nom("&countrycodes=lk");
+  if(out.length<3) await pho(`&lat=${GEO_LK.lat}&lon=${GEO_LK.lon}&bbox=${GEO_LK.box}`);
+  if(!out.length) await pho(`&lat=${GEO_LK.lat}&lon=${GEO_LK.lon}`);
+  if(!out.length) await nom("");
+  return out.slice(0,10);
+}
+const GEO_TIP="Not found. Try the nearest town, an English spelling (e.g. “Katubedda”, “Moratuwa”), paste coordinates like 6.795, 79.900 or a Google Maps link, or click the place on the map.";
 async function placeSearch(q){
   const hits=$("mapHits"); hits.hidden=false; hits.innerHTML=`<li class="muted">Searching…</li>`;
-  try{ const v=MP.view||{lat:7.8,lon:80.7};
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=en&q=${encodeURIComponent(q)}&viewbox=${v.lon-3},${v.lat+3},${v.lon+3},${v.lat-3}`,{headers:{"Accept":"application/json"}});
-    const j=await r.json();
-    if(!j.length){ hits.innerHTML=`<li class="muted">No places found for “${esc(q)}”.</li>`; return; }
-    hits.innerHTML=j.map((h,i)=>`<li role="option" tabindex="0" data-i="${i}"><b>${esc(h.name||h.display_name.split(",")[0])}</b><span class="muted">${esc(h.display_name.split(",").slice(1,4).join(","))}</span></li>`).join("");
-    hits.querySelectorAll("li[data-i]").forEach(li=>{ const pick=()=>{ const h=j[+li.dataset.i]; showSearchPt({lat:+h.lat,lon:+h.lon,name:h.name||h.display_name.split(",")[0]}); hits.hidden=true; };
+  try{ const j=await geoSearch(q);
+    if(!j.length){ hits.innerHTML=`<li class="muted">${esc(GEO_TIP)}</li>`; return; }
+    hits.innerHTML=j.map((h,i)=>`<li role="option" tabindex="0" data-i="${i}"><b>${esc(h.name)}</b><span class="muted">${esc(h.label||"")}</span></li>`).join("");
+    hits.querySelectorAll("li[data-i]").forEach(li=>{ const pick=()=>{ const h=j[+li.dataset.i]; showSearchPt({lat:h.lat,lon:h.lon,name:h.name}); hits.hidden=true; };
       li.addEventListener("click",pick); li.addEventListener("keydown",e=>{ if(e.key==="Enter") pick(); }); });
-  }catch(e){ hits.innerHTML=`<li class="muted">Search is unavailable right now (offline, or the free OpenStreetMap search is busy).</li>`; }
+    if(j.length===1&&j[0].label==="Coordinates"){ showSearchPt(j[0]); hits.hidden=true; }
+  }catch(e){ hits.innerHTML=`<li class="muted">Search is unavailable right now (offline, or the free map search is busy). You can still paste coordinates or click the map.</li>`; }
 }
 function showSearchPt(pt){ MP.searchPt=pt; MP.view={lon:pt.lon,lat:pt.lat,z:Math.max(MP.view?MP.view.z:10,13)}; drawMap();
   const a=$("searchAct"), mob=MP.layer==="mobile"; a.hidden=false;
@@ -9207,13 +9230,12 @@ init();
     render(); heights(); feeds(); if(!name) reverseName(q.lat,q.lon).then(nm=>{ if(nm&&SH.site.lat===q.lat){ SH.site.name=nm; renderSite(); draw(); } }); }
   function setBand(k){ const b=BANDS.find(x=>x[0]===k)||BANDS[0]; SH.band=b[0]; SH.f=b[2]; SH.P=b[3]; SH.ds=b[4]; }
   async function search(q){ const ul=$("shHits"); ul.hidden=false; ul.innerHTML=`<li><button type="button" disabled>Searching…</button></li>`;
-    try{ const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=en&q=${encodeURIComponent(q)}`); const j=await r.json();
-      if(!j.length){ ul.innerHTML=`<li><button type="button" disabled>No places found. Try another name, or click the map in “Move station”.</button></li>`; return; }
-      ul.innerHTML=j.map((h,i)=>`<li><button type="button" data-h="${i}">${esc(h.display_name)}</button></li>`).join("");
-      ul.querySelectorAll("button[data-h]").forEach(b=>b.addEventListener("click",()=>{ const h=j[+b.dataset.h]; ul.hidden=true; $("shQ").value="";
-        setSite({lat:+h.lat,lon:+h.lon},h.name||h.display_name.split(",")[0]); hint("Station placed. Sample readings were made around it."); }));
-      ul.querySelector("button[data-h]").focus();
-    }catch(e){ ul.innerHTML=`<li><button type="button" disabled>Search is unavailable right now. Choose “Move station” and click the map instead.</button></li>`; } }
+    let j=[]; try{ j=await geoSearch(q); }catch(e){}
+    if(!j.length){ ul.innerHTML=`<li><button type="button" disabled>${esc(GEO_TIP)}</button></li>`; return; }
+    ul.innerHTML=j.map((h,i)=>`<li><button type="button" data-h="${i}"><b>${esc(h.name)}</b>${h.label?` · ${esc(h.label)}`:""}</button></li>`).join("");
+    ul.querySelectorAll("button[data-h]").forEach(b=>b.addEventListener("click",()=>{ const h=j[+b.dataset.h]; ul.hidden=true; $("shQ").value="";
+      setSite({lat:h.lat,lon:h.lon},h.name); hint("Station placed. Sample readings were made around it."); }));
+    ul.querySelector("button[data-h]").focus(); }
 
   /* ---------- panels ---------- */
   const fx=v=>isFinite(v)?v.toFixed(1):"—";
