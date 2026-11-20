@@ -6,9 +6,16 @@
  * Octave sensor emulator (software-in-the-loop), later the real SDR
  * sensor stations. The page polls the same channel and shows the readings.
  *
- * Storage: the KV namespace bound as VISITS (the same one the feedback
- * inbox uses), or a separate one bound as MEASURE if you add it.
- *   Pages project → Settings → Bindings → KV namespace → VISITS
+ * Storage (recommended): a D1 database bound as MEASURE_DB. It is strongly
+ * consistent, so no reading is lost when uploads reach different
+ * Cloudflare locations. Tables are created automatically.
+ *   Workers & Pages → D1 → Create database "groundwave-measure", then
+ *   Pages project → Settings → Bindings → Add → D1 database
+ *     Variable name: MEASURE_DB   Database: groundwave-measure
+ *   and retry the latest deployment.
+ * Fallback: the KV namespace bound as VISITS. KV is eventually consistent,
+ * so with KV some readings can be overwritten when two uploads land in
+ * different locations; use D1 for experiments.
  *
  * A "channel" is a name both sides agree on, e.g. "wisdom-lab1".
  * Optional: set a secret MEASURE_KEY (Settings → Variables and Secrets);
@@ -46,6 +53,15 @@ const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
 });
 
 const kv = (env) => env.MEASURE || env.VISITS || null;
+const db = (env) => env.MEASURE_DB || null;
+async function ensureTables(d) {
+  await d.batch([
+    d.prepare("CREATE TABLE IF NOT EXISTS readings (id INTEGER PRIMARY KEY AUTOINCREMENT, ch TEXT NOT NULL, rt INTEGER, t INTEGER, sensor TEXT, lat REAL, lon REAL, level REAL, f_mhz REAL, h REAL, built INTEGER, fixed INTEGER, src TEXT)"),
+    d.prepare("CREATE INDEX IF NOT EXISTS readings_ch_id ON readings (ch, id)"),
+    d.prepare("CREATE TABLE IF NOT EXISTS stations (ch TEXT PRIMARY KEY, tx TEXT, updated INTEGER)"),
+  ]);
+}
+const rowOut = (r) => ({ id: r.id, rt: r.rt, t: r.t, sensor: r.sensor, lat: r.lat, lon: r.lon, level: r.level, f_mhz: r.f_mhz, h: r.h, built: !!r.built, fixed: !!r.fixed, src: r.src });
 const num = (v, lo, hi) => { const x = Number(v); return Number.isFinite(x) && x >= lo && x <= hi ? x : null; };
 const str = (v, n) => (typeof v === "string" ? v.replace(/[^\w .:+\-·()/]/g, "").slice(0, n) : "");
 
@@ -84,15 +100,24 @@ async function load(store, ch) { try { return JSON.parse((await store.get("ms:" 
 export async function onRequestOptions() { return json({ ok: true }); }
 
 export async function onRequestGet({ request, env }) {
+  const d = db(env);
+  if (d) {
+    const ch = channel(request); if (!ch) return json({ error: "Give a channel name: 3–40 lowercase letters, digits or dashes" }, 400);
+    await ensureTables(d);
+    const after = Number(new URL(request.url).searchParams.get("after")) || 0;
+    const rows = (await d.prepare("SELECT * FROM readings WHERE ch = ? AND id > ? ORDER BY id LIMIT 2000").bind(ch, after).all()).results || [];
+    const st = await d.prepare("SELECT tx FROM stations WHERE ch = ?").bind(ch).first();
+    return json({ readings: rows.map(rowOut), tx: st ? JSON.parse(st.tx) : null, cursor: rows.length ? rows[rows.length - 1].id : after, store: "d1", now: Date.now() });
+  }
   const store = kv(env); if (!store) return json({ error: "Storage is not switched on (KV binding VISITS)" }, 503);
   const ch = channel(request); if (!ch) return json({ error: "Give a channel name: 3–40 lowercase letters, digits or dashes" }, 400);
   const since = Number(new URL(request.url).searchParams.get("since")) || 0;
   const data = await load(store, ch);
-  return json({ readings: data.r.filter((x) => x.rt > since), tx: data.tx, now: Date.now() });
+  return json({ readings: data.r.filter((x) => x.rt > since), tx: data.tx, store: "kv", now: Date.now() });
 }
 
 export async function onRequestPost({ request, env }) {
-  const store = kv(env); if (!store) return json({ error: "Storage is not switched on (KV binding VISITS)" }, 503);
+  const store = kv(env), d = db(env); if (!store && !d) return json({ error: "Storage is not switched on (D1 binding MEASURE_DB, or KV binding VISITS)" }, 503);
   const ch = channel(request); if (!ch) return json({ error: "Give a channel name: 3–40 lowercase letters, digits or dashes" }, 400);
   if (!allowed(request, env)) return json({ error: "Wrong or missing key" }, 401);
   let body; try { const text = await request.text(); if (text.length > 200000) return json({ error: "too large" }, 413); body = JSON.parse(text); } catch (e) { return json({ error: "expected JSON" }, 400); }
@@ -100,18 +125,31 @@ export async function onRequestPost({ request, env }) {
     : body.readings && typeof body.readings === "object" ? [body.readings]   // MATLAB encodes a 1-element struct array as an object
     : body.readings !== undefined ? [] : [body];
   const add = list.slice(0, MAX_POST).map((r) => cleanReading(r, now)).filter(Boolean);
+  if (d) {
+    const tx = cleanTx(body.tx);
+    if (!add.length && !tx) return json({ error: "No valid readings: each needs lat, lon and level (dBµV/m)" }, 400);
+    await ensureTables(d);
+    const ins = d.prepare("INSERT INTO readings (ch, rt, t, sensor, lat, lon, level, f_mhz, h, built, fixed, src) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    const ops = add.map((r) => ins.bind(ch, r.rt, r.t, r.sensor, r.lat, r.lon, r.level, r.f_mhz, r.h, r.built ? 1 : 0, r.fixed ? 1 : 0, r.src));
+    if (tx) ops.push(d.prepare("INSERT INTO stations (ch, tx, updated) VALUES (?, ?, ?) ON CONFLICT(ch) DO UPDATE SET tx = excluded.tx, updated = excluded.updated").bind(ch, JSON.stringify(tx), now));
+    if (Math.random() < 0.02) ops.push(d.prepare("DELETE FROM readings WHERE rt < ?").bind(now - TTL * 1000));
+    if (ops.length) await d.batch(ops);
+    const c = await d.prepare("SELECT COUNT(*) AS n FROM readings WHERE ch = ?").bind(ch).first();
+    return json({ ok: true, stored: add.length, total: c ? c.n : add.length, store: "d1" });
+  }
   const data = await load(store, ch);
   const tx = cleanTx(body.tx); if (tx) data.tx = tx;
   if (!add.length && !tx) return json({ error: "No valid readings: each needs lat, lon and level (dBµV/m)" }, 400);
   data.r = data.r.concat(add).slice(-MAX_KEEP);
   await store.put("ms:" + ch, JSON.stringify(data), { expirationTtl: TTL });
-  return json({ ok: true, stored: add.length, total: data.r.length });
+  return json({ ok: true, stored: add.length, total: data.r.length, store: "kv" });
 }
 
 export async function onRequestDelete({ request, env }) {
-  const store = kv(env); if (!store) return json({ error: "Storage is not switched on (KV binding VISITS)" }, 503);
+  const store = kv(env), d = db(env); if (!store && !d) return json({ error: "Storage is not switched on" }, 503);
   const ch = channel(request); if (!ch) return json({ error: "bad channel" }, 400);
   if (!allowed(request, env)) return json({ error: "Wrong or missing key" }, 401);
+  if (d) { await ensureTables(d); await d.batch([d.prepare("DELETE FROM readings WHERE ch = ?").bind(ch), d.prepare("DELETE FROM stations WHERE ch = ?").bind(ch)]); return json({ ok: true }); }
   await store.delete("ms:" + ch);
   return json({ ok: true });
 }
