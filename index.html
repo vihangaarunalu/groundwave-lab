@@ -2658,7 +2658,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
         <div class="sh-zoom"><button class="iconbtn mapbtn" type="button" id="shZin" aria-label="Zoom in" data-kbd="+">+</button><button class="iconbtn mapbtn" type="button" id="shZout" aria-label="Zoom out" data-kbd="−">−</button><button class="iconbtn mapbtn" type="button" id="shFitB" aria-label="Fit all points" data-kbd="0" data-tiptext="Fit all points">⤢</button></div>
         <div class="sh-legend" aria-hidden="true"><span><i class="g"></i>Match &lt; 3 dB</span><span><i class="w"></i>3–6 dB</span><span><i class="b"></i>&gt; 6 dB</span><span><i class="s"></i>Sensor</span></div>
       </div>
-      <p class="hint" id="shHint" aria-live="polite">Click a dot to see its numbers. Drag to move the map, scroll to zoom.</p>
+      <p class="hint" id="shHint" aria-live="polite">Drag the tower to move it. Click a dot to see its numbers. Drag the map to pan, scroll to zoom.</p>
       <div class="sh-detail" id="shDetail" aria-live="polite"></div>
       <p class="hint sh-attr" id="shAttrib"></p>
     </section>
@@ -3639,7 +3639,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.9.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.9.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -9358,7 +9358,7 @@ init();
 
   /* ---------- wiring ---------- */
   function setMode(m){ SH.mode=m; const r=$({inspect:"shModeI",add:"shModeA",site:"shModeS"}[m]); if(r) r.checked=true; C.style.cursor=m==="inspect"?"pointer":"crosshair";
-    hint(m==="add"?"Click the map to add a reading there (simulated measurement).":m==="site"?"Click the map where the station should stand.":"Click a dot to see its numbers. Drag to move the map, scroll to zoom."); }
+    hint(m==="add"?"Click the map to add a reading there (simulated measurement).":m==="site"?"Click the map where the station should stand, or drag the tower.":"Drag the tower to move it. Click a dot to see its numbers. Drag the map to pan, scroll to zoom."); }
   function onMapClick(x,y){ const i=hit(x,y), q=U(x,y);
     if(SH.mode==="site"){ setSite(q,null); setMode("inspect"); hint("Station moved. Sample readings were made around it."); return; }
     if(SH.mode==="add"&&i<0){ const r=rng(Date.now()&0xffff), p={id:SH.nextId++,name:"Student "+(SH.pts.filter(p=>p.src==="click").length+1),...q,h:1.5,sensor:false,built:r()<0.4,src:"click",g:null};
@@ -9368,10 +9368,19 @@ init();
     $("shBand").innerHTML=BANDS.map(b=>`<option value="${b[0]}">${b[1]}</option>`).join("");
     document.querySelectorAll('input[name="shMode"]').forEach(r=>r.addEventListener("change",e=>setMode(e.target.value)));
     let drag=null;
-    C.addEventListener("pointerdown",e=>{ drag={x:e.clientX,y:e.clientY,lon:SH.view.lon,lat:SH.view.lat,moved:false}; C.setPointerCapture(e.pointerId); });
-    C.addEventListener("pointermove",e=>{ if(!drag) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(!drag.moved&&Math.hypot(dx,dy)<5) return;
-      drag.moved=true; C.classList.add("panning"); const z=SH.view.z; SH.view.lon=ilon(wx(drag.lon,z)-dx,z); SH.view.lat=ilat(wy(drag.lat,z)-dy,z); drawSoon(); });
-    C.addEventListener("pointerup",e=>{ const d=drag; drag=null; C.classList.remove("panning"); if(!d||d.moved) return; const b=C.getBoundingClientRect(); onMapClick(e.clientX-b.left,e.clientY-b.top); });
+    const local=e=>{ const b=C.getBoundingClientRect(); return [e.clientX-b.left,e.clientY-b.top]; };
+    const onStation=(x,y)=>{ const T=tx(); if(!T||!SH.view) return false; const [sx,sy]=P(T.lon,T.lat); return Math.hypot(x-sx,y-(sy-4))<20; };
+    C.addEventListener("pointerdown",e=>{ const [x,y]=local(e); drag={x:e.clientX,y:e.clientY,lon:SH.view.lon,lat:SH.view.lat,moved:false,site:onStation(x,y)}; C.setPointerCapture(e.pointerId); });
+    C.addEventListener("pointermove",e=>{ const [x,y]=local(e);
+      if(!drag){ C.style.cursor=onStation(x,y)?"grab":SH.mode==="inspect"?"pointer":"crosshair"; return; }
+      const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(!drag.moved&&Math.hypot(dx,dy)<5) return; drag.moved=true;
+      if(drag.site){ C.style.cursor="grabbing"; const q=U(x,y); SH.site.lat=q.lat; SH.site.lon=q.lon; drawSoon(); return; }
+      C.classList.add("panning"); const z=SH.view.z; SH.view.lon=ilon(wx(drag.lon,z)-dx,z); SH.view.lat=ilat(wy(drag.lat,z)-dy,z); drawSoon(); });
+    C.addEventListener("pointerup",e=>{ const d=drag; drag=null; C.classList.remove("panning"); C.style.cursor="";
+      if(d&&d.site&&d.moved){ const T=SH.site; T.name="Station (moved)"; SH.gTx=null; SH.cal=null; measureAll(); render(); heights(); feeds();
+        reverseName(T.lat,T.lon).then(nm=>{ if(nm&&SH.site===T){ T.name=nm; renderSite(); draw(); } });
+        hint("Station moved. The readings stay where they were measured; the predictions and colours updated. Press Calibrate again."); return; }
+      if(!d||d.moved) return; const [x,y]=local(e); onMapClick(x,y); });
     C.addEventListener("pointercancel",()=>{ drag=null; C.classList.remove("panning"); });
     C.addEventListener("wheel",e=>{ e.preventDefault(); const b=C.getBoundingClientRect(); zoomAt(e.deltaY<0?0.5:-0.5,e.clientX-b.left,e.clientY-b.top); },{passive:false});
     C.addEventListener("keydown",e=>{ const s=60, z=SH.view.z; const mv=(dx,dy)=>{ e.preventDefault(); SH.view.lon=ilon(wx(SH.view.lon,z)+dx,z); SH.view.lat=ilat(wy(SH.view.lat,z)+dy,z); draw(); };
