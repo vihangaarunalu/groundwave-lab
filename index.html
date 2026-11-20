@@ -335,6 +335,9 @@ table.sites tr.selrow{background:var(--accent-soft)}
 .k-e{background:rgba(110,190,255,.75)}
 .k-f{background:rgba(150,130,255,.8)}
 .k-skip{background:rgb(226,76,66)}
+.k-mua{background:repeating-linear-gradient(90deg,#CDF23A 0 6px,transparent 6px 9px)!important;height:3px!important;align-self:center}
+.skipcard .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.skipcard .tile .val{font-size:17px}
 .k-fade{background:rgb(240,170,40)}
 .clock{font-size:30px}
 
@@ -2302,10 +2305,11 @@ body.still .hero-par{transform:none}
         <span><i class="k-d"></i>D layer (absorbs by day)</span>
         <span><i class="k-e"></i>E layer</span>
         <span><i class="k-f"></i>F2 layer</span>
-        <span><i class="k-skip"></i>Skip zone</span>
+        <span><i class="k-mua"></i>Critical ray (maximum usable angle)</span>
+        <span><i class="k-skip"></i>Silent (skip) zone</span>
         <span><i class="k-fade"></i>Fading zone</span>
       </div>
-      <p class="hint">Scroll or pinch to zoom, drag to pan. Heights are exaggerated and wave tilt is drawn ×3 so you can see them.</p>
+      <p class="hint">Scroll or pinch to zoom, drag to pan. Heights are exaggerated (the axis on the left shows true kilometres) and wave tilt is drawn ×3 so you can see them. Choose 0–3000 km to see long skip distances.</p>
     </div>
 
     <aside class="stack">
@@ -2318,6 +2322,12 @@ body.still .hero-par{transform:none}
         <div class="mrow"><span>Needed</span><div class="bar"><span id="bT" style="background:var(--muted)"></span></div><span class="mono" id="vT">–</span></div>
         <div class="field"><span class="lbl">Received signal over time</span><canvas id="scope" aria-label="Received signal level over time"></canvas>
         <p class="hint">When ground and sky waves are similar in strength they interfere, and the level swings up and down. This is fading.</p></div>
+      </section>
+      <section class="panel card skipcard" aria-labelledby="skH">
+        <div class="card-h"><h3 id="skH">Skip distance</h3><span class="pill info" id="skState">–</span></div>
+        <div class="tiles" id="skTiles" aria-live="polite"></div>
+        <p class="hint" id="skNote"></p>
+        <label class="check"><input type="checkbox" id="skShow" checked> Show skip geometry (critical ray)</label>
       </section>
       <section class="panel card quick" aria-labelledby="qsH">
         <div class="card-h"><h3 id="qsH">Quick settings</h3><span class="editing">changes <b id="qsModel"></b></span></div>
@@ -3564,7 +3574,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.6.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.7</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -3812,6 +3822,25 @@ function iono(p){
 }
 function absdB(f,I,sec){ return 677.2*I*sec/(Math.pow(f+1.4,1.98)+10.2); }
 function secAt(del,h){ const s=RE*Math.cos(del)/(RE+h); return 1/Math.sqrt(1-s*s); }
+/* Skip distance by the secant law on a curved earth (mirror reflection, ITU-R P.533 geometry).
+   A layer of critical frequency fc at height h returns a ray only if f <= fc·sec i, i = angle of incidence.
+   The steepest returning ray (the maximum usable angle, MUA) lands closest: that range is the skip distance. */
+function skipLayer(f,fc,h,name){
+  const sInf=RE/(RE+h), mufMax=fc/Math.sqrt(1-sInf*sInf), dmax=2*RE*(Math.PI/2-Math.asin(sInf));
+  if(f<=fc) return {name,fc,h,state:"nvis",mua:90,skip:0,mufMax,dmax,flat:0};
+  const si=Math.sqrt(1-(fc/f)*(fc/f)), cb=si/sInf, flat=2*h*Math.sqrt((f/fc)*(f/fc)-1);
+  if(cb>=1) return {name,fc,h,state:"closed",mua:null,skip:null,mufMax,dmax,flat,inc:toDeg(Math.asin(si))};
+  const b=Math.acos(cb), i=Math.asin(si), th=Math.PI/2-b-i;
+  return {name,fc,h,state:"skip",mua:toDeg(b),beta:b,inc:toDeg(i),th,skip:2*RE*th,mufMax,dmax,flat};
+}
+function skipGeom(f,io){
+  const F=skipLayer(f,io.foF2,io.hF,"F2"), E=skipLayer(f,io.foE,io.hE||110,"E");
+  let best;
+  if(F.state==="nvis") best=F; else if(E.state==="nvis") best=E;
+  else if(E.state==="skip"&&F.state==="skip") best=E.skip<F.skip?E:F;
+  else if(F.state==="skip") best=F; else if(E.state==="skip") best=E; else best=F;
+  return {F,E,best};
+}
 function elevFor(th,h){ return Math.atan((Math.cos(th)-RE/(RE+h))/Math.sin(th)); }
 function skyField(d,p,io){
   const f=p.f;
@@ -5186,7 +5215,8 @@ const TOUR=[
   {t:"The ground wave",f:["gw"],x:"The yellow band hugs the ground and follows the earth's curve. Its height shows the signal strength, which shrinks as ground losses add up. Sea water and wet soil keep it strong. Dry rock and higher frequencies weaken it quickly."},
   {t:"The ionosphere",f:["iono"],x:"Between about 60 and 400 km up, sunlight ionizes the air into layers. The D layer (red) absorbs radio waves by day. The E and F2 layers can bend waves back down to earth."},
   {t:"The sky wave",f:["sky","iono","zones"],x:"Waves sent upward come back only if the frequency is low enough for that angle (the secant law). Steep rays at high frequency escape into space, leaving a skip zone where nothing arrives."},
-  {t:"Day and night",f:["iono","sky","gw","zones"],cycle:true,x:"Watch the clock. After sunset the D layer disappears, so the sky wave returns strongly and reaches far beyond the ground wave. That is why AM stations travel further at night."},
+  {t:"Skip distance",f:["sky","iono","skip","zones"],x:"The dashed lime ray is the steepest ray the layer can still return: its elevation is the maximum usable angle, set by the secant law f ≤ fc·sec i. It lands at the skip distance. Closer than that no sky wave arrives, and where the ground wave has also died out there is a silent zone. Raise the frequency and the skip distance grows; at night fc falls and the skip goes long."},
+  {t:"Day and night",f:["iono","sky","gw","zones","skip"],cycle:true,x:"Watch the clock. After sunset the D layer disappears, so the sky wave returns strongly and reaches far beyond the ground wave. That is why AM stations travel further at night."},
   {t:"At the receiver",f:["rx","zones"],x:"Drag the radio along the ground. The meter compares the two waves with the level needed. Where they are similar in strength they interfere, and the trace swings up and down. This is fading."}
 ];
 function showTour(i){
@@ -5212,6 +5242,7 @@ function bindAnim(){
   $("rxSlider2").addEventListener("input",e=>{ AN.rx=+e.target.value; $("rxSlider").value=AN.rx; AN.scope=[]; AN.meterT=999; });
   if(window.innerWidth<520){ AN.labels=false; $("explainT").checked=false; } // labels overlap on phones: start with them off
   $("explainT").addEventListener("change",e=>AN.labels=e.target.checked);
+  $("skShow").addEventListener("change",e=>{ AN.showSkip=e.target.checked; AN.skKey=null; });
   $("tourBtn").addEventListener("click",()=>showTour(0));
   $("tourNext").addEventListener("click",()=>showTour(AN.tour+1>=TOUR.length?null:AN.tour+1));
   $("tourBack").addEventListener("click",()=>showTour(Math.max(0,AN.tour-1)));
@@ -5306,7 +5337,7 @@ function drawAnim(dt){
   const dpr=window.devicePixelRatio||1; if(anim.width!==Math.round(W*dpr)||anim.height!==Math.round(H*dpr)){ anim.width=W*dpr; anim.height=H*dpr; }
   const c=actx; c.setTransform(dpr,0,0,dpr,0,0); PILLS=[];
   const m=animModel(); if(!m) { PILLS=null; return; }
-  const p=animParams(), io=iono(p), cosC=p.cosChi, thr=dBuV(threshold(p));
+  const p=animParams(), io=iono(p), cosC=p.cosChi, thr=dBuV(threshold(p)), SG=skipGeom(p.f,io), skyOn=(p.type==="sky"||p.type==="combined")&&AN.showSkip!==false;
   const {d0,span}=AN.view, th0=d0/RE, thS=span/RE, Tv=0.62, x0=40, x1=W-30;
   const Rpx=(x1-x0)/(2*Math.sin(Tv/2)), drop=Rpx*(1-Math.cos(Tv/2)), gTop=H-34-drop, cx=(x0+x1)/2, cy=gTop+Rpx;
   const altScale=(gTop-56)/400;
@@ -5337,7 +5368,7 @@ function drawAnim(dt){
     g.addColorStop(0,`rgba(${rgb},0)`); g.addColorStop(0.3,`rgba(${rgb},${a*0.55*sh})`); g.addColorStop(0.5,`rgba(${rgb},${a*sh})`); g.addColorStop(0.7,`rgba(${rgb},${a*0.55*sh})`); g.addColorStop(1,`rgba(${rgb},0)`);
     c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2+pad); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1-pad); c.lineTo(x,y);} c.closePath(); c.fillStyle=g; c.fill();
     c.strokeStyle=`rgba(${rgb},${Math.min(0.9,a*1.4)})`; c.lineWidth=1; c.setLineDash([2,6]); c.lineDashOffset=-t/90; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,(h1+h2)/2); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); c.setLineDash([]); c.lineDashOffset=0; };
-  const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); pill(c,txt,W-14,y,{align:"right",accent:rgb,size:11.5}); };
+  const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); pill(c,txt,W-66,y,{align:"right",accent:rgb,size:11.5}); };
   c.globalAlpha=fa("iono");
   const dDens=clamp((io.I-0.08)/1.2,0,1)*(flareLevel(p)>0&&cosC>0?1+0.15*flareLevel(p):1);
   if(dDens>0.02) band(60,90,SC.D,clamp(dDens*0.7,0.08,0.8));
@@ -5347,6 +5378,10 @@ function drawAnim(dt){
   layerTag(`F2 layer · foF2 ${io.foF2.toFixed(1)} MHz`,io.hF,SC.F); layerTag(`E layer · foE ${io.foE.toFixed(1)} MHz`,110,SC.E);
   if(dDens>0.02) layerTag(`D layer${flareLevel(p)>0&&cosC>0?" · "+FLARE[flareLevel(p)].name:""}`,75,SC.D);
   c.globalAlpha=1;
+  // height axis (true km; the drawing exaggerates heights)
+  { c.font="10.5px "+cssVar("--font-mono"); c.textAlign="left"; c.textBaseline="middle";
+    for(const hk of [100,200,300,400]){ const [ax,ay]=map(d0/RE,hk); if(ay<14) continue; c.fillStyle="rgba(236,244,252,.55)"; c.fillRect(ax-2,ay-0.5,7,1); c.fillStyle="rgba(236,244,252,.8)"; c.fillText(hk+" km",Math.max(4,ax-36),ay); }
+    c.textBaseline="alphabetic"; }
 
   // earth
   const arcFill=(a,b,col)=>{ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((a+(b-a)*i/40)/RE,0); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=40;i>=0;i--){ const [x,y]=map((a+(b-a)*i/40)/RE,-260); c.lineTo(x,y);} c.closePath(); c.fillStyle=col; c.fill(); };
@@ -5411,7 +5446,9 @@ function drawAnim(dt){
     c.strokeStyle=`rgba(${rgb},.95)`; c.lineWidth=6; c.lineCap="butt"; c.beginPath(); for(let i=0;i<=30;i++){ const [x,y]=map((aa+(bb-aa)*i/30)/RE,0); i?c.lineTo(x,y+30):c.moveTo(x,y+30);} c.stroke();
     if(AN.labels){ const mid=clamp((Math.max(a,d0)+Math.min(b,d0+span))/2,d0,d0+span); const [x,y]=map(mid/RE,0); pill(c,txt,x,y-18,{accent:rgb,size:11.5}); } };
   c.globalAlpha=fa("zones");
-  if(A&&A.skip) zone(A.skip.a,A.skip.b,SC.skip,`Skip zone: no signal (${fmtD(A.skip.a)}–${fmtD(A.skip.b)} km)`);
+  const geoSkip=skyOn&&SG.best.state==="skip";
+  if(geoSkip){ const gwR=p.type==="combined"?((A&&A.r)||AN.svc||0):0; if(SG.best.skip>gwR+2) zone(gwR,SG.best.skip,SC.skip,`Silent (skip) zone · ${fmtD(gwR)}–${fmtD(SG.best.skip)} km`); }
+  else if(A&&A.skip) zone(A.skip.a,A.skip.b,SC.skip,`No usable signal (${fmtD(A.skip.a)}–${fmtD(A.skip.b)} km)`);
   if(A&&A.fade) zone(A.fade.a,A.fade.b,SC.fade,`Fading zone (${fmtD(A.fade.a)}–${fmtD(A.fade.b)} km)`);
   c.globalAlpha=1;
 
@@ -5457,7 +5494,7 @@ function drawAnim(dt){
     }
     const r=AN.svc; if(r&&r<d0+span*1.05&&r>d0){ const [xr,y]=map(r/RE,0); c.strokeStyle="rgba(255,255,255,.85)"; c.setLineDash([3,3]); c.lineWidth=1.2; c.beginPath(); c.moveTo(xr,y); c.lineTo(xr,y-80); c.stroke(); c.setLineDash([]);
       pill(c,`${p.f>=30?"Coverage":"Ground-wave"} limit ${fmtD(r)} km`,xr,y-92,{accent:SC.gw}); }
-    if(AN.labels&&!TR){ const dl=clamp((r||span)*0.35,d0+span*0.1,d0+span*0.45); const q=AN.gw[Math.min(300,Math.max(0,Math.round((dl-d0)/(span*1.12)*300)))]; const [gx,gy]=map(dl/RE,0);
+    if(AN.labels&&!TR&&span<=1200){ const dl=clamp((r||span)*0.35,d0+span*0.1,d0+span*0.45); const q=AN.gw[Math.min(300,Math.max(0,Math.round((dl-d0)/(span*1.12)*300)))]; const [gx,gy]=map(dl/RE,0);
       pill(c,p.type==="cell"?`${(CELL_TECH[p.tech]||{}).name||"Mobile"}: ${cellMethod(p)}`:p.f>=30?"Space wave: direct + reflected, line of sight":"Ground wave: follows the curve, fades with distance",gx+30,gy-amp(q.v)-78,{to:[gx,gy-amp(q.v)*0.6],accent:SC.gw}); }
     c.globalAlpha=1;
   }
@@ -5494,6 +5531,39 @@ function drawAnim(dt){
     c.globalAlpha=1;
   }
 
+  // ===== skip distance: the critical (MUA) ray, layer height, landing point =====
+  if(skyOn){ const L=SG.best; c.globalAlpha=fa("skip");
+    if(L.state==="skip"){
+      const pts=[], segp=(thA,hA,thB,hB)=>{ const ax=(RE+hA)*Math.sin(thA),ay=(RE+hA)*Math.cos(thA),bx=(RE+hB)*Math.sin(thB),by=(RE+hB)*Math.cos(thB); for(let i=0;i<=40;i++){ const u=i/40,x=ax+(bx-ax)*u,y=ay+(by-ay)*u; pts.push([Math.atan2(x,y),Math.hypot(x,y)-RE]); } };
+      segp(0,0,L.th,L.h); segp(L.th,L.h,2*L.th,0);
+      const path=()=>{ c.beginPath(); pts.forEach((q,i)=>{ const [x,y]=map(q[0],q[1]); i?c.lineTo(x,y):c.moveTo(x,y); }); };
+      c.lineCap="round"; c.lineJoin="round"; path(); c.strokeStyle="rgba(205,242,58,.22)"; c.lineWidth=8; c.stroke();
+      path(); c.strokeStyle="rgba(205,242,58,.95)"; c.lineWidth=2.2; c.setLineDash([9,6]); c.lineDashOffset=-t/60; c.stroke(); c.setLineDash([]); c.lineDashOffset=0;
+      // layer height
+      const [ax,ay]=map(L.th,L.h), [gx,gy]=map(L.th,0);
+      c.strokeStyle="rgba(236,244,252,.75)"; c.lineWidth=1; c.setLineDash([3,4]); c.beginPath(); c.moveTo(ax,ay); c.lineTo(gx,gy); c.stroke(); c.setLineDash([]);
+      c.fillStyle="#CDF23A"; c.beginPath(); c.arc(ax,ay,4,0,7); c.fill();
+      // elevation angle (MUA) at the mast foot
+      const [ox,oy]=map(0,0), [tx2,ty2]=map(span*0.02/RE,0), [rx2,ry2]=map(pts[4][0],pts[4][1]);
+      const a0=Math.atan2(ty2-oy,tx2-ox), a1=Math.atan2(ry2-oy,rx2-ox);
+      c.strokeStyle="#CDF23A"; c.lineWidth=1.6; c.beginPath(); c.arc(ox,oy,30,a1,a0); c.stroke();
+      // landing point B
+      const inView=L.skip<=d0+span&&L.skip>=d0;
+      if(inView){ const [bx,by]=map(2*L.th,0); c.fillStyle="#CDF23A"; c.strokeStyle="#102C40"; c.lineWidth=2; c.beginPath(); c.arc(bx,by,6,0,7); c.fill(); c.stroke(); }
+      if(AN.labels){
+        pill(c,`MUA ${L.mua.toFixed(0)}°`,ox+78,oy-16,{accent:"205,242,58",size:11.5,to:[ox+31,oy-8]});
+        pill(c,`Reflection at ${L.name}: h′ ≈ ${Math.round(L.h)} km · incidence ${L.inc.toFixed(0)}°`,ax+170,ay+34,{accent:"205,242,58",size:11.5,to:[ax,ay]});
+        if(inView){ const [bx,by]=map(2*L.th,0); pill(c,`Skip distance ${fmtD(L.skip)} km: first sky-wave landing`,bx,by-64,{accent:"205,242,58",to:[bx,by-6]}); }
+        else pill(c,`Skip distance ${fmtD(L.skip)} km → (widen the view)`,W-16,gTop-150,{align:"right",accent:"205,242,58"}); }
+    } else if(AN.labels){
+      const [mx,my]=map((d0+span*0.5)/RE,(L.h||300)+40);
+      if(L.state==="nvis") pill(c,`No skip zone: f ${fmtF(p.f)} ≤ fo${L.name} ${L.fc.toFixed(1)} MHz, so even vertical rays return (NVIS)`,mx,Math.max(64,my),{accent:"205,242,58"});
+      else pill(c,`Band closed for one hop: f is above the ${L.name} MUF (${SG.F.mufMax.toFixed(1)} MHz at ${fmtD(SG.F.dmax)} km). The sky wave escapes`,mx,Math.max(64,my),{accent:SC.esc});
+    }
+    c.globalAlpha=1;
+    const k=[p.f,io.foF2,io.foE,io.hF].map(v=>v.toFixed(2)).join("|"); if(AN.skKey!==k){ AN.skKey=k; renderSkipCard(p,io,SG); }
+  } else if(AN.skKey!=="off"){ AN.skKey="off"; renderSkipCard(p,io,null); }
+
   // ===== receiver =====
   c.globalAlpha=fa("rx");
   if(AN.rx>=dA&&AN.rx<=dB){
@@ -5505,7 +5575,7 @@ function drawAnim(dt){
       const lg=c.createRadialGradient(-5,-10,0,-5,-10,11); lg.addColorStop(0,`rgba(${col},${0.55*pulse})`); lg.addColorStop(1,`rgba(${col},0)`); c.fillStyle=lg; c.beginPath(); c.arc(-5,-10,11,0,7); c.fill();
       c.fillStyle=`rgb(${col})`; c.beginPath(); c.arc(-5,-10,3.6,0,7); c.fill(); }
     c.restore();
-    pill(c,`Receiver ${fmtD(AN.rx)} km · drag me`,rx,ry-58,{size:11.5,to:[rx,ry-40]});
+    pill(c,`Receiver ${fmtD(AN.rx)} km`,rx,ry-58,{size:11.5,to:[rx,ry-40]});
   }
   c.globalAlpha=1;
   // caption & zoom info
@@ -5514,6 +5584,22 @@ function drawAnim(dt){
   PILLS=null;
   $("zoomInfo").textContent=`${fmtD(Math.max(d0,0))}–${fmtD(d0+span)} km`;
   updateMeter(p,io,thr,dt);
+}
+function renderSkipCard(p,io,SG){
+  const st=$("skState"), tl=$("skTiles"), nt=$("skNote"); if(!st) return;
+  if(!SG){ st.className="pill info"; st.textContent="Off"; tl.innerHTML=""; nt.textContent=p.type==="gw"?"Choose “Sky” or “Both” under Show to see the skip distance.":"Turn on “Show skip geometry” to see the critical ray."; return; }
+  const L=SG.best, F=SG.F, tile=(k,v,sub,cls)=>`<div class="tile ${cls||"info"}"><span class="k">${k}</span><span class="val">${v}</span><span class="sub">${sub}</span></div>`;
+  const lab={skip:["Skip zone","warn"],nvis:["No skip zone","good"],closed:["Band closed","bad"]}[L.state];
+  st.className="pill "+lab[1]; st.textContent=lab[0];
+  tl.innerHTML=tile("Operating frequency",fmtF(p.f),`f / foF2 = ${(p.f/io.foF2).toFixed(2)}`)
+    +tile("Critical frequency",`${io.foF2.toFixed(1)} MHz`,`foF2 · foE ${io.foE.toFixed(1)} MHz`)
+    +tile("Reflection height",`${Math.round(L.h)} km`,`${L.name} layer (mirror height)`)
+    +tile("Maximum usable angle",L.state==="closed"?"—":`${L.mua.toFixed(1)}°`,L.state==="nvis"?"all angles return":L.state==="closed"?"no ray returns":`flat earth sin⁻¹(fc/f) = ${toDeg(Math.asin(L.fc/p.f)).toFixed(1)}°`)
+    +tile("Skip distance",L.state==="skip"?`${fmtD(L.skip)} km`:L.state==="nvis"?"0 km":"—",L.state==="skip"?`flat-earth check ${fmtD(L.flat)} km`:L.state==="nvis"?"coverage from the mast":"above the one-hop MUF",L.state==="skip"?"warn":L.state==="nvis"?"good":"bad")
+    +tile("One-hop MUF (F2)",`${F.mufMax.toFixed(1)} MHz`,`longest hop ${fmtD(F.dmax)} km`);
+  nt.innerHTML=L.state==="skip"?`Secant law: a ray returns only if f ≤ f<sub>c</sub>·sec i. Here sec i = f/f<sub>c</sub> = ${(p.f/L.fc).toFixed(2)}, so the steepest returning ray leaves at ${L.mua.toFixed(1)}° and lands ${fmtD(L.skip)} km away (curved earth). Nothing sky-wave arrives closer. Lower the frequency or wait for a higher f<sub>c</sub> (daytime) to shrink the skip zone.`
+    :L.state==="nvis"?`f ≤ f<sub>c</sub>: even a ray sent straight up is reflected, so the sky wave covers from the mast outwards (near-vertical incidence skywave, NVIS).${io.I>0.5&&p.f<10?" By day the D layer may still absorb much of it.":""}`
+    :`f is above the maximum usable frequency for even the longest single hop (${F.mufMax.toFixed(1)} MHz over ${fmtD(F.dmax)} km), so every ray escapes. Choose a lower frequency.`;
 }
 function updateMeter(p,io,thr,dt){
   const r=evalP(p,AN.rx,io);
