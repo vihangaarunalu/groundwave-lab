@@ -96,7 +96,9 @@ export async function onRequestPost({ request, env }) {
   const ch = channel(request); if (!ch) return json({ error: "Give a channel name: 3–40 lowercase letters, digits or dashes" }, 400);
   if (!allowed(request, env)) return json({ error: "Wrong or missing key" }, 401);
   let body; try { const text = await request.text(); if (text.length > 200000) return json({ error: "too large" }, 413); body = JSON.parse(text); } catch (e) { return json({ error: "expected JSON" }, 400); }
-  const now = Date.now(), list = Array.isArray(body) ? body : Array.isArray(body.readings) ? body.readings : [body];
+  const now = Date.now(), list = Array.isArray(body) ? body : Array.isArray(body.readings) ? body.readings
+    : body.readings && typeof body.readings === "object" ? [body.readings]   // MATLAB encodes a 1-element struct array as an object
+    : body.readings !== undefined ? [] : [body];
   const add = list.slice(0, MAX_POST).map((r) => cleanReading(r, now)).filter(Boolean);
   const data = await load(store, ch);
   const tx = cleanTx(body.tx); if (tx) data.tx = tx;
