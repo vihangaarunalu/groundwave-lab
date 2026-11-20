@@ -1932,6 +1932,10 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .guidebtn.hello{animation:gb-hello 2.4s ease-in-out 3}
 @keyframes gb-hello{0%,100%{box-shadow:0 0 0 0 rgba(205,242,58,0)}50%{box-shadow:0 0 0 6px rgba(205,242,58,.45)}}
 @media (prefers-reduced-motion:reduce){.gt-hand svg,.gt-hand i,.guidebtn.hello{animation:none!important}}
+
+.sh-linkrow{align-items:flex-end;gap:var(--sp-3);flex-wrap:wrap}
+.sh-linkrow .field{min-width:220px}
+.sh-linkstat{margin:var(--sp-2) 0 0;font-size:13px;min-height:1.2em}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2698,6 +2702,25 @@ body:not(.an-scene) #animation .sc-only{display:none}
     <p class="sh-whatnote" id="shWhatNote" aria-live="polite"></p>
   </section>
 
+  <section class="panel card sh-live" aria-labelledby="shLinkH">
+    <div class="chart-head"><h2 id="shLinkH">Live link: MATLAB or sensors</h2><span class="pill info" id="shLinkState">Not connected</span></div>
+    <p class="hint">Stream readings into this page from a MATLAB, Scilab or Octave simulation (a virtual sensor) now, and from real SDR sensor stations later. Both sides use the same channel name.</p>
+    <div class="row sh-linkrow">
+      <div class="field"><label for="shCh">Channel name</label><input type="text" id="shCh" maxlength="40" autocomplete="off" spellcheck="false"></div>
+      <button class="btn primary" type="button" id="shConnect">Connect</button>
+      <label class="check"><input type="checkbox" id="shReplace" checked> Show only live readings</label>
+    </div>
+    <p class="sh-linkstat mono" id="shLinkStat" aria-live="polite"></p>
+    <details class="acc plain"><summary>How to send data from MATLAB</summary><div class="acc-body">
+      <ol class="sh-task">
+        <li>Download <a href="assets/wisdom_sensor_emulator.m" download>wisdom_sensor_emulator.m</a> and open it in MATLAB (R2016b or newer).</li>
+        <li>Set <code>CHANNEL</code> in the script to the channel name above (<b id="shChEcho"></b>), and the transmitter position to your site.</li>
+        <li>Press <b>Connect</b> here, then press <b>Run</b> in MATLAB. Readings appear on the map every few seconds.</li>
+        <li>Press <b>Calibrate</b> when enough readings have arrived.</li>
+      </ol>
+      <p class="hint">Any program can send data: an HTTP POST of JSON to <code>/api/measure?ch=<i>channel</i></code> with <code>{"tx":{lat,lon,h,f_mhz,erp_kw}, "readings":[{sensor,lat,lon,level,h,built,fixed,src}]}</code>, where <code>level</code> is in dBµV/m.</p>
+    </div></details>
+  </section>
   <section class="panel card" aria-labelledby="shDataH">
     <div class="chart-head"><h2 id="shDataH">Measurements</h2>
       <div class="row"><button class="btn" type="button" id="shSample">New sample walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label><button class="btn" type="button" id="shExport">Export CSV</button><button class="btn" type="button" id="shClear">Clear</button></div></div>
@@ -3616,7 +3639,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.8</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -9113,7 +9136,7 @@ init();
     for(let i=0;i<14;i++){ const km=(1.4+i*0.82)*k, b=86+18*Math.sin(i*0.9)+(r()-0.5)*10;
       SH.pts.push({id:SH.nextId++,name:"Walk test "+(i+1),...dest(T,km,b),h:1.5,sensor:false,built:r()<0.42,src:"walk",g:null}); }
     measureAll(); }
-  function measureAll(){ SH.pts.forEach(p=>{ if(p.src!=="csv") p.meas=truth(p,prng(p)); }); }
+  function measureAll(){ SH.pts.forEach(p=>{ if(p.src!=="csv"&&p.src!=="live") p.meas=truth(p,prng(p)); }); }
 
   /* ---------- ground heights (Copernicus DEM) ---------- */
   async function heights(){ const T=tx(), list=SH.pts.filter(p=>p.g==null);
@@ -9277,6 +9300,40 @@ init();
   function exportCSV(){ const lines=["name,lat,lon,ground_m,antenna_m,model_dBuV_m,measured_dBuV_m,difference_dB,built"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,p.lat.toFixed(5),p.lon.toFixed(5),p.g==null?"":Math.round(p.g),p.h,fx(pred(p)),fx(p.meas),fx(p.meas-pred(p)),p.built?1:0].join(",")));
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-shadow.csv"; document.body.appendChild(a); a.click(); a.remove(); hint("Exported "+SH.pts.length+" readings as wisdom-shadow.csv."); }
 
+  /* ---------- live link: /api/measure (MATLAB emulator now, SDR sensors later) ---------- */
+  const LV={on:false,ch:"",since:0,timer:null,last:0,n:0,txKey:"",err:""};
+  const srcLabel=s=>s==="sdr"?"real sensor":"emulated · "+(s||"unknown");
+  function liveStat(){ const el=$("shLinkStat"), st=$("shLinkState"); if(!el) return;
+    if(!LV.on){ st.className="pill info"; st.textContent="Not connected"; el.textContent=LV.err||""; return; }
+    const live=SH.pts.filter(p=>p.src==="live"), age=LV.last?Math.round((Date.now()-LV.last)/1000):null;
+    st.className="pill "+(LV.err?"bad":age!==null&&age<20?"good":"warn"); st.textContent=LV.err?"Problem":age!==null&&age<20?"● Live":"Waiting for data";
+    el.textContent=LV.err?LV.err:`Channel ${LV.ch} · ${live.length} points · ${LV.n} readings received${age!==null?` · last ${age} s ago`:" · none yet"}`; }
+  function applyTx(tx){ const k=JSON.stringify(tx); if(k===LV.txKey) return; LV.txKey=k;
+    SH.site={name:tx.name||"Transmitter",lat:tx.lat,lon:tx.lon,h:tx.h||30}; SH.gTx=null; SH.view=null;
+    if(tx.f_mhz){ SH.f=tx.f_mhz; const b=BANDS.find(x=>Math.abs(x[2]-tx.f_mhz)<0.01); const sel=$("shBand");
+      if(b){ SH.band=b[0]; } else { let o=sel.querySelector('option[value="custom"]'); if(!o){ o=document.createElement("option"); o.value="custom"; sel.appendChild(o); } o.textContent="From data · "+fmtF(tx.f_mhz); SH.band="custom"; } }
+    if(tx.erp_kw) SH.P=tx.erp_kw; }
+  function takeReadings(list){ let added=false;
+    list.forEach(r=>{ LV.n++; LV.last=Date.now(); let p=SH.pts.find(q=>q.src==="live"&&q.liveKey===r.sensor);
+      if(!p){ p={id:SH.nextId++,liveKey:r.sensor,src:"live",g:null}; SH.pts.push(p); added=true; }
+      if(p.lat!==r.lat||p.lon!==r.lon) p.g=null;
+      Object.assign(p,{name:`${r.sensor} · ${srcLabel(r.src)}`,origin:r.src,lat:r.lat,lon:r.lon,h:r.h,built:!!r.built,sensor:!!r.fixed,meas:r.level}); });
+    return added; }
+  async function poll(){ if(!LV.on) return;
+    try{ const r=await fetch(`/api/measure?ch=${encodeURIComponent(LV.ch)}&since=${LV.since}`,{cache:"no-store"}); const j=await r.json().catch(()=>({}));
+      if(!r.ok){ LV.err=j.error||("Server answered "+r.status); liveStat(); return; } LV.err="";
+      if(j.tx) applyTx(j.tx);
+      const list=(j.readings||[]); if(list.length){ LV.since=Math.max(...list.map(x=>x.rt));
+        if($("shReplace").checked&&SH.pts.some(p=>p.src!=="live"&&p.src!=="csv")){ SH.pts=SH.pts.filter(p=>p.src==="live"||p.src==="csv"); SH.cal=null; SH.sel=-1; }
+        const added=takeReadings(list); if(added) SH.view=null; render(); sensors(); if(SH.pts.some(p=>p.g==null)) heights(); }
+    }catch(e){ LV.err="Cannot reach the live link (offline?)"; }
+    liveStat(); }
+  function connect(on){ LV.on=on; clearInterval(LV.timer); LV.err="";
+    $("shConnect").textContent=on?"Disconnect":"Connect"; $("shCh").disabled=on;
+    if(on){ LV.ch=$("shCh").value.trim().toLowerCase(); if(!/^[a-z0-9][a-z0-9-]{2,39}$/.test(LV.ch)){ LV.on=false; $("shCh").disabled=false; $("shConnect").textContent="Connect"; LV.err="Use 3–40 lowercase letters, digits or dashes for the channel name."; liveStat(); return; }
+      try{ localStorage.setItem("gwlab-live-ch",LV.ch); }catch(e){} LV.since=0; LV.txKey=""; poll(); LV.timer=setInterval(poll,3000); hint("Connected. Readings appear as they arrive."); }
+    liveStat(); }
+
   /* ---------- wiring ---------- */
   function setMode(m){ SH.mode=m; const r=$({inspect:"shModeI",add:"shModeA",site:"shModeS"}[m]); if(r) r.checked=true; C.style.cursor=m==="inspect"?"pointer":"crosshair";
     hint(m==="add"?"Click the map to add a reading there (simulated measurement).":m==="site"?"Click the map where the station should stand.":"Click a dot to see its numbers. Drag to move the map, scroll to zoom."); }
@@ -9322,7 +9379,10 @@ init();
     window.addEventListener("resize",()=>{ if(currentTab==="shadow"){ draw(); scatter(); } });
     document.addEventListener("keydown",e=>{ if(currentTab!=="shadow"||e.ctrlKey||e.metaKey||e.altKey) return; const t=e.target; if(t&&t.closest&&t.closest("input,textarea,select,dialog")) return; if(document.querySelector("dialog[open]")) return;
       const k=e.key.toLowerCase(); if(k==="i") setMode("inspect"); else if(k==="l") setMode("site"); else if(k==="0"){ SH.view=null; draw(); } else if(k==="+"||k==="=") zoomAt(1); else if(k==="-") zoomAt(-1); });
-    renderMods(); setInterval(tick,3000); }
+    renderMods(); setInterval(tick,3000);
+    { let ch=""; try{ ch=localStorage.getItem("gwlab-live-ch")||""; }catch(e){} if(!ch) ch="wisdom-"+Math.random().toString(36).slice(2,6);
+      $("shCh").value=ch; $("shChEcho").textContent=ch; $("shCh").addEventListener("input",e=>$("shChEcho").textContent=e.target.value.trim().toLowerCase()); }
+    $("shConnect").addEventListener("click",()=>connect(!LV.on)); setInterval(()=>{ if(LV.on&&currentTab==="shadow") liveStat(); },1000); }
   let started=false;
   window.shadowShow=function(){ if(!started){ started=true; bind(); const t=mapTx(); SH.site={name:t.name,lat:t.lat,lon:t.lon,h:t.h}; setBand(SH.band); buildSample(); render(); heights(); feeds(); return; }
     render(); sensors(); };

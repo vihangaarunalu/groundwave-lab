@@ -107,3 +107,19 @@ Use this to check that students and trainees can use the lab. Test with 5 people
 | Scene: D / E / F2 layers | `222,104,66` / `110,190,255` / `150,130,255` | | animation layers and legend |
 
 Spacing: cards use 20–22 px padding and a 20 px gap between cards. Click targets are at least 36 px high.
+
+## Live link (Digital shadow tab)
+
+The Digital shadow tab can receive readings live from any program, today a
+MATLAB sensor emulator (software-in-the-loop), later the real SDR sensors.
+
+- Endpoint: `functions/api/measure.js` → `/api/measure?ch=<channel>`
+  (POST JSON readings, GET `?since=` to read them back). It uses the same
+  `VISITS` KV binding as the feedback inbox. Optional secret `MEASURE_KEY`
+  makes senders add `Authorization: Bearer <key>`.
+- MATLAB script: `assets/wisdom_sensor_emulator.m` (R2016b or newer). Set
+  `CHANNEL` to the name in the Live link panel, press Connect on the page,
+  then Run. It uses an independent model with injected losses and sensor
+  errors, and prints what the calibration should recover.
+- Reading format: `{sensor, lat, lon, level (dBµV/m), h, built, fixed, src}`;
+  optional `tx: {name, lat, lon, h, f_mhz, erp_kw}` sets the modelled station.
