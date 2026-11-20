@@ -3639,7 +3639,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v8.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v8.9.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -9301,13 +9301,13 @@ init();
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-shadow.csv"; document.body.appendChild(a); a.click(); a.remove(); hint("Exported "+SH.pts.length+" readings as wisdom-shadow.csv."); }
 
   /* ---------- live link: /api/measure (MATLAB emulator now, SDR sensors later) ---------- */
-  const LV={on:false,ch:"",since:0,timer:null,last:0,n:0,txKey:"",err:""};
+  const LV={on:false,ch:"",since:0,after:0,timer:null,last:0,n:0,txKey:"",err:"",store:""};
   const srcLabel=s=>s==="sdr"?"real sensor":"emulated · "+(s||"unknown");
   function liveStat(){ const el=$("shLinkStat"), st=$("shLinkState"); if(!el) return;
     if(!LV.on){ st.className="pill info"; st.textContent="Not connected"; el.textContent=LV.err||""; return; }
     const live=SH.pts.filter(p=>p.src==="live"), age=LV.last?Math.round((Date.now()-LV.last)/1000):null;
     st.className="pill "+(LV.err?"bad":age!==null&&age<20?"good":"warn"); st.textContent=LV.err?"Problem":age!==null&&age<20?"● Live":"Waiting for data";
-    el.textContent=LV.err?LV.err:`Channel ${LV.ch} · ${live.length} points · ${LV.n} readings received${age!==null?` · last ${age} s ago`:" · none yet"}`; }
+    el.textContent=LV.err?LV.err:`Channel ${LV.ch} · ${live.length} points · ${LV.n} readings received${age!==null?` · last ${age} s ago`:" · none yet"}${LV.store==="kv"?" · basic storage (some readings may be lost; connect the D1 database)":LV.store==="d1"?" · database storage":""}`; }
   function applyTx(tx){ const k=JSON.stringify(tx); if(k===LV.txKey) return; LV.txKey=k;
     SH.site={name:tx.name||"Transmitter",lat:tx.lat,lon:tx.lon,h:tx.h||30}; SH.gTx=null; SH.view=null;
     if(tx.f_mhz){ SH.f=tx.f_mhz; const b=BANDS.find(x=>Math.abs(x[2]-tx.f_mhz)<0.01); const sel=$("shBand");
@@ -9320,10 +9320,10 @@ init();
       Object.assign(p,{name:`${r.sensor} · ${srcLabel(r.src)}`,origin:r.src,lat:r.lat,lon:r.lon,h:r.h,built:!!r.built,sensor:!!r.fixed,meas:r.level}); });
     return added; }
   async function poll(){ if(!LV.on) return;
-    try{ const r=await fetch(`/api/measure?ch=${encodeURIComponent(LV.ch)}&since=${LV.since}`,{cache:"no-store"}); const j=await r.json().catch(()=>({}));
+    try{ const r=await fetch(`/api/measure?ch=${encodeURIComponent(LV.ch)}&since=${LV.since}&after=${LV.after}`,{cache:"no-store"}); const j=await r.json().catch(()=>({}));
       if(!r.ok){ LV.err=j.error||("Server answered "+r.status); liveStat(); return; } LV.err="";
-      if(j.tx) applyTx(j.tx);
-      const list=(j.readings||[]); if(list.length){ LV.since=Math.max(...list.map(x=>x.rt));
+      if(j.tx) applyTx(j.tx); LV.store=j.store||"";
+      const list=(j.readings||[]); if(j.cursor!==undefined) LV.after=j.cursor; if(list.length){ LV.since=Math.max(...list.map(x=>x.rt));
         if($("shReplace").checked&&SH.pts.some(p=>p.src!=="live"&&p.src!=="csv")){ SH.pts=SH.pts.filter(p=>p.src==="live"||p.src==="csv"); SH.cal=null; SH.sel=-1; }
         const added=takeReadings(list); if(added) SH.view=null; render(); sensors(); if(SH.pts.some(p=>p.g==null)) heights(); }
     }catch(e){ LV.err="Cannot reach the live link (offline?)"; }
@@ -9331,7 +9331,7 @@ init();
   function connect(on){ LV.on=on; clearInterval(LV.timer); LV.err="";
     $("shConnect").textContent=on?"Disconnect":"Connect"; $("shCh").disabled=on;
     if(on){ LV.ch=$("shCh").value.trim().toLowerCase(); if(!/^[a-z0-9][a-z0-9-]{2,39}$/.test(LV.ch)){ LV.on=false; $("shCh").disabled=false; $("shConnect").textContent="Connect"; LV.err="Use 3–40 lowercase letters, digits or dashes for the channel name."; liveStat(); return; }
-      try{ localStorage.setItem("gwlab-live-ch",LV.ch); }catch(e){} LV.since=0; LV.txKey=""; poll(); LV.timer=setInterval(poll,3000); hint("Connected. Readings appear as they arrive."); }
+      try{ localStorage.setItem("gwlab-live-ch",LV.ch); }catch(e){} LV.since=0; LV.after=0; LV.txKey=""; poll(); LV.timer=setInterval(poll,3000); hint("Connected. Readings appear as they arrive."); }
     liveStat(); }
 
   /* ---------- wiring ---------- */
