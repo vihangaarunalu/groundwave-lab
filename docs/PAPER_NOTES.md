@@ -24,6 +24,11 @@ Aim-Theory-Procedure-Simulation-Observation-Test format. Nothing has to be insta
 | Obstacles (buildings, hills) | Single knife edge J(ν); two strongest edges | ITU-R P.526 |
 | Ground reflection | Two-ray model with Fresnel coefficients | ITU-R P.527 ground constants; Rappaport (2002) |
 | Rain | Specific attenuation | ITU-R P.838 |
+| Free space (line of sight) | Free-space attenuation; field strength from received power | ITU-R P.525 |
+| Atmospheric refraction | Refractivity gradient (−40 N/km standard; ducting below −157 N/km), effective earth radius k·R | ITU-R P.453, ITU-R P.834 |
+| Line-of-sight path clearance | Fresnel-zone clearance criteria | ITU-R P.530, ITU-R P.526 |
+| Fading statistics | Rayleigh / Nakagami-Rice distributions | ITU-R P.1057, ITU-R P.1406 |
+| EARFCN → frequency | 4G operating bands | 3GPP TS 36.101 |
 | Mobile fading (experiment) | Clarke/Jakes sum of sinusoids; Rice statistics | Clarke (1968); Jakes (1974) |
 | Walk-test planning | Route measurements; 40λ averaging; coverage edge | ITU-R SM.1708; Lee (1985); BS.412 / BT.1368 |
 | Shadowing (sensor model) | Exponentially correlated log-normal shadowing | Gudmundson (1991) |

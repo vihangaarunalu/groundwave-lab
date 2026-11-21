@@ -1927,6 +1927,11 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .gt-hand.drag svg{animation:gt-drag 2.2s ease-in-out infinite}
 @keyframes gt-tap{0%,100%{transform:translate(0,6px)}35%{transform:translate(0,0) scale(.92)}60%{transform:translate(0,6px)}}
 @keyframes gt-ring{0%,30%{opacity:0;transform:scale(.4)}40%{opacity:1}80%,100%{opacity:0;transform:scale(2.4)}}
+.gt-hand{transition:left .55s cubic-bezier(.23,1,.32,1),top .55s cubic-bezier(.23,1,.32,1)}
+.gt-hand.point svg{animation:gt-bob 1.6s ease-in-out infinite}
+@keyframes gt-bob{0%,100%{transform:translate(0,0)}50%{transform:translate(-3px,-6px)}}
+.gt-tip{margin:6px 0 0;font-size:12.5px;color:var(--muted)}
+.gt.explain .gt-dots,.gt.explain #gtBack{display:none}
 @keyframes gt-drag{0%{transform:translate(-40px,4px)}15%{transform:translate(-40px,0) scale(.92)}70%{transform:translate(40px,0) scale(.92)}85%,100%{transform:translate(40px,4px)}}
 .guidebtn{border-color:var(--lime)!important}
 .guidebtn.hello{animation:gb-hello 2.4s ease-in-out 3}
@@ -2042,6 +2047,21 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .sh-showf{font-size:var(--fs-meta);color:var(--muted);align-self:center}
 #shShow{min-height:38px}
 .sh-legend i.p{background:#8A99A8;border-radius:2px;transform:rotate(45deg) scale(.9)}
+
+/* propagation picker above the animation */
+.scpick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 var(--sp-3)}
+.scpick button{display:grid;grid-template-columns:64px minmax(0,1fr);grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-md);padding:8px 10px;font:inherit;cursor:pointer;min-height:58px}
+.scpick svg{grid-row:1/3;width:64px;height:32px}
+.scpick b{font-size:14px;line-height:1.2} .scpick span{font-size:12px;color:var(--muted);line-height:1.25}
+.scpick button:hover{border-color:var(--accent)}
+.scpick button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.scpick button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
+.scpick path{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.scpick .m{stroke:var(--ink)} .scpick .g{stroke:#6b7d45} .scpick .r1{stroke:#7a9a12} .scpick .r2{stroke:#1f8fc4;stroke-dasharray:4 3} .scpick .r0{stroke:var(--muted);stroke-dasharray:3 3;stroke-width:1.4} .scpick .h{fill:#8a6f43;stroke:#5a4526} .scpick .i{stroke:#9b7bd1}
+@media (max-width:1100px){.scpick{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.scpick{grid-template-columns:1fr 1fr}.scpick button{grid-template-columns:48px minmax(0,1fr)}.scpick svg{width:48px;height:24px}}
+
+#scNote .src{display:block;margin-top:6px;font-size:12px;color:var(--muted)}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2127,7 +2147,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
       <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz" data-kbd="9" data-tiptext="Quiz"><span class="n">9</span>Quiz</button>
     </nav>
     <button class="scope" id="scopeChip" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>&#8212;</b></button>
-    <button class="iconbtn themebtn guidebtn" id="guideBtn" type="button" aria-label="Guide to this page" data-kbd="G" data-tiptext="Show me how this page works"><svg class=ic aria-hidden=true><use href=#i-target /></svg><span class="lbl-t">Guide</span></button>
+    <button class="iconbtn themebtn guidebtn" id="guideBtn" type="button" aria-label="Guide to this page" data-kbd="G" data-tiptext="Show me how this page works · or point at anything and press G"><svg class=ic aria-hidden=true><use href=#i-target /></svg><span class="lbl-t">Guide</span></button>
     <button class="iconbtn themebtn fbtop" id="fbTop" type="button" aria-haspopup="dialog" aria-label="Give feedback" title="Tell us how it went"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg><span class="lbl-t">Feedback</span></button>
     <button class="iconbtn themebtn" id="helpBtn" type="button" aria-haspopup="dialog" title="Help and quick start">? Help</button>
     <button class="iconbtn themebtn" id="themeBtn" type="button" data-kbd="T" aria-label="Colour theme: automatic" title="Switch light / dark theme">◐ Auto</button>
@@ -2379,8 +2399,15 @@ body:not(.an-scene) #animation .sc-only{display:none}
 <section class="wrap" id="animation" role="tabpanel" aria-labelledby="tab-animation" hidden>
   <div class="screenhead"><h2 class="th"><span class="ti ti-anim" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M32 54V30M26 54L32 30L38 54M28.5 44H35.5"/><path class="arc a1" d="M25 24a10 10 0 0 1 14 0"/><path class="arc a2" d="M20 18a17 17 0 0 1 24 0"/><path class="arc a3" d="M15 12a24 24 0 0 1 34 0"/><circle class="dot" cx="32" cy="28" r="2.6"/></svg></span>What the wave does</h2><p>The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere.</p></div>
   <section class="panel card stagebar">
+        <div class="scpick" id="scPick" role="group" aria-label="Choose the kind of propagation to animate">
+      <button type="button" data-scn="los" aria-pressed="false"><svg viewBox="0 0 64 32" aria-hidden="true"><path d="M8 26V8M56 26V12" class="m"/><path d="M8 8L56 12" class="r1"/><path d="M2 26h60" class="g"/></svg><b>Line of sight</b><span>straight path, free space</span></button>
+      <button type="button" data-scn="tworay" aria-pressed="false"><svg viewBox="0 0 64 32" aria-hidden="true"><path d="M8 26V8M56 26V12" class="m"/><path d="M8 8L56 12" class="r1"/><path d="M8 8L36 26L56 12" class="r2"/><path d="M2 26h60" class="g"/></svg><b>Reflection</b><span>direct + ground-reflected ray</span></button>
+      <button type="button" data-scn="refract" aria-pressed="false"><svg viewBox="0 0 64 32" aria-hidden="true"><path d="M8 24V8M56 24V10" class="m"/><path d="M8 8Q32 0 56 10" class="r1"/><path d="M8 8L56 10" class="r0"/><path d="M2 26Q32 18 62 26" class="g"/></svg><b>Refraction</b><span>air bends the wave over the earth</span></button>
+      <button type="button" data-scn="knife" aria-pressed="false"><svg viewBox="0 0 64 32" aria-hidden="true"><path d="M8 26V10M56 26V14" class="m"/><path d="M22 26L32 6L42 26Z" class="h"/><path d="M8 10L32 6L56 14" class="r2"/><path d="M2 26h60" class="g"/></svg><b>Diffraction</b><span>bending over a hill or roof</span></button>
+      <button type="button" data-scn="gs" aria-pressed="false"><svg viewBox="0 0 64 32" aria-hidden="true"><path d="M2 8Q32 -4 62 8" class="i"/><path d="M8 26L24 8L40 26" class="r1"/><path d="M8 25Q32 22 62 25" class="r2"/><path d="M2 27h60" class="g"/></svg><b>Ground and sky wave</b><span>LF/MF/HF, ionosphere, skip</span></button>
+    </div>
     <div class="row">
-      <div class="field" style="min-width:230px"><label for="animScene">Propagation</label><select id="animScene"><option value="gs">Ground wave and sky wave</option><option value="tworay">Line of sight + ground reflection</option><option value="knife">Diffraction over a hill (knife-edge)</option></select></div>
+      <div class="field" style="min-width:230px"><label for="animScene">Propagation</label><select id="animScene"><option value="gs">Ground wave and sky wave</option><option value="los">Line of sight (free space)</option><option value="tworay">Reflection (line of sight + ground)</option><option value="refract">Refraction (the atmosphere bends the wave)</option><option value="knife">Diffraction over a hill (knife-edge)</option></select></div>
       <div class="field gs-only" style="min-width:200px"><label for="animModel">Model</label><select id="animModel"></select></div>
       <div class="field"><label for="animRange">View</label><select id="animRange"><option value="30">0–30 km</option><option value="100">0–100 km</option><option value="300">0–300 km</option><option value="1000" selected>0–1000 km</option><option value="3000">0–3000 km</option></select></div>
       <div class="field"><label for="unitPickA">Units</label><select class="unit-pick" id="unitPickA"><option value="auto">Auto (FM/TV: both)</option><option value="lin">µV/m · mV/m</option><option value="db">dBµV/m</option><option value="rx">dBµV at receiver (FM/TV)</option></select></div>
@@ -2463,6 +2490,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
         <div class="field"><label for="scD">Path length <span class="v" id="scDV"></span></label><input type="range" id="scD" min="-1.3" max="1.9" step="0.001"></div>
         <div class="field" data-sc="tworay"><label for="scG">Reflecting ground</label><select id="scG"><option value="sea">Sea water</option><option value="wet">Wet ground</option><option value="avg" selected>Average ground</option><option value="dry">Dry ground</option><option value="city">City (concrete)</option></select></div>
         <div class="field" data-sc="tworay"><label for="scPol">Polarisation</label><select id="scPol"><option value="v">Vertical</option><option value="h">Horizontal</option></select></div>
+        <div class="field" data-sc="refract" hidden><label for="scK">Atmosphere</label><select id="scK"><option value="0.67">Sub-refraction, k = 2/3 (fog, cold air near the ground)</option><option value="1">No bending, k = 1 (for comparison)</option><option value="1.333" selected>Standard atmosphere, k = 4/3</option><option value="2">Super-refraction, k = 2 (warm humid evening)</option><option value="-3">Ducting (the wave is trapped near the ground)</option></select></div>
         <div class="field" data-sc="knife" hidden><label for="scHo">Hilltop above the line of sight <span class="v" id="scHoV"></span></label><input type="range" id="scHo" min="-80" max="300" step="1"></div>
         <div class="field" data-sc="knife" hidden><label for="scPos">Hill position along the path <span class="v" id="scPosV"></span></label><input type="range" id="scPos" min="8" max="92" step="1"></div>
       </section>
@@ -3863,7 +3891,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v9.5</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v9.6</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -5952,7 +5980,13 @@ function drawScope(thr){
    - knife-edge: diffraction over a single obstacle (ITU-R P.526 J(ν))
    Field values assume 1 kW ERP; free space E = 106.9 + 10log P − 20log d.
    ===================================================================== */
-const SCN={f:100,ht:30,hr:10,d:5,g:"avg",pol:"v",ho:20,pos:0.5,drag:null,key:""};
+const SCN={f:100,ht:30,hr:10,d:5,g:"avg",pol:"v",ho:20,pos:0.5,k:1.333,drag:null,key:""};
+const RE_M=6371e3;
+/* line of sight over a curved earth: effective radius k·R (standard atmosphere k = 4/3) */
+function losGeom(d_km,ht,hr,fMHz,k){ const D=d_km*1000, lam=300/fMHz, ke=k||4/3, bul=u=>u*(1-u)*D*D/(2*ke*RE_M), hz=h=>Math.sqrt(2*Math.abs(ke)*RE_M*h)/1000;
+  let minClr=1e9, minF=1e9, at=0.5; for(let i=1;i<100;i++){ const u=i/100, hl=ht+(hr-ht)*u, r=Math.sqrt(lam*u*(1-u)*D), c=hl-bul(u); if(c<minClr){ minClr=c; } if(r>0&&c/r<minF){ minF=c/r; at=u; } }
+  const r1=Math.sqrt(lam*D)/2, Lfs=32.44+20*Math.log10(fMHz)+20*Math.log10(Math.max(d_km,1e-3)), Efs=106.9-20*Math.log10(Math.max(d_km,1e-4));
+  return {D,lam,bul,r1,Lfs,Efs,horizon:ke>0?hz(ht)+hz(hr):Infinity,minClr,minF,at,state:minClr<0?"blocked":minF<0.6?"fresnel":"clear"}; }
 const SCN_G={sea:["Sea water",80,5],wet:["Wet ground",30,0.01],avg:["Average ground",15,0.005],dry:["Dry ground",4,0.001],city:["City (concrete)",5,0.0001]};
 const cx_=(re,im)=>({re,im}), cArgS=a=>Math.atan2(a.im,a.re);   /* complex helpers cAdd, cSub, cMul, cDiv, cSqrt, cAbs are defined with the ground-wave code */
 /* Fresnel reflection coefficient of a flat ground at grazing angle psi */
@@ -5975,6 +6009,16 @@ function knifeEdge(d_km,pos,ho,fMHz){
 }
 function sceneTiles(){
   const el=$("scTiles"), nt=$("scNote"); if(!el) return; const S=SCN, t=(k,v,sub,cls)=>`<div class="tile ${cls||"info"}"><span class="k">${k}</span><span class="val">${v}</span><span class="sub">${sub}</span></div>`;
+  if(AN.scene==="los"||AN.scene==="refract"){ const ref=AN.scene==="refract", G=losGeom(S.d,S.ht,S.hr,S.f,ref?S.k:4/3), G1=losGeom(S.d,S.ht,S.hr,S.f,1), stc=G.state==="clear"?"good":G.state==="fresnel"?"warn":"bad";
+    const hz=v=>isFinite(v)?`${v.toFixed(v<10?1:0)} km`:"very far (ducting)";
+    el.innerHTML=(ref?t("Atmosphere",S.k<0?"duct":`k = ${S.k.toFixed(2)}`,`refractivity gradient ${S.k<0?"< −157":(-157*(1-1/S.k)).toFixed(0)} N-units/km (ITU-R P.453)`):t("Free-space loss",`${G.Lfs.toFixed(1)} dB`,"32.4 + 20·log f + 20·log d (ITU-R P.525)"))
+      +t("Path",{clear:"clear",fresnel:"Fresnel zone touched",blocked:"blocked by the earth"}[G.state],`smallest clearance ${G.minClr.toFixed(0)} m above the ground`,stc)
+      +t("Radio horizon",hz(G.horizon),ref?`without bending (k = 1): ${hz(G1.horizon)}`:"√(2kR·hₜ) + √(2kR·hᵣ), k = 4/3 (ITU-R P.834)")
+      +t("Fresnel zone (middle)",`${G.r1.toFixed(1)} m`,"keep 60% clear (ITU-R P.526 / P.530)")
+      +t("Field strength",fmtField(G.Efs,S.f),"free space, 1 kW ERP")
+      +t("Wavelength",G.lam>=1?G.lam.toFixed(2)+" m":(G.lam*100).toFixed(1)+" cm",fmtF(S.f));
+    nt.innerHTML=ref?`Air is denser near the ground, so radio waves travel a little slower there and <b>bend down towards the earth</b> (refraction). In a standard atmosphere the ray curves as if the earth were 4/3 larger, so the radio horizon moves out. On warm humid evenings (k = 2) it bends more and signals reach further; in ducting the wave is trapped near the ground and travels very far. In sub-refraction (fog, k = 2/3) it bends less and links can fade. Choose the atmosphere and watch the ray and the clearance curves.<br><span class="src">Sources: ITU-R P.453 (refractivity: standard gradient −40 N-units/km, super-refraction below −79, ducting below −157 N-units/km) · ITU-R P.834 (tropospheric refraction, effective earth radius k·R) · ITU-R P.526 (Fresnel zones).</span>`
+      :`The wave travels in a <b>straight line</b> from the transmitter to the receiver. Its strength falls with distance only (free space: −6 dB each time the distance doubles). Over long paths the curve of the earth rises into the path: keep 60% of the first Fresnel zone (the blue band) clear. Beyond the <b>radio horizon</b> the earth blocks the line of sight. Drag the masts or the receiver distance in the chart.<br><span class="src">Sources: ITU-R P.525 (free-space attenuation, field strength for 1 kW ERP) · ITU-R P.526 (Fresnel zones; 0.6 F1 clearance gives practically free-space loss) · ITU-R P.530 (path clearance criteria for line-of-sight links) · ITU-R P.834 / P.453 (standard atmosphere, k = 4/3).</span>`; return; }
   if(AN.scene==="tworay"){ const R=twoRay(S.d,S.ht,S.hr,S.f,S.g,S.pol), con=R.FdB>=0;
     el.innerHTML=t("Path difference",`${(R.dl*100).toFixed(R.dl<1?1:0)} cm`,`${(R.dl/R.lam).toFixed(2)} λ · λ = ${R.lam>=1?R.lam.toFixed(2)+" m":(R.lam*100).toFixed(1)+" cm"}`)
       +t("Reflection",`|Γ| ${cAbs(R.G).toFixed(2)}`,`phase ${(cArgS(R.G)*180/Math.PI).toFixed(0)}° · grazing ${(R.psi*180/Math.PI).toFixed(2)}°`)
@@ -5982,7 +6026,7 @@ function sceneTiles(){
       +t("Field strength",fmtField(R.E,S.f),`free space ${fmtField(R.Efs,S.f)} (1 kW ERP)`)
       +t("Breakpoint distance",`${fmtD(R.db)} km`,`4·ht·hr/λ: beyond it the level falls as 1/d²`)
       +t("Total phase difference",`${R.dPhase.toFixed(0)}°`,"path delay + reflection phase");
-    nt.innerHTML=`The receiver gets the <b>direct ray</b> and a <b>ray reflected by the ground</b>. The reflected ray travels ${(R.dl*100).toFixed(1)} cm further and the ground flips its phase by about 180°, so the two either add or cancel. Move the receiver or change an antenna height and watch the level swing between peaks and nulls (the curve below). Flat earth; valid for short paths.`; }
+    nt.innerHTML=`The receiver gets the <b>direct ray</b> and a <b>ray reflected by the ground</b>. The reflected ray travels ${(R.dl*100).toFixed(1)} cm further and the ground flips its phase by about 180°, so the two either add or cancel. Move the receiver or change an antenna height and watch the level swing between peaks and nulls (the curve below). Flat earth; valid for short paths.<br><span class="src">Sources: ground electrical constants from ITU-R P.527; Fresnel reflection coefficients; free-space field from ITU-R P.525.</span>`; }
   else { const K=knifeEdge(S.d,S.pos,S.ho,S.f), blocked=S.ho>0;
     el.innerHTML=t("Fresnel parameter ν",K.nu.toFixed(2),"ν = h·√(2d / (λ·d₁·d₂))")
       +t("Diffraction loss",`${K.L.toFixed(1)} dB`,"ITU-R P.526 J(ν)",K.L<3?"good":K.L<12?"warn":"bad")
@@ -5990,15 +6034,16 @@ function sceneTiles(){
       +t("Clearance",blocked?`blocked by ${S.ho.toFixed(0)} m`:`${Math.round(K.clear*100)}% of F1`,blocked?"line of sight cut":K.clear>=0.6?"≥ 60%: practically free space":"inside the Fresnel zone",blocked?"bad":K.clear>=0.6?"good":"warn")
       +t("Field strength",fmtField(K.E,S.f),`free space ${fmtField(K.Efs,S.f)} (1 kW ERP)`)
       +t("Frequency effect",`λ = ${K.lam>=1?K.lam.toFixed(2)+" m":(K.lam*100).toFixed(1)+" cm"}`,"higher frequency: larger ν, more loss");
-    nt.innerHTML=`The hill bends part of the wave over its top into the shadow behind it (diffraction). How much gets through depends on how far the hill reaches into the first Fresnel zone, given by ν. Even a hill just below the line of sight costs a few dB; keep 60% of the first Fresnel zone clear for a free-space link. Drag the hilltop or the masts.`; }
+    nt.innerHTML=`The hill bends part of the wave over its top into the shadow behind it (diffraction). How much gets through depends on how far the hill reaches into the first Fresnel zone, given by ν. Even a hill just below the line of sight costs a few dB; keep 60% of the first Fresnel zone clear for a free-space link. Drag the hilltop or the masts.<br><span class="src">Source: ITU-R P.526 (single knife-edge diffraction J(ν), Fresnel zones).</span>`; }
 }
 function drawScene(dt){
   const W=anim.clientWidth, H=anim.clientHeight; if(!W||!H) return;
   const dpr=window.devicePixelRatio||1; if(anim.width!==Math.round(W*dpr)||anim.height!==Math.round(H*dpr)){ anim.width=W*dpr; anim.height=H*dpr; }
   const c=actx; c.setTransform(dpr,0,0,dpr,0,0); PILLS=[]; const S=SCN, t=AN.t, two=AN.scene==="tworay";
   // layout: geometry on top, a plot strip at the bottom
-  const plotH=Math.min(140,H*0.28), yG=H-plotH-26, x0=88, x1=W-88, gH=yG-78;
-  const hMax=Math.max(S.ht,S.hr,two?0:S.ho+Math.max(S.ht,S.hr),10)*1.25, vs=gH/hMax;   // px per metre (heights exaggerated)
+  const plotH=Math.min(140,H*0.28), yG=H-plotH-26, x0=88, x1=W-88, gH=yG-78, sc=AN.scene, curved=sc==="los"||sc==="refract";
+  const bulMax=curved?(S.d*1000)**2/(8*(sc==="los"?4/3:1)*RE_M):0;
+  const hMax=Math.max(S.ht,S.hr,sc==="knife"?S.ho+Math.max(S.ht,S.hr):0,bulMax+Math.max(S.ht,S.hr)*0.35,10)*1.25, vs=gH/hMax;   // px per metre (heights exaggerated)
   const X=f=>x0+(x1-x0)*f, Y=h=>yG-h*vs;
   const sky=c.createLinearGradient(0,0,0,yG); sky.addColorStop(0,"#16405e"); sky.addColorStop(1,"#5d8db3"); c.fillStyle=sky; c.fillRect(0,0,W,yG);
   const gnd=c.createLinearGradient(0,yG,0,H); gnd.addColorStop(0,S.g==="sea"&&two?"#1f5f8f":"#4d5b33"); gnd.addColorStop(1,"#1b2a1c"); c.fillStyle=gnd; c.fillRect(0,yG,W,H-yG);
@@ -6012,7 +6057,50 @@ function drawScene(dt){
     for(let k=0;k<3;k++){ let s=((t*0.12+phase+k*len)%(tot+60))-30; if(s<0||s>tot) continue; let i=0; while(i<seg.length&&s>seg[i]){ s-=seg[i]; i++; } if(i>=seg.length) continue;
       const u=s/seg[i], x=pts[i][0]+(pts[i+1][0]-pts[i][0])*u, y=pts[i][1]+(pts[i+1][1]-pts[i][1])*u, gl=c.createRadialGradient(x,y,0,x,y,10); gl.addColorStop(0,`rgba(${col},.85)`); gl.addColorStop(1,`rgba(${col},0)`); c.fillStyle=gl; c.beginPath(); c.arc(x,y,10,0,7); c.fill(); } };
   const [tx,ty]=[X(0),Y(S.ht)], [rx,ry]=[X(1),Y(S.hr)];
-  if(two){
+  if(curved){
+    const ref=sc==="refract", kk=ref?S.k:4/3, G=losGeom(S.d,S.ht,S.hr,S.f,kk), D=G.D, bulT=u=>u*(1-u)*D*D/(2*(ref?1:4/3)*RE_M);
+    const sagR=u=>ref?u*(1-u)*D*D/(2*RE_M)*(1-1/S.k):0, rayH=u=>S.ht+(S.hr-S.ht)*u+sagR(u);
+    // atmosphere: refractive index falls with height (drawn as fading bands)
+    if(ref){ for(let b=0;b<6;b++){ c.fillStyle=`rgba(205,242,58,${0.10-b*0.016})`; c.fillRect(0,yG-(b+1)*(yG-40)/6,W,(yG-40)/6); }
+      if(AN.labels) pill(c,"denser air near the ground → the wave slows down there and bends towards it",W/2,48,{size:11,bold:false}); }
+    // curved ground (true earth for refraction, effective 4/3 earth for line of sight)
+    const gnd2=c.createLinearGradient(0,Y(bulT(0.5)),0,yG+40); gnd2.addColorStop(0,"#5a6a3a"); gnd2.addColorStop(1,"#26361f"); c.fillStyle=gnd2; c.beginPath(); c.moveTo(0,yG+2);
+    for(let i=0;i<=80;i++){ const u=i/80; c.lineTo(X(u),Y(bulT(u))); } c.lineTo(W,yG+2); c.lineTo(W,H); c.lineTo(0,H); c.closePath(); c.fill();
+    c.strokeStyle="rgba(236,244,252,.6)"; c.lineWidth=1.2; c.beginPath(); for(let i=0;i<=80;i++){ const u=i/80; i?c.lineTo(X(u),Y(bulT(u))):c.moveTo(X(u),Y(bulT(u))); } c.stroke();
+    // first Fresnel zone around the ray
+    c.save(); c.fillStyle="rgba(98,206,255,.12)"; c.strokeStyle="rgba(98,206,255,.4)"; c.lineWidth=1; c.beginPath();
+    for(let i=0;i<=80;i++){ const u=i/80, r=Math.sqrt(G.lam*u*(1-u)*D); i?c.lineTo(X(u),Y(rayH(u)+r)):c.moveTo(X(u),Y(rayH(u)+r)); }
+    for(let i=80;i>=0;i--){ const u=i/80, r=Math.sqrt(G.lam*u*(1-u)*D); c.lineTo(X(u),Y(rayH(u)-r)); } c.closePath(); c.fill(); c.stroke(); c.restore();
+    const col=G.state==="blocked"?"226,76,66":G.state==="fresnel"?"240,180,60":"205,242,58", pts=[]; for(let i=0;i<=60;i++){ const u=i/60; pts.push([X(u),Y(rayH(u))]); }
+    if(ref){ dash(tx,ty,rx,ry,"rgba(236,244,252,.75)",1.4,[6,5]); }
+    c.strokeStyle=`rgba(${col},.95)`; c.lineWidth=2.6; c.beginPath(); pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])); c.stroke();
+    // wavefronts travelling along the ray
+    packet(pts,110,col,0);
+    if(G.state!=="clear"){ const u=G.at, bx=X(u), by=Y(bulT(u)); c.fillStyle=`rgba(${col},.9)`; c.beginPath(); c.arc(bx,by,5,0,7); c.fill(); }
+    mast(tx,S.ht,"TX","#d13b4f"); mast(rx,S.hr,"RX","#1f5fd1");
+    if(AN.labels){
+      const st={clear:"Clear line of sight · 60% of the Fresnel zone is free",fresnel:"The earth reaches into the Fresnel zone · some loss",blocked:"Blocked by the earth's curve · beyond the radio horizon"}[G.state];
+      pill(c,st,X(0.5),Y(rayH(0.5)+Math.sqrt(G.lam*0.25*D))-18,{accent:col,size:11.5});
+      if(ref){ pill(c,"straight line (no atmosphere)",X(0.25),Y(S.ht+(S.hr-S.ht)*0.25)+18,{size:11,bold:false}); pill(c,`real ray, bent by the air (k = ${S.k<0?"duct":S.k.toFixed(2)})`,X(0.7),Y(rayH(0.7))-16,{size:11,accent:col}); }
+      else pill(c,"earth's bulge (drawn with the standard 4/3 earth)",X(0.5),Y(bulT(0.5))+22,{size:11,bold:false}); }
+    // plot strip
+    const L=x0, Rr=W-24, T=yG+18, B=H-22; c.fillStyle="rgba(8,26,39,.72)"; c.fillRect(L-8,T-12,Rr-L+16,B-T+22);
+    c.font="11px "+cssVar("--font-mono"); c.textAlign="left";
+    if(!ref){ const dmin=0.05, dmax=Math.min(300,Math.max(80,G.horizon*1.3)), lx=d=>L+(Math.log10(d)-Math.log10(dmin))/(Math.log10(dmax)-Math.log10(dmin))*(Rr-L), hi=106.9-20*Math.log10(dmin)+4, lo=hi-70, ly=v=>T+(hi-clamp(v,lo,hi))/(hi-lo)*(B-T);
+      if(G.horizon<dmax){ c.fillStyle="rgba(226,76,66,.18)"; c.fillRect(lx(G.horizon),T,Rr-lx(G.horizon),B-T); c.fillStyle="rgba(255,190,180,.9)"; c.fillText("beyond the radio horizon",lx(G.horizon)+6,T+12); }
+      c.strokeStyle="rgba(236,244,252,.18)"; c.lineWidth=1; for(let v=Math.ceil(lo/10)*10;v<=hi;v+=10){ c.beginPath(); c.moveTo(L,ly(v)); c.lineTo(Rr,ly(v)); c.stroke(); }
+      c.strokeStyle="#CDF23A"; c.lineWidth=2; c.beginPath(); for(let i=0;i<=200;i++){ const d=dmin*Math.pow(dmax/dmin,i/200); i?c.lineTo(lx(d),ly(106.9-20*Math.log10(d))):c.moveTo(lx(d),ly(106.9-20*Math.log10(d))); } c.stroke();
+      c.fillStyle="#fff"; c.beginPath(); c.arc(lx(S.d),ly(G.Efs),5,0,7); c.fill();
+      c.fillStyle="rgba(236,244,252,.85)"; c.fillText("Free-space field vs distance (1 kW ERP): −6 dB every time the distance doubles · drag here to move the receiver",L,T-2);
+      c.textAlign="center"; [0.05,0.1,0.5,1,5,10,50,100,300].filter(d=>d>=dmin&&d<=dmax).forEach(d=>c.fillText(d+" km",lx(d),B+14)); c.textAlign="left";
+      AN.sgeom={plot:{L,Rr,T,B,dmin,dmax},tx:[tx,ty],rx:[rx,ry],vs,yG,X}; }
+    else { const ks=[[0.67,"k 2/3","226,76,66"],[1,"k 1","236,244,252"],[1.333,"k 4/3","205,242,58"],[2,"k 2","98,206,255"]], cl=(u,k)=>S.ht+(S.hr-S.ht)*u-u*(1-u)*D*D/(2*k*RE_M);
+      let lo=0,hi=0; ks.forEach(([k])=>{ for(let i=0;i<=50;i++){ const v=cl(i/50,k); lo=Math.min(lo,v); hi=Math.max(hi,v); } }); hi+=5; lo-=5; const ly=v=>T+(hi-v)/(hi-lo)*(B-T), lxu=u=>L+u*(Rr-L);
+      c.strokeStyle="rgba(236,244,252,.4)"; c.setLineDash([3,3]); c.beginPath(); c.moveTo(L,ly(0)); c.lineTo(Rr,ly(0)); c.stroke(); c.setLineDash([]);
+      ks.forEach(([k,lab,cc])=>{ const on=Math.abs(k-S.k)<0.01; c.strokeStyle=`rgba(${cc},${on?1:.45})`; c.lineWidth=on?2.6:1.2; c.beginPath(); for(let i=0;i<=60;i++){ const u=i/60; i?c.lineTo(lxu(u),ly(cl(u,k))):c.moveTo(lxu(u),ly(cl(u,k))); } c.stroke(); c.fillStyle=`rgba(${cc},${on?1:.6})`; c.fillText(lab,lxu(0.5)+4,ly(cl(0.5,k))-4); });
+      c.fillStyle="rgba(236,244,252,.85)"; c.fillText("Clearance of the ray above the ground along the path (m) · below the dotted line = blocked",L,T-2);
+      AN.sgeom={tx:[tx,ty],rx:[rx,ry],vs,yG,X}; }
+  } else if(two){
     const R=twoRay(S.d,S.ht,S.hr,S.f,S.g,S.pol), fr=S.ht/(S.ht+S.hr), [px,py]=[X(fr),yG], ix=tx, iy=yG+S.ht*vs;
     // image antenna (method of images)
     dash(tx,ty,rx,ry,"rgba(205,242,58,.95)",2.6); dash(tx,ty,px,py,"rgba(98,206,255,.95)",2.2); dash(px,py,rx,ry,"rgba(98,206,255,.95)",2.2);
@@ -6070,19 +6158,23 @@ function drawScene(dt){
     c.textAlign="center"; for(let v=-3;v<=3;v++) c.fillText("ν "+v,nx(v),B+14); c.textAlign="right"; for(let v=0;v<=30;v+=10) c.fillText(v+" dB",L-6,ly(v)+4); c.textAlign="left";
     AN.sgeom={tip:[kx,ky],tx:[tx,ty],rx:[rx,ry],vs,yG,X};
   }
-  pill(c,`${two?"Line of sight + ground reflection":"Diffraction over a hill"} · ${fmtF(S.f)} · ${fmtD(S.d)} km path · heights exaggerated`,12,22,{align:"left"});
+  pill(c,`${{los:"Line of sight",refract:"Refraction in the atmosphere",tworay:"Reflection: line of sight + ground",knife:"Diffraction over a hill"}[sc]} · ${fmtF(S.f)} · ${fmtD(S.d)} km path · heights exaggerated`,12,22,{align:"left"});
   PILLS=null;
-  const k=JSON.stringify([AN.scene,S.f,S.ht,S.hr,S.d,S.g,S.pol,S.ho,S.pos,UNITS.mode]); if(k!==SCN.key){ SCN.key=k; sceneTiles(); syncSceneInputs(); }
+  const k=JSON.stringify([AN.scene,S.f,S.ht,S.hr,S.d,S.g,S.pol,S.ho,S.pos,S.k,UNITS.mode]); if(k!==SCN.key){ SCN.key=k; sceneTiles(); syncSceneInputs(); }
 }
 function syncSceneInputs(){ const S=SCN, set=(id,v)=>{ const e=$(id); if(e&&document.activeElement!==e) e.value=v; };
   set("scF",Math.log10(S.f)); set("scHt",S.ht); set("scHr",S.hr); set("scD",Math.log10(S.d)); set("scHo",S.ho); set("scPos",Math.round(S.pos*100));
   const v=(id,txt)=>{ const e=$(id); if(e) e.textContent=txt; }; v("scFV",fmtF(S.f)); v("scHtV",S.ht.toFixed(0)+" m"); v("scHrV",S.hr.toFixed(S.hr<10?1:0)+" m"); v("scDV",fmtD(S.d)+" km"); v("scHoV",(S.ho>=0?"+":"")+S.ho.toFixed(0)+" m"); v("scPosV",Math.round(S.pos*100)+"%"); }
-function setScene(s){ AN.scene=s; document.body.classList.toggle("an-scene",s!=="gs"); const sel=$("animScene"); if(sel) sel.value=s;
+function setScene(s){ const prev=AN.scene; AN.scene=s; document.body.classList.toggle("an-scene",s!=="gs"); const sel=$("animScene"); if(sel) sel.value=s;
+  document.querySelectorAll("#scPick [data-scn]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.scn===s)));
+  if(s!==prev&&(s==="los"||s==="refract")){ if(SCN.f<300) SCN.f=900; Object.assign(SCN,s==="los"?{d:30,ht:80,hr:30}:{d:50,ht:80,hr:20}); }
   const card=$("scnCard"); if(card) card.hidden=s==="gs"; document.querySelectorAll("[data-sc]").forEach(e=>e.hidden=e.dataset.sc!==s);
-  if(s!=="gs"){ SCN.key=""; if(s==="tworay"&&SCN.d>30) SCN.d=5; } }
+  if(s!=="gs"){ SCN.key=""; if((s==="tworay"||s==="knife")&&SCN.d>30) SCN.d=5; } }
 function bindScenes(){
   if(!$("animScene")) return;
   $("animScene").addEventListener("change",e=>setScene(e.target.value));
+  document.querySelectorAll("#scPick [data-scn]").forEach(b=>b.addEventListener("click",()=>setScene(b.dataset.scn)));
+  $("scK").addEventListener("change",e=>{ SCN.k=+e.target.value; SCN.key=""; });
   const rng=(id,fn)=>$(id).addEventListener("input",e=>{ fn(+e.target.value); SCN.key=""; });
   rng("scF",v=>SCN.f=+Math.pow(10,v).toPrecision(3)); rng("scHt",v=>SCN.ht=v); rng("scHr",v=>SCN.hr=v); rng("scD",v=>SCN.d=+Math.pow(10,v).toPrecision(3)); rng("scHo",v=>SCN.ho=v); rng("scPos",v=>SCN.pos=v/100);
   $("scG").addEventListener("change",e=>{ SCN.g=e.target.value; SCN.key=""; }); $("scPol").addEventListener("change",e=>{ SCN.pol=e.target.value; SCN.key=""; });
@@ -8747,6 +8839,14 @@ function bindTabs(){
     x.textAlign="right"; nice(yr[0],yr[1],4).forEach(v=>{ const py=Y(v); x.beginPath(); x.moveTo(L,py); x.lineTo(L+W,py); x.stroke(); x.fillText(+v.toPrecision(4),L-4,py+4); });
     x.textAlign="left"; if(o.xl){ x.textAlign="right"; x.fillText(o.xl,L+W,T+H+26); x.textAlign="left"; } if(o.yl) x.fillText(o.yl,L,T-6);
     return {X,Y}; }
+  const RAY1="#1F8FC4", RAY2="#E07B24";   /* direct ray / reflected or diffracted ray: distinct in both themes */
+  /* glowing pulses that travel along a ray, and a small legend box */
+  function pulses(x,pts,t,col,n){ n=n||3; const seg=[]; let L=0; for(let i=1;i<pts.length;i++){ const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]); seg.push(l); L+=l; } if(!L) return;
+    for(let k=0;k<n;k++){ let s=(((t||0)*0.12)+k*L/n)%L, i=0; while(i<seg.length-1&&s>seg[i]){ s-=seg[i]; i++; } const u=seg[i]?s/seg[i]:0, px=pts[i][0]+(pts[i+1][0]-pts[i][0])*u, py=pts[i][1]+(pts[i+1][1]-pts[i][1])*u;
+      const g=x.createRadialGradient(px,py,0,px,py,9); g.addColorStop(0,col); g.addColorStop(1,"rgba(0,0,0,0)"); x.globalAlpha=0.9; x.fillStyle=g; x.beginPath(); x.arc(px,py,9,0,7); x.fill(); x.globalAlpha=1; } }
+  function legend(x,W,items){ x.font="12px "+(C("--font-body")||"sans-serif"); const w=Math.max(...items.map(i=>x.measureText(i[1]).width))+44, h=items.length*18+10, x0=W-w-10, y0=10;
+    x.fillStyle=C("--panel"); x.globalAlpha=0.92; x.fillRect(x0,y0,w,h); x.globalAlpha=1; x.strokeStyle=C("--line"); x.strokeRect(x0+0.5,y0+0.5,w,h);
+    items.forEach(([col,lab,dash],i)=>{ const y=y0+14+i*18; x.strokeStyle=col; x.lineWidth=2.5; x.setLineDash(dash?[5,4]:[]); x.beginPath(); x.moveTo(x0+8,y); x.lineTo(x0+30,y); x.stroke(); x.setLineDash([]); x.fillStyle=C("--ink"); x.fillText(lab,x0+36,y+4); }); }
   /* Rice / Rayleigh helpers for the fading experiment (E[r²] = 1) */
   function lnI0(z){ if(z<15){ let s=1,t=1; for(let k=1;k<60;k++){ t*=(z/2)*(z/2)/(k*k); s+=t; if(t<1e-14*s) break; } return Math.log(s); } return z-0.5*Math.log(2*Math.PI*z)+Math.log(1+1/(8*z)); }
   const ricePdf=(r,K)=>r<=0?0:Math.exp(Math.log(2*(K+1)*r)-K-(K+1)*r*r+lnI0(2*r*Math.sqrt(K*(K+1))));
@@ -8802,17 +8902,22 @@ function bindTabs(){
         ["Flat-earth formula",s.flat?`${Math.round(s.flat)} km`:"—","2h·√((f/fc)²−1), no earth curvature"],
         ["Steepest returning ray",s.mua!=null?`${s.mua.toFixed(1)}°`:"—","elevation of the critical ray"],
         ["Highest usable frequency",`${s.mufMax.toFixed(1)} MHz`,"fc·sec i for the lowest possible ray"]]; },
-    draw(x,W,H,v,s){ const g=H-28, top=22, maxD=Math.max(4200,(s.skip||0)*1.15), X=d=>18+d/maxD*(W-36), hy=top+ (g-top)*0.15, Hs=(g-hy);
+    anim:true,
+    draw(x,W,H,v,s,t){ const g=H-28, top=22, maxD=Math.max(4200,(s.skip||0)*1.15), X=d=>18+d/maxD*(W-36), hy=top+ (g-top)*0.15, Hs=(g-hy);
       x.fillStyle=C("--accent-soft"); x.fillRect(0,top-10,W,hy-top+14); x.fillStyle=C("--muted"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText(`F2 layer · foF2 ${v.fc} MHz · ${v.h} km`,10,top+4);
       x.strokeStyle=C("--ink"); x.lineWidth=2; x.beginPath(); x.moveTo(0,g); x.lineTo(W,g); x.stroke();
       if(s.state==="skip"){ x.fillStyle="rgba(210,69,58,.12)"; x.fillRect(X(120),g-Hs,X(s.skip)-X(120),Hs); x.fillStyle=C("--bad"); x.fillText("skip zone: no sky wave lands here",X(120)+6,g-8); }
       const ray=(d,col,dash)=>{ x.strokeStyle=col; x.lineWidth=2; x.setLineDash(dash||[]); x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(d/2),hy); x.lineTo(X(d),g); x.stroke(); x.setLineDash([]); };
-      if(s.state==="skip"){ ray(s.skip,C("--accent")); ray(Math.min(s.skip*1.6,maxD*0.98),C("--muted"),[4,4]);
+      if(s.state==="skip"){ ray(s.skip,RAY1); ray(Math.min(s.skip*1.6,maxD*0.98),C("--muted"),[4,4]);
         x.strokeStyle=C("--bad"); x.setLineDash([3,4]); x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(s.skip*0.3),top-6); x.stroke(); x.setLineDash([]); x.fillStyle=C("--bad"); x.fillText("steeper rays escape",X(s.skip*0.3)+4,top+16);
         x.fillStyle=C("--ink"); x.textAlign="center"; x.fillText(`${Math.round(s.skip)} km`,X(s.skip),g+16); x.textAlign="left"; }
       else if(s.state==="nvis"){ x.strokeStyle=C("--accent"); x.lineWidth=2; for(const d of [0,300,700]){ x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(d/2),hy); x.lineTo(X(d),g); x.stroke(); } }
       else { x.strokeStyle=C("--bad"); x.setLineDash([4,4]); x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(maxD*0.5),top-8); x.stroke(); x.setLineDash([]); }
-      x.fillStyle=C("--ink"); x.beginPath(); x.moveTo(X(0)-6,g); x.lineTo(X(0),g-18); x.lineTo(X(0)+6,g); x.fill(); },
+      x.fillStyle=C("--ink"); x.beginPath(); x.moveTo(X(0)-6,g); x.lineTo(X(0),g-18); x.lineTo(X(0)+6,g); x.fill();
+      if(s.state==="skip") pulses(x,[[X(0),g],[X(s.skip/2),hy],[X(s.skip),g]],t,RAY1);
+      else if(s.state==="nvis") pulses(x,[[X(0),g],[X(150),hy],[X(300),g]],t,C("--accent"));
+      else pulses(x,[[X(0),g],[X(maxD*0.5),top-8]],t,C("--bad"),2);
+      legend(x,W,[[RAY1,"critical ray: first landing = skip distance"],[C("--muted"),"lower ray: lands further away",1],[C("--bad"),"steeper ray: escapes to space",1]]); },
     obs:{cols:[["f","f (MHz)",1],["fc","foF2 (MHz)",1],["h","h (km)",0],["skip","Skip, curved earth (km)",0],["flat","Skip, flat earth (km)",0],["mua","Critical ray (°)",1]],
       row(v,s){ return {f:v.f,fc:v.fc,h:v.h,skip:s.state==="skip"?s.skip:s.state==="nvis"?0:NaN,flat:s.flat,mua:s.mua??NaN}; },
       plots:[{label:"Skip distance against frequency",x:"f",y:["skip","flat"],xl:"frequency (MHz)",yl:"skip distance (km)",sweep:{k:"f",vals:[6,8,9,10,11,12,13,14,16,18,20,22,24,26,28,30]}}]},
@@ -8846,17 +8951,20 @@ function bindTabs(){
     calc(v){ return twoRay(v.d,v.ht,v.hr,v.f,v.g,v.pol); },
     tiles(v,R){ return [["Field strength",`${f1(R.E)} dBµV/m`,`free space ${f1(R.Efs)} dBµV/m`],["Two rays combine",`${R.FdB>=0?"+":""}${f1(R.FdB)} dB`,R.FdB>=0?"in phase: they add":"out of phase: they cancel",R.FdB>-3?"good":R.FdB>-10?"warn":"bad"],
       ["Path difference",`${(R.dl/R.lam).toFixed(2)} λ`,`${(R.dl*100).toFixed(1)} cm`],["Breakpoint distance",`${f2(R.db)} km`,"4·ht·hr/λ"]]; },
-    draw(x,W,H,v,R){ const sh=H*0.42, g=sh-8, hmax=Math.max(v.ht,v.hr)*1.25, Y=h=>g-h/hmax*(sh-24), x0=30, x1=W-30;
+    anim:true,
+    draw(x,W,H,v,R,t){ const sh=H*0.42, g=sh-8, hmax=Math.max(v.ht,v.hr)*1.25, Y=h=>g-h/hmax*(sh-24), x0=30, x1=W-30;
       x.strokeStyle=C("--ink"); x.lineWidth=2; x.beginPath(); x.moveTo(0,g); x.lineTo(W,g); x.stroke();
       x.lineWidth=3; x.beginPath(); x.moveTo(x0,g); x.lineTo(x0,Y(v.ht)); x.moveTo(x1,g); x.lineTo(x1,Y(v.hr)); x.stroke();
-      const xr=x0+(x1-x0)*v.ht/(v.ht+v.hr); x.strokeStyle=C("--accent"); x.lineWidth=2; x.beginPath(); x.moveTo(x0,Y(v.ht)); x.lineTo(x1,Y(v.hr)); x.stroke();
-      x.strokeStyle=C("--warn"); x.setLineDash([6,4]); x.beginPath(); x.moveTo(x0,Y(v.ht)); x.lineTo(xr,g); x.lineTo(x1,Y(v.hr)); x.stroke(); x.setLineDash([]);
-      x.fillStyle=C("--muted"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText("direct ray",(x0+x1)/2-30,Math.min(Y(v.ht),Y(v.hr))-6); x.fillText("reflected ray",xr+6,g-6);
+      const xr=x0+(x1-x0)*v.ht/(v.ht+v.hr); x.strokeStyle=RAY1; x.lineWidth=2.4; x.beginPath(); x.moveTo(x0,Y(v.ht)); x.lineTo(x1,Y(v.hr)); x.stroke();
+      x.strokeStyle=RAY2; x.lineWidth=2.4; x.setLineDash([7,4]); x.beginPath(); x.moveTo(x0,Y(v.ht)); x.lineTo(xr,g); x.lineTo(x1,Y(v.hr)); x.stroke(); x.setLineDash([]);
+      pulses(x,[[x0,Y(v.ht)],[x1,Y(v.hr)]],t,RAY1); pulses(x,[[x0,Y(v.ht)],[xr,g],[x1,Y(v.hr)]],t,RAY2);
+      x.fillStyle=RAY2; x.beginPath(); x.arc(xr,g,4,0,7); x.fill();
+      legend(x,W,[[RAY1,"direct ray"],[RAY2,"ray reflected by the ground",1],[C("--bad"),"breakpoint distance",1]]);
       const b=[44,sh+16,W-60,H-sh-40], xr2=[0.05,30]; const pts=[]; for(let i=0;i<=360;i++){ const d=0.05*Math.pow(600,i/360); const r=twoRay(d,v.ht,v.hr,v.f,v.g,v.pol); pts.push([d,r.E,r.Efs]); }
       const ys=pts.map(p=>p[1]).concat(pts.map(p=>p[2])).filter(isFinite), ymax=Math.ceil(Math.max(...ys)/10)*10+5, ymin=Math.max(Math.floor(Math.min(...ys)/10)*10,ymax-90);
       const A=axes(x,b,xr2,[ymin,ymax],{logx:true,xl:"distance (km)",yl:"field strength (dBµV/m)"});
       x.strokeStyle=C("--muted"); x.setLineDash([5,4]); x.beginPath(); pts.forEach((p,i)=>i?x.lineTo(A.X(p[0]),A.Y(p[2])):x.moveTo(A.X(p[0]),A.Y(p[2]))); x.stroke(); x.setLineDash([]);
-      x.strokeStyle=C("--accent"); x.lineWidth=2; x.beginPath(); pts.forEach((p,i)=>{ const yy=A.Y(Math.max(p[1],ymin)); i?x.lineTo(A.X(p[0]),yy):x.moveTo(A.X(p[0]),yy); }); x.stroke();
+      x.strokeStyle=RAY1; x.lineWidth=2; x.beginPath(); pts.forEach((p,i)=>{ const yy=A.Y(Math.max(p[1],ymin)); i?x.lineTo(A.X(p[0]),yy):x.moveTo(A.X(p[0]),yy); }); x.stroke();
       if(R.db>0.05&&R.db<30){ x.strokeStyle=C("--bad"); x.setLineDash([2,3]); x.beginPath(); x.moveTo(A.X(R.db),b[1]); x.lineTo(A.X(R.db),b[1]+b[3]); x.stroke(); x.setLineDash([]); x.fillStyle=C("--bad"); x.fillText("breakpoint",A.X(R.db)+4,b[1]+12); }
       x.fillStyle=C("--ink"); x.beginPath(); x.arc(A.X(v.d),A.Y(Math.max(R.E,ymin)),5,0,7); x.fill(); },
     obs:{cols:[["d","d (km)",2],["E","Two-ray E (dBµV/m)",1],["Efs","Free space (dBµV/m)",1],["FdB","Gain over free space (dB)",1],["pd","Path difference (λ)",2]],
@@ -8867,7 +8975,7 @@ function bindTabs(){
     post:[{q:"Beyond the breakpoint the two-ray field falls by about…",o:["20 dB per decade","40 dB per decade","60 dB per decade"],a:1,why:"The field goes as 1/d², i.e. 40 dB per decade of distance."},
           {q:"Raising the transmitter from 30 m to 60 m (receiver unchanged) moves the breakpoint…",o:["closer","twice as far","it does not move"],a:1,why:"d_b = 4·ht·hr/λ is proportional to ht."},
           {q:"Why is Γ close to −1 far from the transmitter?",o:["The ground is a perfect conductor","At grazing angles almost any ground reflects with a 180° phase flip","Because of the curvature of the earth"],a:1,why:"As the grazing angle tends to zero the Fresnel coefficient tends to −1 for both polarisations."}],
-    refs:["T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, §4.6.","J. D. Parsons, The Mobile Radio Propagation Channel, 2nd ed., Wiley, 2000, ch. 2.","Recommendation ITU-R P.527-6 (2021), Electrical characteristics of the surface of the Earth.","Recommendation ITU-R P.1546-6 (2019), Method for point-to-area predictions for terrestrial services."]},
+    refs:["T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, §4.6.","J. D. Parsons, The Mobile Radio Propagation Channel, 2nd ed., Wiley, 2000, ch. 2.","Recommendation ITU-R P.527-6 (2021), Electrical characteristics of the surface of the Earth.","Recommendation ITU-R P.525, Calculation of free-space attenuation.","Recommendation ITU-R P.1546-6 (2019), Method for point-to-area predictions for terrestrial services."]},
 
   { id:"knife", title:"Diffraction over a hill or building (knife-edge)", level:"Intermediate", mins:25,
     plain:"Radio waves bend a little around obstacles. A hill does not block the signal completely, it adds a loss. You will measure that loss and see why even an obstacle below the line of sight matters.",
@@ -8892,13 +9000,16 @@ function bindTabs(){
     calc(v){ return knifeEdge(v.d,v.pos,v.ho,v.f); },
     tiles(v,K){ return [["Diffraction loss",`${f1(K.L)} dB`,K.nu<=-0.78?"clear path":K.nu<0?"partly in the Fresnel zone":"blocked: the wave bends over the top",K.L<1?"good":K.L<10?"warn":"bad"],["Parameter ν",f2(K.nu),"height in Fresnel units"],
       ["Fresnel zone radius",`${f1(K.r1)} m`,"at the obstacle"],["Clearance",`${f2(-v.ho/K.r1)} r₁`,"≥ 0.6 r₁ is the planning rule"]]; },
-    draw(x,W,H,v,K){ const m=40, g=H-30, ly=g-H*0.45, X=t=>m+t*(W-2*m), sc=(H*0.32)/Math.max(80,K.r1*1.3), ox=X(v.pos);
+    anim:true,
+    draw(x,W,H,v,K,t){ const m=40, g=H-30, ly=g-H*0.45, X=t=>m+t*(W-2*m), sc=(H*0.32)/Math.max(80,K.r1*1.3), ox=X(v.pos);
       x.strokeStyle=C("--ink"); x.lineWidth=2; x.beginPath(); x.moveTo(0,g); x.lineTo(W,g); x.stroke(); x.lineWidth=3; x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(0),ly); x.moveTo(X(1),g); x.lineTo(X(1),ly); x.stroke();
       x.fillStyle="rgba(205,242,58,.22)"; x.beginPath(); for(let i=0;i<=60;i++){ const t=i/60, r=Math.sqrt(t*(1-t))/Math.sqrt(v.pos*(1-v.pos))*K.r1*sc; x.lineTo(X(t),ly-r); } for(let i=60;i>=0;i--){ const t=i/60, r=Math.sqrt(t*(1-t))/Math.sqrt(v.pos*(1-v.pos))*K.r1*sc; x.lineTo(X(t),ly+r); } x.fill();
-      x.strokeStyle=C("--accent"); x.lineWidth=2; x.setLineDash([6,4]); x.beginPath(); x.moveTo(X(0),ly); x.lineTo(X(1),ly); x.stroke(); x.setLineDash([]);
+      x.strokeStyle=RAY1; x.lineWidth=2; x.setLineDash([6,4]); x.beginPath(); x.moveTo(X(0),ly); x.lineTo(X(1),ly); x.stroke(); x.setLineDash([]);
       const tip=ly-v.ho*sc; x.fillStyle=C("--muted"); x.beginPath(); x.moveTo(ox-46,g); x.lineTo(ox,tip); x.lineTo(ox+46,g); x.fill();
-      if(v.ho>-0.78*K.r1){ x.strokeStyle=C("--warn"); x.lineWidth=2; x.beginPath(); x.moveTo(X(0),ly); x.lineTo(ox,tip); x.lineTo(X(1),ly); x.stroke(); }
-      x.fillStyle=C("--ink"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText("line of sight",X(0.02),ly-6); x.fillText("first Fresnel zone",X(0.05),ly+K.r1*sc*0.6+14); x.fillText(`ν = ${K.nu.toFixed(2)} · loss ${K.L.toFixed(1)} dB`,ox+10,Math.max(16,tip-6)); },
+      if(v.ho>-0.78*K.r1){ x.strokeStyle=RAY2; x.lineWidth=2.4; x.beginPath(); x.moveTo(X(0),ly); x.lineTo(ox,tip); x.lineTo(X(1),ly); x.stroke(); }
+      x.fillStyle=C("--ink"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText("line of sight",X(0.02),ly-6); x.fillText("first Fresnel zone",X(0.05),ly+K.r1*sc*0.6+14); x.fillText(`ν = ${K.nu.toFixed(2)} · loss ${K.L.toFixed(1)} dB`,ox+10,Math.max(16,tip-6));
+      if(v.ho>-0.78*K.r1) pulses(x,[[X(0),ly],[ox,tip],[X(1),ly]],t,RAY2); else pulses(x,[[X(0),ly],[X(1),ly]],t,RAY1);
+      legend(x,W,[[RAY1,"line of sight",1],["rgba(150,190,40,.9)","first Fresnel zone"],[RAY2,"path bent over the top"]]); },
     obs:{cols:[["ho","Tip above line (m)",0],["nu","ν",2],["L","Loss J(ν) (dB)",1],["r1","r₁ (m)",1],["f","f (MHz)",0],["pos","Position",2]],
       row(v,K){ return {ho:v.ho,nu:K.nu,L:K.L,r1:K.r1,f:v.f,pos:v.pos}; },
       plots:[{label:"Loss against the parameter ν",x:"nu",y:["L"],xl:"ν",yl:"loss (dB)",sweep:{k:"ho",vals:[-40,-30,-20,-10,-5,0,5,10,20,30,40,50,60,70,80]}},{label:"Loss against obstacle height",x:"ho",y:["L"],xl:"tip above line (m)",yl:"loss (dB)",sweep:{k:"ho",vals:[-40,-30,-20,-10,-5,0,5,10,20,30,40,50,60,70,80]}}]},
@@ -8907,7 +9018,7 @@ function bindTabs(){
     post:[{q:"Which change lowers the diffraction loss for the same obstacle height above the line?",o:["Higher frequency","Lower frequency","Moving the obstacle to the middle of the path"],a:1,why:"Lower frequency means larger λ, smaller ν and less loss."},
           {q:"For ν = 2.4 the loss J(ν) is about…",o:["6 dB","20 dB","40 dB"],a:1,why:"J(2.4) = 6.9 + 20·log10(√(2.3²+1)+2.3) ≈ 20 dB."},
           {q:"The 0.6 r₁ clearance rule keeps the loss…",o:["below about 0 dB","exactly 6 dB","above 10 dB"],a:0,why:"With 60% of the first Fresnel zone clear the obstacle adds practically no loss."}],
-    refs:["Recommendation ITU-R P.526-15 (2019), Propagation by diffraction, §4.1.","J. D. Parsons, The Mobile Radio Propagation Channel, 2nd ed., Wiley, 2000, ch. 3.","T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, §4.9."]},
+    refs:["Recommendation ITU-R P.526-15 (2019), Propagation by diffraction, §4.1.","Recommendation ITU-R P.530, Propagation data and prediction methods required for the design of terrestrial line-of-sight systems (path clearance).","J. D. Parsons, The Mobile Radio Propagation Channel, 2nd ed., Wiley, 2000, ch. 3.","T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, §4.9."]},
 
   { id:"fading", title:"Fading channels and mobile communications", level:"Intermediate", mins:30,
     plain:"When you move with a phone, the signal flickers many times a second because reflected waves keep changing how they add up. You will simulate this fading, count how often it drops below a threshold, and compare with theory.",
@@ -8953,7 +9064,7 @@ function bindTabs(){
     post:[{q:"Doubling the speed of a Rayleigh-fading receiver…",o:["doubles the fraction of time in a fade","doubles the number of fades per second, same fraction of time","halves the fade depth"],a:1,why:"N_ρ ∝ fd while P(r<ρ) does not depend on speed."},
           {q:"For Rayleigh fading, the probability of being 20 dB below the rms level is about…",o:["0.1 %","1 %","10 %"],a:1,why:"P = 1 − e^(−ρ²) ≈ ρ² = 0.01."},
           {q:"Increasing the K factor…",o:["makes deep fades more likely","makes deep fades less likely","does not change the fades"],a:1,why:"A stronger direct path keeps the envelope near its mean."}],
-    refs:["R. H. Clarke, “A statistical theory of mobile-radio reception,” Bell System Technical Journal, vol. 47, no. 6, pp. 957–1000, 1968.","W. C. Jakes (ed.), Microwave Mobile Communications, Wiley, 1974.","T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, ch. 5.","A. Goldsmith, Wireless Communications, Cambridge University Press, 2005, ch. 3.","Virtual Labs (IIT Kharagpur), Fading Channels and Mobile Communications, Ministry of Education, Government of India."]},
+    refs:["R. H. Clarke, “A statistical theory of mobile-radio reception,” Bell System Technical Journal, vol. 47, no. 6, pp. 957–1000, 1968.","W. C. Jakes (ed.), Microwave Mobile Communications, Wiley, 1974.","T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, ch. 5.","A. Goldsmith, Wireless Communications, Cambridge University Press, 2005, ch. 3.","Recommendation ITU-R P.1057, Probability distributions relevant to radiowave propagation modelling (Rayleigh and Nakagami-Rice).","Recommendation ITU-R P.1406, Propagation effects relating to terrestrial land mobile and broadcasting services in the VHF and UHF bands.","Virtual Labs (IIT Kharagpur), Fading Channels and Mobile Communications, Ministry of Education, Government of India."]},
 
   { id:"calib", title:"Calibrating a digital shadow with a sensor model", level:"Intermediate", mins:30,
     plain:"A propagation model is never exactly right. Here a simulated sensor hides known errors in its readings (like MATLAB does in the Digital shadow tab). You will let the model correct itself and check that it finds the hidden errors.",
@@ -9031,7 +9142,7 @@ function bindTabs(){
     post:[{q:"A 10 MHz cell shows RSRP −100 dBm. The total power is about…",o:["−100 dBm","−72 dBm","−128 dBm"],a:1,why:"−100 + 10·log10(600) ≈ −100 + 27.8 = −72 dBm."},
           {q:"Why average over 40 wavelengths?",o:["To remove fast fading and keep the local mean","To save battery","Because the GPS needs it"],a:0,why:"Averaging over about 40λ removes the fast fading but keeps the slower changes caused by buildings and distance."},
           {q:"The tower's real power is unknown. What happens to this error?",o:["The results are useless","It becomes part of the calibration offset","It changes the building loss"],a:1,why:"A constant error moves every reading equally, so the offset term absorbs it."}],
-    refs:["3GPP TS 36.214, Evolved Universal Terrestrial Radio Access (E-UTRA); Physical layer measurements (definition of RSRP).","3GPP TS 36.133, E-UTRA; Requirements for support of radio resource management (RSRP measurement accuracy).","Recommendation ITU-R SM.1708-1 (2017), Field-strength measurements along a route with geographical coordinate registrations.","W. C. Y. Lee, “Estimate of local average power of a mobile radio signal,” IEEE Trans. Vehicular Technology, vol. VT-34, no. 1, pp. 22–27, 1985.","G-NetTrack Lite, Gyokov Solutions (Android app); NetMonster (open-source Android app)."]}
+    refs:["3GPP TS 36.214, Evolved Universal Terrestrial Radio Access (E-UTRA); Physical layer measurements (definition of RSRP).","3GPP TS 36.133, E-UTRA; Requirements for support of radio resource management (RSRP measurement accuracy).","3GPP TS 36.101, E-UTRA; User Equipment radio transmission and reception (EARFCN to frequency, operating bands).","Recommendation ITU-R P.525, Calculation of free-space attenuation (received power to field strength).","Recommendation ITU-R SM.1708-1 (2017), Field-strength measurements along a route with geographical coordinate registrations.","W. C. Y. Lee, “Estimate of local average power of a mobile radio signal,” IEEE Trans. Vehicular Technology, vol. VT-34, no. 1, pp. 22–27, 1985.","G-NetTrack Lite, Gyokov Solutions (Android app); NetMonster (open-source Android app)."]}
   ];
 
   /* ------------------------------------------------------------------ state and rendering */
@@ -9584,7 +9695,7 @@ function bindTabs(){
   let STEPS=GUIDES.site, gname="site", waitOff=null;
   const root=document.createElement("div"); root.className="gt"; root.hidden=true;
   root.innerHTML='<div class="gt-spot" aria-hidden="true"></div><div class="gt-hand" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M12 30c-2-3-6-8-6-11 0-1.6 1.6-2.4 3-1.4l2 1.6V5.5a2 2 0 0 1 4 0V14l1-.1V12a2 2 0 0 1 4 0v2l1 .1v-.9a2 2 0 0 1 4 0V22c0 3-1 5-2.5 8z" fill="#F7FAFC" stroke="#102C40" stroke-width="1.6" stroke-linejoin="round"/></svg><i></i></div><div class="gt-card" role="dialog" aria-modal="false" aria-labelledby="gtT" aria-describedby="gtX" tabindex="-1">'+
-    '<p class="gt-n" id="gtN"></p><h2 id="gtT"></h2><p id="gtX"></p><p class="gt-act" id="gtAct" hidden></p><div class="gt-dots" aria-hidden="true"></div>'+
+    '<p class="gt-n" id="gtN"></p><h2 id="gtT"></h2><p id="gtX"></p><p class="gt-act" id="gtAct" hidden></p><p class="gt-tip" id="gtTip">Tip: point at any chart or control and press <kbd>G</kbd> to learn what it is.</p><div class="gt-dots" aria-hidden="true"></div>'+
     '<div class="gt-row"><button class="btn ghost" type="button" id="gtSkip">Close</button><button class="btn ghost gt-site" type="button" id="gtSite" hidden>Whole-site tour</button><span class="gt-sp"></span><button class="btn" type="button" id="gtBack">Back</button><button class="btn primary" type="button" id="gtNext">Next</button></div></div>';
   document.body.appendChild(root);
   const spot=root.querySelector(".gt-spot"), card=root.querySelector(".gt-card"), hand=root.querySelector(".gt-hand"); let i=0, target=null, back=null;
@@ -9600,20 +9711,20 @@ function bindTabs(){
     if(phone){ cx=(vw-cw)/2; const bn=document.querySelector(".bnav"); const bottom=vh-(bn&&visible(bn)?bn.offsetHeight:0)-12; cy=(y+h+ch+12<bottom)?y+h+12:(y-ch-12>8?y-ch-12:bottom-ch); }
     else { cx=Math.min(Math.max(12,r.left),vw-cw-12); cy=(y+h+ch+16<vh)?y+h+12:(y-ch-12>8?y-ch-12:Math.max(12,vh-ch-12)); }
     card.style.left=Math.max(8,cx)+"px"; card.style.top=Math.max(8,cy)+"px";
-    const s=STEPS[i]; hand.hidden=!s||(!s.wait&&!s.hand);
-    if(!hand.hidden){ hand.className="gt-hand "+(s.hand==="drag"?"drag":"tap"); hand.style.left=(r.left+Math.min(r.width*0.5,r.width-20))+"px"; hand.style.top=(r.top+Math.min(r.height*0.55,r.height-6))+"px"; }
+    const s=STEPS[i]; hand.hidden=!s;
+    if(!hand.hidden){ hand.className="gt-hand "+(s.hand==="drag"?"drag":s.wait?"tap":"point"); hand.style.left=(r.left+Math.min(r.width*0.5,r.width-20))+"px"; hand.style.top=(r.top+Math.min(r.height*0.55,r.height-6))+"px"; }
   }
   function show(n){
     i=Math.max(0,Math.min(STEPS.length-1,n)); const s=STEPS[i];
     if(currentTab!==s.tab) go(s.tab,true);
-    $("gtN").textContent=(gname==="site"?"Tour":"Guide · "+(TABNAME[gname]||""))+" · step "+(i+1)+" of "+STEPS.length; $("gtT").textContent=s.t; $("gtX").textContent=s.x;
+    $("gtN").textContent=gname==="explain"?"What is this?":(gname==="site"?"Tour":"Guide · "+(TABNAME[gname]||""))+" · step "+(i+1)+" of "+STEPS.length; root.classList.toggle("explain",gname==="explain"); $("gtT").textContent=s.t; $("gtX").textContent=s.x;
     const act=$("gtAct"); act.hidden=!s.act; act.classList.remove("done"); act.textContent=s.act?"Try it: "+s.act:"";
     if(waitOff){ waitOff(); waitOff=null; }
     if(s.wait){ const h=e=>{ if(!e.target.closest||!e.target.closest(s.wait.sel)) return; act.classList.add("done"); act.textContent="✓ Well done!"; if(waitOff){ waitOff(); waitOff=null; } setTimeout(()=>{ if(!root.hidden&&STEPS[i]===s) $("gtNext").click(); },1100); };
       document.addEventListener(s.wait.ev,h,true); waitOff=()=>document.removeEventListener(s.wait.ev,h,true); }
     root.querySelectorAll(".gt-dots i").forEach((d,k)=>d.classList.toggle("on",k===i));
-    $("gtBack").disabled=i===0; $("gtNext").textContent=i===STEPS.length-1?"Finish":"Next";
-    setTimeout(()=>{ target=s.sel.map(q=>document.querySelector(q)).find(visible)||document.querySelector("#"+(s.tab==="map"?"map-tab":s.tab));
+    $("gtBack").disabled=i===0; $("gtNext").textContent=gname==="explain"?"Got it":i===STEPS.length-1?"Finish":"Next";
+    setTimeout(()=>{ target=(s.el&&visible(s.el)?s.el:null)||s.sel.map(q=>document.querySelector(q)).find(visible)||document.querySelector("#"+(s.tab==="map"?"map-tab":s.tab==="exp"?"exp-tab":s.tab));
       const r=target.getBoundingClientRect(); if(r.top<80||r.bottom>innerHeight-160) target.scrollIntoView({block:"center",behavior:"instant"in window?"instant":"auto"});
       requestAnimationFrame(()=>{ place(); card.focus({preventScroll:true}); }); },160);
   }
@@ -9631,6 +9742,58 @@ function bindTabs(){
   $("guideBtn").addEventListener("click",()=>{ try{ localStorage.setItem("gwlab-guide-seen","1"); }catch(e){} $("guideBtn").classList.remove("hello"); start(currentTab); });
   try{ if(!localStorage.getItem("gwlab-guide-seen")) $("guideBtn").classList.add("hello"); }catch(e){}
   window.startSiteTour=start; window.startGuide=()=>start(currentTab);
+  /* "What is this?": point at (or focus) something and press G. The nearest element with an explanation wins. */
+  const SCN_TXT={gs:"The ground wave follows the earth's surface (LF/MF); the sky wave goes up, is bent back by the ionosphere and lands far away. Close in there can be a skip zone where no sky wave lands.",
+    los:"Line of sight: the wave goes straight from mast to mast and weakens only with distance (free space, ITU-R P.525). The blue band is the first Fresnel zone; the earth's curve must stay out of most of it (ITU-R P.526, P.530).",
+    tworay:"Reflection: the receiver gets a direct ray and a ray bounced off the ground. They add or cancel, so the level swings up and down with distance.",
+    refract:"Refraction: air is denser near the ground, so the wave bends down towards the earth and reaches past the geometric horizon. Change the atmosphere to see sub-refraction, standard, super-refraction and ducting (ITU-R P.453, P.834).",
+    knife:"Diffraction: a hill or roof does not block the wave completely; part of it bends over the top into the shadow. The loss depends on how far the obstacle reaches into the Fresnel zone (ν)."};
+  const EXPLAIN=[
+    ["#scPick [data-scn]",m=>m.querySelector("b").textContent,m=>SCN_TXT[m.dataset.scn]+" Click to watch it."],
+    ["#scPick","Choose what to watch","Five kinds of propagation: line of sight, reflection, refraction, diffraction, and ground and sky wave. Each one is a live animation driven by the real equations."],
+    ["#anim",()=>"The animation",()=>(AN.scene==="gs"?SCN_TXT.gs:SCN_TXT[AN.scene])+" You can drag the masts, the receiver or the hilltop."],
+    ["#scTiles .tile",m=>m.querySelector(".k").textContent,m=>`${m.querySelector(".val").textContent}: ${m.querySelector(".sub").textContent}. These numbers update as you change the scene.`],
+    ["#scK","The atmosphere (k factor)","k says how strongly the air bends the wave: k = 157 / (157 + dN/dh), where dN/dh is the refractivity gradient in N-units/km. The standard atmosphere (−40 N-units/km) gives k ≈ 4/3. Below −79 is super-refraction, below −157 is ducting, positive gradients give sub-refraction (ITU-R P.453, P.834)."],
+    ["#scnCard","Scene settings","Frequency, antenna heights and path length for the animation. The boxes explain what the result means."],
+    [".skipcard","Skip distance","How far away the first sky wave lands. Inside it there is no sky wave; the ground wave may also have died out, so reception is lost there."],
+    ["#scope","Received signal over time","When the ground wave and the sky wave are similar in strength they interfere, and the level swings up and down. This is fading."],
+    ["#bandRuler","Frequency bands","LF, MF, HF, VHF and UHF. Lower frequencies follow the ground; higher ones need line of sight."],
+    ["#presets","Ready-made experiments","Each chip loads a complete comparison, for example MW by day and by night."],
+    ["#chart","Field strength against distance","Each curve is one setting. Higher is a stronger signal. Where a curve drops below the dashed line, reception is no longer reliable."],
+    ["#tiles .tile",m=>m.querySelector(".k")?m.querySelector(".k").textContent:"Result",m=>m.innerText.replace(/\n+/g," · ")],
+    ["#shMap","The digital shadow map","The tower, sensors (squares), walk-test points (dots) and phone readings (diamonds). Green: the model agrees with the reading; red: something the model does not know about. Right-click to add points; drag to move them."],
+    ["#shPow,#shPowU","Transmitter power","Type the power in kW, W, mW or dBm. ERP is what the antenna radiates in its main direction."],
+    ["#shPowRef","ERP or transmitter output","ERP already includes the antenna gain. Choose transmitter output to have the antenna gain added for you."],
+    ["#shAnt","Antenna type","Omni and dipole send equally in all directions; Yagi, sector and patch antennas focus the power in one direction (gain) and send less backwards (front-to-back ratio)."],
+    ["#shAz","Antenna direction","Where a directional antenna points, in degrees from north (90 = east). Points outside the beam get less signal."],
+    ["#shMast","Mast height","Height of the antenna above the ground. Higher masts see over more obstacles and reach further."],
+    ["#shRings","Distance rings","Circles around the tower with their distance, so you can see how far each sensor is."],
+    ["#shCal","Calibrate the model","Fits the model to the readings by least squares: it learns a fixed offset, extra building and indoor loss, and a distance trend."],
+    ["#shHold","Hold-out test","Keeps 30% of the readings aside. The model never sees them, so their error is an honest test of the calibration."],
+    ["#shErr","Error before and after","The RMS difference between readings and the model. Calibration should lower it; on test points it shows how well the model predicts new places."],
+    ["#shScatter","Predicted against measured","Each dot is one reading. On the diagonal the model is exactly right."],
+    ["#shWhat","What-if","Try a taller mast, double power, a humid evening or indoor receivers on the calibrated model."],
+    [".sh-walk","Walk-test planner","Plans the walk test from the standards (ITU-R SM.1708, 40-wavelength averaging) and re-plans it when the station changes."],
+    ["#shShow","Show readings from","Choose which readings to show and calibrate: simulated, MATLAB or live, phone, or CSV."],
+    ["section[aria-labelledby='shPhH']","Phone measurements","Load a 4G log from a phone app. The columns are found automatically, RSRP becomes field strength, and the readings are averaged and put on the map."],
+    ["section[aria-labelledby='shExpH']","Experiments with MATLAB","MATLAB plays the sensors and hides known errors; this page calibrates and you check that it finds them (software-in-the-loop)."],
+    [".sh-live","Live link","MATLAB, a phone or SDR sensors send readings here every few seconds on a shared channel name."],
+    ["#xpSteps","Experiment steps","Aim, Theory, Pre-test, Procedure, Simulation, Observations, Post-test and References. Green numbers are done."],
+    ["#xpCv","The simulation","Change the sliders on the left; the picture and the numbers follow the real equations. Press Record this reading to add a row to the table."],
+    ["#xpOcv","Observation chart","Your recorded readings. Press Fill automatically to sweep one setting and compare with theory."],
+    ["#xp-c-tiles .tile",m=>m.querySelector(".k").textContent,m=>`${m.querySelector(".val").textContent}: ${m.querySelector(".sub").textContent}.`],
+    [".xp-card",m=>m.querySelector("h3").textContent,m=>m.querySelector("p:not(.lc-eyebrow)").textContent],
+    ["#mapSearch","Search a place","Type a town, a landmark or coordinates and press Enter."],
+    [".lesson","A lesson","The big idea, how it works, the equations, a worked example and a quick check."]
+  ];
+  let lastHover=null, hoverT=0, focusT=0; document.addEventListener("mousemove",e=>{ lastHover=e.target; hoverT=Date.now(); },{passive:true}); document.addEventListener("mouseleave",()=>{ lastHover=null; });
+  document.addEventListener("focusin",e=>{ if(e.target.matches&&e.target.matches(":focus-visible")) focusT=Date.now(); });
+  window.explainHere=function(){ const f=document.activeElement!==document.body?document.activeElement:null, cands=(focusT>hoverT?[f,lastHover]:[lastHover]).filter(Boolean);
+    for(const start of cands){ for(let el=start; el&&el!==document.body; el=el.parentElement){ if(el.closest(".gt")) break;
+      for(const [sel,t,x] of EXPLAIN){ if(el.matches(sel)&&visible(el)){ const T=typeof t==="function"?t(el):t, X=typeof x==="function"?x(el):x; if(!T||!X) continue;
+        STEPS=[{tab:currentTab,sel:[],el,t:T,x:X}]; gname="explain"; root.querySelector(".gt-dots").innerHTML=""; $("gtSite").hidden=true;
+        back=document.activeElement; root.hidden=false; document.body.classList.add("touring"); show(0); return true; } } } }
+    return false; };
 })();
   /* page watchers skip the parts that change many times a second (animation stage, tooltip, toasts) */
   const LIVE=".stage,#tip,.fsbar,#toast,#rxHud,#lcPct,.wg-out,.eq-status";
@@ -10496,7 +10659,7 @@ init();
     if(k==="0"&&currentTab!=="shadow"){ e.preventDefault(); go("exp"); return; }
     if(k==="?"){ e.preventDefault(); openKeys(); return; }
     if(k==="t"||k==="T"){ e.preventDefault(); click("themeBtn"); return; }
-    if(k==="g"||k==="G"){ e.preventDefault(); if(window.startGuide) startGuide(); return; }
+    if(k==="g"||k==="G"){ e.preventDefault(); if(window.explainHere&&explainHere()) return; if(window.startGuide) startGuide(); return; }
     if(onMap&&t!==mapC){
       if(k==="s"||k==="S"){ e.preventDefault(); $("txSetBtn").click(); return; }
       if(k==="a"||k==="A"){ e.preventDefault(); openAimBox(); return; }
