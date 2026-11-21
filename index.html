@@ -2771,6 +2771,18 @@ body:not(.an-scene) #animation .sc-only{display:none}
       <p class="hint">Any program can send data: an HTTP POST of JSON to <code>/api/measure?ch=<i>channel</i></code> with <code>{"tx":{lat,lon,h,f_mhz,erp_kw}, "readings":[{sensor,lat,lon,level,h,built,fixed,src}]}</code>, where <code>level</code> is in dBµV/m.</p>
     </div></details>
   </section>
+  <section class="panel card" aria-labelledby="shExpH">
+    <div class="chart-head"><h2 id="shExpH">Experiments with the MATLAB sensor model</h2><span class="muted sh-small">Software-in-the-loop: no hardware needed</span></div>
+    <p class="hint">MATLAB plays the sensors. It hides known errors (the “answer”) inside its readings; this page calibrates each case and you check that it finds the answer again. Four experiments: E1 find the hidden errors, E2 how many readings are needed, E3 a different propagation model, E4 bad conditions (GPS error, drift, fading, lost readings).</p>
+    <ol class="sh-task">
+      <li><b>Here:</b> place the station and choose service, power and antenna, then <button class="btn sm" type="button" id="shExpPlan">Export points for MATLAB</button> <span class="muted">(saves wisdom-plan.csv)</span></li>
+      <li><b>In MATLAB or Octave:</b> download <a href="assets/wisdom_experiments.m" download>wisdom_experiments.m</a>, put it next to wisdom-plan.csv and run <code>wisdom_experiments</code>. It writes wisdom-experiments.csv and wisdom-truth.csv. With <code>MODE = 'live'</code> it streams a realistic sensor to the Live link above instead.</li>
+      <li><b>Here:</b> <input type="file" id="shExpFile" accept=".csv,text/csv" class="sh-file"><label class="btn sm" for="shExpFile">Run wisdom-experiments.csv</label> <button class="btn sm" type="button" id="shExpDl" disabled>Download results</button> <span class="muted">(saves wisdom-results.csv)</span></li>
+      <li><b>In MATLAB:</b> set <code>MODE = 'plots'</code> and run again. It makes the tables and figures for the paper.</li>
+    </ol>
+    <p class="sh-linkstat mono" id="shExpStat" aria-live="polite"></p>
+    <div class="tablewrap"><table class="fs" id="shExpOut" hidden></table></div>
+  </section>
   <section class="panel card" aria-labelledby="shDataH">
     <div class="chart-head"><h2 id="shDataH">Measurements</h2>
       <div class="row"><button class="btn" type="button" id="shSample">New sensors and walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label><button class="btn" type="button" id="shExport">Export CSV</button><button class="btn" type="button" id="shClear">Clear</button></div></div>
@@ -3695,7 +3707,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v9.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v9.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -9353,14 +9365,17 @@ init();
   function calibrate(){
     if(planning()){ hint("Planning mode: the tower is not where these measurements were taken. Press “Back to the measured station” to calibrate."); return; }
     const all=SH.pts.filter(p=>isFinite(p.meas)), rows=all.filter(p=>!isTest(p)); if(rows.length<4){ hint("Add at least 4 measurements (not counting test points) first, then calibrate."); return; }
-    const y=rows.map(p=>p.meas-model(p,{}));
+    const {full,cols}=fitCal(rows,p=>model(p,{}));
+    SH.cal={b:full,cols,n:rows.length,nTest:all.length-rows.length}; render(); hint("Calibrated. The dots now compare the measurements with the corrected model."); }
+  /* least squares: residual (measured − model) = offset + built·b + indoor·i + trend·log10(d km) */
+  function fitCal(rows,mfn){ const y=rows.map(p=>p.meas-mfn(p));
     const cols=FEAT.map((f,i)=>i).filter(i=>{ if(i===0) return true; const v=rows.map(p=>FEAT[i][1](p)); return Math.max(...v)-Math.min(...v)>1e-9; });
     const m=cols.length, A=cols.map(()=>new Array(m).fill(0)), v=new Array(m).fill(0);
     rows.forEach((p,k)=>{ const x=cols.map(c=>FEAT[c][1](p)); for(let i=0;i<m;i++){ v[i]+=x[i]*y[k]; for(let j=0;j<m;j++) A[i][j]+=x[i]*x[j]; } });
     for(let i=0;i<m;i++) A[i][i]+=1e-6;
-    let bv=solveN(A,v); const full=[0,0,0,0];
-    if(!bv||bv.some(x=>!isFinite(x))) full[0]=y.reduce((s,a)=>s+a,0)/y.length; else cols.forEach((c,k)=>full[c]=bv[k]);
-    SH.cal={b:full,cols,n:rows.length,nTest:all.length-rows.length}; render(); hint("Calibrated. The dots now compare the measurements with the corrected model."); }
+    let bv=solveN(A,v); const full=[0,0,0,0]; let ok=true;
+    if(!bv||bv.some(x=>!isFinite(x))){ ok=false; full[0]=y.reduce((s,a)=>s+a,0)/y.length; } else cols.forEach((c,k)=>full[c]=bv[k]);
+    return {full,cols:ok?cols:[0]}; }
   function solveN(A,v){ const n=v.length, M=A.map((r,i)=>[...r,v[i]]);
     for(let c=0;c<n;c++){ let p=c; for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r; [M[c],M[p]]=[M[p],M[c]];
       if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<n;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; } }
@@ -9582,6 +9597,52 @@ init();
   function exportCSV(){ const lines=["name,lat,lon,ground_m,antenna_m,fixed,built,indoor,building_loss_dB,entry_loss_dB,model_dBuV_m,measured_dBuV_m,difference_dB"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,p.lat.toFixed(6),p.lon.toFixed(6),p.g==null?"":Math.round(p.g),p.h,p.sensor?1:0,p.built?1:0,p.indoor?1:0,p.ana?p.ana.Lb.toFixed(1):"",p.ana&&p.ana.indoor?p.ana.indoor.L.toFixed(1):"",fx(pred(p)),fx(p.meas),fx(p.meas-pred(p))].join(",")));
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-shadow.csv"; document.body.appendChild(a); a.click(); a.remove(); hint("Exported "+SH.pts.length+" readings as wisdom-shadow.csv."); }
 
+  /* ---------- experiments with the MATLAB sensor model (software-in-the-loop) ----------
+     1) export a pool of points with this page's own model values, 2) MATLAB adds known errors and sensor effects,
+     3) this page calibrates every case exactly as the Calibrate button does, 4) MATLAB compares with the known answer. */
+  const towerLine=()=>{ const T=tx(); return `#tower,${T.lat.toFixed(6)},${T.lon.toFixed(6)},${T.h},${Math.round(SH.gTx??0)},${SH.f},${erpKW().toPrecision(6)},${SH.ant},${SH.az},${SH.band}`; };
+  async function expPlan(){ const T=tx(), pl=walkPlan(), R=Math.max(pl.R,pl.d0*4), r=rng(SH.seed*7+11), pool=[], bl=SH.bld.list.length>0;
+    $("shExpStat").textContent="Making the point pool…";
+    SH.pts.filter(p=>!isReal(p)).forEach(p=>pool.push({name:p.name,lat:p.lat,lon:p.lon,h:p.h,sensor:!!p.sensor,built:!!p.built,indoor:!!p.indoor,manB:p.manB,manI:p.manI}));
+    for(let t=0;pool.length<160&&t<4000;t++){ const km=pl.d0+(R-pl.d0)*Math.sqrt(r()), q=dest(T,km,r()*360), ind=r()<0.15;
+      if(bl&&!!buildingAt(q.lat,q.lon)!==ind) continue;
+      pool.push({name:"Pool "+(pool.length+1),...q,h:ind?1.2:1.5,sensor:false,built:bl?false:r()<0.4,indoor:ind,manI:ind,manB:bl?null:undefined}); }
+    let e=null; try{ e=await fetchElev(pool.map(p=>({lat:p.lat,lon:p.lon}))); }catch(x){}
+    pool.forEach((p,i)=>{ p.g=e&&e[i]!=null?e[i]:0; if(p.manB===null) delete p.manB; analysePt(p); });
+    const x=v=>v.toFixed(6), lines=[towerLine(),"name,lat,lon,height_m,ground_m,sensor,built,indoor,dist_km,ant_rel_dB,model_dBuV_m"].concat(pool.map(p=>
+      [`"${p.name.replace(/"/g,"'")}"`,x(p.lat),x(p.lon),p.h,Math.round(p.g),p.sensor?1:0,p.built?1:0,p.indoor?1:0,hav(T,p).toFixed(4),antRel(T,p).toFixed(2),model(p,{}).toFixed(2)].join(",")));
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-plan.csv"; document.body.appendChild(a); a.click(); a.remove();
+    $("shExpStat").textContent=`Saved wisdom-plan.csv: ${pool.length} points (${pool.filter(p=>p.built).length} behind buildings, ${pool.filter(p=>p.indoor).length} indoors) up to ${fmtDist(R)} from the tower${e?"":" · ground heights offline (sea level)"}.`; }
+  async function runExp(text){ const out=$("shExpStat"), L=text.split(/\r?\n/), T=tx();
+    const tw=L.find(l=>l.startsWith("#tower")); if(!tw){ out.textContent="This is not a wisdom-experiments.csv file (the #tower line is missing)."; return; }
+    const t=tw.split(","), dk=hav(T,{lat:+t[1],lon:+t[2]});
+    const bad=[dk>0.005&&"tower position",Math.abs(+t[3]-T.h)>0.5&&"mast height",Math.abs(+t[5]-SH.f)>0.5&&"service",Math.abs(10*Math.log10(+t[6]/erpKW()))>0.1&&"power",t[7]!==SH.ant&&"antenna",Math.abs(+t[8]-SH.az)>0.5&&ant()[3]<360&&"antenna direction"].filter(Boolean);
+    if(bad.length){ out.textContent=`The station is not the one the points were exported for (different ${bad.join(", ")}). Set it back, or load the saved layout, then run again.`; return; }
+    const hi=L.findIndex(l=>/^case,/.test(l)); if(hi<0){ out.textContent="Header line (case,experiment,lat,lon,level,…) not found."; return; }
+    const H=L[hi].split(",").map(s=>s.trim()), col=k=>H.indexOf(k), groups=new Map();
+    L.slice(hi+1).forEach(l=>{ if(!l.trim()||l.startsWith("#")) return; const c=l.split(","), g=c[col("case")]; if(!groups.has(g)) groups.set(g,{exp:c[col("experiment")],rows:[]}); groups.get(g).rows.push(c); });
+    if(!groups.size){ out.textContent="No experiment rows found."; return; }
+    const cache=new Map(), res=[], keys=[...groups.keys()], t0=Date.now();
+    const num=(c,k,d)=>{ const i=col(k); const v=i>=0?+c[i]:NaN; return isFinite(v)?v:d; };
+    for(let gi=0;gi<keys.length;gi++){ const G=groups.get(keys[gi]);
+      const pts=G.rows.map((c,i)=>{ const p={id:i+1,lat:num(c,"lat",0),lon:num(c,"lon",0),h:num(c,"height",1.5),g:num(c,"ground",0),meas:num(c,"level",NaN)};
+        p.manB=p.built=num(c,"built",0)===1; p.manI=p.indoor=num(c,"indoor",0)===1; p.test=num(c,"test",-1);
+        const k=`${p.lat.toFixed(7)},${p.lon.toFixed(7)},${p.h},${p.g},${p.indoor?1:0}`; let m=cache.get(k);
+        if(m==null){ analysePt(p); p.built=p.manB; p.indoor=p.manI; m=model(p,{}); cache.set(k,m); } p.m=m; return p; }).filter(p=>isFinite(p.meas));
+      const hasT=pts.some(p=>p.test>=0), isT=p=>hasT?p.test===1:((Math.imul(p.id,2654435761)>>>0)%10)>=7, tr=pts.filter(p=>!isT(p)), te=pts.filter(isT);
+      const base=p=>p.m, f=tr.length>=2?fitCal(tr,base):{full:[NaN,NaN,NaN,NaN],cols:[]}, cal=p=>p.m+FEAT.reduce((s,ft,i)=>s+(f.full[i]||0)*ft[1](p),0);
+      res.push({c:keys[gi],e:G.exp,ntr:tr.length,nte:te.length,a:rmsOn(base,tr),b:rmsOn(cal,tr),c2:rmsOn(base,te),d:rmsOn(cal,te),k:FEAT.map((ft,i)=>f.cols.includes(i)?f.full[i]:NaN)});
+      if(gi%8===7){ out.textContent=`Calibrating case ${gi+1} of ${keys.length}…`; await new Promise(r=>setTimeout(r,0)); } }
+    SH.expRes=res; $("shExpDl").disabled=false;
+    const ex=[...new Set(res.map(r=>r.e))], avg=(a,k)=>{ const v=a.map(r=>r[k]).filter(isFinite); return v.length?v.reduce((s,x)=>s+x,0)/v.length:NaN; };
+    $("shExpOut").hidden=false; $("shExpOut").innerHTML=`<caption class="muted" style="text-align:left;caption-side:top;padding-bottom:6px">Average over the cases of each experiment. Error is the RMS difference between readings and model, in dB. Full detail: Download results, then MODE = 'plots' in MATLAB.</caption><tr><th>Experiment</th><th>Cases</th><th>Test error before</th><th>Test error after</th><th>Offset</th><th>Buildings</th><th>Indoor</th><th>Trend</th></tr>`+
+      ex.map(e=>{ const a=res.filter(r=>r.e===e), kk=i=>{ const v=a.map(r=>r.k[i]).filter(isFinite); return v.length?fx(v.reduce((s,x)=>s+x,0)/v.length):"—"; };
+        return `<tr><td>${esc(e)}</td><td class="num">${a.length}</td><td class="num">±${fx(avg(a,"c2"))}</td><td class="num">±${fx(avg(a,"d"))}</td><td class="num">${kk(0)}</td><td class="num">${kk(1)}</td><td class="num">${kk(2)}</td><td class="num">${kk(3)}</td></tr>`; }).join("");
+    out.textContent=`Done: ${res.length} cases calibrated in ${((Date.now()-t0)/1000).toFixed(1)} s. Press Download results, then run MODE = 'plots' in MATLAB.`; }
+  function expResults(){ const R=SH.expRes; if(!R) return; const f=v=>isFinite(v)?v.toFixed(3):"";
+    const lines=["case,experiment,n_train,n_test,rms_train_before,rms_train_after,rms_test_before,rms_test_after,offset,built,indoor,trend"].concat(R.map(r=>[r.c,r.e,r.ntr,r.nte,f(r.a),f(r.b),f(r.c2),f(r.d),...r.k.map(f)].join(",")));
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-results.csv"; document.body.appendChild(a); a.click(); a.remove(); }
+
   /* ---------- live link: /api/measure (MATLAB emulator now, SDR sensors later) ---------- */
   const LV={on:false,ch:"",since:0,after:0,timer:null,last:0,n:0,txKey:"",err:"",store:""};
   const srcLabel=s=>s==="sdr"?"real sensor":"emulated · "+(s||"unknown");
@@ -9714,6 +9775,9 @@ init();
     document.querySelectorAll("#shWhat .chip").forEach(b=>b.addEventListener("click",()=>{ SH.what[b.dataset.w]=!SH.what[b.dataset.w]; render(); }));
     $("shSample").addEventListener("click",()=>{ SH.seed++; buildSample(); render(); heights(); hint("New sample walk test made around the station."); });
     $("shExport").addEventListener("click",exportCSV);
+    $("shExpPlan").addEventListener("click",()=>expPlan().catch(e=>{ $("shExpStat").textContent="Could not export: "+e.message; }));
+    $("shExpFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; const txt=await f.text(); e.target.value=""; $("shExpStat").textContent="Reading "+f.name+"…"; try{ await runExp(txt); }catch(x){ $("shExpStat").textContent="Could not run the experiments: "+x.message; } });
+    $("shExpDl").addEventListener("click",expResults);
     $("shClear").addEventListener("click",async()=>{ if(!SH.pts.length) return; if(!await confirmAction("Clear all readings?",`This removes the ${SH.pts.length} readings in the table. The station stays where it is.`,"Clear readings")) return; SH.pts=[]; SH.ref=null; SH.cal=null; SH.sel=-1; render(); sensors(); });
     $("shFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; const add=parseCSV(await f.text()); e.target.value="";
       if(!add.length){ hint("No readings found. Each line needs lat, lon, level."); return; }
