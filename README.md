@@ -191,3 +191,14 @@ Real 4G measurements with no extra hardware (Shadow tab, card "Phone measurement
   "What is this?" explanation; elsewhere G opens the page guide.
 - **Experiments:** animated pulses along the rays, clear legends and distinct ray colours; references now include
   ITU-R P.525, P.530, P.1057, P.1406 and 3GPP TS 36.101.
+
+## Animate a real map path (v9.7)
+
+Place a transmitter and receivers on the Map (for example Colombo → Yatiyantota, and a second receiver behind a
+mountain), then press **Animate it** (or **Animate my map path** in the Animation tab). For VHF/UHF the Animation shows
+the real terrain and buildings between the two sites on an effective earth, with the antenna heights from the map
+(drag the dots or use the sliders to change them), and opens in line of sight when the path is clear or in diffraction
+when it is blocked. Switch the type to present the same path as line of sight, reflection (specular point on the real
+profile, ITU-R P.527 constants), refraction (k = 2/3 … ducting, ITU-R P.453 / P.834) or diffraction (knife edges,
+Deygout with J(ν), ITU-R P.526). Every type shows the same clearance chart in Fresnel zones (0.6 criterion, ITU-R P.526 /
+P.530), free-space loss (ITU-R P.525) and the Map's own ITU-R P.1812 delta-Bullington result for comparison.
