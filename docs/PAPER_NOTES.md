@@ -1,0 +1,97 @@
+# Paper notes: Groundwave Propagation Lab and the WISDOM digital shadow
+
+Material for writing a conference paper about the website (v9.4). Check every number against
+your own runs before you use it; the values below are from the authors' test runs.
+
+## 1. What the system is (one paragraph)
+
+An open, browser-based laboratory for radio-wave propagation that combines (i) ITU-R prediction
+models from LF to UHF, (ii) a digital shadow that compares predictions with measurements on a real
+map, using OpenStreetMap buildings, and calibrates the model by least squares, (iii) a
+standards-guided planner for sensors and walk tests, (iv) an open measurement interface through which
+MATLAB, Octave, Python or SDR sensors stream readings, and (v) five virtual-lab experiments in the
+Aim-Theory-Procedure-Simulation-Observation-Test format. Nothing has to be installed.
+
+## 2. Models and standards used
+
+| Part | Model / method | Source |
+|---|---|---|
+| Ground wave (LF/MF) | GRWAVE method, Millington mixed paths | ITU-R P.368, ITU Handbook on Ground Wave Propagation (2014) |
+| MF sky wave | Sky-wave field strength | ITU-R P.1147 |
+| HF sky wave, skip distance | Secant law, curved-earth geometry | ITU-R P.533, P.1239 |
+| VHF/UHF point-to-area | Delta-Bullington diffraction, troposcatter | ITU-R P.1812 |
+| Clutter and building entry | Clutter loss; building entry loss | ITU-R P.2108; ITU-R P.2109 |
+| Obstacles (buildings, hills) | Single knife edge J(ν); two strongest edges | ITU-R P.526 |
+| Ground reflection | Two-ray model with Fresnel coefficients | ITU-R P.527 ground constants; Rappaport (2002) |
+| Rain | Specific attenuation | ITU-R P.838 |
+| Mobile fading (experiment) | Clarke/Jakes sum of sinusoids; Rice statistics | Clarke (1968); Jakes (1974) |
+| Walk-test planning | Route measurements; 40λ averaging; coverage edge | ITU-R SM.1708; Lee (1985); BS.412 / BT.1368 |
+| Shadowing (sensor model) | Exponentially correlated log-normal shadowing | Gudmundson (1991) |
+| Calibration | Least squares on offset, building, indoor and distance trend, with hold-out test | – |
+
+## 3. Software-in-the-loop sensor model (MATLAB / Octave)
+
+`assets/wisdom_experiments.m` adds hidden "reality" terms (offset, building loss, indoor loss,
+distance trend) and sensor effects: correlated shadowing (σ, decorrelation distance), Rayleigh
+fading averaged over K samples, GPS error, receiver calibration error and drift, 1 dB display
+resolution, sensitivity limit and lost readings. Independent reality models: 3GPP close-in (n = 3)
+and an exact two-ray model.
+
+**Verification of the chain.** With every sensor effect switched off, the page recovered the hidden
+values exactly (offset −2.5 dB, building −8.6 dB, indoor −3.5 dB, trend −3.2 dB/decade; test error
+0.0 dB). This shows the export → MATLAB → calibration → comparison chain is correct.
+
+Experiments E1-E4 (run them and report your own numbers):
+- E1: recovery of the hidden errors (mean ± std over repeats)
+- E2: test error against the number of training readings for several shadowing levels
+- E3: test error before and after calibration when reality follows another model
+- E4: sensitivity to GPS error, receiver drift, fading averaging, lost readings and display rounding
+
+Observation from the campus scenario: the offset and the distance trend are strongly correlated when
+all points lie within a few hundred metres (about one decade of distance). The prediction
+error stays low, but the two terms are individually uncertain. A few far points separate them.
+
+## 4. Virtual-lab experiments (Experiments tab)
+
+| # | Experiment | Checked against |
+|---|---|---|
+| 1 | Skip distance of the HF sky wave | Flat-earth formula 2h√((f/fc)²−1) (agrees at short range; curved earth longer at long range) |
+| 2 | Two-ray ground reflection | Free space; breakpoint 4hₜhᵣ/λ; −40 dB/decade beyond it |
+| 3 | Knife-edge diffraction | J(ν) of ITU-R P.526 (6 dB at ν = 0) |
+| 4 | Fading channels | Rice CDF, level crossing rate and average fade duration (e.g. Rayleigh, 900 MHz, 50 km/h, −10 dB: 9.3 % vs 9.5 % below threshold; 30.5 vs 29.9 crossings/s) |
+| 5 | Digital shadow calibration | Hidden values recovered; test error levels off at the shadowing σ |
+
+Each experiment exports its observation table as CSV and prints as a lab sheet.
+
+## 5. Honest limitations (put these in the paper)
+
+- Results in this phase come from simulated sensors (software-in-the-loop); SDR measurements are
+  planned under the grant.
+- P.1812 uses a straight-line ground profile from the end-point heights when the elevation service
+  is unavailable.
+- Buildings: OpenStreetMap footprints, heights from tags or floors × 3.2 m (editable); two strongest
+  knife edges, not a full multiple-edge or ray-tracing method.
+- Antenna patterns are horizontal only (no vertical pattern or tilt).
+- Commodity receivers (RTL-SDR, phones) need calibration against a known source.
+- AI-assisted development: disclose it according to the conference policy, and state that the authors
+  verified the models and results.
+
+## 6. BibTeX
+
+```bibtex
+@misc{itu_p1812, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.1812: A path-specific propagation prediction method for point-to-area terrestrial services in the frequency range 30 {MHz} to 6000 {MHz}}, institution={International Telecommunication Union}, address={Geneva}}
+@misc{itu_p526, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.526: Propagation by diffraction}, institution={International Telecommunication Union}, address={Geneva}}
+@misc{itu_p2109, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.2109: Prediction of building entry loss}, institution={International Telecommunication Union}, address={Geneva}}
+@misc{itu_p533, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.533: Method for the prediction of the performance of {HF} circuits}, institution={International Telecommunication Union}, address={Geneva}}
+@misc{itu_p368, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.368: Ground-wave propagation prediction method for frequencies between 10 {kHz} and 30 {MHz}}, institution={International Telecommunication Union}, address={Geneva}}
+@misc{itu_sm1708, author={{ITU-R}}, title={Recommendation {ITU-R} {SM}.1708: Field-strength measurements along a route with geographical coordinate registrations}, institution={International Telecommunication Union}, address={Geneva}}
+@article{clarke1968, author={Clarke, R. H.}, title={A statistical theory of mobile-radio reception}, journal={Bell System Technical Journal}, volume={47}, number={6}, pages={957--1000}, year={1968}}
+@book{jakes1974, editor={Jakes, W. C.}, title={Microwave Mobile Communications}, publisher={Wiley}, year={1974}}
+@article{lee1985, author={Lee, W. C. Y.}, title={Estimate of local average power of a mobile radio signal}, journal={IEEE Transactions on Vehicular Technology}, volume={34}, number={1}, pages={22--27}, year={1985}}
+@article{gudmundson1991, author={Gudmundson, M.}, title={Correlation model for shadow fading in mobile radio systems}, journal={Electronics Letters}, volume={27}, number={23}, pages={2145--2146}, year={1991}}
+@book{rappaport2002, author={Rappaport, T. S.}, title={Wireless Communications: Principles and Practice}, edition={2}, publisher={Prentice Hall}, year={2002}}
+@book{parsons2000, author={Parsons, J. D.}, title={The Mobile Radio Propagation Channel}, edition={2}, publisher={Wiley}, year={2000}}
+@book{goldsmith2005, author={Goldsmith, A.}, title={Wireless Communications}, publisher={Cambridge University Press}, year={2005}}
+```
+
+Add the edition year of each ITU-R Recommendation you actually used (for example P.1812-7, 2023).
