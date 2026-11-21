@@ -9173,7 +9173,7 @@ init();
    model + hidden impairments + noise, and labelled as a demo on screen.
    ===================================================================== */
 (function(){
-  const BANDS=[["fm","FM radio · 100 MHz",100,10,1],["tv","TV · 600 MHz",600,50,1],["lte9","4G · 900 MHz",900,0.2,0.3],["lte18","4G · 1800 MHz",1800,0.2,0.22],["nr35","5G · 3.5 GHz",3500,0.2,0.15],["c433","Campus link · 433 MHz",433,0.001,0.05],["c868","LoRa / IoT · 868 MHz",868,0.025,0.05],["wifi","Wi-Fi / ISM · 2.4 GHz",2400,0.0001,0.04]];
+  const BANDS=[["fm","FM radio · 100 MHz",100,10,1],["tv","TV · 600 MHz",600,50,1],["lte9","4G · 900 MHz",900,0.2,0.3],["lte18","4G · 1800 MHz",1800,0.2,0.22],["nr35","5G · 3.5 GHz",3500,0.2,0.15],["c433","Campus link · 433 MHz",433,0.001,0.05],["c868","LoRa / IoT · 868 MHz",868,0.000025,0.05],["wifi","Wi-Fi / ISM · 2.4 GHz",2400,0.0001,0.04]];
   /* antennas: key, name, gain (dBd), half-power beamwidth (°, 360 = all directions), front-to-back (dB), size (wavelengths; negative = metres) */
   const ANTS=[["omni","Omni collinear (vertical)",3,360,0,2],["dipole","Half-wave dipole",0,360,0,0.5],["yagi","Yagi, 5 elements",7,55,15,1.2],["sector","Sector panel, 65°",13,65,25,-1.0],["patch","Patch / flat panel",5,75,20,0.6]];
   /* OUSL Nawala campus: tower on the Faculty of Engineering Technology roof (approximate position: drag it onto the exact roof and save a layout) */
