@@ -137,3 +137,21 @@ MATLAB sensor emulator (software-in-the-loop), later the real SDR sensors.
 - Saved layouts (station, sensors, walk route) in the browser.
 - MATLAB emulator: exact sensor coordinates (`P_TABLE`), separate indoor flag, and
   `SYNC_TX` follows the tower when it is dragged on the website while connected.
+
+## Experiments with the MATLAB sensor model (v9.3)
+
+Software-in-the-loop experiments, no hardware needed (Shadow tab, card "Experiments with the MATLAB sensor model"):
+
+1. On the page: **Export points for MATLAB** saves `wisdom-plan.csv` (a pool of 160 points with this page's own model values).
+2. In MATLAB (R2016b+) or Octave (7+): run `assets/wisdom_experiments.m` next to that file. It hides known errors
+   (offset, building loss, indoor loss, distance trend) and adds a realistic sensor model (correlated shadowing,
+   Rayleigh fading with 40λ averaging, GPS error, receiver calibration error and drift, 1 dB display, sensitivity, lost readings).
+   It writes `wisdom-experiments.csv` and the hidden answers `wisdom-truth.csv`.
+3. On the page: **Run wisdom-experiments.csv** calibrates every case with the same least-squares fit as the Calibrate
+   button and a fixed hold-out test set; **Download results** saves `wisdom-results.csv`.
+4. In MATLAB: `MODE = 'plots'` compares the results with the hidden answers and writes `wisdom-paper-tables.txt`
+   and `wisdom-E1.png` … `wisdom-E4.png`.
+
+Experiments: E1 recover the hidden errors, E2 readings needed vs shadowing, E3 reality from an independent model
+(3GPP close-in, two-ray), E4 GPS error, drift, fading, lost readings and display rounding one at a time.
+`MODE = 'live'` streams one realistic sensor to the Live link for demonstrations.
