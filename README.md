@@ -180,3 +180,14 @@ Real 4G measurements with no extra hardware (Shadow tab, card "Phone measurement
 - Live streaming from the phone: `assets/wisdom_phone_live.sh` (Termux + Termux:API) sends RSRP-derived field
   strength and GPS to the live link every few seconds.
 - Experiments tab: experiment 6, "Real 4G measurement with a smartphone".
+
+## Propagation types, explain-on-G and standards (v9.6)
+
+- **Animation tab:** a visual picker with five propagation types, each animated from its equations and cited to its standard:
+  line of sight (ITU-R P.525, P.526, P.530; 4/3 earth, radio horizon), reflection (two-ray, ground constants ITU-R P.527),
+  refraction (k-factor from the refractivity gradient: standard −40 N/km, super-refraction below −79, ducting below
+  −157 N/km, ITU-R P.453 and P.834), diffraction (ITU-R P.526 knife edge), and ground and sky wave.
+- **Guide:** an animated hand glides to each step. Point at any chart or control (or focus it) and press **G** for a
+  "What is this?" explanation; elsewhere G opens the page guide.
+- **Experiments:** animated pulses along the rays, clear legends and distinct ray colours; references now include
+  ITU-R P.525, P.530, P.1057, P.1406 and 3GPP TS 36.101.
