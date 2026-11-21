@@ -1967,6 +1967,74 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .sh-sens input{width:100%}
 .sh-sens[hidden]{display:none}
 #shAzF[hidden]{display:none}
+
+/* ---------- Experiments (virtual lab) ---------- */
+.xp-head{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:var(--sp-4);align-items:start;margin-bottom:var(--sp-4)}
+.xp-title{font:600 clamp(26px,3vw,36px)/1.1 var(--font-display);letter-spacing:-.03em;margin:4px 0 8px}
+.xp-lead{font-size:var(--fs-body);line-height:1.6;max-width:65ch;margin:0}
+.xp-cite{padding:var(--sp-4);display:grid;gap:6px}
+.xp-cite p{margin:0;font-size:var(--fs-meta);line-height:1.5}
+.xp-small{font-size:12px}
+#exp-tab .lc-eyebrow{color:var(--muted)}
+#exp-tab,#xpTitle,#xpView{scroll-margin-top:150px}
+@media (max-width:760px){#exp-tab,#xpTitle,#xpView{scroll-margin-top:90px}}
+.xp-top .btn{min-height:40px}
+.xp-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--sp-3)}
+.xp-card{padding:var(--sp-4);display:flex;flex-direction:column;gap:8px}
+.xp-card h3{margin:0;font-size:19px;line-height:1.25}
+.xp-card p{margin:0;font-size:var(--fs-meta);line-height:1.55}
+.xp-card ul{margin:0;padding-left:1.2em;font-size:var(--fs-meta);color:var(--muted);display:grid;gap:3px}
+.xp-cfoot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:6px}
+.xp-view{display:grid;gap:var(--sp-4)}
+.xp-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.xp-vhead h3{margin:2px 0 6px;font:600 clamp(22px,2.4vw,30px)/1.15 var(--font-display);letter-spacing:-.02em;outline:none}
+.xp-plain{margin:0;max-width:70ch;line-height:1.6}
+.xp-steps ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.xp-steps button{width:100%;display:flex;gap:6px;align-items:center;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-md);padding:8px;font:inherit;font-size:12.5px;cursor:pointer;min-height:44px;text-align:left}
+.xp-steps .n{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:2px solid var(--line);font-size:11px}
+.xp-steps li.done .n{background:var(--good);border-color:var(--good);color:#fff}
+.xp-steps li.now button{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.xp-steps button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.xp-sec h4{margin:var(--sp-3) 0 var(--sp-2);font-size:17px}
+.xp-sec h4:first-child{margin-top:0}
+.xp-sec p,.xp-list li,.xp-proc li,.xp-refs li{line-height:1.65;max-width:75ch}
+.xp-list,.xp-refs{padding-left:1.3em;margin:0;display:grid;gap:4px}
+.xp-proc{padding-left:1.3em;margin:0;display:grid;gap:10px}
+.xp-proc li span{margin-right:6px}
+.xp-note{background:var(--accent-soft);border-radius:var(--r-md);padding:10px 14px;margin:var(--sp-3) 0 0}
+.xp-theory .mathb{margin:var(--sp-2) 0;overflow-x:auto}
+.xp-q{border:1px solid var(--line);border-radius:var(--r-md);padding:10px 14px;margin:0 0 10px;display:grid;gap:4px}
+.xp-q legend{font-weight:600;padding:0 4px}
+.xp-q.ok{border-color:var(--good)} .xp-q.no{border-color:var(--warn)}
+.xp-opt{display:flex;gap:8px;align-items:flex-start;padding:4px 0;cursor:pointer;min-height:32px}
+.xp-fb{margin:4px 0 0;font-size:var(--fs-meta)}
+.xp-sim{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:var(--sp-4);align-items:start}
+.xp-ctl{display:grid;gap:10px}
+.xp-rng label{display:flex;justify-content:space-between;gap:8px}
+.xp-rng output{font-family:var(--font-mono);font-size:13px;color:var(--ink)}
+.xp-rng input{width:100%}
+.xp-tiles{grid-template-columns:1fr 1fr}
+.xp-canvas{width:100%;height:420px;display:block;border:1px solid var(--line);border-radius:var(--r-md);background:var(--field)}
+.xp-ochart{height:340px;margin-bottom:var(--sp-2)}
+.xp-psel{max-width:420px;margin-bottom:var(--sp-2)}
+.xp-nav{display:flex;justify-content:space-between;gap:8px}
+.xp-hl{animation:xp-hl 1.6s ease-out}
+@keyframes xp-hl{0%,40%{box-shadow:0 0 0 4px var(--accent);border-radius:var(--r-md)}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion: reduce){.xp-hl{animation:none;outline:3px solid var(--accent)}}
+@media (max-width:980px){.xp-head{grid-template-columns:1fr}.xp-sim{grid-template-columns:1fr}.xp-steps ol{grid-template-columns:repeat(4,minmax(0,1fr))}.xp-canvas{height:360px}}
+@media (max-width:560px){.xp-steps ol{grid-template-columns:repeat(2,minmax(0,1fr))}.xp-tiles{grid-template-columns:1fr}}
+@media print{body.xp-printing>*:not(main):not(#exp-tab){display:none!important}body.xp-printing .appbar,body.xp-printing .bnav,body.xp-printing .xp-top,body.xp-printing .xp-steps,body.xp-printing .xp-nav,body.xp-printing #xpBody .row,body.xp-printing .welcome,body.xp-printing footer{display:none!important}
+  body.xp-printing #exp-tab{display:block!important}body.xp-printing .wrap:not(#exp-tab){display:none!important}body.xp-printing .xp-view{border:0;box-shadow:none}}
+/* ---------- welcome card ---------- */
+.welcome{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:400;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);width:min(440px,calc(100vw - 32px));padding:var(--sp-4);display:grid;gap:10px;box-shadow:0 12px 32px rgba(10,30,45,.22)}
+.welcome h2{margin:0 28px 0 0;font-size:18px}
+.wel-x{position:absolute;right:8px;top:8px;width:36px;height:36px;font-size:20px}
+.wel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wel-grid button{display:grid;gap:2px;text-align:left;background:var(--field);border:1px solid var(--line);border-radius:var(--r-md);padding:10px;font:inherit;color:var(--ink);cursor:pointer;min-height:64px}
+.wel-grid button:hover,.wel-grid button:focus-visible{border-color:var(--accent);outline:none;box-shadow:inset 0 0 0 1px var(--accent)}
+.wel-grid b{font-size:14px} .wel-grid span{font-size:12px;color:var(--muted)}
+.wel-foot{margin:0;font-size:var(--fs-meta)}
+@media (max-width:760px){.welcome{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2048,6 +2116,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
       <button class="tab" role="tab" id="tab-shadow" aria-controls="shadow-tab" data-tab="shadow" data-kbd="6" data-tiptext="Digital shadow"><span class="n">6</span>Shadow</button>
       <button class="tab" role="tab" id="tab-methods" aria-controls="methods" data-tab="methods" data-kbd="7" data-tiptext="Models"><span class="n">7</span>Models</button>
       <button class="tab" role="tab" id="tab-learn" aria-controls="learn" data-tab="learn" data-kbd="8" data-tiptext="Learn"><span class="n">8</span>Learn</button>
+      <button class="tab" role="tab" id="tab-exp" aria-controls="exp-tab" data-tab="exp" data-kbd="0" data-tiptext="Experiments"><span class="n">0</span>Experiments</button>
       <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" data-tab="quiz" data-kbd="9" data-tiptext="Quiz"><span class="n">9</span>Quiz</button>
     </nav>
     <button class="scope" id="scopeChip" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>&#8212;</b></button>
@@ -3520,10 +3589,50 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <label class="field"><span class="lbl">Student name</span><input type="text" id="qName" placeholder="for the results file" autocomplete="name"></label>
     <div class="row"><button class="btn" id="qExport" type="button">Export results (CSV)</button><button class="btn" id="qPrint" type="button">Print</button></div>
   </section>
+
   <div class="quiz" id="quizBox"></div>
   <div class="row" style="margin-top:12px"><button class="btn primary" id="qSubmit" type="button" hidden>Mark my answers</button></div>
   <div id="qResult" style="margin-top:12px"></div>
 </section>
+
+<!-- ======================= EXPERIMENTS ======================= -->
+<section class="wrap" id="exp-tab" role="tabpanel" aria-labelledby="tab-exp" hidden>
+  <header class="xp-head">
+    <div>
+      <p class="lc-eyebrow">Virtual lab · 5 experiments · about 25 minutes each</p>
+      <h2 class="xp-title">Experiments</h2>
+      <p class="xp-lead">Each experiment follows the same steps as a university virtual lab: Aim, Theory, Pre-test, Procedure, Simulation, Observations, Post-test and References. Nothing to install. Start with any card; each one tells you exactly what to do next.</p>
+    </div>
+    <div class="xp-cite panel">
+      <b>For reports and papers</b>
+      <p>Every experiment lists its model, the ITU-R or textbook source, and exports its observation table as CSV. Use <b>Print lab sheet</b> for a clean worksheet.</p>
+      <p class="muted xp-small" id="xpCite"></p>
+    </div>
+  </header>
+  <div class="xp-cards" id="xpCards"></div>
+  <article class="xp-view panel card" id="xpView" hidden aria-live="polite">
+    <div class="xp-top">
+      <button class="btn sm" type="button" id="xpBack">← All experiments</button>
+      <div class="row"><button class="btn sm" type="button" id="xpPrint">Print lab sheet</button></div>
+    </div>
+    <header class="xp-vhead"><p class="lc-eyebrow" id="xpEyebrow"></p><h3 id="xpTitle" tabindex="-1"></h3><p class="xp-plain" id="xpPlain"></p></header>
+    <nav class="xp-steps" aria-label="Experiment steps"><ol id="xpSteps"></ol></nav>
+    <div id="xpBody"></div>
+    <div class="xp-nav"><button class="btn" type="button" id="xpPrev">← Previous step</button><button class="btn primary" type="button" id="xpNext">Next step →</button></div>
+  </article>
+</section>
+<aside class="welcome panel" id="welcome" hidden aria-labelledby="welH">
+  <button class="iconbtn wel-x" type="button" data-w="close" aria-label="Close the welcome card">×</button>
+  <h2 id="welH">New here? Pick a starting point</h2>
+  <div class="wel-grid">
+    <button type="button" data-w="learn"><b>I am new to radio</b><span>Short lessons, one idea at a time</span></button>
+    <button type="button" data-w="exp"><b>Do a guided experiment</b><span>Aim, theory, simulation and results</span></button>
+    <button type="button" data-w="map"><b>Plan a real station</b><span>The map, with a step-by-step guide</span></button>
+    <button type="button" data-w="shadow"><b>Research: digital shadow</b><span>Measurements, MATLAB and calibration</span></button>
+  </div>
+  <p class="wel-foot"><button class="linkish" type="button" data-w="tour">Take the one-minute tour</button> · Press <kbd>G</kbd> on any page for its guide.</p>
+</aside>
+
 
 
 <aside class="aui" id="auiPanel" hidden role="dialog" aria-labelledby="auiTitle">
@@ -3533,7 +3642,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 <dialog id="keysDlg" class="cfm keysdlg" aria-labelledby="keysTitle">
   <h2 id="keysTitle">Keyboard shortcuts</h2>
   <div class="keysgrid">
-    <section><h3>Everywhere</h3><dl><dt><kbd>1</kbd>–<kbd>9</kbd></dt><dd>Open a tab (Lab … Quiz)</dd><dt><kbd>?</kbd></dt><dd>This list</dd><dt><kbd>G</kbd></dt><dd>Guide to the page you are on</dd><dt><kbd>T</kbd></dt><dd>Light / dark theme</dd><dt><kbd>Esc</kbd></dt><dd>Close a box or dialog</dd></dl></section>
+    <section><h3>Everywhere</h3><dl><dt><kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd></dt><dd>Open a tab (Lab … Quiz, 0 = Experiments)</dd><dt><kbd>?</kbd></dt><dd>This list</dd><dt><kbd>G</kbd></dt><dd>Guide to the page you are on</dd><dt><kbd>T</kbd></dt><dd>Light / dark theme</dd><dt><kbd>Esc</kbd></dt><dd>Close a box or dialog</dd></dl></section>
     <section><h3>Map and Cellular</h3><dl><dt><kbd>S</kbd></dt><dd>Transmitter settings, opened beside the transmitter (or right-click a transmitter pin)</dd><dt><kbd>P</kbd></dt><dd>All transmitter settings</dd><dt><kbd>A</kbd></dt><dd>Aim the beam</dd><dt><kbd>Shift</kbd> + <kbd>←</kbd>/<kbd>→</kbd></dt><dd>Turn the beam 5° (<kbd>Alt</kbd> for 1°)</dd><dt><kbd>F2</kbd></dt><dd>Rename the selected pin</dd><dt><kbd>Del</kbd></dt><dd>Delete the selected pin</dd><dt><kbd>F</kbd></dt><dd>Full-screen map</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
     <section><h3>Animation</h3><dl><dt><kbd>Space</kbd></dt><dd>Play / pause</dd><dt><kbd>F</kbd></dt><dd>Full screen</dd><dt><kbd>H</kbd></dt><dd>Hide or show the panels</dd><dt><kbd>+</kbd> / <kbd>−</kbd></dt><dd>Zoom</dd></dl></section>
     <section><h3>Digital shadow</h3><dl><dt><kbd>C</kbd></dt><dd>Calibrate the model</dd><dt><kbd>I</kbd> / <kbd>M</kbd> / <kbd>N</kbd> / <kbd>L</kbd></dt><dd>Map click: inspect / add a walk point / add a sensor / move the station</dd><dt><kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd></dt><dd>Zoom in / out / fit all points</dd><dt>Drag, arrow keys</dt><dd>Move the map</dd></dl></section>
@@ -3703,11 +3812,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" data-tab="terrain">Terrain profile</button>
   <button type="button" data-tab="shadow">Digital shadow</button>
   <button type="button" data-tab="learn">Learn</button>
+  <button type="button" data-tab="exp">Experiments</button>
   <button type="button" data-tab="quiz">Quiz</button>
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v9.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v9.4</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -8537,12 +8647,12 @@ function bindQuiz(){ const topics=[...new Set(QUIZ.map(q=>q.topic))]; $("qTopic"
   $("qMode").addEventListener("change",renderQuiz); $("qTopic").addEventListener("change",renderQuiz); $("qSubmit").addEventListener("click",submitQuiz); (function(){const b=$("qExport"); b.dataset.lbl=b.textContent; let top=false; try{top=window.top===window.self;}catch(e){} if(!top) b.textContent=b.dataset.lbl="Copy results (CSV)"; b.addEventListener("click",exportQuiz);})(); $("qPrint").addEventListener("click",()=>window.print()); }
 
 /* ================= TABS ================= */
-const TABS=["lab","animation","map","terrain","mobile","shadow","methods","learn","quiz"];
+const TABS=["lab","animation","map","terrain","mobile","shadow","methods","learn","quiz","exp"];
 let currentTab="lab";
 function go(t,noHash){
   if(!TABS.includes(t)) t="lab"; if(typeof FS!=="undefined"&&FS.on) setMapFs(false); currentTab=t; document.body.dataset.tab=t;
   document.querySelectorAll(".tab").forEach(b=>{ const on=b.dataset.tab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
-  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz"; $("mobile-tab").hidden=t!=="mobile"; $("shadow-tab").hidden=t!=="shadow";
+  $("lab").hidden=t!=="lab"; $("animation").hidden=t!=="animation"; $("map-tab").hidden=t!=="map"; $("terrain-tab").hidden=t!=="terrain"; $("learn").hidden=t!=="learn"; $("methods").hidden=t!=="methods"; $("quiz").hidden=t!=="quiz"; $("exp-tab").hidden=t!=="exp"; $("mobile-tab").hidden=t!=="mobile"; $("shadow-tab").hidden=t!=="shadow";
   if(!noHash && location.hash!=="#"+t){ try{ history.replaceState(null,"","#"+t); }catch(e){ location.hash=t; } }
   if(t==="lab") redraw();
   if(t==="map"||t==="terrain") setLayer("bcast");
@@ -8567,6 +8677,390 @@ function bindBottomNav(){
 }
 function bindTabs(){
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+/* ================= EXPERIMENTS: a virtual lab (Aim, Theory, Pre-test, Procedure, Simulation, Observations, Post-test, References) ================= */
+(function initExperiments(){
+  const root=$("exp-tab"); if(!root) return;
+  const KEY="gwlab-exp-v1";
+  const load=()=>{ try{ return JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ return {}; } };
+  const save=o=>{ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} };
+  const STEPS=[["aim","Aim"],["theory","Theory"],["pre","Pre-test"],["proc","Procedure"],["sim","Simulation"],["obs","Observations"],["post","Post-test"],["ref","References"]];
+  const L10=Math.log10, f1=v=>isFinite(v)?v.toFixed(1):"—", f2=v=>isFinite(v)?v.toFixed(2):"—";
+  const C=n=>cssVar(n)||"#888";
+  function cv(c){ const W=c.clientWidth||600,H=c.clientHeight||300,d=window.devicePixelRatio||1;
+    if(c.width!==Math.round(W*d)||c.height!==Math.round(H*d)){ c.width=Math.round(W*d); c.height=Math.round(H*d); }
+    const x=c.getContext("2d"); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H); return [x,W,H]; }
+  function rngS(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+  const gauss=r=>{ let u=0,v=0; while(!u) u=r(); while(!v) v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+  /* simple axes for small charts */
+  function axes(x,box,xr,yr,o){ o=o||{}; const [L,T,W,H]=box, lx=o.logx;
+    const X=v=>L+((lx?L10(v)-L10(xr[0]):v-xr[0])/((lx?L10(xr[1])-L10(xr[0]):xr[1]-xr[0])||1))*W, Y=v=>T+H-((v-yr[0])/((yr[1]-yr[0])||1))*H;
+    x.strokeStyle=C("--line"); x.lineWidth=1; x.font="11px "+(C("--font-mono")||"monospace"); x.fillStyle=C("--muted");
+    const nice=(a,b,n)=>{ const s=(b-a)/n, p=Math.pow(10,Math.floor(L10(s))), m=s/p, st=(m<1.5?1:m<3?2:m<7?5:10)*p, out=[]; for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st) out.push(+v.toPrecision(10)); return out; };
+    const xt=lx?(()=>{ const out=[]; for(let e=Math.floor(L10(xr[0]));e<=Math.ceil(L10(xr[1]));e++) [1,2,5].forEach(m=>{ const v=m*Math.pow(10,e); if(v>=xr[0]*0.999&&v<=xr[1]*1.001) out.push(v); }); return out; })():nice(xr[0],xr[1],5);
+    x.textAlign="center"; xt.forEach(v=>{ const px=X(v); x.beginPath(); x.moveTo(px,T); x.lineTo(px,T+H); x.stroke(); x.fillText(+v.toPrecision(3),px,T+H+13); });
+    x.textAlign="right"; nice(yr[0],yr[1],4).forEach(v=>{ const py=Y(v); x.beginPath(); x.moveTo(L,py); x.lineTo(L+W,py); x.stroke(); x.fillText(+v.toPrecision(4),L-4,py+4); });
+    x.textAlign="left"; if(o.xl){ x.textAlign="right"; x.fillText(o.xl,L+W,T+H+26); x.textAlign="left"; } if(o.yl) x.fillText(o.yl,L,T-6);
+    return {X,Y}; }
+  /* Rice / Rayleigh helpers for the fading experiment (E[r²] = 1) */
+  function lnI0(z){ if(z<15){ let s=1,t=1; for(let k=1;k<60;k++){ t*=(z/2)*(z/2)/(k*k); s+=t; if(t<1e-14*s) break; } return Math.log(s); } return z-0.5*Math.log(2*Math.PI*z)+Math.log(1+1/(8*z)); }
+  const ricePdf=(r,K)=>r<=0?0:Math.exp(Math.log(2*(K+1)*r)-K-(K+1)*r*r+lnI0(2*r*Math.sqrt(K*(K+1))));
+  function riceCdf(rho,K){ const n=600, h=rho/n; let s=0; for(let i=0;i<n;i++) s+=ricePdf((i+0.5)*h,K)*h; return Math.min(1,s); }
+  const riceLcr=(rho,K,fd)=>Math.sqrt(2*Math.PI*(K+1))*fd*rho*Math.exp(-K-(K+1)*rho*rho+lnI0(2*rho*Math.sqrt(K*(K+1))));
+  /* Clarke / Jakes sum-of-sinusoids channel, sampled at fs = 50·fd for T = 600/fd seconds */
+  const FCACHE={key:"",r:null};
+  function fadeSeries(K,seed){ const key=K+"|"+seed; if(FCACHE.key===key) return FCACHE.r; const r=rngS(seed), M=48, N=30000, fsN=50;
+    const a=[],p=[]; for(let m=0;m<M;m++){ a.push(Math.cos(2*Math.PI*(m+r())/M)); p.push(2*Math.PI*r()); } const th=2*Math.PI*r(), los=Math.sqrt(K/(K+1)), sc=Math.sqrt(1/(K+1))/Math.sqrt(M);
+    const env=new Float32Array(N); for(let n=0;n<N;n++){ const t=n/fsN; let re=0,im=0; for(let m=0;m<M;m++){ const ph=2*Math.PI*a[m]*t+p[m]; re+=Math.cos(ph); im+=Math.sin(ph); }
+      re=re*sc+los*Math.cos(2*Math.PI*Math.cos(th)*t); im=im*sc+los*Math.sin(2*Math.PI*Math.cos(th)*t); env[n]=Math.hypot(re,im); }
+    let ms=0; for(let n=0;n<N;n++) ms+=env[n]*env[n]; const k=1/Math.sqrt(ms/N); for(let n=0;n<N;n++) env[n]*=k;   // normalise: mean power 1
+    FCACHE.key=key; FCACHE.r=env; return env; }
+  function fadeStats(v){ const fd=v.v/3.6*v.f*1e6/3e8, env=fadeSeries(v.K,v.seed||3), rho=Math.pow(10,v.thr/20), N=env.length, dt=1/(50*fd);
+    let below=0, cross=0; for(let n=0;n<N;n++){ if(env[n]<rho) below++; if(n&&env[n-1]>=rho&&env[n]<rho) cross++; }
+    const T=N*dt, Pm=below/N, Pt=riceCdf(rho,v.K), Lm=cross/T, Lt=riceLcr(rho,v.K,fd);
+    return {fd,Pm,Pt,Lm,Lt,Am:Lm?Pm/Lm:NaN,At:Lt?Pt/Lt:NaN,Tc:0.423/fd,env,dt}; }
+  /* calibration experiment: log-distance "model", hidden reality, least squares on offset, buildings, trend */
+  function calibRun(v,seed){ const r=rngS(seed), mk=n=>Array.from({length:n},()=>{ const d=0.05+r()*0.95*Math.pow(10,r()), b=r()<0.4?1:0; const m=100-33*L10(d);
+      return {d,b,m,y:m+v.off+v.bld*b-3.2*L10(d)+v.sig*gauss(r)}; });
+    const tr=mk(v.n), te=mk(40), X=p=>[1,p.b,L10(p.d)];
+    const A=[[0,0,0],[0,0,0],[0,0,0]], b=[0,0,0]; tr.forEach(p=>{ const x=X(p), y=p.y-p.m; for(let i=0;i<3;i++){ b[i]+=x[i]*y; for(let j=0;j<3;j++) A[i][j]+=x[i]*x[j]; } }); for(let i=0;i<3;i++) A[i][i]+=1e-6;
+    let c=solve3(A,b); if(!c) c=[tr.reduce((s,p)=>s+p.y-p.m,0)/tr.length,0,0];
+    const pr=p=>p.m+c[0]+c[1]*p.b+c[2]*L10(p.d), rms=(f,s)=>Math.sqrt(s.reduce((a,p)=>a+(p.y-f(p))**2,0)/s.length);
+    return {tr,te,c,before:rms(p=>p.m,te),after:rms(pr,te),pr}; }
+  function solve3(A,b){ const M=A.map((r,i)=>[...r,b[i]]), n=3; for(let c=0;c<n;c++){ let p=c; for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r; [M[c],M[p]]=[M[p],M[c]];
+      if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<n;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; } } return M.map((r,i)=>r[n]/M[i][i]); }
+
+  /* ------------------------------------------------------------------ the experiments */
+  const EXPS=[
+  { id:"skip", title:"Skip distance of the HF sky wave", level:"Beginner", mins:25,
+    plain:"Short-wave radio bounces off the ionosphere. Close to the transmitter there is a quiet ring where no sky wave lands: the skip zone. You will find how big it is.",
+    learn:["Why some frequencies come back from the ionosphere and others escape","How the skip distance grows with frequency","Why a flat-earth formula is not enough at long range"],
+    aim:"To determine the skip distance of an HF sky wave reflected by the ionospheric F2 layer, and to study how it depends on the operating frequency, the critical frequency foF2 and the layer height.",
+    theory:`<p>The ionosphere returns a wave only if it is not too steep. A layer with critical frequency <i>f</i><sub>c</sub> (the highest frequency it returns straight up) returns a wave of frequency <i>f</i> arriving at angle of incidence <i>i</i> when (the <b>secant law</b>):</p>
+      <div class="mathb" data-tex="f \\le f_c\\,\\sec i"></div>
+      <p>The steepest ray that still comes back lands closest to the transmitter. That distance is the <b>skip distance</b>. On a flat earth with a mirror layer at height <i>h</i>:</p>
+      <div class="mathb" data-tex="D_{\\text{skip}} = 2h\\sqrt{\\left(\\tfrac{f}{f_c}\\right)^{2}-1}"></div>
+      <p>The lab uses the curved-earth geometry of ITU-R P.533: the earth's radius limits the lowest ray and therefore the longest single hop (about 4000 km for the F2 layer). If <i>f</i> ≤ <i>f</i><sub>c</sub> even a vertical ray returns (near-vertical incidence, NVIS) and there is no skip zone. If <i>f</i> is above the maximum usable frequency for every angle, the wave escapes into space.</p>
+      <p class="xp-note">In plain words: the higher the frequency, the shallower the angle needed to bounce back, so the first landing point moves further away.</p>`,
+    pre:[{q:"What happens to a 30 MHz wave sent straight up when foF2 is 8 MHz?",o:["It is reflected back to the transmitter","It passes through the ionosphere into space","It is absorbed by the ground"],a:1,why:"A vertical wave is returned only if f ≤ foF2. 30 MHz is far above 8 MHz, so it escapes."},
+         {q:"The skip zone is…",o:["The area where only the ground wave and the sky wave overlap","The ring between the end of the ground wave and the first sky-wave landing, with no reception","The region beyond the maximum usable frequency"],a:1,why:"Inside the skip distance no sky wave lands; if the ground wave has already died out, nothing is received there."}],
+    proc:[{t:"Keep the default ionosphere (foF2 = 8 MHz, h = 300 km). Set the frequency to 6 MHz.",hl:"f"},
+          {t:"Read the state in the tiles. Below foF2 the wave returns even straight up: there is no skip zone (NVIS).",hl:"tiles"},
+          {t:"Raise the frequency to 10 MHz, then press Record this reading.",hl:"rec"},
+          {t:"Repeat for 12, 15, 20 and 25 MHz. Watch the critical ray move outwards in the picture.",hl:"f"},
+          {t:"Go to Observations and press Fill automatically for a full sweep. Compare the curved-earth result with the flat-earth formula (dashed).",hl:"obs"},
+          {t:"Change foF2 to 5 MHz (night-time) and record a few readings again. Explain why the skip distance grows at night.",hl:"fc"}],
+    controls:[{id:"f",label:"Frequency",unit:"MHz",min:2,max:30,step:0.1,val:12},{id:"fc",label:"Critical frequency foF2",unit:"MHz",min:3,max:14,step:0.1,val:8},{id:"h",label:"F2 layer height",unit:"km",min:200,max:450,step:5,val:300}],
+    calc(v){ const s=skipLayer(v.f,v.fc,v.h,"F2"), flat=v.f>v.fc?2*v.h*Math.sqrt((v.f/v.fc)**2-1):0; return {...s,flat}; },
+    tiles(v,s){ const st={nvis:"Returns even straight up (NVIS): no skip zone",closed:"Above the MUF for every angle: escapes to space",skip:"Returns only at shallow angles"}[s.state];
+      return [["Skip distance",s.state==="skip"?`${Math.round(s.skip)} km`:s.state==="nvis"?"0 km":"none",st,s.state==="closed"?"bad":"good"],
+        ["Flat-earth formula",s.flat?`${Math.round(s.flat)} km`:"—","2h·√((f/fc)²−1), no earth curvature"],
+        ["Steepest returning ray",s.mua!=null?`${s.mua.toFixed(1)}°`:"—","elevation of the critical ray"],
+        ["Highest usable frequency",`${s.mufMax.toFixed(1)} MHz`,"fc·sec i for the lowest possible ray"]]; },
+    draw(x,W,H,v,s){ const g=H-28, top=22, maxD=Math.max(4200,(s.skip||0)*1.15), X=d=>18+d/maxD*(W-36), hy=top+ (g-top)*0.15, Hs=(g-hy);
+      x.fillStyle=C("--accent-soft"); x.fillRect(0,top-10,W,hy-top+14); x.fillStyle=C("--muted"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText(`F2 layer · foF2 ${v.fc} MHz · ${v.h} km`,10,top+4);
+      x.strokeStyle=C("--ink"); x.lineWidth=2; x.beginPath(); x.moveTo(0,g); x.lineTo(W,g); x.stroke();
+      if(s.state==="skip"){ x.fillStyle="rgba(210,69,58,.12)"; x.fillRect(X(120),g-Hs,X(s.skip)-X(120),Hs); x.fillStyle=C("--bad"); x.fillText("skip zone: no sky wave lands here",X(120)+6,g-8); }
+      const ray=(d,col,dash)=>{ x.strokeStyle=col; x.lineWidth=2; x.setLineDash(dash||[]); x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(d/2),hy); x.lineTo(X(d),g); x.stroke(); x.setLineDash([]); };
+      if(s.state==="skip"){ ray(s.skip,C("--accent")); ray(Math.min(s.skip*1.6,maxD*0.98),C("--muted"),[4,4]);
+        x.strokeStyle=C("--bad"); x.setLineDash([3,4]); x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(s.skip*0.3),top-6); x.stroke(); x.setLineDash([]); x.fillStyle=C("--bad"); x.fillText("steeper rays escape",X(s.skip*0.3)+4,top+16);
+        x.fillStyle=C("--ink"); x.textAlign="center"; x.fillText(`${Math.round(s.skip)} km`,X(s.skip),g+16); x.textAlign="left"; }
+      else if(s.state==="nvis"){ x.strokeStyle=C("--accent"); x.lineWidth=2; for(const d of [0,300,700]){ x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(d/2),hy); x.lineTo(X(d),g); x.stroke(); } }
+      else { x.strokeStyle=C("--bad"); x.setLineDash([4,4]); x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(maxD*0.5),top-8); x.stroke(); x.setLineDash([]); }
+      x.fillStyle=C("--ink"); x.beginPath(); x.moveTo(X(0)-6,g); x.lineTo(X(0),g-18); x.lineTo(X(0)+6,g); x.fill(); },
+    obs:{cols:[["f","f (MHz)",1],["fc","foF2 (MHz)",1],["h","h (km)",0],["skip","Skip, curved earth (km)",0],["flat","Skip, flat earth (km)",0],["mua","Critical ray (°)",1]],
+      row(v,s){ return {f:v.f,fc:v.fc,h:v.h,skip:s.state==="skip"?s.skip:s.state==="nvis"?0:NaN,flat:s.flat,mua:s.mua??NaN}; },
+      plots:[{label:"Skip distance against frequency",x:"f",y:["skip","flat"],xl:"frequency (MHz)",yl:"skip distance (km)",sweep:{k:"f",vals:[6,8,9,10,11,12,13,14,16,18,20,22,24,26,28,30]}}]},
+    results:["At which frequency does the skip zone appear? Compare it with foF2.","At 20 MHz, how much longer is the curved-earth skip than the flat-earth formula? Why?","Why is the skip distance larger at night (lower foF2)?"],
+    expect:"The skip zone appears just above foF2 and grows almost linearly with frequency. At long range the curved-earth skip is longer than the flat-earth formula, because the ground curves away below the ray, so the wave lands further out (up to about 26 MHz here, above which no ray returns). Lower foF2 at night pushes the first landing point further out.",
+    post:[{q:"Doubling the frequency well above foF2 makes the skip distance roughly…",o:["half as large","about twice as large","unchanged"],a:1,why:"For f ≫ fc, D ≈ 2h·f/fc, which grows in proportion to f."},
+          {q:"Why can a single F2 hop not exceed about 4000 km?",o:["The ionosphere absorbs longer paths","The earth's curvature: the lowest ray leaves the ground tangentially","The secant law stops working"],a:1,why:"Even a ray launched along the horizon reaches the layer and comes back at a finite distance set by the earth's radius and the layer height."},
+          {q:"At night foF2 falls from 8 to 4 MHz. For a 10 MHz link the skip distance…",o:["shrinks","grows","does not change"],a:1,why:"A lower critical frequency needs a shallower angle, so the first landing point moves outward."}],
+    refs:["Recommendation ITU-R P.533-14 (2019), Method for the prediction of the performance of HF circuits.","Recommendation ITU-R P.1239-3 (2012), ITU-R reference ionospheric characteristics.","K. Davies, Ionospheric Radio, IEE Electromagnetic Waves Series 31, Peter Peregrinus, 1990.","J. M. Goodman, HF Communications: Science and Technology, Van Nostrand Reinhold, 1992."]},
+
+  { id:"tworay", title:"Line of sight with a ground reflection (two-ray model)", level:"Beginner", mins:25,
+    plain:"A receiver gets the direct wave and a wave bounced off the ground. Sometimes they add, sometimes they cancel. You will see why the signal goes up and down with distance, and why it then falls much faster than in free space.",
+    learn:["How a reflected ray interferes with the direct ray","What the breakpoint distance is","Why the far field falls as 1/d² (−40 dB per decade)"],
+    aim:"To study the field strength received over flat ground as the sum of a direct and a ground-reflected ray, to locate the breakpoint distance, and to compare the result with free-space propagation.",
+    theory:`<p>The direct ray travels <i>r</i><sub>1</sub>, the reflected ray <i>r</i><sub>2</sub>. The ground reflects with the Fresnel coefficient Γ (close to −1 at grazing angles). The received field relative to free space is:</p>
+      <div class="mathb" data-tex="\\frac{E}{E_{fs}} = \\left|\\,1 + \\Gamma\\,\\frac{r_1}{r_2}\\,e^{-\\mathrm{j}k(r_2-r_1)}\\right|,\\qquad r_2-r_1 \\approx \\frac{2h_t h_r}{d}"></div>
+      <p>Close to the transmitter the path difference is many wavelengths and the rays alternately add (+6 dB) and cancel (deep nulls). Beyond the <b>breakpoint distance</b></p>
+      <div class="mathb" data-tex="d_b = \\frac{4h_t h_r}{\\lambda}"></div>
+      <p>the two rays are almost equal and opposite, and the field falls as 1/<i>d</i><sup>2</sup> (40 dB per decade) instead of 1/<i>d</i> (20 dB per decade) in free space. Field strengths are for 1 kW ERP.</p>
+      <p class="xp-note">In plain words: two copies of the same wave arrive a little out of step. Far away they almost cancel, so the signal drops twice as fast.</p>`,
+    pre:[{q:"Two equal waves arrive exactly half a wavelength apart. The result is…",o:["twice as strong","almost zero","the same as one wave"],a:1,why:"Half a wavelength is 180°: the two waves cancel."},
+         {q:"In free space, doubling the distance lowers the field by…",o:["3 dB","6 dB","12 dB"],a:1,why:"Free-space field falls as 1/d: 20·log10(2) = 6 dB."}],
+    proc:[{t:"Keep 900 MHz, transmitter 30 m, receiver 2 m. Read the breakpoint distance in the tiles.",hl:"tiles"},
+          {t:"Move the distance slider slowly from 0.1 km to 1 km and watch the signal swing up and down in the lower chart.",hl:"d"},
+          {t:"Set a few distances (0.2, 0.5, 1, 2, 5, 10 km) and press Record this reading at each.",hl:"rec"},
+          {t:"Go to Observations and press Fill automatically. Compare the two-ray field with free space (dashed).",hl:"obs"},
+          {t:"Double the receiver height to 4 m. Predict where the breakpoint moves, then check.",hl:"hr"},
+          {t:"Change the ground to sea water and the polarisation to horizontal. Note what changes near the transmitter.",hl:"g"}],
+    controls:[{id:"f",label:"Frequency",unit:"MHz",min:50,max:3000,step:10,val:900},{id:"ht",label:"Transmitter height",unit:"m",min:2,max:100,step:1,val:30},{id:"hr",label:"Receiver height",unit:"m",min:1,max:20,step:0.5,val:2},
+      {id:"d",label:"Distance",unit:"km",min:0.05,max:30,step:0.01,val:1,log:true},{id:"g",label:"Ground",type:"select",opts:[["avg","Average ground"],["wet","Wet ground"],["dry","Dry ground"],["sea","Sea water"],["city","City"]],val:"avg"},{id:"pol",label:"Polarisation",type:"select",opts:[["v","Vertical"],["h","Horizontal"]],val:"v"}],
+    calc(v){ return twoRay(v.d,v.ht,v.hr,v.f,v.g,v.pol); },
+    tiles(v,R){ return [["Field strength",`${f1(R.E)} dBµV/m`,`free space ${f1(R.Efs)} dBµV/m`],["Two rays combine",`${R.FdB>=0?"+":""}${f1(R.FdB)} dB`,R.FdB>=0?"in phase: they add":"out of phase: they cancel",R.FdB>-3?"good":R.FdB>-10?"warn":"bad"],
+      ["Path difference",`${(R.dl/R.lam).toFixed(2)} λ`,`${(R.dl*100).toFixed(1)} cm`],["Breakpoint distance",`${f2(R.db)} km`,"4·ht·hr/λ"]]; },
+    draw(x,W,H,v,R){ const sh=H*0.42, g=sh-8, hmax=Math.max(v.ht,v.hr)*1.25, Y=h=>g-h/hmax*(sh-24), x0=30, x1=W-30;
+      x.strokeStyle=C("--ink"); x.lineWidth=2; x.beginPath(); x.moveTo(0,g); x.lineTo(W,g); x.stroke();
+      x.lineWidth=3; x.beginPath(); x.moveTo(x0,g); x.lineTo(x0,Y(v.ht)); x.moveTo(x1,g); x.lineTo(x1,Y(v.hr)); x.stroke();
+      const xr=x0+(x1-x0)*v.ht/(v.ht+v.hr); x.strokeStyle=C("--accent"); x.lineWidth=2; x.beginPath(); x.moveTo(x0,Y(v.ht)); x.lineTo(x1,Y(v.hr)); x.stroke();
+      x.strokeStyle=C("--warn"); x.setLineDash([6,4]); x.beginPath(); x.moveTo(x0,Y(v.ht)); x.lineTo(xr,g); x.lineTo(x1,Y(v.hr)); x.stroke(); x.setLineDash([]);
+      x.fillStyle=C("--muted"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText("direct ray",(x0+x1)/2-30,Math.min(Y(v.ht),Y(v.hr))-6); x.fillText("reflected ray",xr+6,g-6);
+      const b=[44,sh+16,W-60,H-sh-40], xr2=[0.05,30]; const pts=[]; for(let i=0;i<=360;i++){ const d=0.05*Math.pow(600,i/360); const r=twoRay(d,v.ht,v.hr,v.f,v.g,v.pol); pts.push([d,r.E,r.Efs]); }
+      const ys=pts.map(p=>p[1]).concat(pts.map(p=>p[2])).filter(isFinite), ymax=Math.ceil(Math.max(...ys)/10)*10+5, ymin=Math.max(Math.floor(Math.min(...ys)/10)*10,ymax-90);
+      const A=axes(x,b,xr2,[ymin,ymax],{logx:true,xl:"distance (km)",yl:"field strength (dBµV/m)"});
+      x.strokeStyle=C("--muted"); x.setLineDash([5,4]); x.beginPath(); pts.forEach((p,i)=>i?x.lineTo(A.X(p[0]),A.Y(p[2])):x.moveTo(A.X(p[0]),A.Y(p[2]))); x.stroke(); x.setLineDash([]);
+      x.strokeStyle=C("--accent"); x.lineWidth=2; x.beginPath(); pts.forEach((p,i)=>{ const yy=A.Y(Math.max(p[1],ymin)); i?x.lineTo(A.X(p[0]),yy):x.moveTo(A.X(p[0]),yy); }); x.stroke();
+      if(R.db>0.05&&R.db<30){ x.strokeStyle=C("--bad"); x.setLineDash([2,3]); x.beginPath(); x.moveTo(A.X(R.db),b[1]); x.lineTo(A.X(R.db),b[1]+b[3]); x.stroke(); x.setLineDash([]); x.fillStyle=C("--bad"); x.fillText("breakpoint",A.X(R.db)+4,b[1]+12); }
+      x.fillStyle=C("--ink"); x.beginPath(); x.arc(A.X(v.d),A.Y(Math.max(R.E,ymin)),5,0,7); x.fill(); },
+    obs:{cols:[["d","d (km)",2],["E","Two-ray E (dBµV/m)",1],["Efs","Free space (dBµV/m)",1],["FdB","Gain over free space (dB)",1],["pd","Path difference (λ)",2]],
+      row(v,R){ return {d:v.d,E:R.E,Efs:R.Efs,FdB:R.FdB,pd:R.dl/R.lam}; },
+      plots:[{label:"Field strength against distance",x:"d",y:["E","Efs"],logx:true,xl:"distance (km)",yl:"dBµV/m",sweep:{k:"d",vals:[0.05,0.07,0.1,0.15,0.2,0.3,0.5,0.7,1,1.5,2,3,5,7,10,15,20,30]}}]},
+    results:["Where is the last deep null before the breakpoint? Relate it to the path difference in wavelengths.","Between 10 and 30 km, by how many dB does the field fall? Compare with 20 dB per decade in free space.","How does doubling the receiver height change the breakpoint distance?"],
+    expect:"Before the breakpoint the field oscillates around free space (up to +6 dB, deep nulls). Beyond it, it falls about 40 dB per decade. The breakpoint is proportional to ht·hr, so doubling hr doubles it.",
+    post:[{q:"Beyond the breakpoint the two-ray field falls by about…",o:["20 dB per decade","40 dB per decade","60 dB per decade"],a:1,why:"The field goes as 1/d², i.e. 40 dB per decade of distance."},
+          {q:"Raising the transmitter from 30 m to 60 m (receiver unchanged) moves the breakpoint…",o:["closer","twice as far","it does not move"],a:1,why:"d_b = 4·ht·hr/λ is proportional to ht."},
+          {q:"Why is Γ close to −1 far from the transmitter?",o:["The ground is a perfect conductor","At grazing angles almost any ground reflects with a 180° phase flip","Because of the curvature of the earth"],a:1,why:"As the grazing angle tends to zero the Fresnel coefficient tends to −1 for both polarisations."}],
+    refs:["T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, §4.6.","J. D. Parsons, The Mobile Radio Propagation Channel, 2nd ed., Wiley, 2000, ch. 2.","Recommendation ITU-R P.527-6 (2021), Electrical characteristics of the surface of the Earth.","Recommendation ITU-R P.1546-6 (2019), Method for point-to-area predictions for terrestrial services."]},
+
+  { id:"knife", title:"Diffraction over a hill or building (knife-edge)", level:"Intermediate", mins:25,
+    plain:"Radio waves bend a little around obstacles. A hill does not block the signal completely, it adds a loss. You will measure that loss and see why even an obstacle below the line of sight matters.",
+    learn:["What the Fresnel zone is","How the diffraction parameter ν sets the loss","Why 60% Fresnel clearance is the planning rule"],
+    aim:"To determine the diffraction loss of a single knife-edge obstacle as a function of its height, using the Fresnel–Kirchhoff diffraction parameter ν and the approximation of ITU-R P.526.",
+    theory:`<p>An obstacle at distances <i>d</i><sub>1</sub> and <i>d</i><sub>2</sub> from the ends, with its tip <i>h</i> above the straight line between the antennas, is described by the dimensionless parameter</p>
+      <div class="mathb" data-tex="\\nu = h\\sqrt{\\frac{2\\,(d_1+d_2)}{\\lambda\\,d_1 d_2}}"></div>
+      <p>ITU-R P.526 gives the knife-edge loss for ν > −0.78:</p>
+      <div class="mathb" data-tex="J(\\nu) = 6.9 + 20\\log_{10}\\!\\left(\\sqrt{(\\nu-0.1)^2+1}+\\nu-0.1\\right)\\ \\text{dB}"></div>
+      <p>At grazing (ν = 0, the tip just touches the line) the loss is already 6 dB. The radius of the first Fresnel zone at the obstacle is</p>
+      <div class="mathb" data-tex="r_1 = \\sqrt{\\frac{\\lambda\\,d_1 d_2}{d_1+d_2}}"></div>
+      <p>Keeping the obstacle at least 0.6 <i>r</i><sub>1</sub> below the line (ν ≤ −0.85) makes the loss negligible. This is the usual planning rule for microwave links.</p>
+      <p class="xp-note">In plain words: the wave needs a "fat" path, not just a line. If a hill pokes into that fat path, you lose signal even before it blocks the view.</p>`,
+    pre:[{q:"If the hilltop just touches the straight line between the antennas, the extra loss is…",o:["0 dB","about 6 dB","infinite: the signal is blocked"],a:1,why:"At grazing incidence half of the Fresnel zone is blocked: J(0) ≈ 6 dB."},
+         {q:"At a higher frequency the Fresnel zone is…",o:["wider","narrower","the same"],a:1,why:"r1 ∝ √λ: shorter wavelength, narrower zone."}],
+    proc:[{t:"Keep 600 MHz, 10 km path, obstacle in the middle. Set the obstacle height to −40 m (well below the line).",hl:"ho"},
+          {t:"Raise it in steps of 10 m up to +80 m. At each step press Record this reading.",hl:"rec"},
+          {t:"Note the height at which the loss reaches 6 dB. Compare it with the line of sight in the picture.",hl:"tiles"},
+          {t:"Go to Observations and press Fill automatically. Plot of loss against ν: every frequency and geometry falls on the same curve.",hl:"obs"},
+          {t:"Move the obstacle close to one end (position 0.1). Explain why the same height now costs less.",hl:"pos"}],
+    controls:[{id:"f",label:"Frequency",unit:"MHz",min:30,max:3000,step:10,val:600},{id:"d",label:"Path length",unit:"km",min:1,max:50,step:0.5,val:10},{id:"pos",label:"Obstacle position (fraction of path)",unit:"",min:0.1,max:0.9,step:0.05,val:0.5},{id:"ho",label:"Tip above the line of sight",unit:"m",min:-40,max:80,step:1,val:10}],
+    calc(v){ return knifeEdge(v.d,v.pos,v.ho,v.f); },
+    tiles(v,K){ return [["Diffraction loss",`${f1(K.L)} dB`,K.nu<=-0.78?"clear path":K.nu<0?"partly in the Fresnel zone":"blocked: the wave bends over the top",K.L<1?"good":K.L<10?"warn":"bad"],["Parameter ν",f2(K.nu),"height in Fresnel units"],
+      ["Fresnel zone radius",`${f1(K.r1)} m`,"at the obstacle"],["Clearance",`${f2(-v.ho/K.r1)} r₁`,"≥ 0.6 r₁ is the planning rule"]]; },
+    draw(x,W,H,v,K){ const m=40, g=H-30, ly=g-H*0.45, X=t=>m+t*(W-2*m), sc=(H*0.32)/Math.max(80,K.r1*1.3), ox=X(v.pos);
+      x.strokeStyle=C("--ink"); x.lineWidth=2; x.beginPath(); x.moveTo(0,g); x.lineTo(W,g); x.stroke(); x.lineWidth=3; x.beginPath(); x.moveTo(X(0),g); x.lineTo(X(0),ly); x.moveTo(X(1),g); x.lineTo(X(1),ly); x.stroke();
+      x.fillStyle="rgba(205,242,58,.22)"; x.beginPath(); for(let i=0;i<=60;i++){ const t=i/60, r=Math.sqrt(t*(1-t))/Math.sqrt(v.pos*(1-v.pos))*K.r1*sc; x.lineTo(X(t),ly-r); } for(let i=60;i>=0;i--){ const t=i/60, r=Math.sqrt(t*(1-t))/Math.sqrt(v.pos*(1-v.pos))*K.r1*sc; x.lineTo(X(t),ly+r); } x.fill();
+      x.strokeStyle=C("--accent"); x.lineWidth=2; x.setLineDash([6,4]); x.beginPath(); x.moveTo(X(0),ly); x.lineTo(X(1),ly); x.stroke(); x.setLineDash([]);
+      const tip=ly-v.ho*sc; x.fillStyle=C("--muted"); x.beginPath(); x.moveTo(ox-46,g); x.lineTo(ox,tip); x.lineTo(ox+46,g); x.fill();
+      if(v.ho>-0.78*K.r1){ x.strokeStyle=C("--warn"); x.lineWidth=2; x.beginPath(); x.moveTo(X(0),ly); x.lineTo(ox,tip); x.lineTo(X(1),ly); x.stroke(); }
+      x.fillStyle=C("--ink"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText("line of sight",X(0.02),ly-6); x.fillText("first Fresnel zone",X(0.05),ly+K.r1*sc*0.6+14); x.fillText(`ν = ${K.nu.toFixed(2)} · loss ${K.L.toFixed(1)} dB`,ox+10,Math.max(16,tip-6)); },
+    obs:{cols:[["ho","Tip above line (m)",0],["nu","ν",2],["L","Loss J(ν) (dB)",1],["r1","r₁ (m)",1],["f","f (MHz)",0],["pos","Position",2]],
+      row(v,K){ return {ho:v.ho,nu:K.nu,L:K.L,r1:K.r1,f:v.f,pos:v.pos}; },
+      plots:[{label:"Loss against the parameter ν",x:"nu",y:["L"],xl:"ν",yl:"loss (dB)",sweep:{k:"ho",vals:[-40,-30,-20,-10,-5,0,5,10,20,30,40,50,60,70,80]}},{label:"Loss against obstacle height",x:"ho",y:["L"],xl:"tip above line (m)",yl:"loss (dB)",sweep:{k:"ho",vals:[-40,-30,-20,-10,-5,0,5,10,20,30,40,50,60,70,80]}}]},
+    results:["At what height does the loss reach 6 dB? What is ν there?","Record readings at 300 MHz and 1500 MHz. Do they fall on the same loss–ν curve? Why?","How much clearance (in metres) does the 0.6 r₁ rule need on your path?"],
+    expect:"The loss is 6 dB at ν = 0 (tip on the line). All frequencies and geometries collapse onto one J(ν) curve, which is why ν is used. For large ν the loss grows about 20 dB per decade of ν.",
+    post:[{q:"Which change lowers the diffraction loss for the same obstacle height above the line?",o:["Higher frequency","Lower frequency","Moving the obstacle to the middle of the path"],a:1,why:"Lower frequency means larger λ, smaller ν and less loss."},
+          {q:"For ν = 2.4 the loss J(ν) is about…",o:["6 dB","20 dB","40 dB"],a:1,why:"J(2.4) = 6.9 + 20·log10(√(2.3²+1)+2.3) ≈ 20 dB."},
+          {q:"The 0.6 r₁ clearance rule keeps the loss…",o:["below about 0 dB","exactly 6 dB","above 10 dB"],a:0,why:"With 60% of the first Fresnel zone clear the obstacle adds practically no loss."}],
+    refs:["Recommendation ITU-R P.526-15 (2019), Propagation by diffraction, §4.1.","J. D. Parsons, The Mobile Radio Propagation Channel, 2nd ed., Wiley, 2000, ch. 3.","T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, §4.9."]},
+
+  { id:"fading", title:"Fading channels and mobile communications", level:"Intermediate", mins:30,
+    plain:"When you move with a phone, the signal flickers many times a second because reflected waves keep changing how they add up. You will simulate this fading, count how often it drops below a threshold, and compare with theory.",
+    learn:["Rayleigh fading (no direct path) and Rician fading (with a direct path)","Doppler spread, level crossing rate and fade duration","How a strong direct path (K factor) makes the link reliable"],
+    aim:"To simulate small-scale multipath fading of a mobile radio channel (Clarke/Jakes model), and to measure the envelope distribution, the level crossing rate and the average fade duration for Rayleigh and Rician channels against their theoretical values.",
+    theory:`<p>Many scattered waves arrive from all directions. A receiver moving at speed <i>v</i> sees each with a Doppler shift up to the maximum Doppler frequency</p>
+      <div class="mathb" data-tex="f_d = \\frac{v}{\\lambda} = \\frac{v\\,f_c}{c}"></div>
+      <p>With no direct path the envelope <i>r</i> (normalised to its rms value) is <b>Rayleigh</b> distributed; with a direct path of power ratio <i>K</i> to the scattered power it is <b>Rician</b>:</p>
+      <div class="mathb" data-tex="p(r)=2(K{+}1)\\,r\\,e^{-K-(K+1)r^2}\\,I_0\\!\\left(2r\\sqrt{K(K{+}1)}\\right),\\qquad K=0:\\ P(r<\\rho)=1-e^{-\\rho^2}"></div>
+      <p>The <b>level crossing rate</b> (how many times per second the envelope falls through the level ρ) and the <b>average fade duration</b> are</p>
+      <div class="mathb" data-tex="N_\\rho=\\sqrt{2\\pi(K{+}1)}\\,f_d\\,\\rho\\,e^{-K-(K+1)\\rho^2}I_0\\!\\left(2\\rho\\sqrt{K(K{+}1)}\\right),\\qquad \\bar\\tau=\\frac{P(r<\\rho)}{N_\\rho}"></div>
+      <p>The coherence time, over which the channel stays roughly constant, is about 0.423/<i>f</i><sub>d</sub>. The simulation sums 48 sinusoids with random angles (Clarke's model) and adds a direct component for K > 0.</p>
+      <p class="xp-note">In plain words: moving faster makes the signal flicker faster but not deeper. A strong direct path (large K) fills in the deep fades.</p>`,
+    pre:[{q:"A car at 72 km/h (20 m/s) receives 900 MHz (λ = 0.33 m). The maximum Doppler shift is about…",o:["6 Hz","60 Hz","600 Hz"],a:1,why:"fd = v/λ = 20/0.333 ≈ 60 Hz."},
+         {q:"Rayleigh fading describes a channel…",o:["with a strong line-of-sight path","with only scattered paths, no direct path","with no multipath at all"],a:1,why:"Rayleigh is the no-LOS case (K = 0)."}],
+    proc:[{t:"Keep 900 MHz, 50 km/h and K = 0 (Rayleigh). Watch the envelope flicker in the upper chart; red parts are below the threshold.",hl:"v"},
+          {t:"Read the tiles: measured and theoretical probability below −10 dB should be close (about 10%).",hl:"tiles"},
+          {t:"Change the speed to 10, 30, 60, 90 and 120 km/h and press Record this reading at each. Fades get faster, not deeper.",hl:"rec"},
+          {t:"Set the speed back to 50 km/h and raise K to 1, 3, 6, 10 and 20 (Rician). Record each.",hl:"K"},
+          {t:"Go to Observations. Choose a plot, press Fill automatically and compare the measured dots with the theory line.",hl:"obs"},
+          {t:"Move the threshold to −20 dB with K = 0. Check that P(r < ρ) ≈ ρ² (1%) as theory predicts.",hl:"thr"}],
+    controls:[{id:"f",label:"Carrier frequency",unit:"MHz",min:100,max:6000,step:10,val:900},{id:"v",label:"Speed",unit:"km/h",min:1,max:120,step:1,val:50},{id:"K",label:"Rician K factor (0 = Rayleigh)",unit:"",min:0,max:20,step:0.5,val:0},{id:"thr",label:"Threshold below rms",unit:"dB",min:-30,max:0,step:1,val:-10}],
+    anim:true,
+    calc(v){ return fadeStats(v); },
+    tiles(v,S){ return [["Max Doppler fd",`${f1(S.fd)} Hz`,`coherence time ≈ ${(S.Tc*1000).toFixed(1)} ms`],["Time below threshold",`${(S.Pm*100).toFixed(1)} %`,`theory ${(S.Pt*100).toFixed(1)} %`,S.Pm<0.02?"good":S.Pm<0.1?"warn":"bad"],
+      ["Level crossings",`${f1(S.Lm)} /s`,`theory ${f1(S.Lt)} /s`],["Average fade",`${(S.Am*1000).toFixed(1)} ms`,`theory ${(S.At*1000).toFixed(1)} ms`]]; },
+    draw(x,W,H,v,S,t){ const b=[44,22,W-64,H*0.5-34], env=S.env, win=Math.round(10/S.fd/S.dt), off=Math.floor(((t||0)/1000)/S.dt*0.25)%(env.length-win), thr=v.thr;
+      const A=axes(x,b,[0,10/S.fd*1000],[-40,10],{xl:"time (ms)",yl:"envelope (dB relative to rms)"});
+      x.strokeStyle=C("--bad"); x.setLineDash([4,4]); x.beginPath(); x.moveTo(b[0],A.Y(thr)); x.lineTo(b[0]+b[2],A.Y(thr)); x.stroke(); x.setLineDash([]);
+      x.lineWidth=1.6; let prevB=null; x.beginPath();
+      for(let i=0;i<win;i+=Math.max(1,Math.floor(win/600))){ const e=20*L10(Math.max(env[off+i],1e-3)), px=A.X(i*S.dt*1000), py=A.Y(Math.max(e,-40)), bl=e<thr;
+        if(bl!==prevB){ if(prevB!==null){ x.lineTo(px,py); x.stroke(); } x.strokeStyle=bl?C("--bad"):C("--accent"); x.beginPath(); x.moveTo(px,py); prevB=bl; } else x.lineTo(px,py); } x.stroke();
+      const b2=[44,H*0.5+26,W-64,H*0.5-62], A2=axes(x,b2,[-30,5],[-4,0],{xl:"level ρ (dB relative to rms)",yl:"log10 P(envelope < ρ)  ·  dots measured, line theory"});
+      x.strokeStyle=C("--ink"); x.lineWidth=1.6; x.beginPath(); for(let q=-30;q<=5;q+=0.5){ const p=riceCdf(Math.pow(10,q/20),v.K), y=A2.Y(Math.max(L10(Math.max(p,1e-4)),-4)); q===-30?x.moveTo(A2.X(q),y):x.lineTo(A2.X(q),y); } x.stroke();
+      const N=env.length; x.fillStyle=C("--accent"); for(let q=-30;q<=5;q+=2.5){ const rho=Math.pow(10,q/20); let c=0; for(let n=0;n<N;n+=3) if(env[n]<rho) c++; const p=c/Math.ceil(N/3); if(p>0){ x.beginPath(); x.arc(A2.X(q),A2.Y(Math.max(L10(p),-4)),3.5,0,7); x.fill(); } } },
+    obs:{cols:[["v","Speed (km/h)",0],["K","K",1],["thr","Threshold (dB)",0],["fd","fd (Hz)",1],["Pm","P(r<ρ) measured",4],["Pt","P(r<ρ) theory",4],["Lm","LCR measured (/s)",1],["Lt","LCR theory (/s)",1],["Am","Fade measured (ms)",2],["At","Fade theory (ms)",2]],
+      row(v,S){ return {v:v.v,K:v.K,thr:v.thr,fd:S.fd,Pm:S.Pm,Pt:S.Pt,Lm:S.Lm,Lt:S.Lt,Am:S.Am*1000,At:S.At*1000}; },
+      plots:[{label:"Level crossing rate against speed",x:"v",y:["Lm","Lt"],xl:"speed (km/h)",yl:"crossings per second",sweep:{k:"v",vals:[5,10,20,30,40,60,80,100,120]}},
+             {label:"Outage probability against K factor",x:"K",y:["Pm","Pt"],xl:"Rician K",yl:"P(envelope < threshold)",sweep:{k:"K",vals:[0,0.5,1,2,3,4,6,8,10,15,20]}},
+             {label:"Average fade duration against speed",x:"v",y:["Am","At"],xl:"speed (km/h)",yl:"ms",sweep:{k:"v",vals:[5,10,20,30,40,60,80,100,120]}}]},
+    results:["How does the level crossing rate change when you double the speed? Why?","At −10 dB, how much does the outage fall between K = 0 and K = 10?","Why do the measured values scatter a little around the theory? How could you reduce the scatter?"],
+    expect:"The crossing rate is proportional to fd, so it doubles with speed, while the time below threshold stays the same. A strong direct path (K = 10) cuts the −10 dB outage from about 10% to well below 1%. Scatter comes from the finite simulated time; longer records reduce it.",
+    post:[{q:"Doubling the speed of a Rayleigh-fading receiver…",o:["doubles the fraction of time in a fade","doubles the number of fades per second, same fraction of time","halves the fade depth"],a:1,why:"N_ρ ∝ fd while P(r<ρ) does not depend on speed."},
+          {q:"For Rayleigh fading, the probability of being 20 dB below the rms level is about…",o:["0.1 %","1 %","10 %"],a:1,why:"P = 1 − e^(−ρ²) ≈ ρ² = 0.01."},
+          {q:"Increasing the K factor…",o:["makes deep fades more likely","makes deep fades less likely","does not change the fades"],a:1,why:"A stronger direct path keeps the envelope near its mean."}],
+    refs:["R. H. Clarke, “A statistical theory of mobile-radio reception,” Bell System Technical Journal, vol. 47, no. 6, pp. 957–1000, 1968.","W. C. Jakes (ed.), Microwave Mobile Communications, Wiley, 1974.","T. S. Rappaport, Wireless Communications: Principles and Practice, 2nd ed., Prentice Hall, 2002, ch. 5.","A. Goldsmith, Wireless Communications, Cambridge University Press, 2005, ch. 3.","Virtual Labs (IIT Kharagpur), Fading Channels and Mobile Communications, Ministry of Education, Government of India."]},
+
+  { id:"calib", title:"Calibrating a digital shadow with a sensor model", level:"Intermediate", mins:30,
+    plain:"A propagation model is never exactly right. Here a simulated sensor hides known errors in its readings (like MATLAB does in the Digital shadow tab). You will let the model correct itself and check that it finds the hidden errors.",
+    learn:["How least-squares calibration corrects a model","Why some readings must be kept aside for testing","How many readings are enough"],
+    aim:"To calibrate a propagation model against simulated sensor readings that contain known (hidden) impairments, to verify that least-squares calibration recovers them, and to determine how the prediction error depends on the number of readings and on shadowing.",
+    theory:`<p>The difference between each reading <i>y</i> and the model prediction <i>m</i> is explained by a few correction terms: a system offset <i>a</i>, an extra building loss <i>b</i> (for points behind buildings, <i>B</i> = 1), and a distance trend <i>c</i>:</p>
+      <div class="mathb" data-tex="y_i - m_i = a + b\\,B_i + c\\log_{10} d_i + \\varepsilon_i"></div>
+      <p>Least squares chooses <i>a</i>, <i>b</i>, <i>c</i> to minimise the sum of squared residuals, which gives the normal equations:</p>
+      <div class="mathb" data-tex="\\hat{\\boldsymbol\\beta} = (X^{\\mathsf T}X)^{-1}X^{\\mathsf T}(\\mathbf y-\\mathbf m)"></div>
+      <p>The residual ε contains shadowing (random, typically 4–8 dB) that no model can predict. To judge the calibration fairly, it is tested on <b>40 separate readings</b> that were not used for fitting (hold-out test). This is exactly what the Digital shadow tab does with MATLAB or sensor data.</p>
+      <p class="xp-note">In plain words: the model learns its own mistakes from the readings, and we check it on readings it has never seen.</p>`,
+    pre:[{q:"Why keep some readings aside for testing?",o:["To save time","Because a model always fits the readings it was trained on; only new readings show the real error","Because the sensors are faulty"],a:1,why:"Testing on unseen data gives an honest estimate of the prediction error."},
+         {q:"Shadowing of 6 dB means…",o:["every reading is 6 dB low","readings scatter randomly with a standard deviation of about 6 dB","the model is 6 dB wrong"],a:1,why:"Shadowing is random scatter around the local mean."}],
+    proc:[{t:"Keep 20 readings, 4 dB shadowing, hidden offset −4 dB and hidden building loss −8.6 dB.",hl:"n"},
+          {t:"Read the tiles: the found offset and building loss should be close to the hidden ones, and the test error should drop after calibration.",hl:"tiles"},
+          {t:"Press New readings a few times. The found values change a little each time: this is the effect of random shadowing.",hl:"seed"},
+          {t:"Change the number of readings to 5, 10, 20, 40 and 60, pressing Record this reading at each (each record averages 20 random repeats).",hl:"rec"},
+          {t:"Go to Observations and press Fill automatically. Find how many readings are enough.",hl:"obs"},
+          {t:"For the full version with a realistic MATLAB sensor model and real buildings, open the Digital shadow tab, card “Experiments with the MATLAB sensor model”.",hl:"shadow"}],
+    controls:[{id:"n",label:"Training readings",unit:"",min:4,max:60,step:1,val:20},{id:"sig",label:"Shadowing (std)",unit:"dB",min:0,max:8,step:0.5,val:4},{id:"off",label:"Hidden system offset",unit:"dB",min:-8,max:8,step:0.5,val:-4},{id:"bld",label:"Hidden building loss",unit:"dB",min:-15,max:0,step:0.1,val:-8.6}],
+    extra:`<button class="btn sm" type="button" data-xp="seed" id="xp-c-seed">New readings</button> <button class="btn sm" type="button" data-xp="shadow" id="xp-c-shadow">Open the Digital shadow</button>`,
+    calc(v){ return calibRun(v,v.seed||5); },
+    tiles(v,R){ return [["Offset found",`${f1(R.c[0])} dB`,`hidden ${f1(v.off)} dB`],["Building loss found",`${f1(R.c[1])} dB`,`hidden ${f1(v.bld)} dB`,Math.abs(R.c[1]-v.bld)<1.5?"good":"warn"],["Trend found",`${f1(R.c[2])} dB/decade`,"hidden −3.2 dB/decade"],
+      ["Test error",`${f1(R.before)} → ${f1(R.after)} dB`,"before → after calibration (40 unseen readings)",R.after<v.sig+1?"good":"warn"]]; },
+    draw(x,W,H,v,R){ const b=[48,22,W-70,H-60], ys=R.tr.concat(R.te).map(p=>p.y), A=axes(x,b,[0.05,10],[Math.floor(Math.min(...ys)/10)*10,Math.ceil(Math.max(...ys)/10)*10],{logx:true,xl:"distance (km)",yl:"reading (dB)"});
+      const line=(fn,col,dash)=>{ x.strokeStyle=col; x.lineWidth=2; x.setLineDash(dash||[]); x.beginPath(); for(let i=0;i<=60;i++){ const d=0.05*Math.pow(200,i/60), y=fn(d); i?x.lineTo(A.X(d),A.Y(y)):x.moveTo(A.X(d),A.Y(y)); } x.stroke(); x.setLineDash([]); };
+      line(d=>100-33*L10(d),C("--muted"),[5,4]); line(d=>100-33*L10(d)+R.c[0]+R.c[2]*L10(d),C("--accent")); line(d=>100-33*L10(d)+R.c[0]+R.c[1]+R.c[2]*L10(d),C("--warn"));
+      R.tr.forEach(p=>{ x.fillStyle=p.b?C("--warn"):C("--accent"); x.beginPath(); x.arc(A.X(p.d),A.Y(p.y),3.5,0,7); x.fill(); });
+      R.te.forEach(p=>{ x.strokeStyle=C("--muted"); x.beginPath(); x.arc(A.X(p.d),A.Y(p.y),3,0,7); x.stroke(); });
+      x.fillStyle=C("--muted"); x.font="12px "+(C("--font-body")||"sans-serif"); x.fillText("dashed: model before · lines: calibrated (clear / behind buildings) · dots: training · rings: test",b[0],H-6); },
+    obs:{cols:[["n","Readings",0],["sig","Shadowing (dB)",1],["offT","Offset hidden",1],["offF","Offset found",2],["bldT","Building hidden",1],["bldF","Building found",2],["before","Test error before (dB)",2],["after","Test error after (dB)",2]],
+      row(v){ let s=[0,0,0,0]; const K=20; for(let k=0;k<K;k++){ const R=calibRun(v,1000+k*7); s[0]+=R.c[0]; s[1]+=R.c[1]; s[2]+=R.before; s[3]+=R.after; } return {n:v.n,sig:v.sig,offT:v.off,offF:s[0]/K,bldT:v.bld,bldF:s[1]/K,before:s[2]/K,after:s[3]/K}; },
+      plots:[{label:"Test error against number of readings",x:"n",y:["after","before"],xl:"training readings",yl:"test error (dB RMS)",sweep:{k:"n",vals:[4,5,6,8,10,12,16,20,30,40,60]}},
+             {label:"Recovered building loss against shadowing",x:"sig",y:["bldF","bldT"],xl:"shadowing (dB)",yl:"building loss (dB)",sweep:{k:"sig",vals:[0,1,2,3,4,5,6,7,8]}}]},
+    results:["From how many readings on does the test error stop improving? Compare it with the shadowing value.","Is the hidden building loss recovered on average? How large is the spread at 8 dB shadowing?","Why can the test error never fall below the shadowing standard deviation?"],
+    expect:"The test error falls quickly and levels off at about the shadowing value after 15–20 readings. On average the hidden values are recovered; the spread grows with shadowing and shrinks with more readings. Random shadowing cannot be predicted, so it sets the floor.",
+    post:[{q:"After calibration with many readings, the test error approaches…",o:["0 dB","the shadowing standard deviation","the hidden offset"],a:1,why:"Only the random part remains, and that is the shadowing."},
+          {q:"Why is it useful to have readings both behind buildings and in the clear?",o:["It is not useful","So the building loss can be separated from the offset","To reduce shadowing"],a:1,why:"Without both kinds of points the building term cannot be told apart from the offset."},
+          {q:"A calibration with 5 readings shows 0.5 dB error on the training data. This means…",o:["the model is excellent","nothing yet: check the hold-out test error","the shadowing is 0.5 dB"],a:1,why:"With few points a model can fit the training data closely by chance; only the test error counts."}],
+    refs:["Recommendation ITU-R SM.1708-1 (2017), Field-strength measurements along a route with geographical coordinate registrations.","W. C. Y. Lee, “Estimate of local average power of a mobile radio signal,” IEEE Trans. Vehicular Technology, vol. VT-34, no. 1, pp. 22–27, 1985.","M. Gudmundson, “Correlation model for shadow fading in mobile radio systems,” Electronics Letters, vol. 27, no. 23, pp. 2145–2146, 1991.","Recommendation ITU-R P.1812-7 (2023), A path-specific propagation prediction method for point-to-area terrestrial services."]}
+  ];
+
+  /* ------------------------------------------------------------------ state and rendering */
+  const S=load(); S.obs=S.obs||{}; S.done=S.done||{}; S.quiz=S.quiz||{};
+  let cur=null, step=0, V={}, raf=0, plotI=0;
+  const ex=()=>EXPS.find(e=>e.id===cur);
+  const prog=e=>Object.keys(S.done[e.id]||{}).length;
+  $("xpCite").textContent=`Cite as: Groundwave Propagation Lab, virtual experiments, ${location.host||"groundwave-lab.pages.dev"} (accessed ${new Date().toISOString().slice(0,10)}).`;
+  function cards(){ $("xpCards").innerHTML=EXPS.map((e,i)=>{ const p=prog(e);
+    return `<article class="xp-card panel"><p class="lc-eyebrow">Experiment ${i+1} · ${e.level} · about ${e.mins} min</p><h3>${esc(e.title)}</h3><p>${esc(e.plain)}</p>
+      <ul>${e.learn.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>
+      <div class="xp-cfoot"><span class="muted xp-small">${p?`${p} of ${STEPS.length} steps done`:"Not started"}</span><button class="btn ${p?"":"primary"} sm" type="button" data-open="${e.id}">${p?"Continue":"Start"}</button></div></article>`; }).join(""); }
+  function open(id,st){ cur=id; const e=ex(); if(!e) return; V={seed:id==="calib"?9:3}; e.controls.forEach(c=>V[c.id]=c.val); plotI=0;
+    $("xpCards").hidden=true; root.querySelector(".xp-head").hidden=true; $("xpView").hidden=false;
+    $("xpEyebrow").textContent=`Experiment ${EXPS.indexOf(e)+1} · ${e.level} · about ${e.mins} min`; $("xpTitle").textContent=e.title; $("xpPlain").textContent=e.plain;
+    go_(st??0); $("xpTitle").focus({preventScroll:true}); $("xpView").scrollIntoView({block:"start"}); }
+  function closeView(){ cancelAnimationFrame(raf); cur=null; $("xpView").hidden=true; $("xpCards").hidden=false; root.querySelector(".xp-head").hidden=false; cards(); }
+  function mark(i){ const e=ex(); (S.done[e.id]=S.done[e.id]||{})[STEPS[i][0]]=1; save(S); }
+  function go_(i){ step=clamp(i,0,STEPS.length-1); cancelAnimationFrame(raf);
+    $("xpSteps").innerHTML=STEPS.map((s,k)=>`<li class="${k===step?"now":""} ${(S.done[cur]||{})[s[0]]?"done":""}"><button type="button" data-xstep="${k}" ${k===step?'aria-current="step"':""}><span class="n">${k+1}</span>${s[1]}</button></li>`).join("");
+    $("xpPrev").disabled=step===0; $("xpNext").textContent=step===STEPS.length-1?"Finish ✓":"Next step →";
+    $("xpBody").innerHTML=section(STEPS[step][0]); after(STEPS[step][0]); }
+  const quizHTML=(list,tag)=>list.map((q,k)=>`<fieldset class="xp-q" data-q="${tag}${k}"><legend>${k+1}. ${esc(q.q)}</legend>${q.o.map((o,j)=>`<label class="xp-opt"><input type="radio" name="${cur}-${tag}${k}" value="${j}"> ${esc(o)}</label>`).join("")}<p class="xp-fb" aria-live="polite"></p></fieldset>`).join("")+`<p class="muted xp-small" id="xpScore"></p>`;
+  function simHTML(e){ return `<div class="xp-sim"><div class="xp-ctl">${e.controls.map(c=>c.type==="select"?`<div class="field" id="xp-c-${c.id}"><label for="xp-${c.id}">${c.label}</label><select id="xp-${c.id}">${c.opts.map(o=>`<option value="${o[0]}" ${V[c.id]===o[0]?"selected":""}>${o[1]}</option>`).join("")}</select></div>`
+      :`<div class="field xp-rng" id="xp-c-${c.id}"><label for="xp-${c.id}">${c.label} <output id="xp-o-${c.id}"></output></label><input type="range" id="xp-${c.id}" min="${c.log?Math.log10(c.min):c.min}" max="${c.log?Math.log10(c.max):c.max}" step="${c.log?0.005:c.step}" value="${c.log?Math.log10(V[c.id]):V[c.id]}"></div>`).join("")}
+      ${e.extra||""}<div class="tiles xp-tiles" id="xp-c-tiles"></div>
+      <div class="row"><button class="btn primary" type="button" id="xp-c-rec">Record this reading</button><span class="muted xp-small" id="xpRecN"></span></div></div>
+      <canvas class="xp-canvas" id="xpCv" role="img" aria-label="Simulation picture for ${esc(e.title)}"></canvas></div>`; }
+  function obsHTML(e){ const P=e.obs.plots; return `${P.length>1?`<div class="field xp-psel"><label for="xpPlot">Plot</label><select id="xpPlot">${P.map((p,i)=>`<option value="${i}" ${i===plotI?"selected":""}>${esc(p.label)}</option>`).join("")}</select></div>`:""}
+      <canvas class="xp-canvas xp-ochart" id="xpOcv" role="img" aria-label="Chart of the recorded observations"></canvas>
+      <div class="row"><button class="btn primary sm" type="button" id="xpSweep">Fill automatically (sweep)</button><button class="btn sm" type="button" id="xpCsv">Export CSV</button><button class="btn sm" type="button" id="xpClr">Clear table</button><span class="muted xp-small" id="xpObsN"></span></div>
+      <div class="tablewrap"><table class="fs" id="xpTable"></table></div>
+      <h4>Result and discussion</h4><ol class="xp-list">${e.results.map(r=>`<li>${esc(r)}</li>`).join("")}</ol>
+      <details class="acc plain"><summary>Expected result (check after you have written your own)</summary><div class="acc-body"><p>${esc(e.expect)}</p></div></details>`; }
+  function section(k){ const e=ex();
+    if(k==="aim") return `<section class="xp-sec"><h4>Aim</h4><p>${esc(e.aim)}</p><h4>You will learn</h4><ul class="xp-list">${e.learn.map(l=>`<li>${esc(l)}</li>`).join("")}</ul><p class="xp-note">Tip: follow the steps in order. Each one is short, and you can come back any time: your progress is saved in this browser.</p></section>`;
+    if(k==="theory") return `<section class="xp-sec xp-theory"><h4>Theory</h4>${e.theory}</section>`;
+    if(k==="pre") return `<section class="xp-sec"><h4>Pre-test</h4><p class="muted">Two quick questions to warm up. Choose an answer to see the explanation.</p>${quizHTML(e.pre,"pre")}</section>`;
+    if(k==="proc") return `<section class="xp-sec"><h4>Procedure</h4><ol class="xp-proc">${e.proc.map((p,i)=>`<li><span>${esc(p.t)}</span> <button class="btn sm" type="button" data-show="${p.hl}">Show me</button></li>`).join("")}</ol></section>`;
+    if(k==="sim") return `<section class="xp-sec"><h4>Simulation</h4>${simHTML(e)}</section>`;
+    if(k==="obs") return `<section class="xp-sec"><h4>Observations</h4>${obsHTML(e)}</section>`;
+    if(k==="post") return `<section class="xp-sec"><h4>Post-test</h4>${quizHTML(e.post,"post")}</section>`;
+    return `<section class="xp-sec"><h4>References</h4><ol class="xp-refs">${e.refs.map(r=>`<li>${esc(r)}</li>`).join("")}</ol><p class="muted xp-small">Model in this lab: ${esc(e.title)} · Groundwave Propagation Lab. Export your observations as CSV for your report.</p></section>`; }
+  let kReady=null; const loadKatex=()=>kReady||(kReady=new Promise((res,rej)=>{ if(window.katex) return res(window.katex); const s=document.createElement("script"); s.src="assets/katex/katex.min.js"; s.onload=()=>res(window.katex); s.onerror=()=>{ kReady=null; rej(); }; document.head.appendChild(s); }));
+  function maths(scope){ const els=[...scope.querySelectorAll(".mathb[data-tex]")]; if(!els.length) return;
+    loadKatex().then(k=>els.forEach(el=>{ try{ k.render(el.dataset.tex,el,{displayMode:true,throwOnError:false,output:"htmlAndMathml"}); }catch(x){ el.textContent=el.dataset.tex; }
+      if(el.scrollWidth>el.clientWidth+1){ el.tabIndex=0; el.setAttribute("role","region"); el.setAttribute("aria-label","Equation (scroll sideways)"); } })).catch(()=>els.forEach(el=>el.textContent=el.dataset.tex)); }
+  function after(k){ const e=ex(), body=$("xpBody"); maths(body);
+    if(k==="pre"||k==="post") bindQuiz(k);
+    if(k==="sim"){ e.controls.forEach(c=>{ const el=$("xp-"+c.id); el.addEventListener("input",()=>{ V[c.id]=c.type==="select"?el.value:c.log?+Math.pow(10,+el.value).toPrecision(3):+el.value; outs(); simDraw(); }); }); outs(); simDraw(); recN();
+      $("xp-c-rec").addEventListener("click",()=>{ record(); $("xp-c-rec").textContent="Recorded ✓"; setTimeout(()=>{ const b=$("xp-c-rec"); if(b) b.textContent="Record this reading"; },900); });
+      if(e.anim){ const loop=t=>{ simDraw(t); raf=requestAnimationFrame(loop); }; if(!matchMedia("(prefers-reduced-motion: reduce)").matches) raf=requestAnimationFrame(loop); } }
+    if(k==="obs"){ if($("xpPlot")) $("xpPlot").addEventListener("change",ev=>{ plotI=+ev.target.value; obsDraw(); }); $("xpSweep").addEventListener("click",sweep); $("xpCsv").addEventListener("click",csv);
+      $("xpClr").addEventListener("click",async()=>{ if(!(S.obs[cur]||[]).length) return; if(!await confirmAction("Clear the observation table?","All recorded readings of this experiment will be removed from this browser.","Clear table")) return; S.obs[cur]=[]; save(S); obsDraw(); }); obsDraw(); } }
+  function outs(){ const e=ex(); e.controls.forEach(c=>{ const o=$("xp-o-"+c.id); if(o) o.textContent=`${V[c.id]}${c.unit?" "+c.unit:""}`; }); }
+  let calcKey="", calcVal=null; const calc=()=>{ const k=JSON.stringify(V)+cur; if(k!==calcKey){ calcKey=k; calcVal=ex().calc(V); } return calcVal; };
+  function simDraw(t){ const e=ex(), c=$("xpCv"); if(!c) return; const s=calc();
+    if(!t||!e.anim){ $("xp-c-tiles").innerHTML=e.tiles(V,s).map(([k,v,sub,cls])=>`<div class="tile ${cls||"info"}"><span class="k">${k}</span><span class="val">${v}</span><span class="sub">${sub}</span></div>`).join(""); }
+    const [x,W,H]=cv(c); e.draw(x,W,H,V,s,t); }
+  function recN(){ const n=(S.obs[cur]||[]).length, el=$("xpRecN"); if(el) el.textContent=n?`${n} reading${n>1?"s":""} in the table (step 6, Observations)`:"Readings you record appear in step 6, Observations."; }
+  function record(){ const e=ex(), r=e.obs.row(V,calc()); (S.obs[cur]=S.obs[cur]||[]).push(r); save(S); recN(); }
+  function sweep(){ const e=ex(), P=e.obs.plots[plotI], keep=V[P.sweep.k]; S.obs[cur]=S.obs[cur]||[];
+    P.sweep.vals.forEach(val=>{ V[P.sweep.k]=val; S.obs[cur].push(e.obs.row(V,e.calc(V))); }); V[P.sweep.k]=keep; calcKey=""; save(S); obsDraw(); }
+  function csv(){ const e=ex(), rows=S.obs[cur]||[]; if(!rows.length) return; const lines=[e.obs.cols.map(c=>`"${c[1]}"`).join(",")].concat(rows.map(r=>e.obs.cols.map(c=>isFinite(r[c[0]])?(+r[c[0]]).toFixed(Math.max(c[2],2)):"").join(",")));
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download=`experiment-${cur}.csv`; document.body.appendChild(a); a.click(); a.remove(); }
+  function obsDraw(){ const e=ex(), rows=S.obs[cur]||[], P=e.obs.plots[plotI], cols=e.obs.cols;
+    $("xpObsN").textContent=rows.length?`${rows.length} readings`:"No readings yet: record some in the Simulation step, or press Fill automatically.";
+    $("xpTable").innerHTML=`<tr>${cols.map(c=>`<th>${esc(c[1])}</th>`).join("")}</tr>`+rows.map(r=>`<tr>${cols.map(c=>`<td class="num">${isFinite(r[c[0]])?(+r[c[0]]).toFixed(c[2]):"—"}</td>`).join("")}</tr>`).join("");
+    const c=$("xpOcv"), [x,W,H]=cv(c); const pts=rows.filter(r=>isFinite(r[P.x])); if(!pts.length){ x.fillStyle=C("--muted"); x.font="14px "+(C("--font-body")||"sans-serif"); x.fillText("The chart appears here once there are readings.",20,H/2); return; }
+    const xs=pts.map(r=>r[P.x]), ys=[]; pts.forEach(r=>P.y.forEach(k=>{ if(isFinite(r[k])) ys.push(r[k]); }));
+    let x0=Math.min(...xs), x1=Math.max(...xs); if(x0===x1){ x0-=1; x1+=1; } if(P.logx){ x0=Math.max(x0,1e-3); }
+    let y0=Math.min(...ys), y1=Math.max(...ys); const pad=(y1-y0)*0.08||1; y0-=pad; y1+=pad;
+    const A=axes(x,[52,44,W-72,H-78],[x0,x1],[y0,y1],{logx:P.logx,xl:P.xl,yl:P.yl}), col=[C("--accent"),C("--ink"),C("--warn")];
+    P.y.forEach((k,j)=>{ const s=pts.filter(r=>isFinite(r[k])).sort((a,b)=>a[P.x]-b[P.x]); x.strokeStyle=col[j]; x.fillStyle=col[j]; x.lineWidth=j?1.5:2; x.setLineDash(j?[6,4]:[]);
+      x.beginPath(); s.forEach((r,i)=>i?x.lineTo(A.X(r[P.x]),A.Y(r[k])):x.moveTo(A.X(r[P.x]),A.Y(r[k]))); x.stroke(); x.setLineDash([]);
+      if(!j) s.forEach(r=>{ x.beginPath(); x.arc(A.X(r[P.x]),A.Y(r[k]),3.5,0,7); x.fill(); }); });
+    x.font="12px "+(C("--font-body")||"sans-serif"); P.y.forEach((k,j)=>{ const lab=(cols.find(c=>c[0]===k)||[,k])[1]; const lx=Math.max(220,W-20-x.measureText(lab).width-24-j*0); x.fillStyle=col[j]; x.fillRect(W-260+j*0,8+j*15,14,3); x.fillStyle=C("--ink"); x.fillText(lab,W-240,13+j*15); }); }
+  function bindQuiz(tag){ const e=ex(), list=tag==="pre"?e.pre:e.post;
+    $("xpBody").querySelectorAll(".xp-q").forEach((fs,k)=>fs.addEventListener("change",ev=>{ const q=list[k], j=+ev.target.value, ok=j===q.a, fb=fs.querySelector(".xp-fb");
+      fs.classList.toggle("ok",ok); fs.classList.toggle("no",!ok); fb.textContent=(ok?"Correct. ":"Not quite. ")+q.why;
+      const sc=(S.quiz[cur]=S.quiz[cur]||{}); sc[tag+k]=ok?1:0; save(S); const got=list.reduce((s,_,i)=>s+(sc[tag+i]||0),0); $("xpScore").textContent=`Score: ${got} of ${list.length}`; })); }
+  function showMe(t){ if(t==="obs"){ mark(step); go_(5); return; } if(t==="shadow"){ go("shadow"); setTimeout(()=>{ const h=$("shExpH"); if(h) h.scrollIntoView({block:"start"}); },300); return; }
+    mark(step); go_(4); requestAnimationFrame(()=>{ const el=$("xp-c-"+t); if(!el) return; el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.remove("xp-hl"); void el.offsetWidth; el.classList.add("xp-hl"); const f=el.querySelector("input,select,button"); if(f) f.focus({preventScroll:true}); else if(el.matches("button")) el.focus({preventScroll:true}); }); }
+  root.addEventListener("click",ev=>{ const o=ev.target.closest("[data-open]"); if(o){ const e=EXPS.find(x=>x.id===o.dataset.open), d=S.done[o.dataset.open]||{}; open(o.dataset.open,Math.min(STEPS.findIndex(s=>!d[s[0]]),STEPS.length-1)); return; }
+    const s=ev.target.closest("[data-xstep]"); if(s){ mark(step); go_(+s.dataset.xstep); return; }
+    const sh=ev.target.closest("[data-show]"); if(sh){ showMe(sh.dataset.show); return; }
+    const xp=ev.target.closest("[data-xp]"); if(xp){ if(xp.dataset.xp==="seed"){ V.seed=(V.seed||5)+1; simDraw(); } else showMe("shadow"); } });
+  $("xpBack").addEventListener("click",closeView);
+  $("xpPrev").addEventListener("click",()=>go_(step-1));
+  $("xpNext").addEventListener("click",()=>{ mark(step); if(step===STEPS.length-1){ closeView(); return; } go_(step+1); $("xpTitle").scrollIntoView({block:"start",behavior:"smooth"}); });
+  /* print: the whole worksheet with every step, then back to the current step */
+  $("xpPrint").addEventListener("click",()=>{ const e=ex(); cancelAnimationFrame(raf); const keep=step;
+    $("xpBody").innerHTML=STEPS.filter(s=>s[0]!=="sim").map(s=>section(s[0])).join(""); maths($("xpBody"));
+    $("xpBody").querySelectorAll("details").forEach(d=>d.open=false);
+    if($("xpOcv")){ obsDraw(); } document.body.classList.add("xp-printing");
+    setTimeout(()=>{ window.print(); document.body.classList.remove("xp-printing"); go_(keep); },400); });
+  addEventListener("resize",()=>{ if(!cur) return; if(STEPS[step][0]==="sim") simDraw(); if(STEPS[step][0]==="obs") obsDraw(); });
+  cards();
+  window.openExperiment=id=>{ go("exp"); open(id,0); };
+})();
+
+/* ================= WELCOME: one gentle starting point for first-time visitors ================= */
+(function initWelcome(){
+  const box=$("welcome"); if(!box) return;
+  let seen=false; try{ seen=!!localStorage.getItem("gwlab-welcome"); }catch(e){}
+  if(seen||navigator.webdriver||/[?&]nowelcome/.test(location.search)) return;
+  const close=()=>{ box.hidden=true; try{ localStorage.setItem("gwlab-welcome","1"); }catch(e){} };
+  box.hidden=false;
+  box.addEventListener("click",e=>{ const b=e.target.closest("[data-w]"); if(!b) return; const w=b.dataset.w; close();
+    if(w==="learn") go("learn"); else if(w==="exp") go("exp"); else if(w==="map"){ go("map"); setTimeout(()=>window.startGuide&&startGuide(),350); } else if(w==="shadow"){ go("shadow"); setTimeout(()=>window.startGuide&&startGuide(),350); } else if(w==="tour"){ if(window.startSiteTour) startSiteTour("site"); } });
+  box.addEventListener("keydown",e=>{ if(e.key==="Escape") close(); });
+})();
+
 /* ================= LEARN: a short course, one lesson at a time ================= */
 (function initLearn(){
   const root=$("learn"); if(!root) return;
@@ -8931,16 +9425,23 @@ function bindTabs(){
 /* ================= GUIDED TOUR: a short walk through the whole lab ================= */
 (function initSiteTour(){
   const GUIDES={site:[
-    {tab:"lab",sel:[".appbar .tabs",".bnav"],t:"Nine tools, one lab",x:"Switch between the Lab, Animation, Map, Terrain profile, Cellular, Digital shadow, Models, Learn and Quiz here. On a phone they are in the bar at the bottom. Press Guide on any page for a step-by-step walk-through."},
+    {tab:"lab",sel:[".appbar .tabs",".bnav"],t:"Ten tools, one lab",x:"Switch between the Lab, Animation, Map, Terrain profile, Cellular, Digital shadow, Models, Learn, Quiz and Experiments here. On a phone they are in the bar at the bottom. Press Guide on any page for a step-by-step walk-through."},
     {tab:"lab",sel:["#bandRuler"],t:"Pick a band",x:"Jump between LF, MF, HF, VHF and UHF. The line beside the bands says which mechanism carries the one you chose."},
     {tab:"lab",sel:["#presets"],t:"Start with an experiment",x:"Each chip loads a ready-made comparison, such as MW by day and by night. Then change one setting at a time and watch the curves."},
     {tab:"lab",sel:["#chart"],t:"Read the curves",x:"Field strength against distance for every model. The dashed line is the minimum usable signal; where a curve crosses it is the edge of reliable service."},
     {tab:"animation",sel:["#animation .stage"],t:"Watch the wave travel",x:"Drag the radio to move the receiver, scroll to zoom, press F for full screen. In full screen, drag the panels by their handle or press H to hide them."},
     {tab:"map",sel:["#mapCore .toolrow","#mapCore"],t:"Plan on a real map",x:"Search a place, add transmitters and receivers, and get a reception verdict for every site, with terrain along the path."},
     {tab:"methods",sel:["[data-eqed=\"latex\"]","#mxH"],t:"See every equation",x:"Pick a model and a distance to see each step of the calculation. Tutors: the Equation editor typesets maths and turns a formula into a Lab model."},
+    {tab:"exp",sel:["#xpCards"],t:"Do a virtual experiment",x:"Five guided experiments in the university virtual-lab format: aim, theory, a pre-test, the procedure, a live simulation, an observation table you can export, a post-test and references."},
     {tab:"learn",sel:[".lc-head"],t:"Learn step by step",x:"17 short lessons based on the ITU-R Handbook on Ground Wave Propagation, each with a worked example, a quick check and a link back to the Lab."},
     {tab:"quiz",sel:["#quiz .intro","#quiz"],t:"Check your understanding",x:"Practise with instant feedback, or switch to exam mode and export the results."},
     {tab:"quiz",sel:["#guideBtn","#helpBtn"],t:"Help is always here",x:"Press Guide on any page to learn its main tools step by step, or open Help for the quick start and the accuracy notes."}
+  ],
+  exp:[
+    {tab:"exp",sel:["#xpCards",".xp-head"],t:"Pick an experiment",x:"Five virtual-lab experiments: skip distance, two-ray reflection, knife-edge diffraction, fading channels and digital shadow calibration. Each card says how long it takes and what you will learn."},
+    {tab:"exp",sel:["#xpCards"],t:"Follow the eight steps",x:"Every experiment has the same steps: Aim, Theory, Pre-test, Procedure, Simulation, Observations, Post-test and References. Press Next step to move on; your progress is saved."},
+    {tab:"exp",sel:["#xpCards"],t:"Show me",x:"In the Procedure, each instruction has a Show me button that jumps to the right slider in the simulation and highlights it."},
+    {tab:"exp",sel:[".xp-cite"],t:"Use it in a report",x:"Record readings, fill the table automatically, export it as CSV, and print a clean lab sheet. The references list the ITU-R Recommendations and textbooks behind each model."}
   ],
   lab:[
     {tab:"lab",sel:["#presets"],t:"Start with a ready-made experiment",x:"Each chip loads a complete comparison, so you never start from an empty screen.",act:"Tap any chip.",wait:{sel:"#presets button",ev:"click"}},
@@ -9055,7 +9556,7 @@ function bindTabs(){
     if(rm.matches||!("IntersectionObserver" in window)) return;
     const SEL=".wrap > .panel, .wrap > section.panel, .lab .panel.card, .tiles .tile, .mxcard, .q, .lesson .lx-sec, .lesson .widget, .lesson .qc, .keyfacts li, .gloss-grid > div, .lc-refs section, .concepts details, .learn .panel";
     const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{rootMargin:"0px 0px -6% 0px",threshold:0.06});
-    const scan=root=>{ (root||document).querySelectorAll(SEL).forEach(el=>{ if(el.dataset.rv||el.closest("#shErr")) return; el.dataset.rv="1"; const r=el.getBoundingClientRect();
+    const scan=root=>{ (root||document).querySelectorAll(SEL).forEach(el=>{ if(el.dataset.rv||el.closest("#shErr")||el.closest("#exp-tab")) return; el.dataset.rv="1"; const r=el.getBoundingClientRect();
       if(r.height===0||r.top<innerHeight*0.92) return; el.classList.add("rv"); io.observe(el); }); };
     const later=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>scan()));
     later(); new MutationObserver(ms=>{ if(!worthIt(ms)) return; clearTimeout(scan.t); scan.t=setTimeout(later,80); }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]});
@@ -9842,6 +10343,7 @@ init();
     if(document.querySelector("dialog[open]")) return;
     const k=e.key, tab=currentTab, onMap=tab==="map"||tab==="mobile";
     if(/^[1-9]$/.test(k)){ e.preventDefault(); go(TABS[+k-1]); return; }
+    if(k==="0"&&currentTab!=="shadow"){ e.preventDefault(); go("exp"); return; }
     if(k==="?"){ e.preventDefault(); openKeys(); return; }
     if(k==="t"||k==="T"){ e.preventDefault(); click("themeBtn"); return; }
     if(k==="g"||k==="G"){ e.preventDefault(); if(window.startGuide) startGuide(); return; }

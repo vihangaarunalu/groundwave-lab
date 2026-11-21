@@ -155,3 +155,14 @@ Software-in-the-loop experiments, no hardware needed (Shadow tab, card "Experime
 Experiments: E1 recover the hidden errors, E2 readings needed vs shadowing, E3 reality from an independent model
 (3GPP close-in, two-ray), E4 GPS error, drift, fading, lost readings and display rounding one at a time.
 `MODE = 'live'` streams one realistic sensor to the Live link for demonstrations.
+
+## Experiments tab and gentle start (v9.4)
+
+- **Experiments** (tab 0): five virtual-lab experiments in the Aim, Theory, Pre-test, Procedure, Simulation,
+  Observations, Post-test and References format: HF skip distance, two-ray ground reflection, knife-edge
+  diffraction, fading channels (Clarke/Jakes, Rayleigh and Rician, with level crossing rate and fade duration
+  against theory) and digital shadow calibration. Each has "Show me" hints, an observation table with an
+  automatic sweep, CSV export, a printable lab sheet and references. Progress is saved in the browser.
+- **Welcome card** for first-time visitors with four starting points (learn, experiment, plan a station,
+  research), plus a guide for the Experiments tab (press G).
+- **Paper support:** `docs/PAPER_NOTES.md` (models and standards table, verification, limitations, BibTeX).
