@@ -2050,8 +2050,8 @@ body:not(.an-scene) #animation .sc-only{display:none}
 
 /* propagation picker above the animation */
 .scpick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 var(--sp-3)}
-.scpick button{display:grid;grid-template-columns:64px minmax(0,1fr);grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-md);padding:8px 10px;font:inherit;cursor:pointer;min-height:58px}
-.scpick svg{grid-row:1/3;width:64px;height:32px}
+.scpick button{display:grid;grid-template-columns:64px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:10px;align-items:center;text-align:left;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-md);padding:8px 10px;font:inherit;cursor:pointer;min-height:58px}
+.scpick svg{grid-row:1/4;width:64px;height:32px}
 .scpick b{font-size:14px;line-height:1.2} .scpick span{font-size:12px;color:var(--muted);line-height:1.25}
 .scpick button:hover{border-color:var(--accent)}
 .scpick button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -2067,6 +2067,15 @@ body:not(.an-scene) #animation .sc-only{display:none}
 #scnCard .sc-ex[hidden]{display:none}
 
 .antshape{width:100%;height:170px;display:block;border:1px solid var(--line);border-radius:var(--r-md);background:var(--field);margin:var(--sp-2) 0}
+
+.scpick button{position:relative}
+.scpick .fit{grid-column:2;justify-self:start;margin-top:3px;font:600 10.5px/1.2 var(--font-mono);font-style:normal;color:var(--good-ink,#1d6b45);background:color-mix(in srgb,var(--good) 16%,transparent);padding:1px 6px;border-radius:999px}
+.scpick .fit.no{color:var(--muted);background:color-mix(in srgb,var(--muted) 14%,transparent)}
+.scpick button:has(.fit.no){opacity:.72}
+
+.sc-ants{display:grid;grid-template-columns:1fr;gap:var(--sp-2)}
+.antshape.sm{height:120px}
+@media (max-width:520px){.sc-ants{grid-template-columns:1fr}}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2491,7 +2500,13 @@ body:not(.an-scene) #animation .sc-only{display:none}
         <div class="sc-real" id="scReal" hidden>
           <div class="field"><label for="scRT">Transmitter mast above ground <span class="v" id="scRTV"></span></label><input type="range" id="scRT" min="1" max="400" step="1"></div>
           <div class="field"><label for="scRR">Receiver antenna above ground <span class="v" id="scRRV"></span></label><input type="range" id="scRR" min="1" max="200" step="0.5"></div>
-          <p class="hint">The terrain, buildings, frequency and the two sites come from the Map tab. <button class="linkish" type="button" id="scToMap">Change them on the map</button></p>
+          <div class="sc-ants">
+            <div><div class="field"><label for="scTxAnt">Transmitter antenna</label><select id="scTxAnt"></select></div><canvas class="antshape sm" id="scTxShape" role="img" aria-label="Sketch of the transmitter antenna"></canvas></div>
+            <div><div class="field"><label for="scRxAnt">Receiver antenna</label><select id="scRxAnt"></select></div><canvas class="antshape sm" id="scRxShape" role="img" aria-label="Sketch of the receiver antenna"></canvas></div>
+          </div>
+          <div class="field"><label for="scSens">Receiver sensitivity (dBm)</label><input type="number" id="scSens" min="-130" max="-40" step="1" value="-90"></div>
+          <div class="row"><button class="btn sm" type="button" id="scAimTx">Point the transmitter antenna at this receiver</button><button class="btn sm" type="button" id="scRxPanel">Receiver antenna…</button><button class="btn sm" type="button" id="scTxPanel">Transmitter antenna and power…</button></div>
+          <p class="hint">The terrain, buildings, frequency, power, antennas and the two sites come from the Map tab. <button class="linkish" type="button" id="scToMap">Change them on the map</button></p>
         </div>
         <div class="tiles" id="scTiles" aria-live="polite"></div>
         <p class="hint" id="scNote"></p>
@@ -2829,6 +2844,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
           <div class="field" id="shAzF"><label for="shAz">Points toward (° from north)</label><input type="number" id="shAz" min="0" max="359" step="1"></div>
         </div>
         <p class="sh-height" id="shAntNote"></p>
+        <canvas class="antshape sm" id="shAntShape" role="img" aria-label="Sketch of the station antenna"></canvas><p class="hint" id="shAntHow"></p>
         <p class="sh-height" id="shTxHeight"></p>
         <div class="row"><button class="btn sm" type="button" id="shCampus">OUSL campus example</button><button class="btn sm" type="button" id="shUseMap">Use the Map tab transmitter</button></div>
         <div class="sh-layout">
@@ -3902,7 +3918,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v9.8</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v9.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -6012,7 +6028,7 @@ function drawScope(thr){
    - knife-edge: diffraction over a single obstacle (ITU-R P.526 J(ν))
    Field values assume 1 kW ERP; free space E = 106.9 + 10log P − 20log d.
    ===================================================================== */
-const SCN={f:100,ht:30,hr:10,d:5,g:"avg",pol:"v",ho:20,pos:0.5,k:1.333,src:-1,drag:null,key:""};
+const SCN={f:100,ht:30,hr:10,d:5,g:"avg",pol:"v",ho:20,pos:0.5,k:1.333,src:-1,sens:-90,na:null,drag:null,key:""};
 const RE_M=6371e3;
 /* line of sight over a curved earth: effective radius k·R (standard atmosphere k = 4/3) */
 function losGeom(d_km,ht,hr,fMHz,k){ const D=d_km*1000, lam=300/fMHz, ke=k||4/3, bul=u=>u*(1-u)*D*D/(2*ke*RE_M), hz=h=>Math.sqrt(2*Math.abs(ke)*RE_M*h)/1000;
@@ -6064,6 +6080,16 @@ function realGeom(R,kk){ const pd=R.T.prof.d.map(x=>x*1000), ph=R.T.prof.h, n=pd
         const G=groundGamma(psi,R.f,er,sg,SCN.pol||"v"), kw=2*Math.PI/lam, ph2=-kw*dl, Fv=cAbs(cAdd(cx_(1,0),cMul(G,cx_(Math.cos(ph2),Math.sin(ph2))))); refl={i:bi,dm,g,dl,psi,G,F:Fv,FdB:20*Math.log10(Math.max(Fv,1e-6)),gk}; } } }
   const state=block>=0?"blocked":minR<0.6?"fresnel":"clear", dk=D/1000;
   return {pd,ph,surf,n,D,lam,A,B,los,r1,bul,minR,minI,block,state,edges,Ld,refl,Lfs:32.44+20*Math.log10(R.f)+20*Math.log10(dk),dk,kk}; }
+/* link budget along the real path (ITU-R P.525): P_tx − feeder + G_tx − L_fs − L_extra + G_rx − L_rx, against the receiver sensitivity */
+function linkBudget(R,G){ const tx=MP.tx, rx=R.rx, f=R.f, Pkw=tx.tpo||baseModel().p.P, Ptx=10*Math.log10(Pkw*1e6), Lf=tx.aui?feederLoss(tx,f):0;
+  const elT=toDeg(Math.atan((G.B-G.A)/G.D)-G.D/(2*G.kk*RE_M)), elR=toDeg(Math.atan((G.A-G.B)/G.D)-G.D/(2*G.kk*RE_M));
+  const ta=tx.ant&&ANT_TYPES[tx.ant.type]&&ANT_TYPES[tx.ant.type].band===antBand(f)?tx.ant:antFor(f), Gt=antGainDbi(ta,bearing(tx,rx),elT);
+  const ra=rx.ant&&ANT_TYPES[rx.ant.type]&&ANT_TYPES[rx.ant.type].band===antBand(f)?rx.ant:null; if(ra&&rx.aim!==false) ra.az=Math.round(bearing(rx,tx));
+  const Gr=ra?antGainDbi(ra,bearing(rx,tx),elR):2.15, Lr=rx.rxLoss??2;
+  const Lx=G.block>=0?G.Ld:(G.edges.length?J(G.edges[0].nu):0), Pr=Ptx-Lf+Gt-G.Lfs-Lx+Gr-Lr, M=Pr-SCN.sens;
+  return {Pkw,Ptx,Lf,Gt,ta,ra,Gr,Lr,Lx,Pr,M,eirp:Ptx-Lf+Gt,elT,elR}; }
+/* which propagation types describe this path */
+function realApplies(R,G){ const vu=R.f>=30; return {los:vu&&G.block<0,tworay:vu&&!!G.refl,refract:vu,knife:vu&&(G.block>=0||G.state==="fresnel"),gs:!vu}; }
 function drawReal(c,W,H,t){ const R=realSrc(), sc=AN.scene, S=SCN;
   const sky=c.createLinearGradient(0,0,0,H); sky.addColorStop(0,"#16405e"); sky.addColorStop(1,"#5d8db3"); c.fillStyle=sky; c.fillRect(0,0,W,H);
   if(!R||R.loading){ pill(c,R?`Loading the terrain from ${MP.tx.name||"the transmitter"} to ${R.rx.name||"the receiver"}…`:"Choose a path",W/2,H/2,{size:13}); AN.sgeom=null; return; }
@@ -6101,20 +6127,45 @@ function drawReal(c,W,H,t){ const R=realSrc(), sc=AN.scene, S=SCN;
         if(AN.labels) pill(c,`${e.role==="main"?(R.T.peakName||"main obstacle"):"second edge"} · ν ${e.nu.toFixed(2)} · ${J(e.nu).toFixed(1)} dB`,p2[0],p2[1]-30,{accent:"205,242,58",size:11.5,to:[p2[0],p2[1]-7]}); });
       banner=`The wave bends over ${es.length===1?"the obstacle":es.length+" edges"}: diffraction loss ${G.Ld.toFixed(1)} dB (Deygout, ITU-R P.526 J(ν))`; bcol=G.Ld<6?"205,242,58":G.Ld<20?"240,180,60":"226,76,66"; }
     else { line(tx,rx,col); glow([tx,rx],col); banner="No obstacle reaches the Fresnel zone: practically no diffraction loss"; } }
+  // antennas on the masts, with their main beam towards the other end
+  const LB=linkBudget(R,G);
+  const antIcon=(p0,p1,a,lab)=>{ const dir=Math.atan2(p1[1]-p0[1],p1[0]-p0[0]), ca=Math.cos(dir), sa=Math.sin(dir), ty=a?a.type:"dip", directional=["yagi","lpda","panel","corner","dish"].includes(ty);
+    if(directional){ const bw=clamp(antBeamwidths(a).v||20,6,40), Lb=Math.min(180,Math.hypot(p1[0]-p0[0],p1[1]-p0[1])*0.3); c.fillStyle="rgba(98,206,255,.13)"; c.beginPath(); c.moveTo(p0[0],p0[1]);
+      for(let k=-1;k<=1;k+=0.1){ const ang=dir+k*rad(bw)/2*1.2, rr=Lb*Math.pow(Math.cos(k*Math.PI/2),0.5); c.lineTo(p0[0]+Math.cos(ang)*rr,p0[1]+Math.sin(ang)*rr); } c.closePath(); c.fill(); }
+    c.save(); c.translate(p0[0],p0[1]); c.rotate(directional?dir:0); c.strokeStyle="#eef1f5"; c.lineCap="round";
+    if(ty==="yagi"||ty==="lpda"){ const n=ty==="yagi"?Math.min(a.el||6,10):7; c.lineWidth=2.5; c.beginPath(); c.moveTo(-14,0); c.lineTo(26,0); c.stroke(); for(let i=0;i<n;i++){ const x=-14+i*40/(n-1), h=ty==="lpda"?11-i*0.9:i===0?12:i===1?10.5:9-i*0.4; c.strokeStyle=i===1&&ty==="yagi"?"#E07B24":"#eef1f5"; c.lineWidth=2; c.beginPath(); c.moveTo(x,-h); c.lineTo(x,h); c.stroke(); } }
+    else if(ty==="dish"){ c.lineWidth=3.5; c.beginPath(); c.arc(-14,0,18,-1.0,1.0); c.stroke(); c.lineWidth=1.5; c.beginPath(); c.moveTo(-14+18*Math.cos(1),18*Math.sin(1)); c.lineTo(8,0); c.lineTo(-14+18*Math.cos(1),-18*Math.sin(1)); c.stroke(); }
+    else if(ty==="corner"||ty==="panel"){ c.lineWidth=3; c.beginPath(); c.moveTo(4,-14); c.lineTo(-10,0); c.lineTo(4,14); c.stroke(); c.strokeStyle="#E07B24"; c.beginPath(); c.moveTo(8,-8); c.lineTo(8,8); c.stroke(); }
+    else { c.lineWidth=3; c.beginPath(); c.moveTo(0,-14); c.lineTo(0,14); c.stroke(); }
+    c.restore(); };
   // masts
   const mast=(x,gh,top2,lab)=>{ c.strokeStyle="#eef1f5"; c.lineWidth=2.4; c.beginPath(); c.moveTo(x,Y(gh)); c.lineTo(x,Y(top2)); c.stroke(); c.fillStyle=lab.startsWith("TX")?"#d13b4f":"#1f5fd1"; c.strokeStyle="#102C40"; c.lineWidth=2; c.beginPath(); c.arc(x,Y(top2),7,0,7); c.fill(); c.stroke(); };
   mast(tx[0],G.ph[0],G.A,"TX"); mast(rx[0],G.ph[G.n-1],G.B,"RX");
-  pill(c,`TX ${R.tx.name||""} · mast ${Math.round(R.txH)} m · ${Math.round(G.A)} m ASL`,tx[0],tx[1]-24,{size:11.5,align:"left"});
-  pill(c,`RX ${R.rx.name||""} · ${R.rxH.toFixed(R.rxH<10?1:0)} m · ${Math.round(G.B)} m ASL`,rx[0],rx[1]-24,{size:11.5,align:"right"});
-  pill(c,banner,W/2,48,{accent:bcol,size:12.5});
+  if(R.f>=30){ antIcon(tx,rx,LB.ta,"TX"); antIcon(rx,tx,LB.ra||{type:"dip"},"RX"); }
+  const pw=LB.Pkw>=1?LB.Pkw.toFixed(LB.Pkw<10?1:0)+" kW":(LB.Pkw*1000).toFixed(LB.Pkw<0.01?1:0)+" W", an=a=>a&&ANT_TYPES[a.type]?ANT_TYPES[a.type].name.split(" (")[0].split(",")[0]:"dipole";
+  pill(c,`TX ${R.tx.name||""} · ${pw} · ${an(LB.ta)} ${LB.Gt.toFixed(1)} dBi · mast ${Math.round(R.txH)} m`,tx[0],tx[1]-30,{size:11.5,align:"left"});
+  pill(c,`RX ${R.rx.name||""} · ${an(LB.ra)} ${LB.Gr.toFixed(1)} dBi · ${R.rxH.toFixed(R.rxH<10?1:0)} m mast`,rx[0]-14,rx[1]<130?rx[1]+34:rx[1]-30,{size:11.5,align:"right"});
+  pill(c,`${R.tx.name||"Transmitter"} → ${R.rx.name||"receiver"} · ${G.dk.toFixed(1)} km · ${fmtF(R.f)} · ${{los:"Line of sight",tworay:"Reflection",refract:"Refraction",knife:"Diffraction"}[sc]} · real terrain, effective earth k = ${kk<0?"duct":kk.toFixed(2)}`,12,22,{align:"left"});
+  pill(c,banner,Math.min(W/2,W*0.38),50,{accent:bcol,size:12.5});
+  if(SCN.na) pill(c,SCN.na,W/2,76,{accent:"240,180,60",size:12});
+  else if(sc==="tworay"&&!G.refl) pill(c,"Only the direct path is shown: this path has no usable ground reflection",W/2,76,{size:11.5});
   // clearance chart (standard presentation for every type): clearance in Fresnel-zone units along the path
-  const L=x0, Rr=x1, T=yG+20, B=H-24, cr=G.pd.map((dm,i)=>{ const r=G.r1(dm); return r>0?(G.los(dm)-G.surf[i])/r:NaN; });
+  const split=W>=900&&R.f>=30, L=x0, Rr=split?x0+(x1-x0)*0.55:x1, T=yG+20, B=H-24, cr=G.pd.map((dm,i)=>{ const r=G.r1(dm); return r>0?(G.los(dm)-G.surf[i])/r:NaN; });
   c.fillStyle="rgba(8,26,39,.78)"; c.fillRect(L-8,T-14,Rr-L+16,B-T+24); const lo2=-2, hi2=3, yy=v=>T+(hi2-clamp(v,lo2,hi2))/(hi2-lo2)*(B-T);
   c.strokeStyle="rgba(236,244,252,.25)"; c.lineWidth=1; [0,0.6,1,2].forEach(v=>{ c.setLineDash(v===0.6?[4,3]:[]); c.strokeStyle=v===0?"rgba(255,107,94,.8)":v===0.6?"rgba(205,242,58,.8)":"rgba(236,244,252,.2)"; c.beginPath(); c.moveTo(L,yy(v)); c.lineTo(Rr,yy(v)); c.stroke(); }); c.setLineDash([]);
-  c.strokeStyle="#62CEFF"; c.lineWidth=2; c.beginPath(); let st=false; G.pd.forEach((dm,i)=>{ if(!isFinite(cr[i])||i===0||i===G.n-1) return; const x=X(dm), y=yy(cr[i]); st?c.lineTo(x,y):c.moveTo(x,y); st=true; }); c.stroke();
+  const Xc=dm=>L+(Rr-L)*dm/G.D; c.strokeStyle="#62CEFF"; c.lineWidth=2; c.beginPath(); let st=false; G.pd.forEach((dm,i)=>{ if(!isFinite(cr[i])||i===0||i===G.n-1) return; const x=Xc(dm), y=yy(cr[i]); st?c.lineTo(x,y):c.moveTo(x,y); st=true; }); c.stroke();
   c.font="11px "+cssVar("--font-mono"); c.fillStyle="rgba(236,244,252,.88)"; c.textAlign="left"; c.fillText("Clearance in Fresnel zones · 0.6 = planning criterion · 0 = touched (ITU-R P.526, P.530)",L,T-3); c.textAlign="right"; [0,0.6,1,2].forEach(v=>c.fillText(String(v),L-6,yy(v)+4)); c.textAlign="left";
-  c.textAlign="center"; for(let k=0;k<=5;k++){ const dm=G.D*k/5; c.fillText((dm/1000).toFixed(dm<10000?1:0)+" km",X(dm),B+14); } c.textAlign="left";
-  pill(c,`${R.tx.name||"Transmitter"} → ${R.rx.name||"receiver"} · ${G.dk.toFixed(1)} km · ${fmtF(R.f)} · ${{los:"Line of sight",tworay:"Reflection",refract:"Refraction",knife:"Diffraction"}[sc]} · real terrain, effective earth k = ${kk<0?"duct":kk.toFixed(2)}`,12,22,{align:"left"});
+  c.textAlign="center"; for(let k=0;k<=5;k++){ const dm=G.D*k/5; c.fillText((dm/1000).toFixed(dm<10000?1:0)+" km",Xc(dm),B+14); } c.textAlign="left";
+  if(split){ // link-budget ladder (ITU-R P.525)
+    const L2=Rr+40, R2=x1+60, steps=[["P tx",LB.Ptx],["feeder",LB.Ptx-LB.Lf],["+G tx",LB.eirp],["path",LB.eirp-G.Lfs],["terrain",LB.eirp-G.Lfs-LB.Lx],["+G rx",LB.eirp-G.Lfs-LB.Lx+LB.Gr],["P rx",LB.Pr]];
+    const vmax=Math.max(...steps.map(q=>q[1]))+14, vmin=Math.min(SCN.sens,...steps.map(q=>q[1]))-8, yb=v=>T+(vmax-v)/(vmax-vmin)*(B-T), xs=i=>L2+(R2-L2)*i/(steps.length-1);
+    c.fillStyle="rgba(8,26,39,.78)"; c.fillRect(L2-30,T-14,R2-L2+54,B-T+24);
+    c.strokeStyle="rgba(255,107,94,.85)"; c.setLineDash([4,3]); c.beginPath(); c.moveTo(L2-20,yb(SCN.sens)); c.lineTo(R2+16,yb(SCN.sens)); c.stroke(); c.setLineDash([]);
+    c.strokeStyle="#CDF23A"; c.lineWidth=2; c.beginPath(); steps.forEach((q,i)=>{ const x=xs(i), y=yb(q[1]); i?(c.lineTo(x,yb(steps[i-1][1])),c.lineTo(x,y)):c.moveTo(x,y); }); c.stroke();
+    c.fillStyle="rgba(236,244,252,.88)"; c.textAlign="center"; steps.forEach((q,i)=>{ c.fillText(q[0],xs(i),B+14); }); c.fillText(`${LB.Ptx.toFixed(0)} dBm`,xs(0),yb(LB.Ptx)-6); c.fillText(`${LB.Pr.toFixed(0)} dBm`,xs(steps.length-1),yb(LB.Pr)-6);
+    c.textAlign="left"; c.fillText(`Link budget (ITU-R P.525) · margin over ${SCN.sens} dBm: ${LB.M>=0?"+":""}${LB.M.toFixed(1)} dB`,L2-20,T-3);
+    c.fillStyle="rgba(255,150,140,.9)"; c.fillText("sensitivity",R2-50,yb(SCN.sens)-4); }
+
   AN.sgeom={real:true,tx,rx,Yinv:y=>lo+(yG-y)/vs,gT:G.ph[0],gR:G.ph[G.n-1]}; AN.realG=G; }
 function sceneTiles(){
   const el=$("scTiles"), nt=$("scNote"); if(!el) return; const S=SCN, t=(k,v,sub,cls)=>`<div class="tile ${cls||"info"}"><span class="k">${k}</span><span class="val">${v}</span><span class="sub">${sub}</span></div>`;
@@ -6127,7 +6178,7 @@ function sceneTiles(){
         :sc==="tworay"?t("Ground reflection",G.refl?`${G.refl.FdB>=0?"+":""}${G.refl.FdB.toFixed(1)} dB`:"none",G.refl?`path difference ${(G.refl.dl/G.lam).toFixed(1)} λ, on ${G.refl.gk==="sea"?"sea":"land"} (ITU-R P.527)`:"no clear reflection point",G.refl?(G.refl.FdB>-3?"good":"warn"):"info")
         :t("Earth model",sc==="refract"?(SCN.k<0?"ducting":`k = ${SCN.k.toFixed(2)}`):"k = 4/3",sc==="refract"?"effective earth radius k·R (ITU-R P.834, P.453)":"standard atmosphere (ITU-R P.453)"))
       +t("Map prediction",map!=null?`${map.toFixed(1)} dB terrain loss`:"—","ITU-R P.1812 delta-Bullington, as in the Map tab")
-      +t("Antennas",`${Math.round(R.txH)} m / ${R.rxH.toFixed(R.rxH<10?1:0)} m`,"masts above ground (drag the dots to change)");
+      +(R.f>=30?(()=>{ const LB=linkBudget(R,G); return t("Received power",`${LB.Pr.toFixed(1)} dBm`,`margin ${LB.M>=0?"+":""}${LB.M.toFixed(1)} dB over ${SCN.sens} dBm · EIRP ${LB.eirp.toFixed(1)} dBm`,LB.M>=20?"good":LB.M>=0?"warn":"bad"); })():t("Antennas",`${Math.round(R.txH)} m / ${R.rxH.toFixed(R.rxH<10?1:0)} m`,"masts above ground"));
     nt.innerHTML=`This is the <b>real path</b> from the Map tab, with the terrain${R.T.osm?" and buildings":""} between the two sites drawn on an effective earth (heights exaggerated). Switch the propagation type above to present the same path as line of sight, reflection, refraction or diffraction. The chart below is the standard clearance presentation: where the blue line drops under 0.6, the path loses the free-space condition; under 0, the line of sight is blocked.<br><span class="src">Sources: ITU-R P.525 (free space), P.526 (Fresnel zones, knife edges J(ν)), P.530 (clearance criteria), P.453 and P.834 (refraction, k-factor), P.527 (ground constants), P.1812 (the Map's prediction).</span>`; return; }
   if(AN.scene==="los"||AN.scene==="refract"){ const ref=AN.scene==="refract", G=losGeom(S.d,S.ht,S.hr,S.f,ref?S.k:4/3), G1=losGeom(S.d,S.ht,S.hr,S.f,1), stc=G.state==="clear"?"good":G.state==="fresnel"?"warn":"bad";
     const hz=v=>isFinite(v)?`${v.toFixed(v<10?1:0)} km`:"very far (ducting)";
@@ -6160,7 +6211,7 @@ function drawScene(dt){
   const W=anim.clientWidth, H=anim.clientHeight; if(!W||!H) return;
   const dpr=window.devicePixelRatio||1; if(anim.width!==Math.round(W*dpr)||anim.height!==Math.round(H*dpr)){ anim.width=W*dpr; anim.height=H*dpr; }
   const c=actx; c.setTransform(dpr,0,0,dpr,0,0); PILLS=[]; const S=SCN, t=AN.t, two=AN.scene==="tworay";
-  if(S.src>=0){ drawReal(c,W,H,t); PILLS=null; const rx=MP.rxs[S.src], k2=JSON.stringify([AN.scene,S.src,S.k,S.pol,MP.txH,rx&&rx.h,!!AN.realG,UNITS.mode,(MP.res.get(rx&&rx.id)||{}).T?1:0]); if(k2!==SCN.key){ SCN.key=k2; sceneTiles(); syncSceneInputs(); } return; }
+  if(S.src>=0){ drawReal(c,W,H,t); PILLS=null; const rx=MP.rxs[S.src], k2=JSON.stringify([AN.scene,S.src,S.k,S.pol,S.sens,MP.txH,rx&&rx.h,rx&&rx.ant,MP.tx.ant,MP.tx.tpo,!!AN.realG,UNITS.mode,(MP.res.get(rx&&rx.id)||{}).T?1:0]); if(k2!==SCN.key){ SCN.key=k2; sceneTiles(); syncSceneInputs(); pickBadges(); } return; }
   AN.realG=null;
   // layout: geometry on top, a plot strip at the bottom
   const plotH=Math.min(140,H*0.28), yG=H-plotH-26, x0=88, x1=W-88, gH=yG-78, sc=AN.scene, curved=sc==="los"||sc==="refract";
@@ -6286,15 +6337,27 @@ function drawScene(dt){
 }
 function syncSceneInputs(){ const S=SCN, set=(id,v)=>{ const e=$(id); if(e&&document.activeElement!==e) e.value=v; };
   { const real=S.src>=0, rx=real?MP.rxs[S.src]:null; const sr=$("scReal"); if(sr) sr.hidden=!real; document.querySelectorAll("#scnCard .sc-ex").forEach(e=>e.hidden=real); document.querySelectorAll('#scnCard [data-sc="knife"]').forEach(e=>{ if(real) e.hidden=true; });
-    if(real&&rx){ set("scRT",MP.txH); set("scRR",rx.h); const a=$("scRTV"), b=$("scRRV"); if(a) a.textContent=Math.round(MP.txH)+" m"; if(b) b.textContent=(+rx.h).toFixed(rx.h<10?1:0)+" m"; }
+    if(real&&rx){ const fA=baseModel().p.f, band=antBand(fA), opts=Object.entries(ANT_TYPES).filter(([,v])=>v.band===band).map(([k,v])=>`<option value="${k}">${esc(v.name)}</option>`).join("");
+      ["scTxAnt","scRxAnt"].forEach(id=>{ const e=$(id); if(e&&e.dataset.o!==opts){ e.innerHTML=opts; e.dataset.o=opts; } });
+      const ta=MP.tx.ant&&ANT_TYPES[MP.tx.ant.type]&&ANT_TYPES[MP.tx.ant.type].band===band?MP.tx.ant:antFor(fA), ra=rx.ant&&ANT_TYPES[rx.ant.type]&&ANT_TYPES[rx.ant.type].band===band?rx.ant:antDefault(band==="vu"?"dip":"mono");
+      set("scTxAnt",ta.type); set("scRxAnt",ra.type); $("scRxAnt").disabled=band!=="vu"; drawAntShape($("scTxShape"),ta,fA); drawAntShape($("scRxShape"),ra,fA);
+      set("scRT",MP.txH); set("scRR",rx.h); const a=$("scRTV"), b=$("scRRV"); if(a) a.textContent=Math.round(MP.txH)+" m"; if(b) b.textContent=(+rx.h).toFixed(rx.h<10?1:0)+" m"; }
     const sel=$("scSrc"); if(sel){ const opts=`<option value="-1">Example path (use the sliders below)</option>`+MP.rxs.map((r,i)=>`<option value="${i}">Map: ${esc(MP.tx.name||"Transmitter")} → R${i+1} ${esc(r.name||"")}</option>`).join(""); if(sel.dataset.o!==opts){ sel.innerHTML=opts; sel.dataset.o=opts; } sel.value=String(real?S.src:-1); } }
   set("scF",Math.log10(S.f)); set("scHt",S.ht); set("scHr",S.hr); set("scD",Math.log10(S.d)); set("scHo",S.ho); set("scPos",Math.round(S.pos*100));
   const v=(id,txt)=>{ const e=$(id); if(e) e.textContent=txt; }; v("scFV",fmtF(S.f)); v("scHtV",S.ht.toFixed(0)+" m"); v("scHrV",S.hr.toFixed(S.hr<10?1:0)+" m"); v("scDV",fmtD(S.d)+" km"); v("scHoV",(S.ho>=0?"+":"")+S.ho.toFixed(0)+" m"); v("scPosV",Math.round(S.pos*100)+"%"); }
-function setScene(s){ const prev=AN.scene; AN.scene=s; document.body.classList.toggle("an-scene",s!=="gs"); const sel=$("animScene"); if(sel) sel.value=s;
-  document.querySelectorAll("#scPick [data-scn]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.scn===s)));
+function setScene(s){ const prev=AN.scene; SCN.na=null;
+  if(SCN.src>=0){ const R=realSrc(); if(R&&!R.loading){ const G=realGeom(R,4/3), ap=realApplies(R,G), fm=fmtF(R.f);
+      if(s==="gs"&&!ap.gs){ SCN.na=`Ground and sky wave do not apply at ${fm} (HF and below only, ITU-R P.368 / P.533): this link works by line of sight.`; s=G.block>=0?"knife":"los"; }
+      else if(s==="los"&&!ap.los&&R.f>=30) SCN.na="No clear line of sight on this path: the signal arrives by diffraction (choose Diffraction).";
+      else if(s!=="gs"&&R.f<30) SCN.na=`At ${fm} the ground wave carries the signal; this view is for VHF and above.`; } }
+  AN.scene=s; document.body.classList.toggle("an-scene",s!=="gs"); const sel=$("animScene"); if(sel) sel.value=s;
+  document.querySelectorAll("#scPick [data-scn]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.scn===s))); pickBadges();
   if(s!==prev&&(s==="los"||s==="refract")){ if(SCN.f<300) SCN.f=900; Object.assign(SCN,s==="los"?{d:30,ht:80,hr:30}:{d:50,ht:80,hr:20}); }
   const card=$("scnCard"); if(card) card.hidden=s==="gs"; document.querySelectorAll("[data-sc]").forEach(e=>e.hidden=e.dataset.sc!==s);
   if(s!=="gs"){ SCN.key=""; if((s==="tworay"||s==="knife")&&SCN.d>30) SCN.d=5; } }
+function pickBadges(){ const R=SCN.src>=0?realSrc():null; let ap=null; if(R&&!R.loading) ap=realApplies(R,realGeom(R,4/3));
+  document.querySelectorAll("#scPick [data-scn]").forEach(b=>{ let tag=b.querySelector(".fit"); if(!ap){ if(tag) tag.remove(); return; } if(!tag){ tag=document.createElement("em"); tag.className="fit"; b.appendChild(tag); }
+    const ok=ap[b.dataset.scn]; tag.textContent=ok?"✓ on this path":"not on this path"; tag.classList.toggle("no",!ok); }); }
 function bindScenes(){
   if(!$("animScene")) return;
   $("animScene").addEventListener("change",e=>setScene(e.target.value));
@@ -6304,6 +6367,12 @@ function bindScenes(){
   $("scRT").addEventListener("input",e=>{ MP.txH=+e.target.value; SCN.key=""; });
   $("scRR").addEventListener("input",e=>{ const rx=MP.rxs[SCN.src]; if(rx){ rx.h=+e.target.value; SCN.key=""; } });
   $("scToMap").addEventListener("click",()=>go("map"));
+  $("scTxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; const a=antDefault(e.target.value); if(rx&&a.az!=null) a.az=Math.round(bearing(MP.tx,rx)); MP.tx.ant=a; MP.tx.aui=true; MP.res.clear(); SCN.key=""; });
+  $("scRxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const a=antDefault(e.target.value); if(a.az!=null) a.az=Math.round(bearing(rx,MP.tx)); rx.ant=a; rx.aim=true; SCN.key=""; });
+  $("scSens").addEventListener("change",e=>{ SCN.sens=clamp(+e.target.value||-90,-130,-40); SCN.key=""; });
+  $("scAimTx").addEventListener("click",()=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const f=baseModel().p.f; if(!MP.tx.ant||!ANT_TYPES[MP.tx.ant.type]||ANT_TYPES[MP.tx.ant.type].band!==antBand(f)) MP.tx.ant=antFor(f); if(MP.tx.ant.az!=null) MP.tx.ant.az=Math.round(bearing(MP.tx,rx)); MP.tx.aui=true; MP.res.clear(); SCN.key=""; });
+  $("scRxPanel").addEventListener("click",()=>{ if(SCN.src>=0){ go("map"); setTimeout(()=>openAui("rx",SCN.src),200); } });
+  $("scTxPanel").addEventListener("click",()=>{ go("map"); setTimeout(()=>openAui("tx",MP.ti),200); });
   const rng=(id,fn)=>$(id).addEventListener("input",e=>{ fn(+e.target.value); SCN.key=""; });
   rng("scF",v=>SCN.f=+Math.pow(10,v).toPrecision(3)); rng("scHt",v=>SCN.ht=v); rng("scHr",v=>SCN.hr=v); rng("scD",v=>SCN.d=+Math.pow(10,v).toPrecision(3)); rng("scHo",v=>SCN.ho=v); rng("scPos",v=>SCN.pos=v/100);
   $("scG").addEventListener("change",e=>{ SCN.g=e.target.value; SCN.key=""; }); $("scPol").addEventListener("change",e=>{ SCN.pol=e.target.value; SCN.key=""; });
@@ -10146,7 +10215,7 @@ init();
 (function(){
   const BANDS=[["fm","FM radio · 100 MHz",100,10,1],["tv","TV · 600 MHz",600,50,1],["lte9","4G · 900 MHz",900,0.2,0.3],["lte18","4G · 1800 MHz",1800,0.2,0.22],["nr35","5G · 3.5 GHz",3500,0.2,0.15],["c433","Campus link · 433 MHz",433,0.001,0.05],["c868","LoRa / IoT · 868 MHz",868,0.000025,0.05],["wifi","Wi-Fi / ISM · 2.4 GHz",2400,0.0001,0.04]];
   /* antennas: key, name, gain (dBd), half-power beamwidth (°, 360 = all directions), front-to-back (dB), size (wavelengths; negative = metres) */
-  const ANTS=[["omni","Omni collinear (vertical)",3,360,0,2],["dipole","Half-wave dipole",0,360,0,0.5],["yagi","Yagi, 5 elements",7,55,15,1.2],["sector","Sector panel, 65°",13,65,25,-1.0],["patch","Patch / flat panel",5,75,20,0.6]];
+  const ANTS=[["omni","Omni collinear (vertical)",3,360,0,2],["dipole","Half-wave dipole",0,360,0,0.5],["yagi","Yagi, 5 elements",7,55,15,1.2],["sector","Sector panel, 65°",13,65,25,-1.0],["corner","Corner reflector, 90°",7.9,60,25,1.0],["dish","Parabolic dish (link)",23.9,9,35,-1.2],["whip","Quarter-wave ground plane / whip",0,360,0,0.25],["patch","Patch / flat panel",5,75,20,0.6]];
   /* OUSL Nawala campus: tower on the Faculty of Engineering Technology roof (approximate position: drag it onto the exact roof and save a layout) */
   const CAMPUS={name:"OUSL Nawala · Faculty of Engineering Technology (approx.)",lat:6.8836,lon:79.8839,h:18,band:"c433",P:0.001,pRef:"tx",ant:"omni",az:90,r:0.45};
   const SH={band:"fm",f:100,P:10,ds:1,pts:[],sel:-1,cal:null,what:{},gTx:null,view:null,mode:"inspect",tries:0,seed:7,nextId:1,site:null,demOk:null,sort:null,ant:"omni",az:90,pRef:"erp",sens:-95,area:null,autoWalk:true,paths:[],pathBB:null,walkInfo:null};
@@ -10508,6 +10577,8 @@ init();
     $("shBand").value=SH.band; if(document.activeElement!==$("shPow")){ $("shPowU").value=powUnit(); $("shPow").value=powShow(SH.P,powUnit()); } $("shMast").value=T.h;
     { const a=ant(), dir=a[3]<360, e=erpKW(); $("shAnt").value=SH.ant; $("shPowRef").value=SH.pRef; $("shAzF").hidden=!dir; if(document.activeElement!==$("shAz")) $("shAz").value=SH.az;
       $("shPowL").textContent=SH.pRef==="tx"?"Transmitter power":"Power (ERP)"; $("shSensF").hidden=SH.band==="fm"||SH.band==="tv"; if(document.activeElement!==$("shSens")) $("shSens").value=SH.sens;
+      { const map={omni:["bays",{n:2}],dipole:["dip",{}],yagi:["yagi",{el:5}],sector:["panel",{n:1,hbw:65}],corner:["corner",{g:10}],dish:["dish",{g:26}],whip:["whip",{}],patch:["panel",{n:1,hbw:75}]}, m=map[SH.ant]||["dip",{}], aa=Object.assign(antDefault(m[0]),m[1]);
+        drawAntShape($("shAntShape"),aa,SH.f); $("shAntHow").textContent="How it works: "+(ANT_HOW[m[0]]||""); }
       $("shAntNote").textContent=`Gain ${a[2]} dBd (${(a[2]+2.15).toFixed(1)} dBi) · ${dir?`beam ${a[3]}° wide, front-to-back ${a[4]} dB`:"same in every direction"} · ERP ${powText(e)} (${(10*Math.log10(e*1e6)).toFixed(1)} dBm)${SH.pRef==="erp"?" · gain is already inside the ERP":""}.`; }
     $("shTxHeight").innerHTML=hLine(SH.gTx,T.h,"Station"); }
   function sortRows(){ const s=SH.sort, idx=SH.pts.map((p,i)=>i).filter(i=>shown(SH.pts[i])); if(!s) return idx;
