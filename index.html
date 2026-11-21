@@ -393,13 +393,13 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .stage:fullscreen .fsbar,.stage.is-expanded .fsbar{display:flex}
 .fsbar select{width:auto;min-height:34px;background:#1d2738;color:#fff;border-color:#3a4760}
 .fsbar .btn{min-height:34px;background:#1d2738;color:#fff;border-color:#3a4760}
-.fsbar input[type=range]{width:160px}
+.fsbar input[type=range]{width:110px}
 .fsbar .check{color:#fff}
 .fsclock{font-size:15px;min-width:46px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .dlg-b .eq{overflow:visible;white-space:normal;line-height:1.6;padding:8px 10px}
 
-@media (min-width:900px){.fsbar{flex-wrap:nowrap;white-space:nowrap}}
+@media (min-width:1700px){.fsbar{flex-wrap:nowrap;white-space:nowrap}}
 
 .method{font-size:13px;color:var(--muted);margin:-4px 0 4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .badge{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent);border-radius:4px;padding:1px 6px}
@@ -2101,6 +2101,15 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .linkmath.min pre,.linkmath.min .aim{display:none}
 .stage.clean .linkmath{display:none}
 @media (max-width:760px){.linkmath{left:8px;right:8px;top:auto;bottom:8px;max-width:none}}
+
+.fsbar{flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);transition:opacity .25s ease,transform .25s ease}
+.fsbar .pseg.fs{flex-wrap:nowrap;padding:2px}
+.fsbar .pseg.fs button{min-height:30px;padding:4px 9px;font-size:12.5px;white-space:nowrap}
+.stage.idle .fsbar{opacity:0;transform:translate(-50%,14px);pointer-events:none}
+.stage.idle{cursor:none}
+@media (prefers-reduced-motion:reduce){.fsbar{transition:none}}
+
+#scRxBox[hidden]{display:none}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2523,7 +2532,8 @@ body:not(.an-scene) #animation .sc-only{display:none}
           <div class="field"><label for="scRR">Receiver antenna above ground <span class="v" id="scRRV"></span></label><input type="range" id="scRR" min="1" max="200" step="0.5"></div>
           <div class="sc-ants">
             <div><div class="field"><label for="scTxAnt">Transmitter antenna</label><select id="scTxAnt"></select></div><canvas class="antshape sm" id="scTxShape" role="img" aria-label="Sketch of the transmitter antenna"></canvas></div>
-            <div><div class="field"><label for="scRxAnt">Receiver antenna</label><select id="scRxAnt"></select></div><canvas class="antshape sm" id="scRxShape" role="img" aria-label="Sketch of the receiver antenna"></canvas></div>
+            <p class="hint" id="scRxNote" hidden>At LF, MF and HF the receiver uses a ferrite rod or a whip: the field strength is what counts, so there is no receiving antenna to choose.</p>
+            <div id="scRxBox"><div class="field"><label for="scRxAnt">Receiver antenna</label><select id="scRxAnt"></select></div><canvas class="antshape sm" id="scRxShape" role="img" aria-label="Sketch of the receiver antenna"></canvas></div>
           </div>
           <div class="field"><label for="scSens">Receiver sensitivity (dBm)</label><input type="number" id="scSens" min="-130" max="-40" step="1" value="-90"></div>
           <div class="row"><button class="btn sm" type="button" id="scAimTx">Point the transmitter antenna at this receiver</button><button class="btn sm" type="button" id="scRxPanel">Receiver antenna…</button><button class="btn sm" type="button" id="scTxPanel">Transmitter antenna and power…</button></div>
@@ -3939,7 +3949,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v10.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v10.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -5726,7 +5736,8 @@ function drawAnim(dt){
   const m=animModel(); if(!m) { PILLS=null; return; }
   const p=animParams(), io=iono(p), cosC=p.cosChi, thr=dBuV(threshold(p)), SG=skipGeom(p.f,io), skyOn=(p.type==="sky"||p.type==="combined")&&AN.showSkip!==false;
   const {d0,span}=AN.view, th0=d0/RE, thS=span/RE, Tv=0.62, x0=40, x1=W-30;
-  const Rpx=(x1-x0)/(2*Math.sin(Tv/2)), drop=Rpx*(1-Math.cos(Tv/2)), gTop=H-34-drop, cx=(x0+x1)/2, cy=gTop+Rpx;
+  const stg=anim.closest(".stage"), fsb=stg&&stg.querySelector(".fsbar"), barH=fsb&&fsb.offsetParent!==null?fsb.offsetHeight+18:0; AN.barH=barH;
+  const Rpx=(x1-x0)/(2*Math.sin(Tv/2)), drop=Rpx*(1-Math.cos(Tv/2)), gTop=H-34-drop-barH, cx=(x0+x1)/2, cy=gTop+Rpx;
   const altScale=(gTop-56)/400;
   const map=(th,alt)=>{ const a=(th-th0)/thS*Tv-Tv/2, r=Rpx+alt*altScale; return [cx+r*Math.sin(a), cy-r*Math.cos(a)]; };
   const angAt=d=>(d/RE-th0)/thS*Tv-Tv/2;
@@ -5973,7 +5984,7 @@ function drawAnim(dt){
   c.globalAlpha=1;
   // caption & zoom info
   pill(c,`${m.name} · ${fmtF(p.f)} · ${fmtP(p.P)}`,12,22,{align:"left"});
-  if(AN.gsNA&&AN.labels) pill(c,SCN.na||`At ${fmtF(p.f)} the ground wave and the sky wave do not carry this link: choose Line of sight`,W/2,H-96,{accent:"240,180,60",size:12.5});
+  if(AN.gsNA&&AN.labels) pill(c,SCN.na||`At ${fmtF(p.f)} the ground wave and the sky wave do not carry this link: choose Line of sight`,W/2,H-96-(AN.barH||0),{accent:"240,180,60",size:12.5});
   if(TR) pill(c,`Real terrain${TR.manual?" (typed heights)":" · Copernicus DEM"}${(TR.b||[]).length?" + "+TR.b.length+" OSM buildings":""} · heights ×${Math.round(vEx)}`,12,48,{align:"left",size:11,accent:"166,138,92"});
   PILLS=null;
   $("zoomInfo").textContent=`${fmtD(Math.max(d0,0))}–${fmtD(d0+span)} km`;
@@ -6032,7 +6043,7 @@ function drawLinkOverlay(c,o){ const {map,TR,tAlt,tEx,altScale,p,t,W,H,OV}=o, L=
   const pw=LB.Pkw>=1?LB.Pkw.toFixed(1)+" kW":(LB.Pkw*1000).toFixed(LB.Pkw<0.01?1:0)+" W", an=x=>x&&ANT_TYPES[x.type]?ANT_TYPES[x.type].name.split(" (")[0].split(",")[0]:"dipole";
   if(AN.labels){ pill(c,`TX ${MP.tx.name||""} · ${pw} · ${an(LB.ta)} · mast ${Math.round(MP.txH)} m`,T0[0]+10,T0[1]-26,{align:"left",size:11.5,accent:"209,59,79"});
     pill(c,`RX ${fmtD(D/1000)} km · ${an(LB.ra)} · ${MP.rx.h} m mast · drag me`,R0[0],R0[1]-30,{size:11.5,accent:"31,95,209"}); }
-  pill(c,banner,W/2,H-96,{accent:col===bcol?bcol:col,size:12.5});
+  pill(c,banner,W/2,H-96-(AN.barH||0),{accent:col===bcol?bcol:col,size:12.5});
   // the mathematics, live
   const f=R.f, lg=v=>(20*Math.log10(v)).toFixed(1), M=E-20*Math.log10(R.f)-77.2+LB.Gr-LB.Lr-SCN.sens, ok=M>=10?"good link":M>=0?"marginal":"no link";
   const Lline=meth.includes("1812")?`L_terrain = ${LB.Lx.toFixed(1)} dB  (${meth}, the Map's prediction; clearance ${G.minR.toFixed(2)}·F1)`:G.block>=0||G.edges.length?`L_terrain = Σ J(ν) = ${LB.Lx.toFixed(1)} dB  (ν = ${G.edges.length?G.edges[0].nu.toFixed(2):"–"}, ${meth})`:G.minR>=0.6?`L_terrain = 0 dB  (clearance ${G.minR.toFixed(2)}·F1 ≥ 0.6, ITU-R P.526/P.530)`:`L_terrain = 0 dB  (clearance ${G.minR.toFixed(2)}·F1 → ν = ${(-G.minR*Math.SQRT2).toFixed(2)} ≤ −0.78 → J(ν) = 0, ITU-R P.526)`;
@@ -6435,7 +6446,7 @@ function syncSceneInputs(){ const S=SCN, set=(id,v)=>{ const e=$(id); if(e&&docu
     if(real&&rx){ const fA=baseModel().p.f, band=antBand(fA), opts=Object.entries(ANT_TYPES).filter(([,v])=>v.band===band).map(([k,v])=>`<option value="${k}">${esc(v.name)}</option>`).join("");
       ["scTxAnt","scRxAnt"].forEach(id=>{ const e=$(id); if(e&&e.dataset.o!==opts){ e.innerHTML=opts; e.dataset.o=opts; } });
       const ta=MP.tx.ant&&ANT_TYPES[MP.tx.ant.type]&&ANT_TYPES[MP.tx.ant.type].band===band?MP.tx.ant:antFor(fA), ra=rx.ant&&ANT_TYPES[rx.ant.type]&&ANT_TYPES[rx.ant.type].band===band?rx.ant:antDefault(band==="vu"?"dip":"mono");
-      set("scTxAnt",ta.type); set("scRxAnt",ra.type); $("scRxAnt").disabled=band!=="vu"; drawAntShape($("scTxShape"),ta,fA); drawAntShape($("scRxShape"),ra,fA);
+      set("scTxAnt",ta.type); set("scRxAnt",ra.type); $("scRxBox").hidden=band!=="vu"; $("scRxNote").hidden=band==="vu"; drawAntShape($("scTxShape"),ta,fA); drawAntShape($("scRxShape"),ra,fA);
       set("scRT",MP.txH); set("scRR",rx.h); const a=$("scRTV"), b=$("scRRV"); if(a) a.textContent=Math.round(MP.txH)+" m"; if(b) b.textContent=(+rx.h).toFixed(rx.h<10?1:0)+" m"; }
     const sel=$("scSrc"); if(sel){ const opts=`<option value="-1">Example path (use the sliders below)</option>`+MP.rxs.map((r,i)=>`<option value="${i}">Map: ${esc(MP.tx.name||"Transmitter")} → R${i+1} ${esc(r.name||"")}</option>`).join(""); if(sel.dataset.o!==opts){ sel.innerHTML=opts; sel.dataset.o=opts; } sel.value=String(real?S.src:-1); } }
   set("scF",Math.log10(S.f)); set("scHt",S.ht); set("scHr",S.hr); set("scD",Math.log10(S.d)); set("scHo",S.ho); set("scPos",Math.round(S.pos*100));
@@ -6466,6 +6477,11 @@ function bindScenes(){
   $("scToMap").addEventListener("click",()=>go("map"));
   $("lmMin").addEventListener("click",()=>{ const m=$("linkMath").classList.toggle("min"); $("lmMin").textContent=m?"Show":"Hide"; $("lmMin").setAttribute("aria-expanded",String(!m)); });
   $("lmAim").addEventListener("click",()=>$("scAimTx").click());
+  /* full screen: the control bar fades away after 3.5 s without movement and comes back on any move, tap or key */
+  { const st=anim.closest(".stage"), bar=st&&st.querySelector(".fsbar"); let tm=null;
+    const full=()=>document.fullscreenElement===st||st.classList.contains("is-expanded");
+    const wake=()=>{ st.classList.remove("idle"); clearTimeout(tm); tm=setTimeout(()=>{ if(full()&&!bar.matches(":hover")&&!bar.matches(":focus-within")) st.classList.add("idle"); },3500); };
+    if(st&&bar){ ["pointermove","pointerdown","keydown","touchstart","wheel"].forEach(ev=>st.addEventListener(ev,wake,{passive:true})); document.addEventListener("fullscreenchange",wake); bar.addEventListener("focusin",wake); } }
   $("scTxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; const a=antDefault(e.target.value); if(rx&&a.az!=null) a.az=Math.round(bearing(MP.tx,rx)); MP.tx.ant=a; MP.tx.aui=true; MP.res.clear(); SCN.key=""; });
   $("scRxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const a=antDefault(e.target.value); if(a.az!=null) a.az=Math.round(bearing(rx,MP.tx)); rx.ant=a; rx.aim=true; SCN.key=""; });
   $("scSens").addEventListener("change",e=>{ SCN.sens=clamp(+e.target.value||-90,-130,-40); SCN.key=""; });
@@ -8453,7 +8469,7 @@ function drawAntShape(cv,a,f){ if(!cv) return; const W=cv.clientWidth,H=cv.clien
     for(let i=0;i<n;i++){ const x=cx-(n-1)*sp/2+i*sp, top=gy-(k==="tant"?H*0.45:H*0.7); L(x,gy,x,top,metal,4); feed(x,gy-2); for(let r=-3;r<=3;r++) L(x,gy+1,x+r*10,gy+8,mut,1);
       if(k==="tant"){ L(x-40,top,x+40,top,metal,2); L(x-40,top,x-46,top+10,metal,1.5); L(x+40,top,x+46,top+10,metal,1.5); } }
     T(k==="darr"?`${n} masts · phase step ${a.ph}°`:k==="tant"?"top-loading wires":"mast radiator",10,18); T("radials (earth system)",10,H-8);
-    if(k==="darr") arrow(cx-60,30,cx+60,"main beam"); }
+    if(k==="darr") arrow(cx-60,Math.max(44,H*0.42),cx+60,"main beam"); }
   else if(k==="dip"){ const y=H/2; L(cx-W*0.32,y,cx-6,y,metal,5); L(cx+6,y,cx+W*0.32,y,metal,5); feed(cx,y); T("λ/4",cx-W*0.16,y-12,"center"); T("λ/4",cx+W*0.16,y-12,"center"); T("feed",cx,y+22,"center",hot);
     T("max radiation at 90° to the rods · none along them",cx,H-10,"center"); }
   else if(k==="bays"){ const n=Math.min(a.n||4,8), x=cx, top=16, bot=gy; L(x,bot,x,top,metal,5); for(let i=0;i<n;i++){ const y=top+16+i*(bot-top-24)/Math.max(n-1,1)*(n>1?1:0); L(x-26,y,x+26,y,acc,3); feed(x,y); }
@@ -8475,7 +8491,7 @@ function drawAntShape(cv,a,f){ if(!cv) return; const W=cv.clientWidth,H=cv.clien
     T("feed at the focus",fx,y+R*0.42,"center",hot); T("parallel, narrow beam",W-14,y-R*0.4,"right",acc); }
   else if(k==="whip"){ const x=cx, top=14; L(x,gy-10,x,top,metal,4); feed(x,gy-10); for(const dx of [-60,-25,25,60]) L(x,gy-10,x+dx,gy+4,metal,2.5);
     T("λ/4 whip",x+10,36); T("ground plane (radials or a car roof)",cx,H-6,"center"); }
-  T(ANT_TYPES[k]?ANT_TYPES[k].name:"",W-8,H-8,"right",mut); }
+  if(W>=420&&H>=150) T(ANT_TYPES[k]?ANT_TYPES[k].name:"",W-8,H-8,"right",mut); }
 /* polar (azimuth) and elevation pattern plots */
 function drawPolar(cv,a,beamAz){
   const W=cv.clientWidth,H=cv.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);

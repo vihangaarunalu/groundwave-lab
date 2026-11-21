@@ -247,3 +247,10 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
   is the Map's ITU-R P.1812 delta-Bullington value, elsewhere ITU-R P.526 J(ν); it warns when the transmit antenna is
   not aimed at the receiver and aims it in one click.
 - Terrain for the animation is sampled at up to 400 points (was 160) so peaks are not missed.
+
+## v10.2: full-screen polish
+
+- Full-screen control bar is one slim row (the propagation buttons no longer stack) and fades out after 3.5 s without
+  movement; any move, tap or key brings it back. The earth is lifted above the bar so the ground and terrain stay visible.
+- Antenna sketches in the scene settings no longer overlap their labels; at LF/MF/HF there is no receiving antenna to
+  choose (the field strength is what counts), so the receiver antenna chooser is replaced by a note.
