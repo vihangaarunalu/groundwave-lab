@@ -226,3 +226,13 @@ and "Point the transmitter antenna at this receiver" aims a directional antenna.
 whether each type applies to this path ("on this path" / "not on this path"); choosing ground and sky wave on a VHF/UHF
 path explains why it does not apply and keeps the line-of-sight view. The Shadow tab's station antenna also has a sketch
 and more types (corner reflector, dish, whip).
+
+## One animation for every propagation type (v10.0)
+
+When a VHF/UHF map path is animated, line of sight, reflection, refraction and diffraction are drawn inside the same
+curved-earth animation as the ground and sky wave: real terrain and buildings, masts at their true heights, the
+antennas with their beams, the Fresnel zone, the moving signal, and a draggable receiver (distance slider) with the
+same signal readout. In this link view the readout judges the link by received power: the field strength needed is
+worked out from the receiver sensitivity, antenna gain and cable loss. A live box shows the mathematics step by step
+(EIRP, free-space loss ITU-R P.525, terrain loss ITU-R P.526 / clearance P.530, field strength, received power and
+margin; k-factor for refraction, two-ray terms for reflection). The view zooms to the link when it opens.

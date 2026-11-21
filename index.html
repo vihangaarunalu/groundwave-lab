@@ -2465,9 +2465,9 @@ body:not(.an-scene) #animation .sc-only{display:none}
         <div class="rxhud gs-only" id="rxHud" aria-live="polite">
           <div class="hud-top"><button class="ov-grip" type="button" aria-label="Move signal readout (drag, or use arrow keys)" title="Drag to move"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="3" cy="3" r="1.2"/><circle cx="9" cy="3" r="1.2"/><circle cx="3" cy="9" r="1.2"/><circle cx="9" cy="9" r="1.2"/><circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/></svg></button><span class="hud-q" id="hudQ">–</span><span class="mono hud-d" id="hudD">–</span></div>
           <div class="hud-val mono" id="hudT">–</div>
-          <div class="hud-row"><span class="hud-k"><i class="k-gw"></i>Ground</span><div class="hud-bar"><span id="hbG" class="b-gw"></span><b id="hbT"></b></div><span class="mono" id="hvG">–</span></div>
-          <div class="hud-row"><span class="hud-k"><i class="k-sky"></i>Sky</span><div class="hud-bar"><span id="hbS" class="b-sky"></span><b id="hbT2"></b></div><span class="mono" id="hvS">–</span></div>
-          <div class="hud-foot">Needed <span class="mono" id="hvT">–</span> · white mark on bars</div>
+          <div class="hud-row"><span class="hud-k"><i class="k-gw"></i><span id="hkG">Ground</span></span><div class="hud-bar"><span id="hbG" class="b-gw"></span><b id="hbT"></b></div><span class="mono" id="hvG">–</span></div>
+          <div class="hud-row"><span class="hud-k"><i class="k-sky"></i><span id="hkS">Sky</span></span><div class="hud-bar"><span id="hbS" class="b-sky"></span><b id="hbT2"></b></div><span class="mono" id="hvS">–</span></div>
+          <div class="hud-foot"><span id="hkN">Needed</span> <span class="mono" id="hvT">–</span> · white mark on bars</div>
         </div>
         <button class="bigplay" id="bigPlay" type="button" hidden><svg class=ic aria-hidden=true><use href=#i-play /></svg> Play animation</button>
         <p class="animerr" id="animErr" hidden></p>
@@ -2524,7 +2524,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
         <div class="card-h"><h3>Receiver</h3><span class="mono" id="rxD">–</span></div>
         <input type="range" id="rxSlider" min="2" max="1000" step="1" value="150" aria-label="Receiver distance">
         <div class="quality" id="quality">–</div>
-        <div class="mrow"><span>Ground wave</span><div class="bar"><span id="bG" class="b-gw"></span></div><span class="mono" id="vG">–</span></div>
+        <div class="mrow"><span id="mkG">Ground wave</span><div class="bar"><span id="bG" class="b-gw"></span></div><span class="mono" id="vG">–</span></div>
         <div class="mrow"><span>Sky wave</span><div class="bar"><span id="bS" class="b-sky"></span></div><span class="mono" id="vS">–</span></div>
         <div class="mrow"><span>Needed</span><div class="bar"><span id="bT" style="background:var(--muted)"></span></div><span class="mono" id="vT">–</span></div>
         <div class="field"><span class="lbl">Received signal over time</span><canvas id="scope" aria-label="Received signal level over time"></canvas>
@@ -3918,7 +3918,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v9.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v10.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -5759,7 +5759,7 @@ function drawAnim(dt){
     c.lineWidth=1.2; c.strokeStyle="rgba(230,244,252,.45)"; c.stroke(); }
   if(p.frozen){ c.strokeStyle="rgba(255,255,255,.9)"; c.lineWidth=4; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,0.5); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); }
   // ===== real terrain along a map path (Copernicus DEM + OpenStreetMap) =====
-  const TR=p.path==="geo"&&p.terrain&&p.terrain.d&&p.terrain.d.length>1?p.terrain:null;
+  const TR=p.path==="geo"&&p.terrain&&p.terrain.d&&p.terrain.d.length>1?p.terrain:null, OV=AN.scene&&AN.scene!=="gs"&&TR&&p.f>=30&&SCN.src>=0?AN.scene:null; AN.linkOn=!!OV;
   let tAlt=()=>0, tEx=0, vEx=0;
   if(TR){
     const Dmax=TR.d[TR.d.length-1], n=TR.e.length;
@@ -5811,7 +5811,7 @@ function drawAnim(dt){
   const zone=(a,b,rgb,txt)=>{ if(b<d0||a>d0+span) return; const aa=Math.max(a,dA), bb=Math.min(b,dB);
     c.strokeStyle=`rgba(${rgb},.95)`; c.lineWidth=6; c.lineCap="butt"; c.beginPath(); for(let i=0;i<=30;i++){ const [x,y]=map((aa+(bb-aa)*i/30)/RE,0); i?c.lineTo(x,y+30):c.moveTo(x,y+30);} c.stroke();
     if(AN.labels){ const mid=clamp((Math.max(a,d0)+Math.min(b,d0+span))/2,d0,d0+span); const [x,y]=map(mid/RE,0); pill(c,txt,x,y-18,{accent:rgb,size:11.5}); } };
-  c.globalAlpha=fa("zones");
+  c.globalAlpha=OV?0:fa("zones");
   const geoSkip=skyOn&&SG.best.state==="skip";
   if(geoSkip){ const gwR=p.type==="combined"?((A&&A.r)||AN.svc||0):0; if(SG.best.skip>gwR+2) zone(gwR,SG.best.skip,SC.skip,`Silent (skip) zone · ${fmtD(gwR)}–${fmtD(SG.best.skip)} km`); }
   else if(A&&A.skip) zone(A.skip.a,A.skip.b,SC.skip,`No usable signal (${fmtD(A.skip.a)}–${fmtD(A.skip.b)} km)`);
@@ -5820,7 +5820,7 @@ function drawAnim(dt){
 
   // tower
   const [tx,ty]=map(0,tAlt(0));
-  c.globalAlpha=fa("tx");
+  c.globalAlpha=OV?0:fa("tx");
   c.strokeStyle="#eef1f5"; c.lineWidth=2.4; c.beginPath(); c.moveTo(tx,ty); c.lineTo(tx,ty-58); c.stroke();
   c.lineWidth=1; for(let k=1;k<6;k++){ c.beginPath(); c.moveTo(tx-5+k*0.7,ty-k*10); c.lineTo(tx+5-k*0.7,ty-k*10-6); c.stroke(); }
   c.fillStyle=Math.floor(t/500)%2?"#ff4d4d":"#7a1d1d"; c.beginPath(); c.arc(tx,ty-60,3,0,7); c.fill();
@@ -5834,7 +5834,7 @@ function drawAnim(dt){
   c.globalAlpha=1;
 
   // ===== ground / space wave =====
-  if(p.type!=="sky"){
+  if(p.type!=="sky"&&!OV){
     const key=JSON.stringify(m.p)+"|"+Math.round(d0)+"|"+Math.round(span)+"|"+W+"|"+phaseOf(cosC);
     if(AN.gwKey!==key){ AN.gwKey=key; AN.svc=serviceRadius({p}); const N=300, arr=[]; for(let i=0;i<=N;i++){ const d=Math.max(0.3,d0+span*1.12*i/N); const r=evalP(p,d,io); arr.push({d,v:p.type==="combined"?r.g:r.t}); } AN.gw=arr; }
     const nt=norton(100,p.f,g1), tilt=Math.min(Math.atan(1/Math.sqrt(Math.hypot(g1.er,nt.x)))*3,0.8);
@@ -5870,7 +5870,7 @@ function drawAnim(dt){
   }
 
   // ===== sky waves =====
-  if(p.type==="sky"||p.type==="combined"){
+  if((p.type==="sky"||p.type==="combined")&&!OV){
     c.globalAlpha=fa("sky");
     const elevs=[3,7,12,18,26,36,50,68]; let apexLabel=null, escLabel=null;
     elevs.forEach((ed,ix)=>{
@@ -5902,7 +5902,7 @@ function drawAnim(dt){
   }
 
   // ===== skip distance: the critical (MUA) ray, layer height, landing point =====
-  if(skyOn){ const L=SG.best; c.globalAlpha=fa("skip");
+  if(skyOn&&!OV){ const L=SG.best; c.globalAlpha=fa("skip");
     if(L.state==="skip"){
       const pts=[], segp=(thA,hA,thB,hB)=>{ const ax=(RE+hA)*Math.sin(thA),ay=(RE+hA)*Math.cos(thA),bx=(RE+hB)*Math.sin(thB),by=(RE+hB)*Math.cos(thB); for(let i=0;i<=40;i++){ const u=i/40,x=ax+(bx-ax)*u,y=ay+(by-ay)*u; pts.push([Math.atan2(x,y),Math.hypot(x,y)-RE]); } };
       segp(0,0,L.th,L.h); segp(L.th,L.h,2*L.th,0);
@@ -5934,9 +5934,11 @@ function drawAnim(dt){
     const k=[p.f,io.foF2,io.foE,io.hF].map(v=>v.toFixed(2)).join("|"); if(AN.skKey!==k){ AN.skKey=k; renderSkipCard(p,io,SG); }
   } else if(AN.skKey!=="off"){ AN.skKey="off"; renderSkipCard(p,io,null); }
 
+  // ===== the chosen propagation type on the real path (line of sight, reflection, refraction, diffraction) =====
+  if(OV) drawLinkOverlay(c,{map,TR,tAlt,tEx,altScale,p,t,W,H,gTop,dA,dB,OV});
   // ===== receiver =====
   c.globalAlpha=fa("rx");
-  if(AN.rx>=dA&&AN.rx<=dB){
+  if(AN.rx>=dA&&AN.rx<=dB&&!OV){
     const [rx,ry]=map(AN.rx/RE,tAlt(AN.rx)), ra=angAt(AN.rx);
     c.save(); c.translate(rx,ry); c.rotate(ra);
     c.fillStyle="#102C40"; c.strokeStyle="#F7FAFC"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
@@ -5953,8 +5955,70 @@ function drawAnim(dt){
   if(TR) pill(c,`Real terrain${TR.manual?" (typed heights)":" · Copernicus DEM"}${(TR.b||[]).length?" + "+TR.b.length+" OSM buildings":""} · heights ×${Math.round(vEx)}`,12,48,{align:"left",size:11,accent:"166,138,92"});
   PILLS=null;
   $("zoomInfo").textContent=`${fmtD(Math.max(d0,0))}–${fmtD(d0+span)} km`;
-  updateMeter(p,io,thr,dt);
+  updateMeter(p,io,OV&&AN.link?AN.link.Eneed:thr,dt);
 }
+/* geometry from the transmitter to a receiver AN.rx km along the map path (receiver can be dragged) */
+function linkAt(TR,f,Dkm){ const n=TR.d.length, Dmax=TR.d[n-1], D=clamp(Dkm,0.05,Math.max(Dmax,0.05));
+  const eAt=d=>{ if(d<=0) return Math.max(0,TR.e[0]); if(d>=Dmax) return Math.max(0,TR.e[n-1]); let k=0; while(k<n-2&&TR.d[k+1]<d) k++; const u=(d-TR.d[k])/((TR.d[k+1]-TR.d[k])||1); return Math.max(0,TR.e[k]*(1-u)+TR.e[k+1]*u); };
+  const pts=[]; TR.d.forEach((d,i)=>{ if(d<D) pts.push([d,Math.max(0,TR.e[i])]); }); pts.push([D,eAt(D)]);
+  (TR.b||[]).forEach(([bd,bh])=>{ if(bd>0.02&&bd<D-0.02) pts.push([bd,eAt(bd)+bh]); }); pts.sort((a,b)=>a[0]-b[0]);
+  const R={T:{prof:{d:pts.map(q=>q[0]),h:pts.map(q=>q[1])},peakName:null},f,txH:MP.txH,rxH:MP.rx.h,P:null,rx:MP.rx,tx:MP.tx};
+  const kk=AN.scene==="refract"?SCN.k:4/3; return {R,G:realGeom(R,kk),kk,eAt,D}; }
+function drawAntIcon(c,p0,p1,a){ const dir=Math.atan2(p1[1]-p0[1],p1[0]-p0[0]), ty=a?a.type:"dip", directional=["yagi","lpda","panel","corner","dish"].includes(ty);
+  if(directional){ const bw=clamp(antBeamwidths(a).v||20,6,40), Lb=Math.min(160,Math.hypot(p1[0]-p0[0],p1[1]-p0[1])*0.3); c.fillStyle="rgba(98,206,255,.14)"; c.beginPath(); c.moveTo(p0[0],p0[1]);
+    for(let k=-1;k<=1;k+=0.1){ const ang=dir+k*rad(bw)/2*1.2, rr=Lb*Math.pow(Math.cos(k*Math.PI/2),0.5); c.lineTo(p0[0]+Math.cos(ang)*rr,p0[1]+Math.sin(ang)*rr); } c.closePath(); c.fill(); }
+  c.save(); c.translate(p0[0],p0[1]); c.rotate(directional?dir:0); c.strokeStyle="#eef1f5"; c.lineCap="round";
+  if(ty==="yagi"||ty==="lpda"){ const n=ty==="yagi"?Math.min(a.el||6,10):7; c.lineWidth=2.5; c.beginPath(); c.moveTo(-14,0); c.lineTo(26,0); c.stroke(); for(let i=0;i<n;i++){ const x=-14+i*40/(n-1), h=ty==="lpda"?11-i*0.9:i===0?12:i===1?10.5:9-i*0.4; c.strokeStyle=i===1&&ty==="yagi"?"#E07B24":"#eef1f5"; c.lineWidth=2; c.beginPath(); c.moveTo(x,-h); c.lineTo(x,h); c.stroke(); } }
+  else if(ty==="dish"){ c.lineWidth=3.5; c.beginPath(); c.arc(-14,0,18,-1.0,1.0); c.stroke(); c.lineWidth=1.5; c.beginPath(); c.moveTo(-14+18*Math.cos(1),18*Math.sin(1)); c.lineTo(8,0); c.lineTo(-14+18*Math.cos(1),-18*Math.sin(1)); c.stroke(); }
+  else if(ty==="corner"||ty==="panel"){ c.lineWidth=3; c.beginPath(); c.moveTo(4,-14); c.lineTo(-10,0); c.lineTo(4,14); c.stroke(); c.strokeStyle="#E07B24"; c.beginPath(); c.moveTo(8,-8); c.lineTo(8,8); c.stroke(); }
+  else { c.lineWidth=3; c.beginPath(); c.moveTo(0,-14); c.lineTo(0,14); c.stroke(); }
+  c.restore(); }
+function mathBox(c,x,y,title,lines){ c.font="12px "+cssVar("--font-mono"); const w=Math.max(c.measureText(title).width,...lines.map(l=>c.measureText(l[0]).width))+24, h=22+lines.length*18+6;
+  c.fillStyle="rgba(8,26,39,.86)"; c.strokeStyle="rgba(205,242,58,.55)"; c.lineWidth=1; c.beginPath(); c.roundRect?c.roundRect(x-w,y,w,h,8):c.rect(x-w,y,w,h); c.fill(); c.stroke();
+  c.fillStyle="#CDF23A"; c.font="600 12px "+cssVar("--font-body"); c.textAlign="left"; c.fillText(title,x-w+12,y+16); c.font="12px "+cssVar("--font-mono");
+  lines.forEach(([t,col],i)=>{ c.fillStyle=col||"rgba(236,244,252,.92)"; c.fillText(t,x-w+12,y+36+i*18); }); }
+function drawLinkOverlay(c,o){ const {map,TR,tAlt,tEx,altScale,p,t,W,OV}=o, L=linkAt(TR,p.f,AN.rx), G=L.G, R=L.R, sc=OV, a=h=>h*tEx/altScale, D=G.D;
+  const pt=(dm,hTrue)=>map(dm/1000/RE,a(hTrue)), rayT=dm=>G.los(dm)-G.bul(dm);
+  const col=G.state==="blocked"?"226,76,66":G.state==="fresnel"?"240,180,60":"205,242,58";
+  // Fresnel zone
+  c.fillStyle="rgba(98,206,255,.13)"; c.strokeStyle="rgba(98,206,255,.5)"; c.lineWidth=1; c.beginPath();
+  for(let i=0;i<=80;i++){ const dm=D*i/80, [x,y]=pt(dm,rayT(dm)+G.r1(dm)); i?c.lineTo(x,y):c.moveTo(x,y); } for(let i=80;i>=0;i--){ const dm=D*i/80, [x,y]=pt(dm,rayT(dm)-G.r1(dm)); c.lineTo(x,y); } c.closePath(); c.fill(); c.stroke();
+  const glow=(ptsS,cc,ph)=>{ let Lt=0; const sg=[]; for(let i=1;i<ptsS.length;i++){ const l=Math.hypot(ptsS[i][0]-ptsS[i-1][0],ptsS[i][1]-ptsS[i-1][1]); sg.push(l); Lt+=l; } if(!Lt) return; for(let k=0;k<3;k++){ let s2=((t*0.12+(ph||0))+k*Lt/3)%Lt, i=0; while(i<sg.length-1&&s2>sg[i]){ s2-=sg[i]; i++; } const u=sg[i]?s2/sg[i]:0, x=ptsS[i][0]+(ptsS[i+1][0]-ptsS[i][0])*u, y=ptsS[i][1]+(ptsS[i+1][1]-ptsS[i][1])*u, gl=c.createRadialGradient(x,y,0,x,y,10); gl.addColorStop(0,`rgba(${cc},.95)`); gl.addColorStop(1,`rgba(${cc},0)`); c.fillStyle=gl; c.beginPath(); c.arc(x,y,10,0,7); c.fill(); } };
+  const poly=(ptsS,cc,w,dash)=>{ c.strokeStyle=`rgba(${cc},.95)`; c.lineWidth=w||2.6; c.setLineDash(dash||[]); c.beginPath(); ptsS.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])); c.stroke(); c.setLineDash([]); };
+  const ray=[]; for(let i=0;i<=80;i++){ const dm=D*i/80; ray.push(pt(dm,rayT(dm))); }
+  const txTop=pt(0,G.A), rxTop=pt(D,G.B);
+  let banner="", bcol=col, extra=[];
+  if(sc==="los"||sc==="refract"){ if(G.block>=0){ const bi=Math.round(G.pd[G.block]/D*80); poly(ray.slice(0,bi+1),col); poly(ray.slice(bi),"226,76,66",1.6,[6,5]); glow(ray.slice(0,bi+1),col); const bp=ray[bi]; c.strokeStyle="#ff6b5e"; c.lineWidth=3; c.beginPath(); c.moveTo(bp[0]-8,bp[1]-8); c.lineTo(bp[0]+8,bp[1]+8); c.moveTo(bp[0]+8,bp[1]-8); c.lineTo(bp[0]-8,bp[1]+8); c.stroke();
+      banner=`Line of sight blocked by the terrain at ${(G.pd[G.block]/1000).toFixed(1)} km: choose Diffraction`; }
+    else { poly(ray,col); glow(ray,col); banner=G.state==="clear"?"Clear line of sight: 60% of the first Fresnel zone is free":"Line of sight, but the ground enters the Fresnel zone"; } }
+  if(sc==="tworay"){ poly(ray,col,2.2,G.block>=0?[6,5]:[]); if(G.block<0) glow(ray,col);
+    if(G.refl){ const rp=pt(G.refl.dm,G.ph[G.refl.i]); poly([txTop,rp,rxTop],"98,206,255",2.2,[7,4]); glow([txTop,rp,rxTop],"98,206,255",40); c.fillStyle="#62CEFF"; c.beginPath(); c.arc(rp[0],rp[1],5,0,7); c.fill();
+      banner=`Direct + ground-reflected ray: ${G.refl.FdB>=0?"+":""}${G.refl.FdB.toFixed(1)} dB against free space`; extra.push([`two-ray: Δ = ${(G.refl.dl/G.lam).toFixed(1)} λ, Γ on ${G.refl.gk==="sea"?"sea":"land"} → ${G.refl.FdB>=0?"+":""}${G.refl.FdB.toFixed(1)} dB (P.527)`]); }
+    else banner="No usable ground reflection on this path: only the direct ray is shown"; }
+  if(sc==="knife"){ if(G.edges.length){ const es=G.edges.slice().sort((u,v)=>G.pd[u.i]-G.pd[v.i]), P2=[txTop,...es.map(e=>pt(G.pd[e.i],G.ph[e.i])),rxTop]; poly(ray,"236,244,252",1.3,[6,5]); poly(P2,"240,140,50"); glow(P2,"240,140,50");
+      es.forEach(e=>{ const q=pt(G.pd[e.i],G.ph[e.i]); c.fillStyle="#CDF23A"; c.beginPath(); c.arc(q[0],q[1],5,0,7); c.fill(); if(AN.labels) pill(c,`ν ${e.nu.toFixed(2)} · ${J(e.nu).toFixed(1)} dB`,q[0],q[1]-28,{accent:"205,242,58",size:11,to:[q[0],q[1]-6]}); });
+      banner=`Diffraction over the terrain: ${G.Ld.toFixed(1)} dB (ITU-R P.526 J(ν))`; }
+    else { poly(ray,col); glow(ray,col); banner="No obstacle reaches the Fresnel zone: no diffraction loss on this path"; } }
+  // masts at true height, antennas, receiver
+  const mast=(dm,top,cc)=>{ const base=pt(dm,top-(dm===0?G.A-G.ph[0]:G.B-G.ph[G.n-1])), tp=pt(dm,top); c.strokeStyle="#eef1f5"; c.lineWidth=2.6; c.beginPath(); c.moveTo(base[0],base[1]); c.lineTo(tp[0],Math.min(tp[1],base[1]-6)); c.stroke(); c.fillStyle=cc; c.strokeStyle="#102C40"; c.lineWidth=2; c.beginPath(); c.arc(tp[0],Math.min(tp[1],base[1]-6),5.5,0,7); c.fill(); c.stroke(); return [tp[0],Math.min(tp[1],base[1]-6)]; };
+  const T0=mast(0,G.A,"#d13b4f"), R0=mast(D,G.B,"#1f5fd1");
+  const LB=linkBudget(R,G); drawAntIcon(c,T0,R0,LB.ta); drawAntIcon(c,R0,T0,LB.ra||{type:"dip"});
+  const E=LB.eirp-30+74.77-20*Math.log10(D/1000)-LB.Lx, Eneed=SCN.sens+20*Math.log10(R.f)+77.2-LB.Gr+LB.Lr; AN.link={E,Eneed,Pr:LB.Pr,M:LB.M};
+  const pw=LB.Pkw>=1?LB.Pkw.toFixed(1)+" kW":(LB.Pkw*1000).toFixed(LB.Pkw<0.01?1:0)+" W", an=x=>x&&ANT_TYPES[x.type]?ANT_TYPES[x.type].name.split(" (")[0].split(",")[0]:"dipole";
+  if(AN.labels){ pill(c,`TX ${MP.tx.name||""} · ${pw} · ${an(LB.ta)} · mast ${Math.round(MP.txH)} m`,T0[0]+10,T0[1]-26,{align:"left",size:11.5,accent:"209,59,79"});
+    pill(c,`RX ${fmtD(D/1000)} km · ${an(LB.ra)} · ${MP.rx.h} m mast · drag me`,R0[0],R0[1]-30,{size:11.5,accent:"31,95,209"}); }
+  pill(c,banner,W/2,76,{accent:col===bcol?bcol:col,size:12.5});
+  // the mathematics, live
+  const f=R.f, lg=v=>(20*Math.log10(v)).toFixed(1), M=LB.M, ok=M>=10?"good link":M>=0?"marginal":"no link";
+  const Lline=G.block>=0||G.edges.length?`L_terrain = Σ J(ν) = ${LB.Lx.toFixed(1)} dB  (ν = ${G.edges.length?G.edges[0].nu.toFixed(2):"–"}, ITU-R P.526)`:`L_terrain = 0 dB  (clearance ${G.minR.toFixed(2)}·F1 ≥ 0.6, P.526/P.530)`;
+  const lines=[[`EIRP = P + G_t − L_f = ${LB.Ptx.toFixed(1)} + ${LB.Gt.toFixed(1)} − ${LB.Lf.toFixed(1)} = ${LB.eirp.toFixed(1)} dBm`],
+    [`L_fs = 32.4 + 20·log f + 20·log d = 32.4 + ${lg(f)} + ${lg(D/1000)} = ${G.Lfs.toFixed(1)} dB  (P.525)`],[Lline],...extra,
+    [`E = EIRP − 30 + 74.8 − 20·log d − L_terrain = ${E.toFixed(1)} dBµV/m`],
+    [`P_r = E − 20·log f − 77.2 + G_r − L_c = ${LB.Pr.toFixed(1)} dBm  (P.525)`],
+    [`Margin = P_r − (${SCN.sens}) = ${M>=0?"+":""}${M.toFixed(1)} dB → ${ok}`,M>=10?"#CDF23A":M>=0?"#F0B43C":"#ff6b5e"]];
+  if(sc==="refract") lines.splice(1,0,[`k = ${SCN.k<0?"duct":SCN.k.toFixed(2)} → effective earth radius ${SCN.k<0?"∞":Math.round(SCN.k*6371)} km  (P.453/P.834)`]);
+  mathBox(c,W-14,100,`The signal, step by step · ${{los:"line of sight",tworay:"reflection",refract:"refraction",knife:"diffraction"}[sc]}`,lines);
+  AN.realG=G; AN.linkR=R; const k2=JSON.stringify([sc,Math.round(AN.rx*10),SCN.k,SCN.sens,MP.txH,MP.rx.h,MP.rx.ant,MP.tx.ant,MP.tx.tpo]); if(k2!==SCN.key){ SCN.key=k2; sceneTiles(); syncSceneInputs(); pickBadges(); } }
 function renderSkipCard(p,io,SG){
   const st=$("skState"), tl=$("skTiles"), nt=$("skNote"); if(!st) return;
   if(!SG){ st.className="pill info"; st.textContent="Off"; tl.innerHTML=""; nt.textContent=p.type==="gw"?"Choose “Sky” or “Both” under Show to see the skip distance.":"Turn on “Show skip geometry” to see the critical ray."; return; }
@@ -5972,9 +6036,10 @@ function renderSkipCard(p,io,SG){
     :`f is above the maximum usable frequency for even the longest single hop (${F.mufMax.toFixed(1)} MHz over ${fmtD(F.dmax)} km), so every ray escapes. Choose a lower frequency.`;
 }
 function updateMeter(p,io,thr,dt){
-  const r=evalP(p,AN.rx,io);
+  const r=AN.linkOn&&AN.link?{g:AN.link.E,s:null,t:AN.link.E}:evalP(p,AN.rx,io);
+  { const L=AN.linkOn, set=(id,v)=>{ const e=$(id); if(e&&e.textContent!==v) e.textContent=v; }; set("hkG",L?"Direct":"Ground"); set("hkS",L?"Sky (none)":"Sky"); set("mkG",L?"Direct (line of sight)":"Ground wave"); set("hkN",L?`Needed for ${SCN.sens} dBm`:"Needed"); }
   // behind the main obstacle of a real map path, the ground wave carries its terrain loss
-  const TRo=p.path==="geo"&&p.terrain&&p.terrain.ob;
+  const TRo=!AN.linkOn&&p.path==="geo"&&p.terrain&&p.terrain.ob;
   if(TRo&&AN.rx>TRo.d&&r.g!==null&&p.type!=="sky"){ r.g-=TRo.loss; const eg=mVfromdB(r.g), es=r.s===null?0:mVfromdB(r.s); r.t=p.type==="combined"?dBuV(Math.hypot(eg,es)):r.g; }
   const g=(p.type==="sky")?null:r.g, s=r.s;
   const eg=g===null?0:mVfromdB(g), es=s===null?0:mVfromdB(s);
@@ -6169,7 +6234,7 @@ function drawReal(c,W,H,t){ const R=realSrc(), sc=AN.scene, S=SCN;
   AN.sgeom={real:true,tx,rx,Yinv:y=>lo+(yG-y)/vs,gT:G.ph[0],gR:G.ph[G.n-1]}; AN.realG=G; }
 function sceneTiles(){
   const el=$("scTiles"), nt=$("scNote"); if(!el) return; const S=SCN, t=(k,v,sub,cls)=>`<div class="tile ${cls||"info"}"><span class="k">${k}</span><span class="val">${v}</span><span class="sub">${sub}</span></div>`;
-  if(SCN.src>=0&&AN.realG){ const R=realSrc(); if(!R||R.loading){ el.innerHTML=t("Terrain","loading…","from the elevation service"); nt.textContent=""; return; }
+  if(SCN.src>=0&&AN.realG){ const R=(AN.linkOn&&AN.linkR)||realSrc(); if(!R||R.loading){ el.innerHTML=t("Terrain","loading…","from the elevation service"); nt.textContent=""; return; }
     const G=AN.realG, sc=AN.scene, stc=G.state==="clear"?"good":G.state==="fresnel"?"warn":"bad", map=R.T&&isFinite(R.T.loss)?R.T.loss:null;
     el.innerHTML=t("Path",`${G.dk.toFixed(1)} km`,`${R.tx.name||"TX"} → ${R.rx.name||"RX"} · ${fmtF(R.f)}`)
       +t("Line of sight",{clear:"clear",fresnel:"Fresnel zone touched",blocked:"blocked"}[G.state],G.block>=0?`by ${R.T.peakName||"terrain"} at ${(G.pd[G.block]/1000).toFixed(1)} km`:`clearance ${G.minR.toFixed(2)} × the Fresnel radius at its worst`,stc)
@@ -6353,7 +6418,7 @@ function setScene(s){ const prev=AN.scene; SCN.na=null;
   AN.scene=s; document.body.classList.toggle("an-scene",s!=="gs"); const sel=$("animScene"); if(sel) sel.value=s;
   document.querySelectorAll("#scPick [data-scn]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.scn===s))); pickBadges();
   if(s!==prev&&(s==="los"||s==="refract")){ if(SCN.f<300) SCN.f=900; Object.assign(SCN,s==="los"?{d:30,ht:80,hr:30}:{d:50,ht:80,hr:20}); }
-  const card=$("scnCard"); if(card) card.hidden=s==="gs"; document.querySelectorAll("[data-sc]").forEach(e=>e.hidden=e.dataset.sc!==s);
+  const card=$("scnCard"); if(card) card.hidden=s==="gs"&&!(SCN.src>=0); document.querySelectorAll("[data-sc]").forEach(e=>e.hidden=e.dataset.sc!==s);
   if(s!=="gs"){ SCN.key=""; if((s==="tworay"||s==="knife")&&SCN.d>30) SCN.d=5; } }
 function pickBadges(){ const R=SCN.src>=0?realSrc():null; let ap=null; if(R&&!R.loading) ap=realApplies(R,realGeom(R,4/3));
   document.querySelectorAll("#scPick [data-scn]").forEach(b=>{ let tag=b.querySelector(".fit"); if(!ap){ if(tag) tag.remove(); return; } if(!tag){ tag=document.createElement("em"); tag.className="fit"; b.appendChild(tag); }
@@ -6363,14 +6428,14 @@ function bindScenes(){
   $("animScene").addEventListener("change",e=>setScene(e.target.value));
   document.querySelectorAll("#scPick [data-scn]").forEach(b=>b.addEventListener("click",()=>setScene(b.dataset.scn)));
   $("scK").addEventListener("change",e=>{ SCN.k=+e.target.value; SCN.key=""; });
-  $("scSrc").addEventListener("change",e=>{ SCN.src=+e.target.value; SCN.key=""; if(SCN.src>=0){ try{ refreshSites(); }catch(x){} } setScene(AN.scene); });
+  $("scSrc").addEventListener("change",e=>{ SCN.src=+e.target.value; SCN.key=""; if(SCN.src>=0){ try{ refreshSites(); }catch(x){} MP.ai=SCN.src; try{ const m=pathModel(); setAnimModel(m.id); $("animModel").value=String(m.id); }catch(x){} } setScene(AN.scene); });
   $("scRT").addEventListener("input",e=>{ MP.txH=+e.target.value; SCN.key=""; });
   $("scRR").addEventListener("input",e=>{ const rx=MP.rxs[SCN.src]; if(rx){ rx.h=+e.target.value; SCN.key=""; } });
   $("scToMap").addEventListener("click",()=>go("map"));
   $("scTxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; const a=antDefault(e.target.value); if(rx&&a.az!=null) a.az=Math.round(bearing(MP.tx,rx)); MP.tx.ant=a; MP.tx.aui=true; MP.res.clear(); SCN.key=""; });
   $("scRxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const a=antDefault(e.target.value); if(a.az!=null) a.az=Math.round(bearing(rx,MP.tx)); rx.ant=a; rx.aim=true; SCN.key=""; });
   $("scSens").addEventListener("change",e=>{ SCN.sens=clamp(+e.target.value||-90,-130,-40); SCN.key=""; });
-  $("scAimTx").addEventListener("click",()=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const f=baseModel().p.f; if(!MP.tx.ant||!ANT_TYPES[MP.tx.ant.type]||ANT_TYPES[MP.tx.ant.type].band!==antBand(f)) MP.tx.ant=antFor(f); if(MP.tx.ant.az!=null) MP.tx.ant.az=Math.round(bearing(MP.tx,rx)); MP.tx.aui=true; MP.res.clear(); SCN.key=""; });
+  $("scAimTx").addEventListener("click",()=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const f=baseModel().p.f; if(!MP.tx.ant||!ANT_TYPES[MP.tx.ant.type]||ANT_TYPES[MP.tx.ant.type].band!==antBand(f)) MP.tx.ant=antFor(f); if(MP.tx.ant.az!=null) MP.tx.ant.az=Math.round(bearing(MP.tx,rx)); MP.tx.aui=true; MP.res.clear(); updateMap(); SCN.key=""; });
   $("scRxPanel").addEventListener("click",()=>{ if(SCN.src>=0){ go("map"); setTimeout(()=>openAui("rx",SCN.src),200); } });
   $("scTxPanel").addEventListener("click",()=>{ go("map"); setTimeout(()=>openAui("tx",MP.ti),200); });
   const rng=(id,fn)=>$(id).addEventListener("input",e=>{ fn(+e.target.value); SCN.key=""; });
@@ -6393,12 +6458,17 @@ function sceneMove(q){ const g=AN.sgeom, S=SCN; if(!g) return; anim.style.cursor
   else if(S.drag==="plot"&&g.plot){ const p=g.plot, u=clamp((q.x-p.L)/(p.Rr-p.L),0,1); S.d=+(p.dmin*Math.pow(p.dmax/p.dmin,u)).toPrecision(3); }
   S.key=""; }
 
+/* the link view runs inside the curved-earth animation when a VHF/UHF map path is chosen */
+function fitLink(){ const m=animModel(); if(!m||!m.p.terrain) return; const D=m.p.terrain.d[m.p.terrain.d.length-1]; if(!(D>0)) return; AN.view={d0:-D*0.06,span:D*1.25}; if(AN.fitDone!==SCN.src+"|"+D){ AN.rx=D; AN.fitT=performance.now(); } AN.fitDone=SCN.src+"|"+D; try{ $("rxSlider").value=AN.rx; $("rxSlider2").value=AN.rx; }catch(e){} }
+function ovActive(){ const m=animModel(); if(!(SCN.src>=0)||!m||m.p.path!=="geo"||!(m.p.f>=30)) return false;
+  if(!m.p.terrain){ const r=MP.res.get(MP.rx.id); if(r&&r.T) m.p.terrain=terrainSnapshot(r.T); } if(!m.p.terrain) return false;
+  const Dl=m.p.terrain.d[m.p.terrain.d.length-1]; if(AN.scene!=="gs"&&(AN.fitDone!==SCN.src+"|"+Dl||(performance.now()-(AN.fitT||0)<3500&&AN.view&&AN.view.span>Dl*2))) fitLink(); return true; }
 function animTick(now){
   requestAnimationFrame(animTick);
   const dt=clamp(now-AN.last,0,100); AN.last=now;
   if(currentTab!=="animation") return;
   if(AN.playing){ AN.t+=dt*AN.speed; if(AN.cycle){ AN.hour=(AN.hour+dt*AN.speed/1000*0.8)%24; $("hour").value=AN.hour; } }
-  try{ if(AN.scene&&AN.scene!=="gs") drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
+  try{ const ov=ovActive(); document.body.classList.toggle("an-scene",AN.scene!=="gs"&&!ov); if(AN.scene&&AN.scene!=="gs"&&!ov) drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
   catch(e){ if(!AN.errShown){ AN.errShown=true; const el=$("animErr"); el.hidden=false; el.textContent="This model can't be animated: "+e.message+". Pick another model or change its settings."; console.error(e); } }
 }
 
