@@ -254,3 +254,14 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
   movement; any move, tap or key brings it back. The earth is lifted above the bar so the ground and terrain stay visible.
 - Antenna sketches in the scene settings no longer overlap their labels; at LF/MF/HF there is no receiving antenna to
   choose (the field strength is what counts), so the receiver antenna chooser is replaced by a note.
+
+## v10.3: one judgement for Map and Animation, full-screen bar fix
+
+- Each receiver now has a **Judge this receiver as** setting (Antenna settings on the Map, and Scene settings in the Animation): *automatic*, *broadcast listener* or *link receiver*, plus a receiver sensitivity in dBm.
+  - Automatic: a directional antenna (Yagi, log-periodic, panel, corner, dish) is judged as a link.
+- Broadcast listener: the field strength is compared with the ITU minimum for home reception (for example 65 dBµV/m at VHF).
+- Link receiver: the received power is compared with the receiver sensitivity:
+  - P_r = E − 20·log f − 77.2 + G_r − L_c (ITU-R P.525)
+- The Map verdict, the Animation HUD and the maths panel use the same setting, so they always agree.
+- In full screen the propagation buttons are always in one row.
+- `index.html` is now served with `Cache-Control: no-cache`, so a new version shows at once.
