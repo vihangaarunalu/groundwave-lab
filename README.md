@@ -214,3 +214,15 @@ P.530), free-space loss (ITU-R P.525) and the Map's own ITU-R P.1812 delta-Bulli
   press P): antenna height, cable loss, antenna type with sketch and patterns, automatic pointing at the transmitter,
   gain towards the transmitter, and the power at the receiver input E − 20·log f − 77.2 + G − loss (ITU-R P.525).
   Planning references for receiving-antenna directivity: ITU-R BT.419 (TV) and BS.599 (FM).
+
+## Point-to-point links in the Animation (v9.9)
+
+For a VHF/UHF map path (for example a 30 W studio-transmitter link from Colombo to a 100 m tower at Yatiyantota,
+Yagi–Uda at both ends) the Animation draws the real antennas on the masts with their main beams, the signal moving along
+the line of sight over the real terrain, and a link budget (ITU-R P.525): transmitter power, feeder loss, transmit
+antenna gain towards the receiver, free-space and terrain loss, receive antenna gain, cable loss, received power and the
+margin over the receiver sensitivity. Antenna types (with sketches) for both ends can be chosen in the scene settings,
+and "Point the transmitter antenna at this receiver" aims a directional antenna. The propagation-type buttons show
+whether each type applies to this path ("on this path" / "not on this path"); choosing ground and sky wave on a VHF/UHF
+path explains why it does not apply and keeps the line-of-sight view. The Shadow tab's station antenna also has a sketch
+and more types (corner reflector, dish, whip).
