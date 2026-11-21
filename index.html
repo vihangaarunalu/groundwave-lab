@@ -2065,6 +2065,8 @@ body:not(.an-scene) #animation .sc-only{display:none}
 
 .sc-real[hidden]{display:none}
 #scnCard .sc-ex[hidden]{display:none}
+
+.antshape{width:100%;height:170px;display:block;border:1px solid var(--line);border-radius:var(--r-md);background:var(--field);margin:var(--sp-2) 0}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -3900,7 +3902,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v9.7</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v9.8</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4629,8 +4631,19 @@ const ANT_TYPES={
   lpda:{name:"Log-periodic dipole array",band:"vu",std:"ITU-R BS.1195 §6.4.3",
     params:[{k:"g",label:"Gain (dBi)",min:5,max:11,step:0.5,def:7},
             {k:"az",label:"Beam azimuth (° from N)",min:0,max:359,step:1,def:0},
-            {k:"tilt",label:"Tilt (° down)",min:-10,max:10,step:0.5,def:0}]}
+            {k:"tilt",label:"Tilt (° down)",min:-10,max:10,step:0.5,def:0}]},
+  corner:{name:"Corner reflector (90°, directional)",band:"vu",std:"J. D. Kraus, Antennas (corner reflector); ITU-R BS.1195 §6.4 directional antennas",
+    params:[{k:"g",label:"Gain (dBi)",min:8,max:14,step:0.5,def:10,hint:"A 90° corner with a half-wave dipole about 0.5 λ from the apex gives about 10 dBi"},
+            {k:"az",label:"Beam azimuth (° from N)",min:0,max:359,step:1,def:0},
+            {k:"tilt",label:"Tilt (° down)",min:-10,max:10,step:0.5,def:0}]},
+  dish:{name:"Parabolic dish (point-to-point link)",band:"vu",std:"ITU-R F.699 (reference radiation pattern for line-of-sight radio-relay antennas)",
+    params:[{k:"g",label:"Gain (dBi)",min:15,max:45,step:0.5,def:28,hint:"G ≈ 10·log10(0.55·(π·D/λ)²): a 1.2 m dish gives about 26 dBi at 2 GHz and 36 dBi at 7 GHz"},
+            {k:"az",label:"Beam azimuth (° from N)",min:0,max:359,step:1,def:0},
+            {k:"tilt",label:"Tilt (° down)",min:-10,max:10,step:0.1,def:0}]},
+  whip:{name:"Quarter-wave ground plane / whip (omnidirectional)",band:"vu",std:"Monopole over a ground plane (C. A. Balanis, Antenna Theory)",params:[]}
 };
+/* Bessel J1 by its integral form, for the dish aperture pattern */
+function besselJ1(x){ let s=0; const n=48; for(let i=0;i<n;i++){ const t=(i+0.5)*Math.PI/n; s+=Math.cos(t-x*Math.sin(t)); } return s/n; }
 function antBand(f){ return f<30?"lf":"vu"; }
 function antDefault(type){ const T=ANT_TYPES[type], a={type}; (T?T.params:[]).forEach(q=>a[q.k]=q.def); return a; }
 function antFor(f){ return antDefault(f<30?"mono":"dip"); }
@@ -4655,6 +4668,13 @@ function antField(a,az,D){
       return Math.max(main,back); }
     case "lpda": { const G=antPeakFormula(a), bw=Math.sqrt(41253/Math.pow(10,G/10)), dp=((az-a.az)%360+540)%360-180, dv=D+(a.tilt||0);
       return Math.pow(10,-Math.min(12*(dp*dp+dv*dv)/(bw*bw),20)/20); }
+    case "corner": { const G=a.g, bw=Math.sqrt(41253/Math.pow(10,G/10)), dp=((az-a.az)%360+540)%360-180, dv=D+(a.tilt||0);
+      return Math.pow(10,-Math.min(12*(dp*dp+dv*dv)/(bw*bw),25)/20); }
+    case "dish": { /* uniform-aperture main lobe 2·J1(u)/u, sidelobes on the ITU-R F.699 envelope 32 − 25·log10(φ) dBi, floor −10 dBi */
+      const G=a.g, Gl=Math.pow(10,G/10), bw=163/Math.sqrt(Gl), dp=rad(((az-a.az)%360+540)%360-180), dv=rad(D+(a.tilt||0)), th=toDeg(Math.acos(clamp(Math.cos(dp)*Math.cos(dv),-1,1)));
+      const u=1.6163*th/(bw/2), main=u<1e-6?1:Math.abs(2*besselJ1(u)/u), env=Math.pow(10,(Math.max(32-25*Math.log10(Math.max(th,1)),-10)-G)/20);
+      return u<3.8317?Math.max(main,Math.min(env,1)):Math.min(env,1); }
+    case "whip": return D>=0?dipF(D):dipF(D)*0.3;
   }
   return 1;
 }
@@ -4671,7 +4691,7 @@ function antStats(a){
   // peak can sit between grid points: refine along azimuth at the best elevation
   for(let i=0;i<360;i++){ const F=antField(a,i,best.el); if(F*F>max){ max=F*F; best={az:i,el:best.el}; } }
   const eff=(a.eff??100)/100, Dmax=4*Math.PI*max/sum;
-  let Gmax=10*Math.log10(Dmax*eff); if(a.type==="yagi"||a.type==="lpda") Gmax=antPeakFormula(a);
+  let Gmax=10*Math.log10(Dmax*eff); if(a.type==="yagi"||a.type==="lpda"||a.type==="corner"||a.type==="dish") Gmax=antPeakFormula(a);
   const st={sum,max,Dmax,eff,Gmax,best,lf}; if(ANT_CACHE.size>300) ANT_CACHE.clear(); ANT_CACHE.set(key,st); return st;
 }
 /* gain (dBi) toward a direction */
@@ -4696,6 +4716,9 @@ function antSize(a,f){ const lam=299.792458/f;
     case "panel": return `${a.n} panels, about ${(lam*0.9).toFixed(2)} × ${(lam*0.6).toFixed(2)} m each, ${(a.n*lam).toFixed(1)} m of mast`;
     case "yagi": return `boom about ${((a.el-1)*0.22*lam).toFixed(2)} m, elements up to ${(lam/2).toFixed(2)} m`;
     case "lpda": return `longest element ${(lam/2).toFixed(2)} m, boom about ${(0.8*lam).toFixed(2)} m`;
+    case "corner": return `two reflector plates about ${lam.toFixed(2)} m wide at 90°, dipole ${(lam/2).toFixed(2)} m about ${(lam/2).toFixed(2)} m from the corner`;
+    case "dish": { const D=Math.sqrt(Math.pow(10,a.g/10)/0.55)/Math.PI*lam; return `dish about ${D.toFixed(2)} m across (efficiency 55%), beamwidth about ${(70*lam/D).toFixed(1)}°`; }
+    case "whip": return `whip ${(lam/4).toFixed(2)} m tall with 4 radials of ${(lam/4).toFixed(2)} m`;
   }
   return "";
 }
@@ -7279,8 +7302,9 @@ function renderSites(){
       <td class="mono">${T?(T.loss>0.05?"−"+T.loss.toFixed(1)+" dB":"0 dB"):"…"}</td>
       <td class="mono">${pr?(mapCellTech()?(pr.cell?pr.cell.ref.toFixed(0)+" dBm":"—"):fmtField(pr.t,pr.f))+(pr.server&&MP.txs.length+MP.relays.length>1?` <span class="muted">via ${pr.server.relay?"Y"+(pr.server.k+1):"T"+(pr.server.i+1)}</span>`:""):"…"}</td>
       <td>${pr?`<span class="pill ${pr.cls}">${pr.verdict}</span>`:"…"}</td>
+      <td><button class="btn sm" type="button" data-aui="rx:${i}" aria-label="Receiver ${i+1} antenna and settings"><svg class=ic aria-hidden=true><use href=#i-gear /></svg> ${rx.ant&&ANT_TYPES[rx.ant.type]?esc(ANT_TYPES[rx.ant.type].name.split(" (")[0].split(",")[0]):"Antenna"}</button></td>
       <td><button class="iconbtn del" type="button" aria-label="Remove receiver ${i+1}" ${MP.rxs.length===1?"disabled":""}><svg class=ic aria-hidden=true><use href=#i-close /></svg></button></td></tr>`; }).join("");
-  $("sitesTable").innerHTML=`<tr><th></th><th>Site</th><th>Lat, lon</th><th>Ground</th><th>Antenna (m)</th><th>Distance</th><th>Terrain</th><th>Signal</th><th>Reception</th><th></th></tr>`+rows;
+  $("sitesTable").innerHTML=`<tr><th></th><th>Site</th><th>Lat, lon</th><th>Ground</th><th>Antenna (m)</th><th>Distance</th><th>Terrain</th><th>Signal</th><th>Reception</th><th>Antenna</th><th></th></tr>`+rows;
 }
 function renderTxTable(){
   const mob=MP.layer==="mobile";
@@ -7562,14 +7586,14 @@ function bindMap(){
   $("txSetBtn").addEventListener("click",()=>{ MP.lastSel={kind:"tx",i:MP.ti}; drawMap(); openQuick(); });
   mapC.addEventListener("contextmenu",e=>{ const r=mapC.getBoundingClientRect(), h=hitPin(e.clientX-r.left,e.clientY-r.top); if(!h||h.kind==="rx") return;
     e.preventDefault(); if(h.kind==="tx"&&h.i!==MP.ti){ MP.ti=h.i; MP.lastSel=h; updateMap(); } else { MP.lastSel=h; drawMap(); } openQuick(); });
-  $("pinPanel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx"){ openAui("tx",MP.ti); } else openAui(s.kind,s.i); });
+  $("pinPanel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx"){ openAui("rx",s.i); } else openAui(s.kind,s.i); });
   $("renSave").addEventListener("click",renSave); $("renCancel").addEventListener("click",()=>$("renBox").hidden=true);
   $("renInput").addEventListener("keydown",e=>{ if(e.key==="Enter") renSave(); if(e.key==="Escape") $("renBox").hidden=true; });
   mapC.addEventListener("keydown",e=>{ if(e.key==="F2"){ e.preventDefault(); renOpen(); }
     if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&(e.shiftKey||e.altKey)){ if(nudgeBeam((e.key==="ArrowRight"?1:-1)*(e.altKey?1:5))) e.preventDefault(); }
     if(e.key==="a"||e.key==="A"){ e.preventDefault(); openAimBox(); }
     if(e.key==="s"||e.key==="S"){ e.preventDefault(); const s=MP.toolSel; if(!s||s.kind==="rx") MP.lastSel={kind:"tx",i:MP.ti}; drawMap(); openQuick(); }
-    if(e.key==="p"||e.key==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("tx",MP.ti); else openAui(s.kind,s.i); } });
+    if(e.key==="p"||e.key==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("rx",s.i); else openAui(s.kind,s.i); } });
   $("pinDel").addEventListener("click",e=>{ e.stopPropagation(); const s=MP.toolSel||MP.lastSel||{kind:"rx",i:MP.ai}; removePin(s); MP.lastSel={kind:"rx",i:MP.ai}; });
   mapC.tabIndex=0;
   mapC.addEventListener("keydown",e=>{ if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removePin(MP.lastSel||{kind:"rx",i:MP.ai}); MP.lastSel={kind:"rx",i:MP.ai}; } });
@@ -8206,7 +8230,8 @@ function renderAimBox(valuesOnly){
 /* ===================== TRANSMITTER PANEL (Nautel-AUI-style, simulated) ===================== */
 const AUI={kind:null,i:-1,back:null};
 const MODES_BY_BAND={lf:["AM","DRM"],hf:["AM","DRM"],vu:["FM","FM + HD Radio","DAB+","DVB-T2","Analogue TV"]};
-function auiStation(){ if(AUI.kind==="relay") return MP.relays[AUI.i]; return MP.txs[AUI.i]; }
+function auiStation(){ if(AUI.kind==="relay") return MP.relays[AUI.i]; if(AUI.kind==="rx") return MP.rxs[AUI.i]; return MP.txs[AUI.i]; }
+function rxAntDefault(rx){ const a=antDefault("yagi"); a.el=6; a.az=Math.round(bearing(rx,MP.tx)); return a; }
 function auiParams(t){ const b=baseModel().p; const f=AUI.kind==="relay"?t.f:(t.f||b.f); return {f,P:AUI.kind==="relay"?(t.tpo||t.P):(t.tpo||b.P)}; }
 /* antenna form (shared by the panel and the Lab) */
 function antFormHTML(a,f,idp){
@@ -8232,6 +8257,52 @@ function bindAntForm(root,getAnt,setAnt,f){
       a[k]=+el.value; const lab=root.querySelector(`label[for="${el.id}"] .v`); if(lab) lab.textContent=el.value; setAnt(a,el.tagName==="SELECT"); };
     el.addEventListener(el.tagName==="SELECT"?"change":"input",h); });
 }
+/* the physical antenna, drawn as a labelled sketch, with one line on how it works */
+const ANT_HOW={mono:"The whole mast radiates. Its electrical height sets the shape: 0.25 λ is a simple quarter-wave, about 0.53 λ pushes more power along the ground. Buried radials form the earth system.",
+  tant:"A short mast with wires across the top. The top loading carries current to the top, so a short mast works almost like a taller one.",
+  darr:"Two to four masts fed with set phase steps. Their waves add in one direction and cancel in another, so the station protects other areas.",
+  dip:"Two rods, each a quarter wavelength, fed in the middle. It radiates most at right angles to the rods and nothing along them (the reference antenna for ERP, 2.15 dBi).",
+  bays:"Dipoles stacked up the mast. Stacking squeezes the vertical beam, which sends more power to the horizon (higher gain) while staying omnidirectional.",
+  panel:"Dipoles in front of a reflecting screen, stacked up the mast. The screen sends the power forward, so the panel covers one direction.",
+  yagi:"One element is fed (the driven element). The longer reflector behind it and the shorter directors in front are not connected: the currents induced in them add the waves forward and cancel them backward.",
+  lpda:"Dipoles of gradually changing length along a boom, fed in turn. At each frequency the elements about half a wavelength long do the work, so it covers a wide band with steady gain.",
+  corner:"A dipole in front of two plates at 90°. The plates act like mirrors and send the power forward; simple, strong and directional.",
+  dish:"A paraboloid reflects the wave from the feed at its focus into a narrow, parallel beam. The bigger the dish (in wavelengths), the higher the gain and the narrower the beam.",
+  whip:"A quarter-wave rod over a ground plane (radials or a car roof). The ground plane acts as the missing half of a dipole, so it is omnidirectional."};
+function drawAntShape(cv,a,f){ if(!cv) return; const W=cv.clientWidth,H=cv.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const ink=cssVar("--ink"), mut=cssVar("--muted"), acc="#1F8FC4", hot="#E07B24", metal="#8A99A8"; c.lineCap="round"; c.font="12px "+(cssVar("--font-body")||"sans-serif");
+  const L=(x0,y0,x1,y1,col,w)=>{ c.strokeStyle=col||ink; c.lineWidth=w||2; c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke(); };
+  const T=(t,x,y,al,col)=>{ c.textAlign=al||"left"; const w=c.measureText(t).width, x0=al==="center"?x-w/2:al==="right"?x-w:x; c.fillStyle=cssVar("--field")||"#eef2f5"; c.globalAlpha=0.85; c.fillRect(x0-3,y-11,w+6,15); c.globalAlpha=1; c.fillStyle=col||mut; c.fillText(t,x,y); c.textAlign="left"; };
+  const feed=(x,y)=>{ c.fillStyle=hot; c.beginPath(); c.arc(x,y,4,0,7); c.fill(); };
+  const arrow=(x0,y,x1,lab)=>{ L(x0,y,x1,y,acc,2.5); c.fillStyle=acc; c.beginPath(); c.moveTo(x1,y); c.lineTo(x1-10,y-6); c.lineTo(x1-10,y+6); c.fill(); if(lab) T(lab,(x0+x1)/2,y-8,"center",acc); };
+  const cx=W/2, gy=H-26, k=a.type;
+  if(k==="mono"||k==="tant"||k==="darr"){ const n=k==="darr"?(a.n||2):1, sp=Math.min(70,W*0.6/Math.max(n-1,1)); L(10,gy,W-10,gy,mut,1.5);
+    for(let i=0;i<n;i++){ const x=cx-(n-1)*sp/2+i*sp, top=gy-(k==="tant"?H*0.45:H*0.7); L(x,gy,x,top,metal,4); feed(x,gy-2); for(let r=-3;r<=3;r++) L(x,gy+1,x+r*10,gy+8,mut,1);
+      if(k==="tant"){ L(x-40,top,x+40,top,metal,2); L(x-40,top,x-46,top+10,metal,1.5); L(x+40,top,x+46,top+10,metal,1.5); } }
+    T(k==="darr"?`${n} masts · phase step ${a.ph}°`:k==="tant"?"top-loading wires":"mast radiator",10,18); T("radials (earth system)",10,H-8);
+    if(k==="darr") arrow(cx-60,30,cx+60,"main beam"); }
+  else if(k==="dip"){ const y=H/2; L(cx-W*0.32,y,cx-6,y,metal,5); L(cx+6,y,cx+W*0.32,y,metal,5); feed(cx,y); T("λ/4",cx-W*0.16,y-12,"center"); T("λ/4",cx+W*0.16,y-12,"center"); T("feed",cx,y+22,"center",hot);
+    T("max radiation at 90° to the rods · none along them",cx,H-10,"center"); }
+  else if(k==="bays"){ const n=Math.min(a.n||4,8), x=cx, top=16, bot=gy; L(x,bot,x,top,metal,5); for(let i=0;i<n;i++){ const y=top+16+i*(bot-top-24)/Math.max(n-1,1)*(n>1?1:0); L(x-26,y,x+26,y,acc,3); feed(x,y); }
+    T(`${a.n} bays`,x+40,30); T(`spacing ${a.sp} λ`,x+40,48); T("beam squeezed towards the horizon",cx,H-8,"center"); }
+  else if(k==="panel"){ const n=Math.min(a.n||4,6), x=cx-20; L(cx+30,gy,cx+30,12,metal,5); for(let i=0;i<n;i++){ const y=14+i*(gy-24)/n, h=(gy-24)/n-6; c.fillStyle=metal; c.fillRect(x-4,y,8,h); L(x-22,y+h*0.3,x-22,y+h*0.7,acc,3); feed(x-22,y+h/2); }
+    T("reflector screen",x+12,24); T("dipoles",x-30,H-8,"right",acc); arrow(x-40,H/2,x-120>10?x-120:10,""); T("beam",x-90,H/2-10,"center",acc); }
+  else if(k==="yagi"||k==="lpda"){ const n=k==="yagi"?Math.min(a.el||6,14):9, x0=36, x1=W-70, y=H/2; L(x0,y,x1,y,mut,3);
+    for(let i=0;i<n;i++){ const x=x0+i*(x1-x0)/(n-1); let h;
+      if(k==="lpda") h=(H*0.38)*(1-i/(n-1)*0.6); else h=i===0&&(a.refl??1)?H*0.4:i===(k==="yagi"&&(a.refl??1)?1:0)?H*0.36:H*0.33*(1-(i-1)/(n*1.6));
+      L(x,y-h,x,y+h,i===((a.refl??1)?1:0)&&k==="yagi"?hot:metal,3); if(k==="yagi"&&i===((a.refl??1)?1:0)) feed(x,y); }
+    if(k==="yagi"){ if(a.refl??1) T("reflector",x0,16,"center"); T("driven",x0+(x1-x0)/(n-1)*((a.refl??1)?1:0),H-6,"center",hot); T(`directors ×${Math.max(n-((a.refl??1)?2:1),0)}`,(x0+x1)/2+20,16,"center"); }
+    else T("element lengths shrink step by step (log-periodic)",cx,16,"center");
+    arrow(x1+6,y,W-6,""); T("beam",W-30,y-10,"center",acc); }
+  else if(k==="corner"){ const ax=60, y=H/2; L(ax,y,ax+W*0.35,y-H*0.4,metal,5); L(ax,y,ax+W*0.35,y+H*0.4,metal,5); L(ax+W*0.18,y-14,ax+W*0.18,y+14,hot,4); feed(ax+W*0.18,y);
+    T("90° reflector plates",ax+W*0.2,18); T("dipole",ax+W*0.18,y+32,"center",hot); arrow(ax+W*0.42,y,W-10,"beam"); }
+  else if(k==="dish"){ const fx=W*0.48, y=H/2, R=H*0.42; c.strokeStyle=metal; c.lineWidth=5; c.beginPath(); for(let i=-20;i<=20;i++){ const yy=y+i/20*R, xx=36+Math.pow(i/20,2)*R*0.55; i===-20?c.moveTo(xx,yy):c.lineTo(xx,yy); } c.stroke();
+    L(36+R*0.55,y-R,fx,y,mut,1); L(36+R*0.55,y+R,fx,y,mut,1);
+    for(const dy of [-0.6,-0.2,0.2,0.6]) L(36+Math.pow(dy,2)*R*0.55,y+dy*R,W-14,y+dy*R,acc,1.2); arrow(fx+40,y,W-8,""); feed(fx,y);
+    T("feed at the focus",fx,y+R*0.42,"center",hot); T("parallel, narrow beam",W-14,y-R*0.4,"right",acc); }
+  else if(k==="whip"){ const x=cx, top=14; L(x,gy-10,x,top,metal,4); feed(x,gy-10); for(const dx of [-60,-25,25,60]) L(x,gy-10,x+dx,gy+4,metal,2.5);
+    T("λ/4 whip",x+10,36); T("ground plane (radials or a car roof)",cx,H-6,"center"); }
+  T(ANT_TYPES[k]?ANT_TYPES[k].name:"",W-8,H-8,"right",mut); }
 /* polar (azimuth) and elevation pattern plots */
 function drawPolar(cv,a,beamAz){
   const W=cv.clientWidth,H=cv.clientHeight; if(!W) return; const dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
@@ -8271,7 +8342,7 @@ document.addEventListener("fullscreenchange",function(){
 
 function openAui(kind,i){
   AUI.kind=kind; AUI.i=i; AUI.back=document.activeElement; const t=auiStation(); if(!t) return;
-  const {f}=auiParams(t); if(MP.layer!=="mobile"&&!t.ant){ t.ant=antFor(f); }
+  const {f}=auiParams(t); if(kind==="rx"){ if(!t.ant||!ANT_TYPES[t.ant.type]||ANT_TYPES[t.ant.type].band!=="vu") t.ant=rxAntDefault(t); } else if(MP.layer!=="mobile"&&!t.ant){ t.ant=antFor(f); }
   // Native full screen paints only the full-screened element's subtree, and
   // the panel lives outside #mapCore, so it has to move in to be visible.
   auiHost();
@@ -8279,8 +8350,37 @@ function openAui(kind,i){
 }
 function closeAui(){ $("auiPanel").hidden=true; document.body.classList.remove("aui-open"); if(AUI.back&&AUI.back.focus) AUI.back.focus(); AUI.kind=null; }
 function auiChanged(full){ const t=auiStation(); if(!t) return; t.aui=true; MP.res.clear(); if(full) renderAui(); else renderAuiLive(); updateMap(); }
+/* receiver antenna: gain toward the transmitter turns field strength into received power, E → P (ITU-R P.525) */
+function rxGainTo(rx){ const a=rx.ant; if(!a||!ANT_TYPES[a.type]) return {G:2.15,az:0,el:0}; const az=bearing(rx,MP.tx), r=MP.res.get(rx.id), T=r&&r.T, D=Math.max(hav(rx,MP.tx),0.01)*1000;
+  const el=T?toDeg(Math.atan(((T.txE+MP.txH)-(T.rxE+rx.h))/D)-D/(2*(4/3)*6371e3)):toDeg(Math.atan((MP.txH-rx.h)/D));
+  if(rx.aim!==false) a.az=Math.round(az); return {G:antGainDbi(a,az,el),az,el}; }
+function renderAuiRx(t){ const f=baseModel().p.f, mob=MP.layer==="mobile";
+  $("auiTitle").textContent=`Receiver R${AUI.i+1} · ${t.name}`;
+  if(f<30||mob){ $("auiBody").innerHTML=`<section class="auisec"><h3>Receiver</h3><div class="field"><label for="auiRH">Antenna height above ground (m)</label><input type="number" id="auiRH" min="0" max="500" step="0.5" value="${t.h}"></div>
+      <p class="hint">${mob?"Phones are modelled at 1.5 m with their built-in antenna (ITU-R P.1812 / P.2109 planning practice).":"At LF, MF and HF the planning quantity is the field strength (dBµV/m); the receiver uses a ferrite rod or whip, so the receiving antenna type does not change the coverage (ITU-R BS.1615 / BS.703 planning practice)."}</p></section>`;
+    $("auiRH").addEventListener("change",e=>{ t.h=clamp(+e.target.value||1,0,500); MP.res.clear(); updateMap(); renderAui(); }); return; }
+  const a=t.ant, g=rxGainTo(t), r=MP.res.get(t.id), pr=r&&r.pred, E=pr&&isFinite(pr.t)?pr.t:null, loss=t.rxLoss??2, Pr=E!=null?E-20*Math.log10(f)-77.2+g.G-loss:null;
+  $("auiBody").innerHTML=`
+  <section class="auisec"><h3>Receiver</h3><div class="two">
+    <div class="field"><label for="auiRH">Antenna height above ground (m)</label><input type="number" id="auiRH" min="0" max="500" step="0.5" value="${t.h}"></div>
+    <div class="field"><label for="auiRL">Cable loss to the receiver (dB)</label><input type="number" id="auiRL" min="0" max="20" step="0.5" value="${loss}"></div></div>
+    <label class="check"><input type="checkbox" id="auiAim" ${t.aim!==false?"checked":""}> Point the antenna at the transmitter automatically</label></section>
+  <section class="auisec"><h3>Receiving antenna</h3><div id="rxAnt">${antFormHTML(a,f,"ra")}</div>
+    <canvas class="antshape" id="rxShape" role="img" aria-label="Sketch of the receiving antenna"></canvas><p class="hint" id="rxHow"></p><p class="hint">${esc(antSize(a,f))}</p>
+    <div class="auiplots"><div><canvas id="rxPolar" aria-label="Horizontal pattern of the receiving antenna"></canvas></div><div><canvas id="rxElev" aria-label="Vertical pattern of the receiving antenna"></canvas></div></div></section>
+  <section class="auisec"><h3>What the receiver gets</h3><div class="tiles">
+    <div class="tile info"><span class="k">Field strength here</span><span class="val">${E!=null?fmtField(E,f):"…"}</span><span class="sub">from the propagation model (does not depend on the antenna)</span></div>
+    <div class="tile ${g.G>=5?"good":g.G>=0?"info":"warn"}"><span class="k">Gain towards the transmitter</span><span class="val">${g.G.toFixed(1)} dBi</span><span class="sub">transmitter at ${Math.round(g.az)}°, ${g.el>=0?"+":""}${g.el.toFixed(2)}° elevation</span></div>
+    <div class="tile ${Pr==null?"info":Pr>-80?"good":Pr>-95?"warn":"bad"}"><span class="k">Power at the receiver input</span><span class="val">${Pr!=null?Pr.toFixed(1)+" dBm":"…"}</span><span class="sub">E − 20·log f − 77.2 + G − cable loss (ITU-R P.525)</span></div></div>
+    <p class="hint">A higher-gain antenna does not change the field strength, but it delivers more power to the receiver and rejects signals from other directions. Reference receiving-antenna directivity for planning: ITU-R BT.419 (TV) and ITU-R BS.599 (FM).</p></section>`;
+  $("auiRH").addEventListener("change",e=>{ t.h=clamp(+e.target.value||1,0,500); MP.res.clear(); updateMap(); renderAui(); });
+  $("auiRL").addEventListener("change",e=>{ t.rxLoss=clamp(+e.target.value||0,0,20); renderAui(); });
+  $("auiAim").addEventListener("change",e=>{ t.aim=e.target.checked; renderAui(); });
+  bindAntForm($("rxAnt"),()=>t.ant,(na,full)=>{ if(t.aim!==false&&na.az!=null) na.az=Math.round(bearing(t,MP.tx)); t.ant=na; if(full) renderAui(); else { drawPolar($("rxPolar"),t.ant); drawElev($("rxElev"),t.ant); drawAntShape($("rxShape"),t.ant,f); } renderSites(); },f);
+  requestAnimationFrame(()=>{ drawPolar($("rxPolar"),a); drawElev($("rxElev"),a); drawAntShape($("rxShape"),a,f); const hw=$("rxHow"); if(hw) hw.textContent="How it works: "+(ANT_HOW[a.type]||""); }); }
 function renderAui(){
   const t=auiStation(); if(!t) return; const mob=MP.layer==="mobile";
+  if(AUI.kind==="rx"){ renderAuiRx(t); return; }
   $("auiTitle").textContent=`${AUI.kind==="relay"?"Relay Y"+(AUI.i+1):(mob?"Tower T":"Transmitter T")+(AUI.i+1)} · ${t.name}`;
   if(mob){ renderAuiTower(t); return; }
   const {f,P}=auiParams(t), band=f<30?(f<3?"lf":"hf"):"vu", a=t.ant||antFor(f);
@@ -8302,6 +8402,7 @@ function renderAui(){
     <div class="field"><label for="auiVswr">Antenna VSWR</label><input type="number" id="auiVswr" min="1" max="5" step="0.01" value="${t.vswr||1.1}"></div></div>
     <p class="hint">Line loss from typical datasheet values at 100 MHz, scaled with √f.</p></section>
   <section class="auisec"><h3>Antenna</h3><div id="auiAnt">${antFormHTML(a,f,"aa")}</div>
+    <canvas class="antshape" id="auiShape" role="img" aria-label="Sketch of the antenna"></canvas><p class="hint" id="auiHow"></p>
     <p class="hint" id="auiSize"></p>
     <div class="auiplots"><div><canvas id="auiPolar" aria-label="Horizontal radiation pattern"></canvas></div><div><canvas id="auiElev" aria-label="Vertical radiation pattern"></canvas></div></div></section>
   <p class="hint">Simulated panel. A real Nautel AUI reads these values from the transmitter; here they are computed from your settings: patterns per ITU-R BS.1386 (LF/MF) and BS.1195 (VHF/UHF), reflected power from the VSWR, and ERP = power at the antenna × gain over a half-wave dipole.</p>`;
@@ -8320,7 +8421,7 @@ function renderAui(){
   renderAuiLive(); auiHeight(t);
 }
 function renderAuiLive(){
-  const t=auiStation(); if(!t||MP.layer==="mobile") return; const {f,P}=auiParams(t), v=txPanelValues(t,{f,P}), a=t.ant||antFor(f), bw=antBeamwidths(a);
+  const t=auiStation(); if(!t||MP.layer==="mobile"||AUI.kind==="rx") return; const {f,P}=auiParams(t), v=txPanelValues(t,{f,P}), a=t.ant||antFor(f), bw=antBeamwidths(a);
   const kw=x=>x>=1?x.toFixed(2)+" kW":(x*1000).toFixed(0)+" W", dbk=x=>(10*Math.log10(x)).toFixed(1)+" dBk";
   const m=[["Forward power",kw(v.tpo),""],["Reflected power",kw(v.refl),`return loss ${(-20*Math.log10(Math.max(v.G,1e-6))).toFixed(1)} dB`],["VSWR",(t.vswr||1.1).toFixed(2)+":1",`mismatch loss ${v.mm.toFixed(2)} dB`],
     ["Feeder loss",v.fl.toFixed(2)+" dB",`${(FEEDERS[t.feeder||(f<30?"open":"ldf7")]||{}).name||""}`],["Power at antenna",kw(v.toAnt),""],["Antenna gain",`${v.gdb.toFixed(2)} dBi`,`${(v.gdb-2.15).toFixed(2)} dBd · HPBW ${bw.h>=359?"omni":bw.h.toFixed(0)+"°"} × ${bw.v.toFixed(0)}°`],
@@ -8329,7 +8430,7 @@ function renderAuiLive(){
   $("auiMeters").innerHTML=m.map(r=>`<div class="aum"><span class="k">${r[0]}</span><span class="val">${r[1]}</span><span class="sub">${esc(r[2])}</span></div>`).join("");
   $("auiAlarms").innerHTML=v.alarms.length?v.alarms.map(x=>`<li class="${x.lvl}">${esc(x.t)}</li>`).join(""):`<li class="good">No alarms</li>`;
   $("auiSize").textContent=`Size at ${fmtF(f)}: ${antSize(a,f)}.`;
-  requestAnimationFrame(()=>{ drawPolar($("auiPolar"),a); drawElev($("auiElev"),a); });
+  requestAnimationFrame(()=>{ drawPolar($("auiPolar"),a); drawElev($("auiElev"),a); drawAntShape($("auiShape"),a,f); const hw=$("auiHow"); if(hw) hw.textContent="How it works: "+(ANT_HOW[a.type]||""); });
 }
 /* ground height at the site, and the antenna top above sea level, under the mast field */
 function auiHeight(t){ const gEl=$("auiG"), top=$("auiTop"); if(!gEl||!top) return;
@@ -10772,7 +10873,7 @@ init();
     if(onMap&&t!==mapC){
       if(k==="s"||k==="S"){ e.preventDefault(); $("txSetBtn").click(); return; }
       if(k==="a"||k==="A"){ e.preventDefault(); openAimBox(); return; }
-      if(k==="p"||k==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("tx",MP.ti); else openAui(s.kind,s.i); return; } }
+      if(k==="p"||k==="P"){ e.preventDefault(); const s=MP.toolSel||{kind:"tx",i:MP.ti}; if(s.kind==="rx") openAui("rx",s.i); else openAui(s.kind,s.i); return; } }
     if(onMap&&(k==="+"||k==="=")){ e.preventDefault(); click("zoomIn"); return; }
     if(onMap&&(k==="-"||k==="_")){ e.preventDefault(); click("zoomOut"); return; }
     if(tab==="animation"&&(k==="+"||k==="=")){ e.preventDefault(); click("aZoomIn"); return; }

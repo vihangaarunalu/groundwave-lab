@@ -202,3 +202,15 @@ when it is blocked. Switch the type to present the same path as line of sight, r
 profile, ITU-R P.527 constants), refraction (k = 2/3 … ducting, ITU-R P.453 / P.834) or diffraction (knife edges,
 Deygout with J(ν), ITU-R P.526). Every type shows the same clearance chart in Fresnel zones (0.6 criterion, ITU-R P.526 /
 P.530), free-space loss (ITU-R P.525) and the Map's own ITU-R P.1812 delta-Bullington result for comparison.
+
+## Antennas for transmitters and receivers (v9.8)
+
+- New VHF/UHF antenna types: corner reflector (90°), parabolic dish (main lobe 2·J1(u)/u, sidelobes on the
+  ITU-R F.699 envelope 32 − 25·log10 φ dBi), and quarter-wave ground plane / whip; alongside the existing half-wave
+  dipole, multi-bay omni, panel, Yagi–Uda and log-periodic (ITU-R BS.1195) and the LF/MF masts (ITU-R BS.1386).
+- Every antenna has a labelled sketch of its physical shape, a "how it works" line, its size at the operating
+  frequency, and its real horizontal and vertical patterns.
+- **Receivers** now have their own settings panel (Map → Receiver sites → Antenna button, or select a receiver and
+  press P): antenna height, cable loss, antenna type with sketch and patterns, automatic pointing at the transmitter,
+  gain towards the transmitter, and the power at the receiver input E − 20·log f − 77.2 + G − loss (ITU-R P.525).
+  Planning references for receiving-antenna directivity: ITU-R BT.419 (TV) and BS.599 (FM).
