@@ -166,3 +166,17 @@ Experiments: E1 recover the hidden errors, E2 readings needed vs shadowing, E3 r
 - **Welcome card** for first-time visitors with four starting points (learn, experiment, plan a station,
   research), plus a guide for the Experiments tab (press G).
 - **Paper support:** `docs/PAPER_NOTES.md` (models and standards table, verification, limitations, BibTeX).
+
+## Phone measurements (v9.5)
+
+Real 4G measurements with no extra hardware (Shadow tab, card "Phone measurements"):
+
+- Record a walk with an Android logging app (G-NetTrack Lite, NetMonster, Network Cell Info Lite), export the log
+  and load it. Columns (latitude, longitude, signal, cell, EARFCN) are recognised automatically and can be changed.
+- Keep only the serving cell; the frequency comes from the EARFCN (bands 1, 3, 5, 7, 8, 20, 28, 38, 40, 41).
+- RSRP → total power (+10·log10(12·N_RB)) → field strength (+20·log10 f + 77.2 − G); averaged in power every 40 λ.
+- Phone readings are diamonds on the map; "Show" filters readings by source (simulated, MATLAB/live, phone, CSV),
+  and Calibrate then fits only those. "Estimate the tower power" sets the unknown tower ERP from the median reading.
+- Live streaming from the phone: `assets/wisdom_phone_live.sh` (Termux + Termux:API) sends RSRP-derived field
+  strength and GPS to the live link every few seconds.
+- Experiments tab: experiment 6, "Real 4G measurement with a smartphone".

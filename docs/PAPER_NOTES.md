@@ -60,10 +60,24 @@ error stays low, but the two terms are individually uncertain. A few far points 
 | 3 | Knife-edge diffraction | J(ν) of ITU-R P.526 (6 dB at ν = 0) |
 | 4 | Fading channels | Rice CDF, level crossing rate and average fade duration (e.g. Rayleigh, 900 MHz, 50 km/h, −10 dB: 9.3 % vs 9.5 % below threshold; 30.5 vs 29.9 crossings/s) |
 | 5 | Digital shadow calibration | Hidden values recovered; test error levels off at the shadowing σ |
+| 6 | Real 4G measurement with a smartphone | RSRP → field strength conversion; calibration with real readings |
 
 Each experiment exports its observation table as CSV and prints as a lab sheet.
 
-## 5. Honest limitations (put these in the paper)
+## 5. Real measurements with a smartphone
+
+Sensor: an Android phone with a logging app (report app name and version, phone model, Android version,
+logging interval, operator, band, EARFCN). Conversion used by the importer:
+
+    P_total = RSRP + 10·log10(12·N_RB)            (N_RB = 25/50/75/100 for 5/10/15/20 MHz)
+    E [dBµV/m] = P_total [dBm] + 20·log10(f MHz) + 77.2 − G [dBi]
+
+Readings from the serving cell only, averaged in linear power every 40 λ (Lee 1985; ITU-R SM.1708).
+The tower ERP is estimated from the median reading (unknown for operator sites); calibration then reports
+the remaining terms. Measure the same route twice, ideally with two phones, and report the difference as
+measurement uncertainty. RSRP absolute accuracy of phones is limited (3GPP TS 36.133, about ±6 dB).
+
+## 6. Honest limitations (put these in the paper)
 
 - Results in this phase come from simulated sensors (software-in-the-loop); SDR measurements are
   planned under the grant.
@@ -76,7 +90,7 @@ Each experiment exports its observation table as CSV and prints as a lab sheet.
 - AI-assisted development: disclose it according to the conference policy, and state that the authors
   verified the models and results.
 
-## 6. BibTeX
+## 7. BibTeX
 
 ```bibtex
 @misc{itu_p1812, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.1812: A path-specific propagation prediction method for point-to-area terrestrial services in the frequency range 30 {MHz} to 6000 {MHz}}, institution={International Telecommunication Union}, address={Geneva}}
@@ -91,6 +105,8 @@ Each experiment exports its observation table as CSV and prints as a lab sheet.
 @article{gudmundson1991, author={Gudmundson, M.}, title={Correlation model for shadow fading in mobile radio systems}, journal={Electronics Letters}, volume={27}, number={23}, pages={2145--2146}, year={1991}}
 @book{rappaport2002, author={Rappaport, T. S.}, title={Wireless Communications: Principles and Practice}, edition={2}, publisher={Prentice Hall}, year={2002}}
 @book{parsons2000, author={Parsons, J. D.}, title={The Mobile Radio Propagation Channel}, edition={2}, publisher={Wiley}, year={2000}}
+@misc{3gpp36214, author={{3GPP}}, title={{TS} 36.214: Evolved Universal Terrestrial Radio Access ({E-UTRA}); Physical layer; Measurements}, institution={3rd Generation Partnership Project}}
+@misc{3gpp36133, author={{3GPP}}, title={{TS} 36.133: Evolved Universal Terrestrial Radio Access ({E-UTRA}); Requirements for support of radio resource management}, institution={3rd Generation Partnership Project}}
 @book{goldsmith2005, author={Goldsmith, A.}, title={Wireless Communications}, publisher={Cambridge University Press}, year={2005}}
 ```
 
