@@ -236,3 +236,14 @@ same signal readout. In this link view the readout judges the link by received p
 worked out from the receiver sensitivity, antenna gain and cable loss. A live box shows the mathematics step by step
 (EIRP, free-space loss ITU-R P.525, terrain loss ITU-R P.526 / clearance P.530, field strength, received power and
 margin; k-factor for refraction, two-ray terms for reflection). The view zooms to the link when it opens.
+
+## v10.1: one chooser, link judgement everywhere
+
+- The propagation type is chosen in one control (Ground & sky, Line of sight, Reflection, Refraction, Diffraction),
+  in the stage bar and in the full-screen bar; a green dot marks the types that describe the chosen map path.
+- On a VHF/UHF map path every type runs in the curved-earth view on the user's terrain, with sky-wave-style animated
+  rays; Ground & sky is still shown but judged "Not this mechanism", never "no reliable signal".
+- The live maths panel (hide/show) sits beside the zoom buttons; at the map receiver's own position the terrain loss
+  is the Map's ITU-R P.1812 delta-Bullington value, elsewhere ITU-R P.526 J(ν); it warns when the transmit antenna is
+  not aimed at the receiver and aims it in one click.
+- Terrain for the animation is sampled at up to 400 points (was 160) so peaks are not missed.
