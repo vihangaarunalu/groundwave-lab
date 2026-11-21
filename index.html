@@ -2035,6 +2035,13 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .wel-grid b{font-size:14px} .wel-grid span{font-size:12px;color:var(--muted)}
 .wel-foot{margin:0;font-size:var(--fs-meta)}
 @media (max-width:760px){.welcome{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
+
+.sh-phgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px var(--sp-3);margin:var(--sp-2) 0}
+.sh-phgrid select,.sh-phgrid input{width:100%}
+.sh-phopts{gap:var(--sp-4);flex-wrap:wrap;margin-bottom:var(--sp-2)}
+.sh-showf{font-size:var(--fs-meta);color:var(--muted);align-self:center}
+#shShow{min-height:38px}
+.sh-legend i.p{background:#8A99A8;border-radius:2px;transform:rotate(45deg) scale(.9)}
 .linkish{background:none;border:0;padding:2px 0;min-height:24px;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .ht-note{margin:6px 0 0;font-family:var(--font-mono);font-size:13px;line-height:1.5}
 
@@ -2761,7 +2768,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
         <div class="sh-pinbar" id="shPinBar" hidden><button class="pinbtn" type="button" id="shPinKind"></button><button class="pinbtn" type="button" id="shPinInfo">Details</button><button class="pinbtn del" type="button" id="shPinDel">Remove</button></div>
         <div class="sh-ctx" id="shCtx" hidden role="menu" aria-label="Add here"><button type="button" role="menuitem" data-c="addS">＋ Sensor here</button><button type="button" role="menuitem" data-c="add">＋ Walk point here</button><button type="button" role="menuitem" data-c="site">Move tower here</button><button type="button" role="menuitem" data-c="aim" hidden>Point the antenna here</button><button type="button" role="menuitem" data-c="bld" hidden>Edit this building</button></div>
         <div class="sh-zoom"><button class="iconbtn mapbtn" type="button" id="shZin" aria-label="Zoom in" data-kbd="+">+</button><button class="iconbtn mapbtn" type="button" id="shZout" aria-label="Zoom out" data-kbd="−">−</button><button class="iconbtn mapbtn" type="button" id="shFitB" aria-label="Fit all points" data-kbd="0" data-tiptext="Fit all points">⤢</button></div>
-        <div class="sh-legend" aria-hidden="true"><span><i class="g"></i>Match &lt; 3 dB</span><span><i class="w"></i>3–6 dB</span><span><i class="b"></i>&gt; 6 dB</span><span><i class="s"></i>Sensor</span></div>
+        <div class="sh-legend" aria-hidden="true"><span><i class="g"></i>Match &lt; 3 dB</span><span><i class="w"></i>3–6 dB</span><span><i class="b"></i>&gt; 6 dB</span><span><i class="s"></i>Sensor</span><span><i class="p"></i>Phone</span></div>
       </div>
       <p class="hint" id="shHint" aria-live="polite">Right-click the map (or press and hold on a phone) to add a sensor or a walk point there. Drag the tower or a dot to move it. Click a dot or a building for details.</p>
       <div class="sh-detail" id="shDetail" aria-live="polite"></div>
@@ -2852,9 +2859,48 @@ body:not(.an-scene) #animation .sc-only{display:none}
     <p class="sh-linkstat mono" id="shExpStat" aria-live="polite"></p>
     <div class="tablewrap"><table class="fs" id="shExpOut" hidden></table></div>
   </section>
+  <section class="panel card" aria-labelledby="shPhH">
+    <div class="chart-head"><h2 id="shPhH">Phone measurements (real 4G signal)</h2><span class="muted sh-small">G-NetTrack, NetMonster, Network Cell Info or any log with position and signal</span></div>
+    <ol class="sh-task">
+      <li><b>Place the tower first:</b> put the station on the real 4G tower (search its coordinates, or right-click the map → Move tower here) and set its mast height.</li>
+      <li><b>Record:</b> on an Android phone, record your walk with a logging app, for example <b>G-NetTrack Lite</b>. Walk the planned route (Download route (GPX) below), slowly, phone held the same way. Then export the log.</li>
+      <li><b>Load the log:</b> <input type="file" id="shPhFile" accept=".csv,.txt,.tsv,text/csv,text/plain" class="sh-file"><label class="btn sm primary" for="shPhFile">Choose the phone log</label> <span class="muted">the settings fill in by themselves</span></li>
+    </ol>
+    <div id="shPhCfg" hidden>
+      <p class="sh-linkstat" id="shPhSum" aria-live="polite"></p>
+      <div class="sh-phgrid">
+        <div class="field"><label for="shPhLat">Latitude column</label><select id="shPhLat"></select></div>
+        <div class="field"><label for="shPhLon">Longitude column</label><select id="shPhLon"></select></div>
+        <div class="field"><label for="shPhSig">Signal column (dBm)</label><select id="shPhSig"></select></div>
+        <div class="field"><label for="shPhCellC">Cell column</label><select id="shPhCellC"></select></div>
+        <div class="field"><label for="shPhChC">Channel column (EARFCN)</label><select id="shPhChC"></select></div>
+        <div class="field"><label for="shPhType">The signal is</label><select id="shPhType"><option value="rsrp">RSRP (4G / 5G reference signal)</option><option value="rssi">Total received power (RSSI, 2G/3G, Wi-Fi)</option></select></div>
+        <div class="field"><label for="shPhCell">Keep readings from</label><select id="shPhCell"></select></div>
+        <div class="field"><label for="shPhF">Frequency (MHz)</label><input type="number" id="shPhF" min="30" max="6000" step="0.1"></div>
+        <div class="field"><label for="shPhBw">Cell bandwidth</label><select id="shPhBw"><option value="5">5 MHz (25 RB)</option><option value="10" selected>10 MHz (50 RB)</option><option value="15">15 MHz (75 RB)</option><option value="20">20 MHz (100 RB)</option></select></div>
+        <div class="field"><label for="shPhG">Phone antenna gain (dBi)</label><input type="number" id="shPhG" min="-15" max="10" step="0.5" value="0"></div>
+      </div>
+      <div class="row sh-phopts"><label class="check"><input type="checkbox" id="shPhAvg" checked> Average every 40 wavelengths (Lee method)</label><label class="check"><input type="checkbox" id="shPhRepl" checked> Remove the simulated sample points</label></div>
+      <p class="hint" id="shPhPrev" aria-live="polite"></p>
+      <div class="row"><button class="btn primary" type="button" id="shPhAdd">Add to the map</button><button class="btn sm" type="button" id="shPhPow" hidden>Estimate the tower power from the readings</button><button class="btn sm" type="button" id="shPhRef" hidden>The tower is now in the right place</button></div>
+      <p class="hint" id="shPhNext" hidden>Next: the real power of a 4G tower is usually unknown, so press <b>Estimate the tower power</b> first, then <b>Calibrate the model</b>. Use <b>Show: Phone</b> in the Measurements card to look at the phone readings only.</p>
+    </div>
+    <details class="acc plain"><summary>How the phone signal becomes field strength</summary><div class="acc-body">
+      <p>4G phones report RSRP: the power of one resource element (one 15 kHz subcarrier) of the reference signal. The whole cell has 12 subcarriers per resource block, so the total power is RSRP + 10·log<sub>10</sub>(12·N<sub>RB</sub>), for example +27.8 dB for 10 MHz. Field strength then follows from the received power: E (dBµV/m) = P (dBm) + 20·log<sub>10</sub>(f MHz) + 77.2 − G (dBi).</p>
+      <p>Phones are not calibrated instruments (3GPP allows about ±6 dB absolute RSRP accuracy). A fixed phone error, and the unknown real power of the tower, both end up in the calibration offset. Measure with two phones to report the phone-to-phone uncertainty.</p>
+    </div></details>
+    <details class="acc plain"><summary>Stream live from the phone (Android, Termux)</summary><div class="acc-body">
+      <ol class="sh-task">
+        <li>Install <b>Termux</b> and <b>Termux:API</b> from F-Droid, and allow location and phone permissions for Termux:API.</li>
+        <li>In Termux type: <code>pkg install termux-api jq curl</code></li>
+        <li>Download <a href="assets/wisdom_phone_live.sh" download>wisdom_phone_live.sh</a> to the phone and run: <code>CHANNEL=<span id="shPhChEcho">wisdom-lab1</span> bash wisdom_phone_live.sh</code></li>
+        <li>Press <b>Connect</b> in the Live link card here. A reading arrives every few seconds while you walk.</li>
+      </ol>
+    </div></details>
+  </section>
   <section class="panel card" aria-labelledby="shDataH">
     <div class="chart-head"><h2 id="shDataH">Measurements</h2>
-      <div class="row"><button class="btn" type="button" id="shSample">New sensors and walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label><button class="btn" type="button" id="shExport">Export CSV</button><button class="btn" type="button" id="shClear">Clear</button></div></div>
+      <div class="row"><label class="sh-showf" for="shShow">Show</label><select id="shShow"><option value="all">All readings</option><option value="sim">Simulated sample</option><option value="live">MATLAB / live</option><option value="phone">Phone</option><option value="csv">CSV upload</option></select><button class="btn" type="button" id="shSample">New sensors and walk test</button><input type="file" id="shFile" accept=".csv,text/csv" class="sh-file"><label class="btn" for="shFile">Upload CSV</label><button class="btn" type="button" id="shExport">Export CSV</button><button class="btn" type="button" id="shClear">Clear</button></div></div>
     <div class="sh-walk">
       <div class="row"><label class="check"><input type="checkbox" id="shAutoWalk" checked> Re-plan the walk test when the station changes</label>
         <div class="field sh-sens" id="shSensF"><label for="shSens">Receiver sensitivity (dBm)</label><input type="number" id="shSens" min="-140" max="-30" step="1" value="-95"></div>
@@ -3599,7 +3645,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 <section class="wrap" id="exp-tab" role="tabpanel" aria-labelledby="tab-exp" hidden>
   <header class="xp-head">
     <div>
-      <p class="lc-eyebrow">Virtual lab · 5 experiments · about 25 minutes each</p>
+      <p class="lc-eyebrow">Virtual lab · 6 experiments · 25 to 45 minutes each</p>
       <h2 class="xp-title">Experiments</h2>
       <p class="xp-lead">Each experiment follows the same steps as a university virtual lab: Aim, Theory, Pre-test, Procedure, Simulation, Observations, Post-test and References. Nothing to install. Start with any card; each one tells you exactly what to do next.</p>
     </div>
@@ -3817,7 +3863,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v9.4</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v9.5</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -8947,7 +8993,45 @@ function bindTabs(){
     post:[{q:"After calibration with many readings, the test error approaches…",o:["0 dB","the shadowing standard deviation","the hidden offset"],a:1,why:"Only the random part remains, and that is the shadowing."},
           {q:"Why is it useful to have readings both behind buildings and in the clear?",o:["It is not useful","So the building loss can be separated from the offset","To reduce shadowing"],a:1,why:"Without both kinds of points the building term cannot be told apart from the offset."},
           {q:"A calibration with 5 readings shows 0.5 dB error on the training data. This means…",o:["the model is excellent","nothing yet: check the hold-out test error","the shadowing is 0.5 dB"],a:1,why:"With few points a model can fit the training data closely by chance; only the test error counts."}],
-    refs:["Recommendation ITU-R SM.1708-1 (2017), Field-strength measurements along a route with geographical coordinate registrations.","W. C. Y. Lee, “Estimate of local average power of a mobile radio signal,” IEEE Trans. Vehicular Technology, vol. VT-34, no. 1, pp. 22–27, 1985.","M. Gudmundson, “Correlation model for shadow fading in mobile radio systems,” Electronics Letters, vol. 27, no. 23, pp. 2145–2146, 1991.","Recommendation ITU-R P.1812-7 (2023), A path-specific propagation prediction method for point-to-area terrestrial services."]}
+    refs:["Recommendation ITU-R SM.1708-1 (2017), Field-strength measurements along a route with geographical coordinate registrations.","W. C. Y. Lee, “Estimate of local average power of a mobile radio signal,” IEEE Trans. Vehicular Technology, vol. VT-34, no. 1, pp. 22–27, 1985.","M. Gudmundson, “Correlation model for shadow fading in mobile radio systems,” Electronics Letters, vol. 27, no. 23, pp. 2145–2146, 1991.","Recommendation ITU-R P.1812-7 (2023), A path-specific propagation prediction method for point-to-area terrestrial services."]},
+  { id:"phone", title:"Real 4G measurement with a smartphone", level:"Beginner", mins:45,
+    plain:"Your phone measures the 4G signal all the time. Here you record it while walking, turn it into field strength, and compare it with the model on the map. This is a real field measurement with no extra hardware.",
+    learn:["What RSRP is and how to convert it to field strength","How to plan and record a measurement walk","How to load a phone log and calibrate the model with it"],
+    aim:"To measure the field strength of a real 4G cell along a planned route with a smartphone logging app, to convert RSRP to field strength, and to compare and calibrate the propagation model with the measurements in the digital shadow.",
+    theory:`<p>A 4G phone reports <b>RSRP</b>: the power of one resource element (one 15 kHz subcarrier) of the cell's reference signal, in dBm. A cell of bandwidth <i>B</i> has <i>N</i><sub>RB</sub> resource blocks of 12 subcarriers, so the total received power is about</p>
+      <div class="mathb" data-tex="P_{\\text{tot}} \\approx \\text{RSRP} + 10\\log_{10}(12\\,N_{RB})\\quad(N_{RB}=25,50,75,100\\ \\text{for}\\ 5,10,15,20\\ \\text{MHz})"></div>
+      <p>The field strength at the phone follows from the received power and the antenna gain <i>G</i> (dBi):</p>
+      <div class="mathb" data-tex="E\\,[\\text{dB}\\mu\\text{V/m}] = P_{\\text{tot}}\\,[\\text{dBm}] + 20\\log_{10} f_{\\text{MHz}} + 77.2 - G"></div>
+      <p>Readings flicker because of fast fading, so they are averaged in power over 40 wavelengths (Lee's method, also used in ITU-R SM.1708). The phone is not a calibrated instrument: 3GPP allows about ±6 dB absolute RSRP accuracy, and the real power of the tower is usually unknown. Both end up in the calibration offset, which is why the model is calibrated with the readings.</p>
+      <p class="xp-note">In plain words: the phone gives a small number (RSRP); add a fixed amount to get the field strength; average a few metres of walking; then let the model learn from it.</p>`,
+    pre:[{q:"RSRP measures…",o:["the whole power of the cell","the power of one 15 kHz piece (resource element) of the reference signal","the download speed"],a:1,why:"RSRP is per resource element, so it is about 28 dB below the total power of a 10 MHz cell."},
+         {q:"Why walk the same planned route each time?",o:["It is shorter","So the readings can be repeated and compared point by point","Phones need it"],a:1,why:"Repeating the same route makes the measurement reproducible."}],
+    proc:[{t:"Install G-NetTrack Lite (or NetMonster / Network Cell Info Lite) on an Android phone. Make a 2-minute test recording and check that you can export the log.",hl:"tiles"},
+          {t:"In the Digital shadow tab, put the station on the real 4G tower (by eye, or its coordinates) and set its mast height. Choose a service near the band, for example 4G 1800 MHz.",hl:"shadow"},
+          {t:"Press Download route (GPX) in the Measurements card and open it on the phone, so you can follow the planned walk.",hl:"shadow"},
+          {t:"Start recording in the app. Walk slowly (about 1 m/s), phone held the same way, along the route. Stop and export the log.",hl:"rsrp"},
+          {t:"In the Phone measurements card, choose the log. Check the columns, keep the serving cell, check the frequency and bandwidth, then press Add to the map.",hl:"shadow"},
+          {t:"Press Estimate the tower power, tick Keep 30% aside, then Calibrate. Write down the test error before and after, and the building loss found.",hl:"shadow"},
+          {t:"Repeat the walk at another time, and with a second phone if you can. Compare: the difference is your measurement uncertainty.",hl:"rec"}],
+    controls:[{id:"rsrp",label:"RSRP shown by the phone",unit:"dBm",min:-140,max:-44,step:1,val:-95},{id:"f",label:"Downlink frequency",unit:"MHz",min:700,max:3500,step:5,val:1850},{id:"bw",label:"Cell bandwidth",type:"select",opts:[["5","5 MHz (25 RB)"],["10","10 MHz (50 RB)"],["15","15 MHz (75 RB)"],["20","20 MHz (100 RB)"]],val:"10"},{id:"g",label:"Phone antenna gain",unit:"dBi",min:-10,max:5,step:0.5,val:0}],
+    calc(v){ const nrb={5:25,10:50,15:75,20:100}[v.bw]||50, add=10*L10(12*nrb), P=v.rsrp+add, E=P+20*L10(v.f)+77.2-v.g, lam=300/v.f; return {nrb,add,P,E,L:40*lam,lam}; },
+    tiles(v,R){ return [["Field strength",`${f1(R.E)} dBµV/m`,`= ${f1(R.P)} dBm + ${f1(20*L10(v.f))} + 77.2 − ${v.g}`],["Total cell power",`${f1(R.P)} dBm`,`RSRP + 10·log10(12·${R.nrb}) = +${f1(R.add)} dB`],
+      ["Averaging window",`${f1(R.L)} m`,`40 wavelengths (λ = ${(R.lam*100).toFixed(1)} cm)`],["Readings per window",`${Math.max(1,Math.round(R.L/1.0))}`,"at 1 reading per second, walking 1 m/s"]]; },
+    draw(x,W,H,v,R){ const steps=[["RSRP (phone)",v.rsrp,"dBm"],["+ all subcarriers",R.P,"dBm"],["field strength",R.E,"dBµV/m"]], lo=-140, hi=140, b=[60,30,W-100,H-80], Y=t=>b[1]+b[3]-(t-lo)/(hi-lo)*b[3];
+      x.font="13px "+(C("--font-body")||"sans-serif"); x.strokeStyle=C("--line"); x.fillStyle=C("--muted");
+      for(let t=lo;t<=hi;t+=40){ x.beginPath(); x.moveTo(b[0],Y(t)); x.lineTo(b[0]+b[2],Y(t)); x.stroke(); x.fillText(t,b[0]-36,Y(t)+4); }
+      const bw=b[2]/steps.length*0.5; steps.forEach(([lab,val,u],i)=>{ const cx=b[0]+b[2]*(i+0.5)/steps.length; x.fillStyle=i===2?C("--accent"):C("--ink"); const y0=Y(0), y1=Y(val); x.fillRect(cx-bw/2,Math.min(y0,y1),bw,Math.abs(y1-y0));
+        x.fillStyle=C("--ink"); x.textAlign="center"; x.fillText(`${val.toFixed(1)} ${u}`,cx,val>=0?y1-8:y1+18); x.fillText(lab,cx,H-24); x.textAlign="left"; });
+      x.fillStyle=C("--muted"); x.fillText("From the phone's RSRP to the field strength the digital shadow uses",b[0],18); },
+    obs:{cols:[["rsrp","RSRP (dBm)",0],["P","Total power (dBm)",1],["E","Field strength (dBµV/m)",1],["f","f (MHz)",0]],
+      row(v,R){ return {rsrp:v.rsrp,P:R.P,E:R.E,f:v.f}; },
+      plots:[{label:"Field strength against RSRP",x:"rsrp",y:["E"],xl:"RSRP (dBm)",yl:"dBµV/m",sweep:{k:"rsrp",vals:[-130,-120,-110,-100,-90,-80,-70,-60]}}]},
+    results:["What test error did you get before and after calibration? Compare it with the MATLAB experiments.","How different were the two walks (or the two phones) at the same points?","Was the building loss found from your data close to the value the model uses?"],
+    expect:"Typical campus results: a few dB of test error after calibration, close to the shadowing level; repeated walks agree within a few dB; phones differ by a fixed amount that the offset absorbs.",
+    post:[{q:"A 10 MHz cell shows RSRP −100 dBm. The total power is about…",o:["−100 dBm","−72 dBm","−128 dBm"],a:1,why:"−100 + 10·log10(600) ≈ −100 + 27.8 = −72 dBm."},
+          {q:"Why average over 40 wavelengths?",o:["To remove fast fading and keep the local mean","To save battery","Because the GPS needs it"],a:0,why:"Averaging over about 40λ removes the fast fading but keeps the slower changes caused by buildings and distance."},
+          {q:"The tower's real power is unknown. What happens to this error?",o:["The results are useless","It becomes part of the calibration offset","It changes the building loss"],a:1,why:"A constant error moves every reading equally, so the offset term absorbs it."}],
+    refs:["3GPP TS 36.214, Evolved Universal Terrestrial Radio Access (E-UTRA); Physical layer measurements (definition of RSRP).","3GPP TS 36.133, E-UTRA; Requirements for support of radio resource management (RSRP measurement accuracy).","Recommendation ITU-R SM.1708-1 (2017), Field-strength measurements along a route with geographical coordinate registrations.","W. C. Y. Lee, “Estimate of local average power of a mobile radio signal,” IEEE Trans. Vehicular Technology, vol. VT-34, no. 1, pp. 22–27, 1985.","G-NetTrack Lite, Gyokov Solutions (Android app); NetMonster (open-source Android app)."]}
   ];
 
   /* ------------------------------------------------------------------ state and rendering */
@@ -9029,7 +9113,7 @@ function bindTabs(){
     $("xpBody").querySelectorAll(".xp-q").forEach((fs,k)=>fs.addEventListener("change",ev=>{ const q=list[k], j=+ev.target.value, ok=j===q.a, fb=fs.querySelector(".xp-fb");
       fs.classList.toggle("ok",ok); fs.classList.toggle("no",!ok); fb.textContent=(ok?"Correct. ":"Not quite. ")+q.why;
       const sc=(S.quiz[cur]=S.quiz[cur]||{}); sc[tag+k]=ok?1:0; save(S); const got=list.reduce((s,_,i)=>s+(sc[tag+i]||0),0); $("xpScore").textContent=`Score: ${got} of ${list.length}`; })); }
-  function showMe(t){ if(t==="obs"){ mark(step); go_(5); return; } if(t==="shadow"){ go("shadow"); setTimeout(()=>{ const h=$("shExpH"); if(h) h.scrollIntoView({block:"start"}); },300); return; }
+  function showMe(t){ if(t==="obs"){ mark(step); go_(5); return; } if(t==="shadow"){ go("shadow"); setTimeout(()=>{ const h=$(cur==="phone"?"shPhH":"shExpH"); if(h) h.scrollIntoView({block:"start"}); },300); return; }
     mark(step); go_(4); requestAnimationFrame(()=>{ const el=$("xp-c-"+t); if(!el) return; el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.remove("xp-hl"); void el.offsetWidth; el.classList.add("xp-hl"); const f=el.querySelector("input,select,button"); if(f) f.focus({preventScroll:true}); else if(el.matches("button")) el.focus({preventScroll:true}); }); }
   root.addEventListener("click",ev=>{ const o=ev.target.closest("[data-open]"); if(o){ const e=EXPS.find(x=>x.id===o.dataset.open), d=S.done[o.dataset.open]||{}; open(o.dataset.open,Math.min(STEPS.findIndex(s=>!d[s[0]]),STEPS.length-1)); return; }
     const s=ev.target.closest("[data-xstep]"); if(s){ mark(step); go_(+s.dataset.xstep); return; }
@@ -9432,13 +9516,13 @@ function bindTabs(){
     {tab:"animation",sel:["#animation .stage"],t:"Watch the wave travel",x:"Drag the radio to move the receiver, scroll to zoom, press F for full screen. In full screen, drag the panels by their handle or press H to hide them."},
     {tab:"map",sel:["#mapCore .toolrow","#mapCore"],t:"Plan on a real map",x:"Search a place, add transmitters and receivers, and get a reception verdict for every site, with terrain along the path."},
     {tab:"methods",sel:["[data-eqed=\"latex\"]","#mxH"],t:"See every equation",x:"Pick a model and a distance to see each step of the calculation. Tutors: the Equation editor typesets maths and turns a formula into a Lab model."},
-    {tab:"exp",sel:["#xpCards"],t:"Do a virtual experiment",x:"Five guided experiments in the university virtual-lab format: aim, theory, a pre-test, the procedure, a live simulation, an observation table you can export, a post-test and references."},
+    {tab:"exp",sel:["#xpCards"],t:"Do a virtual experiment",x:"Six guided experiments in the university virtual-lab format: aim, theory, a pre-test, the procedure, a live simulation, an observation table you can export, a post-test and references."},
     {tab:"learn",sel:[".lc-head"],t:"Learn step by step",x:"17 short lessons based on the ITU-R Handbook on Ground Wave Propagation, each with a worked example, a quick check and a link back to the Lab."},
     {tab:"quiz",sel:["#quiz .intro","#quiz"],t:"Check your understanding",x:"Practise with instant feedback, or switch to exam mode and export the results."},
     {tab:"quiz",sel:["#guideBtn","#helpBtn"],t:"Help is always here",x:"Press Guide on any page to learn its main tools step by step, or open Help for the quick start and the accuracy notes."}
   ],
   exp:[
-    {tab:"exp",sel:["#xpCards",".xp-head"],t:"Pick an experiment",x:"Five virtual-lab experiments: skip distance, two-ray reflection, knife-edge diffraction, fading channels and digital shadow calibration. Each card says how long it takes and what you will learn."},
+    {tab:"exp",sel:["#xpCards",".xp-head"],t:"Pick an experiment",x:"Six virtual-lab experiments: skip distance, two-ray reflection, knife-edge diffraction, fading channels, digital shadow calibration and a real 4G measurement with a phone. Each card says how long it takes and what you will learn."},
     {tab:"exp",sel:["#xpCards"],t:"Follow the eight steps",x:"Every experiment has the same steps: Aim, Theory, Pre-test, Procedure, Simulation, Observations, Post-test and References. Press Next step to move on; your progress is saved."},
     {tab:"exp",sel:["#xpCards"],t:"Show me",x:"In the Procedure, each instruction has a Show me button that jumps to the right slider in the simulation and highlights it."},
     {tab:"exp",sel:[".xp-cite"],t:"Use it in a report",x:"Record readings, fill the table automatically, export it as CSV, and print a clean lab sheet. The references list the ITU-R Recommendations and textbooks behind each model."}
@@ -9479,6 +9563,7 @@ function bindTabs(){
     {tab:"shadow",sel:["#shSteps"],t:"Four steps",x:"Place the station, get measurements, compare and calibrate, then try what-if. Each step turns green when it is done."},
     {tab:"shadow",sel:["#shSearch"],t:"Place the station",x:"Search a place, or choose Move station and click the map.",act:"Type a place and press Search.",wait:{sel:"#shSearch",ev:"submit"}},
     {tab:"shadow",sel:["#shMap"],t:"Model against reality",x:"Green dots: the model is right. Red dots: something the model does not know about. Click a dot to see why."},
+    {tab:"shadow",sel:["#shPhH","#shPhFile"],t:"Real phone measurements",x:"Record a walk with a 4G logging app such as G-NetTrack Lite, then load its log here. The columns are found automatically, RSRP is turned into field strength and averaged, and the readings appear as diamonds on the map."},
     {tab:"shadow",sel:["#shCal"],t:"Let the model learn",x:"Calibrate fits the model to the measurements and shows what it learned.",act:"Press Calibrate.",wait:{sel:"#shCal",ev:"click"}},
     {tab:"shadow",sel:["#shWhat"],t:"Try what-if",x:"Test a taller mast, more power or indoor receivers on the corrected model."}
   ],
@@ -9733,7 +9818,7 @@ init();
 
   /* ---------- sample data around the station ---------- */
   function buildSample(){
-    const T=tx(), r=rng(SH.seed); SH.pts=SH.pts.filter(p=>p.src==="csv"||p.src==="live"); SH.cal=null; SH.sel=-1;
+    const T=tx(), r=rng(SH.seed); SH.pts=SH.pts.filter(isReal); SH.cal=null; SH.sel=-1;
     const pl=walkPlan(); placeSensors(pl); addWalk(pl,r); measureAll(); }
   function placeSensors(pl){ const T=tx(), a=ant(), dir=a[3]<360, R=pl.R, b0=dir?SH.az:pl.b0;
     /* three fixed sensors, the usual layout: near (clear line of sight, the reference), middle (partly blocked), far (towards the coverage edge),
@@ -9790,7 +9875,9 @@ init();
       `<wpt lat="${x(T.lat)}" lon="${x(T.lon)}"><name>${e("Tower · "+T.name)}</name></wpt>\n`+S.map(p=>`<wpt lat="${x(p.lat)}" lon="${x(p.lon)}"><name>${e(p.name)}</name></wpt>`).join("\n")+
       `\n<rte><name>Walk test</name>\n`+w.map(p=>`<rtept lat="${x(p.lat)}" lon="${x(p.lon)}"><name>${e(p.name)}</name></rtept>`).join("\n")+`\n</rte>\n</gpx>\n`;
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([gpx],{type:"application/gpx+xml"})); a.download="wisdom-walk-test.gpx"; document.body.appendChild(a); a.click(); a.remove(); }
-  const isReal=p=>p.src==="csv"||p.src==="live";
+  const isReal=p=>p.src==="csv"||p.src==="live"||p.src==="phone";
+  const srcOf=p=>p.src==="live"?(p.origin==="phone"?"phone":"live"):p.src==="phone"?"phone":p.src==="csv"?"csv":"sim";
+  const shown=p=>!SH.show||SH.show==="all"||srcOf(p)===SH.show;
   function measureAll(){ SH.pts.forEach(p=>{ if(!isReal(p)) p.meas=truth(p,prng(p)); }); }
 
   /* ---------- real buildings (OpenStreetMap) and the path from the tower to each point ---------- */
@@ -9865,7 +9952,7 @@ init();
   const isTest=p=>SH.hold&&((Math.imul(p.id,2654435761)>>>0)%10)>=7;
   function calibrate(){
     if(planning()){ hint("Planning mode: the tower is not where these measurements were taken. Press “Back to the measured station” to calibrate."); return; }
-    const all=SH.pts.filter(p=>isFinite(p.meas)), rows=all.filter(p=>!isTest(p)); if(rows.length<4){ hint("Add at least 4 measurements (not counting test points) first, then calibrate."); return; }
+    const all=SH.pts.filter(p=>isFinite(p.meas)&&shown(p)), rows=all.filter(p=>!isTest(p)); if(rows.length<4){ hint("Add at least 4 measurements (not counting test points) first, then calibrate."); return; }
     const {full,cols}=fitCal(rows,p=>model(p,{}));
     SH.cal={b:full,cols,n:rows.length,nTest:all.length-rows.length}; render(); hint("Calibrated. The dots now compare the measurements with the corrected model."); }
   /* least squares: residual (measured − model) = offset + built·b + indoor·i + trend·log10(d km) */
@@ -9882,7 +9969,7 @@ init();
       if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<n;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; } }
     return M.map((r,i)=>r[n]/M[i][i]); }
   const rmsOn=(fn,set)=>set.length?Math.sqrt(set.reduce((s,p)=>s+(p.meas-fn(p))**2,0)/set.length):NaN;
-  function rms(fn){ return rmsOn(fn,SH.pts.filter(p=>isFinite(p.meas))); }
+  function rms(fn){ return rmsOn(fn,SH.pts.filter(p=>isFinite(p.meas)&&shown(p))); }
   const hint=t=>{ $("shHint").textContent=t; };
 
   /* ---------- map: tiles, pan, zoom ---------- */
@@ -9929,9 +10016,9 @@ init();
         c.setLineDash([6,4]); c.beginPath(); c.moveTo(tX,tY); c.lineTo(tX+Math.cos(b)*rr*1.1,tY+Math.sin(b)*rr*1.1); c.stroke(); c.setLineDash([]);
         label(c,`${a[1].split(",")[0]} → ${SH.az}°`,tX+Math.cos(b)*rr*1.02+6,tY+Math.sin(b)*rr*1.02+14); } }
     const plan=planning();
-    SH.pts.forEach((p,i)=>{ const [x,y]=P(p.lon,p.lat), d=isFinite(p.meas)?p.meas-pred(p):NaN, st=isFinite(d)?status(d):"w", r=p.sensor?9:7;
+    SH.pts.forEach((p,i)=>{ if(!shown(p)){ p._x=p._y=-1e9; return; } const [x,y]=P(p.lon,p.lat), d=isFinite(p.meas)?p.meas-pred(p):NaN, st=isFinite(d)?status(d):"w", r=p.sensor?9:7;
       c.lineWidth=i===SH.sel?3.5:2; c.strokeStyle=i===SH.sel?"#102C40":"#fff"; c.fillStyle=plan&&isReal(p)?"#8A99A8":COL[st];
-      c.beginPath(); if(p.sensor) c.rect(x-r,y-r,2*r,2*r); else c.arc(x,y,r,0,7); c.fill(); c.stroke();
+      c.beginPath(); if(p.sensor) c.rect(x-r,y-r,2*r,2*r); else if(srcOf(p)==="phone"){ c.moveTo(x,y-r-1.5); c.lineTo(x+r+1.5,y); c.lineTo(x,y+r+1.5); c.lineTo(x-r-1.5,y); c.closePath(); } else c.arc(x,y,r,0,7); c.fill(); c.stroke();
       if(p.sensor){ c.strokeStyle="#CDF23A"; c.lineWidth=2; c.strokeRect(x-r-3,y-r-3,2*r+6,2*r+6); label(c,`${p.name.split(" · ")[0]} · ${fmtDist(hav(T,p))}`,x+14,y+4); }
       else if(i===SH.sel||SH.view.z>=17.5) label(c,fmtDist(hav(T,p)),x+10,y+4);
       p._x=x; p._y=y; });
@@ -10008,7 +10095,7 @@ init();
     $("shPtB").addEventListener("change",e=>{ p.manB=pick(e.target.value); if(p.manB!=null) p.built=p.manB; changed(); });
     $("shPtI").addEventListener("change",e=>{ p.manI=pick(e.target.value); if(p.manI!=null) p.indoor=p.manI; changed(); });
     $("shPtDel").addEventListener("click",()=>{ SH.pts.splice(SH.sel,1); SH.sel=-1; render(); sensors(); }); }
-  function renderErr(){ const all=SH.pts.filter(p=>isFinite(p.meas)), tr=all.filter(p=>!isTest(p)), te=all.filter(isTest), plan=planning();
+  function renderErr(){ const all=SH.pts.filter(p=>isFinite(p.meas)&&shown(p)), tr=all.filter(p=>!isTest(p)), te=all.filter(isTest), plan=planning();
     $("shPlan").hidden=!plan;
     const before=rmsOn(rawModel,tr), after=SH.cal?rmsOn(predBase,tr):NaN, tb=rmsOn(rawModel,te), ta=SH.cal?rmsOn(predBase,te):NaN;
     const cls=v=>!isFinite(v)?"info":v<3?"good":v<6?"warn":"bad";
@@ -10026,7 +10113,7 @@ init();
   function renderResults(){ const el=$("shRes"); if(!el) return; const R=SH.results;
     $("shResExp").disabled=!R.length; $("shResClr").disabled=!R.length;
     el.innerHTML=R.length?`<div class="tablewrap"><table class="fs sh-restab"><tr><th>#</th><th>Points</th><th>Before</th><th>After</th><th>Test</th><th>Offset</th><th>Bldg</th><th>Indoor</th><th>Trend</th></tr>${R.map((r,i)=>`<tr><td>${i+1}</td><td class="num">${r.n}${r.nTest?"+"+r.nTest:""}</td><td class="num">±${fx(r.before)}</td><td class="num">±${fx(r.after)}</td><td class="num">${isFinite(r.testAfter)?"±"+fx(r.testAfter):"—"}</td><td class="num">${fx(r.b[0])}</td><td class="num">${fx(r.b[1])}</td><td class="num">${fx(r.b[2])}</td><td class="num">${fx(r.b[3])}</td></tr>`).join("")}</table></div>`:""; }
-  function saveResult(){ const c=SH.cal; if(!c) return; const all=SH.pts.filter(p=>isFinite(p.meas)), tr=all.filter(p=>!isTest(p)), te=all.filter(isTest);
+  function saveResult(){ const c=SH.cal; if(!c) return; const all=SH.pts.filter(p=>isFinite(p.meas)&&shown(p)), tr=all.filter(p=>!isTest(p)), te=all.filter(isTest);
     SH.results.push({at:new Date().toISOString(),station:tx().name,f:SH.f,n:c.n,nTest:c.nTest,before:rmsOn(rawModel,tr),after:rmsOn(predBase,tr),testBefore:rmsOn(rawModel,te),testAfter:c.nTest?rmsOn(predBase,te):NaN,b:c.b.slice(),buildings:SH.bld.list.length});
     try{ localStorage.setItem("gwlab-shadow-results",JSON.stringify(SH.results)); }catch(e){} renderResults(); hint(`Result ${SH.results.length} saved. Export results to get them all as a CSV file.`); }
   function exportResults(){ const f=v=>isFinite(v)?v.toFixed(2):"";
@@ -10034,7 +10121,7 @@ init();
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-calibration-results.csv"; document.body.appendChild(a); a.click(); a.remove(); }
   function scatter(){ const cv=$("shScatter"); if(!cv||cv.offsetParent===null) return; const W=cv.clientWidth,H=cv.clientHeight,dpr=window.devicePixelRatio||1; cv.width=W*dpr; cv.height=H*dpr;
     const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
-    const rows=SH.pts.filter(p=>isFinite(p.meas)); if(!rows.length) return;
+    const rows=SH.pts.filter(p=>isFinite(p.meas)&&shown(p)); if(!rows.length) return;
     const all=rows.flatMap(p=>[p.meas,rawModel(p),SH.cal?predBase(p):p.meas]); let lo=Math.floor(Math.min(...all)/10)*10, hi=Math.ceil(Math.max(...all)/10)*10; if(hi-lo<20) hi=lo+20;
     const L=46,R=8,T=8,B=30, sx=v=>L+(v-lo)/(hi-lo)*(W-L-R), sy=v=>H-B-(v-lo)/(hi-lo)*(H-T-B);
     c.strokeStyle=cssVar("--line"); c.fillStyle=cssVar("--muted"); c.font="11px "+cssVar("--font-mono"); c.lineWidth=1;
@@ -10050,7 +10137,7 @@ init();
       $("shPowL").textContent=SH.pRef==="tx"?"Transmitter power":"Power (ERP)"; $("shSensF").hidden=SH.band==="fm"||SH.band==="tv"; if(document.activeElement!==$("shSens")) $("shSens").value=SH.sens;
       $("shAntNote").textContent=`Gain ${a[2]} dBd (${(a[2]+2.15).toFixed(1)} dBi) · ${dir?`beam ${a[3]}° wide, front-to-back ${a[4]} dB`:"same in every direction"} · ERP ${powText(e)} (${(10*Math.log10(e*1e6)).toFixed(1)} dBm)${SH.pRef==="erp"?" · gain is already inside the ERP":""}.`; }
     $("shTxHeight").innerHTML=hLine(SH.gTx,T.h,"Station"); }
-  function sortRows(){ const s=SH.sort, idx=SH.pts.map((p,i)=>i); if(!s) return idx;
+  function sortRows(){ const s=SH.sort, idx=SH.pts.map((p,i)=>i).filter(i=>shown(SH.pts[i])); if(!s) return idx;
     const val={name:i=>SH.pts[i].name,dist:i=>hav(tx(),SH.pts[i]),diff:i=>Math.abs(SH.pts[i].meas-pred(SH.pts[i]))}[s.k];
     return idx.sort((a,b)=>{ const x=val(a),y=val(b); return (x>y?1:x<y?-1:0)*s.dir; }); }
   function renderTable(){ const th=(k,t)=>{ const s=SH.sort&&SH.sort.k===k?(SH.sort.dir>0?"ascending":"descending"):"none"; return `<th aria-sort="${s}"><button type="button" data-sort="${k}">${t}</button></th>`; };
@@ -10064,7 +10151,7 @@ init();
     const a=predBase(ref), b=pred(ref);
     const notes={mast:"A taller mast lifts the antenna above more obstacles.",power:"Double the power adds 3 dB everywhere.",humid:"Warm, humid air bends the waves further (super-refraction, k = 2).",indoor:"Walk-test receivers move indoors; ITU-R P.2109 adds the median building entry loss.",rain:SH.f<1000?"Below 1 GHz rain costs almost nothing. Switch the service to 5G 3.5 GHz, or think of 28 GHz mmWave, where a tropical storm costs about 10 dB per km (ITU-R P.838).":"Rain loss from ITU-R P.838 at 100 mm/h."};
     $("shWhatNote").innerHTML=`At ${esc(ref.name)}: <b>${fx(a)} → ${fx(b)} dBµV/m</b> (${b-a>=0?"+":""}${fx(b-a)} dB). `+on.map(k=>notes[k]).join(" "); }
-  function renderSteps(){ const n=SH.pts.filter(p=>isFinite(p.meas)).length, done=[!!SH.site, n>=4, !!SH.cal, Object.values(SH.what).some(Boolean)];
+  function renderSteps(){ const n=SH.pts.filter(p=>isFinite(p.meas)&&shown(p)).length, done=[!!SH.site, n>=4, !!SH.cal, Object.values(SH.what).some(Boolean)];
     const now=done.indexOf(false); document.querySelectorAll("#shSteps li").forEach((li,i)=>{ li.classList.toggle("done",done[i]); li.classList.toggle("now",i===now); }); }
   function renderMods(){ const L=[["Ground wave, LF/MF","live"],["HF sky wave","live"],["VHF/UHF terrain (this demo)","live"],["Cellular 4G/5G","live"],["Indoor + outdoor (P.2109)","pilot"],["5G/6G WSN and IoT","pilot"],["5G/6G urban outdoor","future"],["Indoor environments","future"],["Built environment, smart campus","future"],["mmWave and sub-THz 6G","future"],["RIS and beamforming","future"],["Satellite and non-terrestrial","future"]];
     const T={live:"Live",pilot:"Pilot",future:"Future"}; $("shMods").innerHTML=L.map(([n,s])=>`<li class="${s}"><span>${n}</span><span class="tag">${T[s]}</span></li>`).join(""); }
@@ -10097,6 +10184,58 @@ init();
     return out; }
   function exportCSV(){ const lines=["name,lat,lon,ground_m,antenna_m,fixed,built,indoor,building_loss_dB,entry_loss_dB,model_dBuV_m,measured_dBuV_m,difference_dB"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,p.lat.toFixed(6),p.lon.toFixed(6),p.g==null?"":Math.round(p.g),p.h,p.sensor?1:0,p.built?1:0,p.indoor?1:0,p.ana?p.ana.Lb.toFixed(1):"",p.ana&&p.ana.indoor?p.ana.indoor.L.toFixed(1):"",fx(pred(p)),fx(p.meas),fx(p.meas-pred(p))].join(",")));
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-shadow.csv"; document.body.appendChild(a); a.click(); a.remove(); hint("Exported "+SH.pts.length+" readings as wisdom-shadow.csv."); }
+
+  /* ---------- phone measurements: logs from G-NetTrack, NetMonster, Network Cell Info or any CSV ----------
+     RSRP (one 15 kHz resource element) -> total power: + 10·log10(12·N_RB); received power -> field strength:
+     E = P + 20·log10(f MHz) + 77.2 − G. Averaging over 40 λ in linear power (Lee 1985, ITU-R SM.1708). */
+  const PH={head:[],rows:[],name:""};
+  const EARFCN=[[1,2110,0,0,599],[3,1805,1200,1200,1949],[5,869,2400,2400,2649],[7,2620,2750,2750,3449],[8,925,3450,3450,3799],[20,791,6150,6150,6449],[28,758,9210,9210,9659],[38,2570,37750,37750,38249],[40,2300,38650,38650,39649],[41,2496,39650,39650,41589]];
+  const earfcnF=n=>{ const b=EARFCN.find(x=>n>=x[3]&&n<=x[4]); return b?{band:b[0],f:+(b[1]+0.1*(n-b[2])).toFixed(1)}:null; };
+  function phParse(text,name){ const L=text.replace(/^\uFEFF/,"").split(/\r?\n/).filter(l=>l.trim()); if(L.length<2) return false;
+    const d=["\t",";",","].map(c=>[c,L.slice(0,6).map(l=>l.split(c).length)]).filter(([c,n])=>n[0]>2).sort((a,b)=>b[1][0]-a[1][0])[0]; if(!d) return false;
+    const split=l=>l.split(d[0]).map(x=>x.trim().replace(/^"|"$/g,""));
+    let hi=L.findIndex(l=>/lat/i.test(l)&&/lon|lng/i.test(l)); const head=hi>=0?split(L[hi]):split(L[0]).map((_,i)=>"Column "+(i+1)); if(hi<0) hi=-1;
+    PH.head=head; PH.rows=L.slice(hi+1).map(split).filter(r=>r.length>=Math.min(3,head.length)); PH.name=name; return PH.rows.length>0; }
+  function phGuess(list){ const n=PH.head.map(h=>h.toLowerCase().replace(/[^a-z0-9]/g,"")); for(const w of list){ const i=n.findIndex(x=>x===w); if(i>=0) return i; } for(const w of list){ const i=n.findIndex(x=>x.includes(w)); if(i>=0) return i; } return -1; }
+  function phSetup(){ const opt=(none)=>(none?`<option value="-1">(none)</option>`:"")+PH.head.map((h,i)=>`<option value="${i}">${esc(h)}</option>`).join("");
+    const set=(id,list,none)=>{ $(id).innerHTML=opt(none); $(id).value=String(phGuess(list)); if($(id).value==="") $(id).value=none?"-1":"0"; };
+    set("shPhLat",["latitude","lat"]); set("shPhLon",["longitude","lon","lng","long"]);
+    set("shPhSig",["rsrp","ltersrp","ssrsrp","level","signalstrength","signal","dbm","rssi"]);
+    set("shPhCellC",["cellid","cid","ci","eci","cgi","pci","psc","node","enb"],true); set("shPhChC",["earfcn","dlearfcn","arfcn","uarfcn","channel"],true);
+    const sh=PH.head[+$("shPhSig").value]||""; $("shPhType").value=/rssi/i.test(sh)&&!/rsrp|level/i.test(sh)?"rssi":"rsrp";
+    phCells(true); $("shPhCfg").hidden=false; phPreview(); }
+  function phRaw(){ const la=+$("shPhLat").value, lo=+$("shPhLon").value, sg=+$("shPhSig").value, ce=+$("shPhCellC").value, ch=+$("shPhChC").value, out=[];
+    PH.rows.forEach(r=>{ const lat=parseFloat(r[la]), lon=parseFloat(r[lo]), v=parseFloat(r[sg]); if(!isFinite(lat)||!isFinite(lon)||!isFinite(v)||(!lat&&!lon)||Math.abs(lat)>90||Math.abs(lon)>180||v<-160||v>-10) return;
+      out.push({lat,lon,v,cell:ce>=0?(r[ce]||"?"):"all",ch:ch>=0?parseFloat(r[ch]):NaN}); }); return out; }
+  function phCells(auto){ const raw=phRaw(), m=new Map(); raw.forEach(x=>{ const k=x.cell; if(!m.has(k)) m.set(k,{n:0,s:0,ch:x.ch}); const c=m.get(k); c.n++; c.s+=x.v; });
+    const list=[...m.entries()].sort((a,b)=>b[1].n-a[1].n); const keep=$("shPhCell").value;
+    $("shPhCell").innerHTML=(list.length>1?`<option value="*">All cells (${raw.length} readings)</option>`:"")+list.map(([k,c])=>`<option value="${esc(k)}">${k==="all"?"All readings":"Cell "+esc(k)} · ${c.n} readings · mean ${(c.s/c.n).toFixed(0)} dBm</option>`).join("");
+    if(!auto&&[...$("shPhCell").options].some(o=>o.value===keep)) $("shPhCell").value=keep; else if(list.length) $("shPhCell").value=list[0][0];
+    phFreq(); }
+  function phFreq(){ const raw=phRaw().filter(x=>$("shPhCell").value==="*"||x.cell===$("shPhCell").value), ch=raw.map(x=>x.ch).filter(isFinite), e=ch.length?earfcnF(ch[0]):null;
+    if(e){ $("shPhF").value=e.f; PH.band=e.band; } else { if(!$("shPhF").value) $("shPhF").value=SH.f>=600?SH.f:1800; PH.band=null; } }
+  function phPoints(){ const sel=$("shPhCell").value, raw=phRaw().filter(x=>sel==="*"||x.cell===sel), f=+$("shPhF").value||1800, rsrp=$("shPhType").value==="rsrp";
+    const nrb={5:25,10:50,15:75,20:100}[$("shPhBw").value]||50, G=+$("shPhG").value||0, add=(rsrp?10*Math.log10(12*nrb):0)+20*Math.log10(f)+77.2-G, lam=300/f, Lm=40*lam;
+    const pts=[]; if(!$("shPhAvg").checked){ raw.forEach(x=>pts.push({lat:x.lat,lon:x.lon,v:x.v,n:1,cell:x.cell})); }
+    else { let bin=[], dist=0, prev=null; const flush=()=>{ if(!bin.length) return; const pw=bin.reduce((s,x)=>s+Math.pow(10,x.v/10),0)/bin.length;
+        pts.push({lat:bin.reduce((s,x)=>s+x.lat,0)/bin.length,lon:bin.reduce((s,x)=>s+x.lon,0)/bin.length,v:10*Math.log10(pw),n:bin.length,cell:bin[0].cell}); bin=[]; dist=0; };
+      raw.forEach(x=>{ if(prev){ const dm=hav(prev,x)*1000; if(dm>Lm*3) flush(); else dist+=dm; } bin.push(x); prev=x; if(dist>=Lm||bin.length>=60) flush(); }); flush(); }
+    return {pts:pts.map(q=>({...q,E:q.v+add})),raw:raw.length,f,Lm,add}; }
+  function phPreview(){ const r=phPoints(), el=$("shPhPrev"); if(!r.pts.length){ el.textContent="No usable readings with these columns. Check the latitude, longitude and signal columns."; $("shPhAdd").disabled=true; return; }
+    $("shPhAdd").disabled=false; const v=r.pts.map(p=>p.v), E=r.pts.map(p=>p.E), mn=a=>Math.min(...a).toFixed(0), mx=a=>Math.max(...a).toFixed(0);
+    el.textContent=`${r.raw} readings → ${r.pts.length} points${$("shPhAvg").checked?` (averaged every ${r.Lm.toFixed(1)} m = 40 wavelengths at ${r.f} MHz)`:""}. Signal ${mn(v)} to ${mx(v)} dBm → ${mn(E)} to ${mx(E)} dBµV/m (conversion +${r.add.toFixed(1)} dB)${PH.band?` · 4G band ${PH.band} from the EARFCN`:""}.`;
+    $("shPhSum").textContent=`${PH.name}: ${PH.rows.length} lines, ${PH.head.length} columns. The columns were recognised automatically; change any that are wrong.`; }
+  function phAdd(){ const r=phPoints(); if(!r.pts.length) return; const T=tx();
+    if($("shPhRepl").checked){ SH.pts=SH.pts.filter(isReal); SH.walkInfo=null; }
+    const base=SH.pts.filter(p=>p.src==="phone").length;
+    r.pts.forEach((q,i)=>SH.pts.push({id:SH.nextId++,name:`Phone ${base+i+1}`,lat:q.lat,lon:q.lon,meas:+q.E.toFixed(2),rsrp:+q.v.toFixed(1),nAvg:q.n,cell:q.cell,h:1.5,sensor:false,src:"phone",g:null,autoFlag:true}));
+    if(Math.abs(SH.f-r.f)>0.5){ const k=BANDS.findIndex(b=>b[0]==="phone"), row=["phone",`Measured band · ${r.f} MHz`,r.f,0.2,0.22]; if(k>=0) BANDS[k]=row; else BANDS.push(row);
+      $("shBand").innerHTML=BANDS.map(b=>`<option value="${b[0]}">${b[1]}</option>`).join(""); setBand("phone"); SH.area=null; }
+    SH.ref={lat:T.lat,lon:T.lon,h:T.h}; SH.cal=null; SH.sel=-1; SH.show="all"; $("shShow").value="all"; SH.view=null;
+    analyseAll(); render(); heights(); sensors(); loadBuildings(false); $("shPhRef").hidden=$("shPhPow").hidden=$("shPhNext").hidden=false;
+    const far=Math.max(...r.pts.map(q=>hav(T,q)));
+    hint(`Added ${r.pts.length} phone points. ${far>30?"They are more than 30 km from the tower: place the tower on the real 4G site, then press “The tower is now in the right place”.":"Check that the tower is on the real 4G site, then press Calibrate."}`); }
+  function phLoad(f){ f.text().then(t=>{ if(!phParse(t,f.name)){ $("shPhCfg").hidden=false; $("shPhSum").textContent="This file could not be read as a table. Export the log as CSV or text and try again."; return; } phSetup(); }); }
 
   /* ---------- experiments with the MATLAB sensor model (software-in-the-loop) ----------
      1) export a pool of points with this page's own model values, 2) MATLAB adds known errors and sensor effects,
@@ -10146,7 +10285,7 @@ init();
 
   /* ---------- live link: /api/measure (MATLAB emulator now, SDR sensors later) ---------- */
   const LV={on:false,ch:"",since:0,after:0,timer:null,last:0,n:0,txKey:"",err:"",store:""};
-  const srcLabel=s=>s==="sdr"?"real sensor":"emulated · "+(s||"unknown");
+  const srcLabel=s=>s==="sdr"?"real sensor":s==="phone"?"phone":"emulated · "+(s||"unknown");
   function liveStat(){ const el=$("shLinkStat"), st=$("shLinkState"); if(!el) return;
     if(!LV.on){ st.className="pill info"; st.textContent="Not connected"; el.textContent=LV.err||""; return; }
     const live=SH.pts.filter(p=>p.src==="live"), age=LV.last?Math.round((Date.now()-LV.last)/1000):null;
@@ -10170,7 +10309,7 @@ init();
       if(!r.ok){ LV.err=j.error||("Server answered "+r.status); liveStat(); return; } LV.err="";
       if(j.tx) applyTx(j.tx); LV.store=j.store||"";
       const list=(j.readings||[]); if(j.cursor!==undefined) LV.after=j.cursor; if(list.length){ LV.since=Math.max(...list.map(x=>x.rt));
-        if($("shReplace").checked&&SH.pts.some(p=>p.src!=="live"&&p.src!=="csv")){ SH.pts=SH.pts.filter(p=>p.src==="live"||p.src==="csv"); SH.cal=null; SH.sel=-1; }
+        if($("shReplace").checked&&SH.pts.some(p=>!isReal(p))){ SH.pts=SH.pts.filter(isReal); SH.cal=null; SH.sel=-1; }
         const added=takeReadings(list); if(added&&!SH.view) SH.view=null; analyseAll(); render(); sensors(); if(SH.pts.some(p=>p.g==null)) heights(); }
     }catch(e){ LV.err="Cannot reach the live link (offline?)"; }
     liveStat(); }
@@ -10265,10 +10404,10 @@ init();
     const LKEY="gwlab-shadow-layouts", lays=()=>{ try{ return JSON.parse(localStorage.getItem(LKEY)||"{}")||{}; }catch(e){ return {}; } };
     const layList=()=>{ const L=lays(), k=Object.keys(L); $("shLay").innerHTML=k.length?k.map(n=>`<option>${esc(n)}</option>`).join(""):`<option value="">No saved layouts yet</option>`; $("shLayLoad").disabled=$("shLayDel").disabled=!k.length; };
     $("shLaySave").addEventListener("click",()=>{ const n=$("shLayName").value.trim(); if(!n){ $("shLayName").focus(); hint("Type a name for the layout first."); return; } const L=lays();
-      L[n]={site:{...tx()},band:SH.band,f:SH.f,P:SH.P,ant:SH.ant,az:SH.az,pRef:SH.pRef,sens:SH.sens,area:SH.area,view:SH.view,pts:SH.pts.map(p=>({name:p.name,lat:p.lat,lon:p.lon,h:p.h,floor:p.floor,sensor:p.sensor,src:p.src==="csv"?"csv":p.src==="walk"?"walk":"click",meas:p.src==="csv"?p.meas:undefined,manB:p.manB,manI:p.manI,built:p.built,indoor:p.indoor}))};
+      L[n]={site:{...tx()},band:SH.band,f:SH.f,P:SH.P,ant:SH.ant,az:SH.az,pRef:SH.pRef,sens:SH.sens,area:SH.area,view:SH.view,pts:SH.pts.map(p=>({name:p.name,lat:p.lat,lon:p.lon,h:p.h,floor:p.floor,sensor:p.sensor,src:p.src==="csv"||p.src==="phone"?p.src:p.src==="walk"?"walk":"click",meas:p.src==="csv"||p.src==="phone"?p.meas:undefined,manB:p.manB,manI:p.manI,built:p.built,indoor:p.indoor}))};
       try{ localStorage.setItem(LKEY,JSON.stringify(L)); }catch(e){ hint("Could not save in this browser."); return; } layList(); $("shLay").value=n; $("shLayName").value=""; hint(`Layout “${n}” saved in this browser.`); });
     $("shLayLoad").addEventListener("click",()=>{ const n=$("shLay").value, l=lays()[n]; if(!l) return;
-      SH.site={...l.site}; SH.band=l.band; SH.f=l.f; SH.P=l.P; SH.ant=l.ant||"omni"; SH.az=l.az??90; SH.pRef=l.pRef||"erp"; SH.sens=l.sens??-95; SH.area=l.area||null; SH.gTx=null; SH.cal=null; SH.sel=-1; SH.selB=null; SH.ref=l.pts.some(p=>p.src==="csv")?{lat:l.site.lat,lon:l.site.lon,h:l.site.h}:null;
+      SH.site={...l.site}; SH.band=l.band; SH.f=l.f; SH.P=l.P; SH.ant=l.ant||"omni"; SH.az=l.az??90; SH.pRef=l.pRef||"erp"; SH.sens=l.sens??-95; SH.area=l.area||null; SH.gTx=null; SH.cal=null; SH.sel=-1; SH.selB=null; SH.ref=l.pts.some(p=>p.src==="csv"||p.src==="phone")?{lat:l.site.lat,lon:l.site.lon,h:l.site.h}:null;
       SH.pts=l.pts.map(p=>({...p,id:SH.nextId++,g:null})); SH.view=l.view||null; analyseAll(); measureAll(); render(); heights(); feeds(); sensors(); loadBuildings(false); hint(`Layout “${n}” loaded.`); });
     $("shLayDel").addEventListener("click",async()=>{ const n=$("shLay").value; if(!n) return; if(!await confirmAction("Delete this layout?",`The saved layout “${n}” will be removed from this browser.`,"Delete layout")) return; const L=lays(); delete L[n]; try{ localStorage.setItem(LKEY,JSON.stringify(L)); }catch(e){} layList(); });
     layList();
@@ -10276,6 +10415,17 @@ init();
     document.querySelectorAll("#shWhat .chip").forEach(b=>b.addEventListener("click",()=>{ SH.what[b.dataset.w]=!SH.what[b.dataset.w]; render(); }));
     $("shSample").addEventListener("click",()=>{ SH.seed++; buildSample(); render(); heights(); hint("New sample walk test made around the station."); });
     $("shExport").addEventListener("click",exportCSV);
+    $("shPhFile").addEventListener("change",e=>{ const f=e.target.files[0]; if(f) phLoad(f); e.target.value=""; });
+    ["shPhLat","shPhLon","shPhSig","shPhCellC","shPhChC"].forEach(id=>$(id).addEventListener("change",()=>{ phCells(false); phPreview(); }));
+    $("shPhCell").addEventListener("change",()=>{ phFreq(); phPreview(); });
+    ["shPhType","shPhF","shPhBw","shPhG","shPhAvg"].forEach(id=>$(id).addEventListener("change",phPreview));
+    $("shPhAdd").addEventListener("click",phAdd);
+    $("shPhPow").addEventListener("click",()=>{ const ph=SH.pts.filter(p=>srcOf(p)==="phone"&&isFinite(p.meas)); if(!ph.length) return;
+      const d=ph.map(p=>p.meas-model(p,{})).sort((a,b)=>a-b), m=d[Math.floor(d.length/2)]; SH.P=clamp(SH.P*Math.pow(10,m/10),1e-9,1000); SH.powU=null; SH.cal=null; render();
+      hint(`Tower power estimated as ${powText(erpKW())} ERP (the median of ${ph.length} phone readings matches the model). Now press Calibrate: it finds what the model still gets wrong, such as buildings and the distance trend.`); });
+    $("shPhRef").addEventListener("click",()=>{ const T=tx(); SH.ref={lat:T.lat,lon:T.lon,h:T.h}; SH.cal=null; render(); hint("The phone readings now belong to the tower where it is now. Press Calibrate."); });
+    $("shShow").addEventListener("change",e=>{ SH.show=e.target.value; SH.cal=null; SH.sel=-1; render(); hint(SH.show==="all"?"Showing all readings.":"Showing only "+e.target.selectedOptions[0].text.toLowerCase()+" readings. Calibrate now fits only these."); });
+    $("shCh").addEventListener("input",e=>{ const x=$("shPhChEcho"); if(x) x.textContent=e.target.value.trim().toLowerCase()||"wisdom-lab1"; });
     $("shExpPlan").addEventListener("click",()=>expPlan().catch(e=>{ $("shExpStat").textContent="Could not export: "+e.message; }));
     $("shExpFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; const txt=await f.text(); e.target.value=""; $("shExpStat").textContent="Reading "+f.name+"…"; try{ await runExp(txt); }catch(x){ $("shExpStat").textContent="Could not run the experiments: "+x.message; } });
     $("shExpDl").addEventListener("click",expResults);
