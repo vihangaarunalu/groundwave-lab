@@ -273,3 +273,10 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
 - **Link budget table** in the Animation: Transmitter | Path | Receiver, then the fade margin and the standards used. The step-by-step equations are still one click away (**Equations**).
 - Numbers no longer wrap: the main unit is large and the second unit small, on the Map and in the readout.
 - On a VHF/UHF link the ionosphere is dimmed and unlabelled, and the Animation heading describes the link.
+
+## v10.5: mouse and antenna tilt in every propagation type
+
+- Scroll or pinch to zoom, drag to pan, and double-click to refit now work in Line of sight, Reflection, Refraction and Diffraction, not only in Ground & sky. The + / − and arrow keys also zoom and pan.
+- **Antenna tilt:** drag the gold dot on a transmitter or receiver beam. The beam is drawn ×4 so small angles are visible. The label shows the tilt, the gain toward the far end, and the best aim.
+  - The gain uses the antenna's vertical pattern, so the budget, readout and Map update live.
+- Drag the transmitter mast up or down to change its height. Drag the receiver sideways to change the distance, or up and down to change its height. The Map recalculates when you let go.
