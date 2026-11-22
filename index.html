@@ -293,7 +293,12 @@ select.mapbtn{width:auto;border-radius:var(--r-sm);font-size:13px}
 .mapresult{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px}
 @media (max-width:900px){.mapresult{grid-template-columns:1fr}}
 .verdict .big{font-family:var(--font-display);font-size:24px;font-weight:600;line-height:1.2}
-.verdict .val{font-family:var(--font-mono);font-size:30px}
+.verdict .val{font-family:var(--font-mono);font-size:clamp(22px,2.2vw,30px);line-height:1.2}
+.verdict .val .u1,.hud-val .u1{white-space:nowrap}
+.verdict .val .u2{font-size:.55em;color:var(--muted);white-space:nowrap}
+.hud-val .u2{font-size:.55em;opacity:.8;white-space:nowrap}
+.aimwarn{margin:6px 0 0;padding:8px 10px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 40%,var(--line));font-size:13.5px}
+.aimwarn .btn{margin-top:6px}
 #profile{height:200px}
 .mapresult .tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
 
@@ -413,7 +418,8 @@ dialog#helpDlg::backdrop{background:rgba(8,14,26,.55)}
 .hud-q{font-family:var(--font-display);font-weight:600;font-size:15px}
 .hud-d{font-size:12px;opacity:.85}
 .hud-val{font-size:22px;line-height:1.1}
-.hud-row{display:grid;grid-template-columns:62px 1fr 74px;gap:6px;align-items:center}
+.hud-row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.hud-row .mono{white-space:nowrap}
 .hud-k{display:flex;gap:5px;align-items:center}
 .hud-k i{width:9px;height:9px;border-radius:var(--r-xs);display:inline-block}
 .hud-bar{position:relative;height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:visible}
@@ -2098,7 +2104,20 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .linkmath pre{margin:0;font:12px/1.65 var(--font-mono);white-space:pre-wrap}
 .linkmath .ok{color:#CDF23A} .linkmath .w{color:#F0B43C} .linkmath .no{color:#ff6b5e}
 .linkmath .aim{margin-top:6px;font:600 12px var(--font-body);background:#F0B43C;color:#102C40;border:0;border-radius:6px;padding:5px 10px;cursor:pointer;min-height:30px}
-.linkmath.min pre,.linkmath.min .aim{display:none}
+.linkmath.min pre,.linkmath.min .aim,.linkmath.min .lmb{display:none}
+.linkmath:not(.eqv) pre,.linkmath.eqv .lmb{display:none}
+.lmtabs{display:flex;gap:4px}
+.linkmath h3 .lmtabs button[aria-pressed="true"]{background:rgba(205,242,58,.16);color:#CDF23A;border-color:rgba(205,242,58,.55)}
+.lmb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 14px;font:12px/1.45 var(--font-body)}
+.lmb h4{margin:0 0 2px;font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:#93a9ba}
+.lmb table{width:100%;border-collapse:collapse}
+.lmb td{padding:1px 0;vertical-align:baseline}
+.lmb td+td{text-align:right;font-family:var(--font-mono);white-space:nowrap;padding-left:8px}
+.lmb tr.tot td{border-top:1px solid rgba(236,244,252,.25);font-weight:600;padding-top:3px}
+.lmb .res{grid-column:1/-1;margin-top:6px;padding:6px 10px;border-radius:8px;font:600 13px var(--font-body);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.lmb .res.ok{background:rgba(205,242,58,.14)} .lmb .res.w{background:rgba(240,180,60,.16)} .lmb .res.no{background:rgba(255,107,94,.16)}
+.lmb .src{grid-column:1/-1;color:#93a9ba;font-size:11px}
+@media (max-width:760px){.lmb{grid-template-columns:1fr}}
 .stage.clean .linkmath{display:none}
 @media (max-width:760px){.linkmath{left:8px;right:8px;top:auto;bottom:8px;max-width:none}}
 
@@ -2449,7 +2468,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
 
 <!-- ======================= ANIMATION ======================= -->
 <section class="wrap" id="animation" role="tabpanel" aria-labelledby="tab-animation" hidden>
-  <div class="screenhead"><h2 class="th"><span class="ti ti-anim" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M32 54V30M26 54L32 30L38 54M28.5 44H35.5"/><path class="arc a1" d="M25 24a10 10 0 0 1 14 0"/><path class="arc a2" d="M20 18a17 17 0 0 1 24 0"/><path class="arc a3" d="M15 12a24 24 0 0 1 34 0"/><circle class="dot" cx="32" cy="28" r="2.6"/></svg></span>What the wave does</h2><p>The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere.</p></div>
+  <div class="screenhead"><h2 class="th"><span class="ti ti-anim" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M32 54V30M26 54L32 30L38 54M28.5 44H35.5"/><path class="arc a1" d="M25 24a10 10 0 0 1 14 0"/><path class="arc a2" d="M20 18a17 17 0 0 1 24 0"/><path class="arc a3" d="M15 12a24 24 0 0 1 34 0"/><circle class="dot" cx="32" cy="28" r="2.6"/></svg></span>What the wave does</h2><p id="animSub">The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere.</p></div>
   <section class="panel card stagebar">
         <div class="pseg" id="scSeg" role="group" aria-label="Propagation type"></div>
     <div class="row">
@@ -2495,7 +2514,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
           <button class="btn" id="fsPanels" type="button" aria-pressed="false" data-tiptext="Hide the readout and zoom buttons" data-kbd="H">Hide panels</button>
           <button class="btn" id="fsExit" type="button">Exit full screen</button>
         </div>
-        <aside class="linkmath" id="linkMath" hidden aria-label="The signal, step by step"><h3><span id="lmT">The signal, step by step</span><button type="button" id="lmMin" aria-expanded="true">Hide</button></h3><pre id="lmP"></pre><button class="aim" type="button" id="lmAim" hidden>Point the transmitter antenna at the receiver</button></aside>
+        <aside class="linkmath" id="linkMath" hidden aria-label="The signal, step by step"><h3><span id="lmT">Link budget</span><span class="lmtabs" role="group" aria-label="Show"><button type="button" id="lmTabB" aria-pressed="true">Budget</button><button type="button" id="lmTabE" aria-pressed="false">Equations</button><button type="button" id="lmMin" aria-expanded="true">Hide</button></span></h3><div class="lmb" id="lmB"></div><pre id="lmP"></pre><button class="aim" type="button" id="lmAim" hidden>Point the transmitter antenna at the receiver</button></aside>
         <div class="rxhud gs-only" id="rxHud" aria-live="polite">
           <div class="hud-top"><button class="ov-grip" type="button" aria-label="Move signal readout (drag, or use arrow keys)" title="Drag to move"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="3" cy="3" r="1.2"/><circle cx="9" cy="3" r="1.2"/><circle cx="3" cy="9" r="1.2"/><circle cx="9" cy="9" r="1.2"/><circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/></svg></button><span class="hud-q" id="hudQ">–</span><span class="mono hud-d" id="hudD">–</span></div>
           <div class="hud-val mono" id="hudT">–</div>
@@ -3954,7 +3973,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v10.3</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v10.4</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4697,6 +4716,8 @@ const ANT_TYPES={
 /* Bessel J1 by its integral form, for the dish aperture pattern */
 function besselJ1(x){ let s=0; const n=48; for(let i=0;i<n;i++){ const t=(i+0.5)*Math.PI/n; s+=Math.cos(t-x*Math.sin(t)); } return s/n; }
 function antBand(f){ return f<30?"lf":"vu"; }
+/* "41.8 dBµV/m · 25.5 dBµV" → main unit large, the second one small (never wraps mid-number) */
+function twoUnits(x){ const [a,b]=String(x).split(" · "); return b?`<span class="u1">${a}</span><span class="u2"> · ${b}</span>`:a; }
 function antDefault(type){ const T=ANT_TYPES[type], a={type}; (T?T.params:[]).forEach(q=>a[q.k]=q.def); return a; }
 function antFor(f){ return antDefault(f<30?"mono":"dip"); }
 const rad=d=>d*Math.PI/180;
@@ -5772,14 +5793,14 @@ function drawAnim(dt){
     c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2+pad); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1-pad); c.lineTo(x,y);} c.closePath(); c.fillStyle=g; c.fill();
     c.strokeStyle=`rgba(${rgb},${Math.min(0.9,a*1.4)})`; c.lineWidth=1; c.setLineDash([2,6]); c.lineDashOffset=-t/90; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,(h1+h2)/2); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); c.setLineDash([]); c.lineDashOffset=0; };
   const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); pill(c,txt,W-66,y,{align:"right",accent:rgb,size:11.5}); };
-  c.globalAlpha=fa("iono");
+  const ionoOff=!!AN.ovOn; c.globalAlpha=fa("iono")*(ionoOff?0.3:1);
   const dDens=clamp((io.I-0.08)/1.2,0,1)*(flareLevel(p)>0&&cosC>0?1+0.15*flareLevel(p):1);
   if(dDens>0.02) band(60,90,SC.D,clamp(dDens*0.7,0.08,0.8));
   band(100,120,SC.E,clamp(io.foE/4,0.12,0.55));
   band(io.hF-45,io.hF+45,SC.F,clamp(io.foF2/14,0.18,0.55));
   if(p.gstorm){ c.strokeStyle="rgba(90,255,170,.5)"; c.lineWidth=3; for(let k=0;k<3;k++){ c.beginPath(); for(let i=0;i<=40;i++){ const [x,y]=map((d0+span*(0.5+i/80))/RE,430+k*14+8*Math.sin(i/4+t/500+k)); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); } }
-  layerTag(`F2 layer · foF2 ${io.foF2.toFixed(1)} MHz`,io.hF,SC.F); layerTag(`E layer · foE ${io.foE.toFixed(1)} MHz`,110,SC.E);
-  if(dDens>0.02) layerTag(`D layer${flareLevel(p)>0&&cosC>0?" · "+FLARE[flareLevel(p)].name:""}`,75,SC.D);
+  if(!ionoOff){ layerTag(`F2 layer · foF2 ${io.foF2.toFixed(1)} MHz`,io.hF,SC.F); layerTag(`E layer · foE ${io.foE.toFixed(1)} MHz`,110,SC.E); }
+  if(dDens>0.02&&!ionoOff) layerTag(`D layer${flareLevel(p)>0&&cosC>0?" · "+FLARE[flareLevel(p)].name:""}`,75,SC.D);
   c.globalAlpha=1;
   // height axis (true km; the drawing exaggerates heights)
   { c.font="10.5px "+cssVar("--font-mono"); c.textAlign="left"; c.textBaseline="middle";
@@ -6061,8 +6082,16 @@ function drawLinkOverlay(c,o){ const {map,TR,tAlt,tEx,altScale,p,t,W,H,OV}=o, L=
       :[`E − E_min = ${E.toFixed(1)} − ${o.thrB.toFixed(1)} = ${M>=0?"+":""}${M.toFixed(1)} dB  (judged as a broadcast listener: ITU minimum)`,M>=6?"#CDF23A":M>=0?"#F0B43C":"#ff6b5e"]];
   if(sc==="refract") lines.splice(1,0,[`k = ${SCN.k<0?"duct":SCN.k.toFixed(2)} → effective earth radius ${SCN.k<0?"∞":Math.round(SCN.k*6371)} km  (P.453/P.834)`]);
   if(aimOff>20) lines.splice(1,0,[`⚠ the transmitter antenna points ${Math.round(aimOff)}° away from the receiver: G_t is only ${LB.Gt.toFixed(1)} dBi`,"#F0B43C"]);
+  { const bt=$("lmB"), d1=v=>Math.abs(v)<0.05?"0.0":(v>0?"+":"−")+Math.abs(v).toFixed(1), Prx=E-20*Math.log10(f)-77.2+LB.Gr-LB.Lr, cls=isLink?(M>=10?"ok":M>=0?"w":"no"):(M>=6?"ok":M>=0?"w":"no");
+    const tb=(h,rows)=>`<div><h4>${h}</h4><table>${rows.map(([k,v,t])=>`<tr${t?' class="tot"':""}><td>${k}</td><td>${v}</td></tr>`).join("")}</table></div>`;
+    const bh=tb("Transmitter",[["Power",`${LB.Ptx.toFixed(1)} dBm`],["Feeder loss",`${d1(-LB.Lf)} dB`],[`${an(LB.ta)} gain${aimOff>20?" ⚠":""}`,`${d1(LB.Gt)} dBi`],["EIRP",`${LB.eirp.toFixed(1)} dBm`,1]])
+      +tb("Path",[["Distance",`${fmtD(D/1000)} km`],["Free-space loss",`${d1(-G.Lfs)} dB`],[meth.includes("1812")?"Terrain (P.1812)":"Terrain (P.526)",`${d1(-LB.Lx)} dB`],...(sc==="tworay"&&G.refl?[["Ground reflection",`${d1(G.refl.FdB)} dB`]]:[]),...(sc==="refract"?[["k-factor",SCN.k<0?"duct":SCN.k.toFixed(2)]]:[]),["Field strength",`${E.toFixed(1)} dBµV/m`,1]])
+      +tb("Receiver",[[`${an(LB.ra)} gain`,`${d1(LB.Gr)} dBi`],["Cable loss",`${d1(-LB.Lr)} dB`],["Received level",`${Prx.toFixed(1)} dBm`,1],isLink?["Sensitivity",`${rxSens(MP.rx)} dBm`]:["Broadcast minimum",`${o.thrB.toFixed(1)} dBµV/m`]])
+      +`<div class="res ${cls}"><span>${isLink?"Fade margin":"Margin over the broadcast minimum"}: ${M>=0?"+":""}${M.toFixed(1)} dB</span><span>${isLink?(M>=10?"Good link":M>=0?"Marginal link":"No link"):(M>=6?"Good reception":M>=0?"Weak but usable":"No reliable reception")}</span></div>`
+      +`<div class="src">Free space ITU-R P.525 · terrain ${meth} · judged as ${isLink?"a link receiver":"a broadcast listener"}</div>`;
+    if(bt&&bt.dataset.h!==bh){ bt.innerHTML=bh; bt.dataset.h=bh; } }
   { const html=lines.map(([tx,cc])=>cc?`<span class="${cc==="#CDF23A"?"ok":cc==="#F0B43C"?"w":"no"}">${esc(tx)}</span>`:esc(tx)).join("\n"), pe=$("lmP");
-    if(pe&&pe.dataset.h!==html){ pe.innerHTML=html; pe.dataset.h=html; $("lmT").textContent=`The signal, step by step · ${{los:"line of sight",tworay:"reflection",refract:"refraction",knife:"diffraction"}[sc]}`; }
+    if(pe&&pe.dataset.h!==html){ pe.innerHTML=html; pe.dataset.h=html; $("lmT").textContent=`Link budget · ${{los:"line of sight",tworay:"reflection",refract:"refraction",knife:"diffraction"}[sc]}`; }
     const ab=$("lmAim"); if(ab) ab.hidden=!(aimOff>20); }
   AN.realG=G; AN.linkR=R; const k2=JSON.stringify([sc,Math.round(AN.rx*10),SCN.k,rxSens(MP.rx),MP.txH,MP.rx.h,MP.rx.ant,MP.tx.ant,MP.tx.tpo]); if(k2!==SCN.key){ SCN.key=k2; sceneTiles(); syncSceneInputs(); pickBadges(); } }
 function renderSkipCard(p,io,SG){
@@ -6114,9 +6143,9 @@ function updateMeter(p,io,thr,dt){
   const isCell=p.type==="cell", fmtV=v=>v===null?"—":isCell?`${dBuV2dBm(v,p.f).toFixed(0)} dBm`:fmtField(v,p.f);
   const dTxt=AN.rx<1?`${Math.round(AN.rx*1000)} m`:`${fmtD(AN.rx)} km`;
   $("hudQ").textContent=q; $("hudQ").style.color=cls.replace("var(--good)","#4cd68f").replace("var(--warn)","#f3b54a").replace("var(--bad)","#ff7a70").replace("var(--muted)","#a9b8c6");
-  $("hudD").innerHTML=`<svg class=ic aria-hidden=true><use href=#i-radio /></svg> ${dTxt}`; $("hudT").innerHTML=fmtV(tot);
+  $("hudD").innerHTML=`<svg class=ic aria-hidden=true><use href=#i-radio /></svg> ${dTxt}`; $("hudT").innerHTML=twoUnits(fmtV(tot));
   $("hbG").style.width=sc(g)+"%"; $("hbS").style.width=sc(s)+"%"; $("hbT").style.left=sc(thr)+"%"; $("hbT2").style.left=sc(thr)+"%";
-  $("hvG").textContent=fmtV(g); $("hvS").textContent=s===null?"none":fmtV(s); $("hvT").textContent=fmtV(thr);
+  const v1=v=>fmtV(v).split(" · ")[0]; $("hvG").textContent=v1(g); $("hvS").textContent=s===null?"none":v1(s); $("hvT").textContent=fmtV(thr);
   $("rxD2").textContent=dTxt;
   const hh=Math.floor(AN.hour)%24, mm=Math.floor((AN.hour%1)*60);
   $("clock").textContent=`${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
@@ -6481,6 +6510,10 @@ function bindScenes(){
   $("scRT").addEventListener("input",e=>{ MP.txH=+e.target.value; SCN.key=""; });
   $("scRR").addEventListener("input",e=>{ const rx=MP.rxs[SCN.src]; if(rx){ rx.h=+e.target.value; SCN.key=""; } });
   $("scToMap").addEventListener("click",()=>go("map"));
+  const lmView=v=>{ $("linkMath").classList.toggle("eqv",v==="eq"); $("lmTabB").setAttribute("aria-pressed",String(v!=="eq")); $("lmTabE").setAttribute("aria-pressed",String(v==="eq")); try{ localStorage.setItem("gw-lmview",v); }catch(e){} $("lmP").dataset.h=""; };
+  document.addEventListener("click",e=>{ if(!(e.target.closest&&e.target.closest("#mvAim"))) return; const a=MP.tx.ant; if(!a) return; delete a.manual; a.az=Math.round(bearing(MP.tx,MP.rx)); MP.res.clear(); updateMap(); });
+  $("lmTabB").addEventListener("click",()=>lmView("budget")); $("lmTabE").addEventListener("click",()=>lmView("eq"));
+  try{ if(localStorage.getItem("gw-lmview")==="eq") lmView("eq"); }catch(e){}
   $("lmMin").addEventListener("click",()=>{ const m=$("linkMath").classList.toggle("min"); $("lmMin").textContent=m?"Show":"Hide"; $("lmMin").setAttribute("aria-expanded",String(!m)); });
   $("lmAim").addEventListener("click",()=>$("scAimTx").click());
   /* full screen: the control bar fades away after 3.5 s without movement and comes back on any move, tap or key */
@@ -6492,7 +6525,7 @@ function bindScenes(){
   $("scRxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const a=antDefault(e.target.value); if(a.az!=null) a.az=Math.round(bearing(rx,MP.tx)); rx.ant=a; rx.aim=true; SCN.key=""; });
   $("scSens").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]||MP.rx; rx.sens=clamp(Math.round(+e.target.value)||-90,-130,-40); MP.res.clear(); updateMap(); SCN.key=""; });
   $("scJudge").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]||MP.rx; rx.judge=e.target.value; MP.res.clear(); updateMap(); SCN.key=""; });
-  $("scAimTx").addEventListener("click",()=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const f=baseModel().p.f; if(!MP.tx.ant||!ANT_TYPES[MP.tx.ant.type]||ANT_TYPES[MP.tx.ant.type].band!==antBand(f)) MP.tx.ant=antFor(f); if(MP.tx.ant.az!=null) MP.tx.ant.az=Math.round(bearing(MP.tx,rx)); MP.tx.aui=true; MP.res.clear(); updateMap(); SCN.key=""; });
+  $("scAimTx").addEventListener("click",()=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const f=baseModel().p.f; if(!MP.tx.ant||!ANT_TYPES[MP.tx.ant.type]||ANT_TYPES[MP.tx.ant.type].band!==antBand(f)) MP.tx.ant=antFor(f); if(MP.tx.ant.az!=null){ MP.tx.ant.az=Math.round(bearing(MP.tx,rx)); delete MP.tx.ant.manual; } MP.tx.aui=true; MP.res.clear(); updateMap(); SCN.key=""; });
   $("scRxPanel").addEventListener("click",()=>{ if(SCN.src>=0){ go("map"); setTimeout(()=>openAui("rx",SCN.src),200); } });
   $("scTxPanel").addEventListener("click",()=>{ go("map"); setTimeout(()=>openAui("tx",MP.ti),200); });
   const rng=(id,fn)=>$(id).addEventListener("input",e=>{ fn(+e.target.value); SCN.key=""; });
@@ -6525,7 +6558,7 @@ function animTick(now){
   const dt=clamp(now-AN.last,0,100); AN.last=now;
   if(currentTab!=="animation") return;
   if(AN.playing){ AN.t+=dt*AN.speed; if(AN.cycle){ AN.hour=(AN.hour+dt*AN.speed/1000*0.8)%24; $("hour").value=AN.hour; } }
-  try{ const ov=ovActive(); document.body.classList.toggle("an-scene",AN.scene!=="gs"&&!ov); if(AN.scene&&AN.scene!=="gs"&&!ov) drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
+  try{ const ov=ovActive(); if(AN.ovOn!==ov){ const sb=$("animSub"); if(sb) sb.textContent=ov?"The Map's link as a moving picture: the direct ray over the real terrain, with ground reflection, refraction and diffraction, and the full link budget.":"The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere."; } AN.ovOn=ov; if(ov&&txAutoAim(MP.rx)){ SCN.key=""; updateMap(); } document.body.classList.toggle("an-scene",AN.scene!=="gs"&&!ov); if(AN.scene&&AN.scene!=="gs"&&!ov) drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
   catch(e){ if(!AN.errShown){ AN.errShown=true; const el=$("animErr"); el.hidden=false; el.textContent="This model can't be animated: "+e.message+". Pick another model or change its settings."; console.error(e); } }
 }
 
@@ -7377,7 +7410,17 @@ function pathModel(){
 /* every broadcast station carries an antenna, so it can be aimed straight after a click */
 function ensureAnts(){ if(MP.layer!=="bcast") return; const f=baseModel().p.f;
   MP.txs.forEach(t=>{ const ft=t.f||f; if(!t.ant||!ANT_TYPES[t.ant.type]||ANT_TYPES[t.ant.type].band!==antBand(ft)) t.ant=antDefault(ft<30?"mono":"bays"); });
-  MP.relays.forEach(r=>{ if(!r.ant||!ANT_TYPES[r.ant.type]||ANT_TYPES[r.ant.type].band!=="vu") { r.ant=antDefault("panel"); r.ant.az=Math.round(bearing(relaySource(r),r)); } }); }
+  MP.relays.forEach(r=>{ if(!r.ant||!ANT_TYPES[r.ant.type]||ANT_TYPES[r.ant.type].band!=="vu") { r.ant=antDefault("panel"); r.ant.az=Math.round(bearing(relaySource(r),r)); } });
+  txAutoAim(); }
+/* a point-to-point antenna (or any directional antenna feeding a link receiver) is aimed at its receiver,
+   as link-planning tools do, until the user aims it by hand (beam handle or azimuth field) */
+const P2P_ANTS=["yagi","dish","corner"];
+function txAutoAim(rx){ const t=MP.tx, a=t&&t.ant; rx=rx||MP.rxs[MP.ai];
+  if(!a||a.az==null||a.manual||!rx||!ANT_TYPES[a.type]) return false;
+  if(!P2P_ANTS.includes(a.type)&&!rxJudgeLink(rx)) return false;
+  const az=Math.round(bearing(t,rx)); if(a.az===az) return false; a.az=az; MP.res.clear(); return true; }
+function txAimOff(rx){ const a=MP.tx&&MP.tx.ant; rx=rx||MP.rx; if(!a||a.az==null||!rx||!["yagi","lpda","panel","corner","dish"].includes(a.type)) return 0;
+  return Math.abs((((bearing(MP.tx,rx)-a.az)%360)+540)%360-180); }
 function setPoint(which,pt){
   if(pt.auto){ delete pt.auto; pt.autoName=true; }
   const mob=MP.layer==="mobile";
@@ -7433,8 +7476,9 @@ function renderActive(){
   const rows=(pr.servers||[]).map(a=>`<tr${isSv(a)?' class="srv"':""}><td>${a.relay?"Y"+(a.k+1)+" relay":"T"+(a.i+1)} · ${esc(a.tx.name)}</td><td class="mono">${a.skip&&!a.relay?"—":fmtD(a.dist||a.feed&&a.feed.dist||0)+" km"}</td><td class="mono">${a.skip?(a.relay?"not fed":`no ${TECH_LABEL[ct]||""}`):lvl(a.pred.t,a.pred)}</td><td>${a.skip?"":`<span class="pill ${a.pred.cls}">${esc(a.pred.verdict.split(" · ")[0])}</span>`}${isSv(a)?` <span class="srvmark">serving</span>`:""}</td></tr>`).join("");
   $("mapVerdict").innerHTML=`<p class="eyebrow" style="margin:0">Prediction at R${MP.ai+1} · ${esc(MP.rx.name)}${ct?` · ${TECH_LABEL[ct]} ${CT.name.split(" ").slice(1).join(" ")}`:""}</p>
     <div class="big" style="color:var(--${pr.cls})">${pr.verdict}${r.loading?' <span class="muted" style="font-size:13px;font-weight:500">(terrain loading…)</span>':""}</div>
-    <div class="val">${lvl(pr.t,pr)}${isCell?` <span class="muted" style="font-size:14px">${CT.meas}</span>`:""}</div>
+    <div class="val">${twoUnits(lvl(pr.t,pr))}${isCell?` <span class="muted" style="font-size:14px">${CT.meas}</span>`:""}</div>
     <p class="muted" style="font-size:14px">${svTxt} ${isCell?(sv&&sv.pred.cell?`Cell edge ${CT.thr} dBm · uplink margin ${sv.pred.cell.ulm.toFixed(0)} dB · this cell's radius ≈ ${fmtD(cellRange(sv.p).r)} km (phone at 1.5 m, ${MP.cov.env}${MP.cov.indoor?", indoors":""}).`:""):(pr.link?`Judged as a link receiver: ${pr.link.Pr.toFixed(1)} dBm at the receiver input against its ${pr.link.sens} dBm sensitivity (antenna ${pr.link.G.toFixed(1)} dBi, cable ${pr.link.loss} dB; ITU-R P.525).`:pr.ok?"":`Below the ${fmtField(pr.thr)} needed (broadcast minimum for a home listener). If this is a link receiver, open its Antenna settings and judge it as a link.`)} ${fmtF(sv?sv.p.f:p.f)}, ${fmtP(sv?sv.p.P:p.P)}${isCell?" EIRP":""}, ${phTxt}.${T&&MP.useTerrain&&T.loss>0.5&&(!sv||sv.i===MP.ti)?` Terrain costs about ${T.loss.toFixed(1)} dB.`:""}</p>
+    ${(off=>off>20&&!isCell?`<p class="aimwarn"><b>⚠ T${MP.ti+1}'s antenna points ${Math.round(off)}° away from R${MP.ai+1}</b>, so it sends ${antGainDbi(MP.tx.ant,bearing(MP.tx,MP.rx),0).toFixed(1)} dBi this way instead of its ${antGainDbi(MP.tx.ant,MP.tx.ant.az,0).toFixed(1)} dBi peak. <button class="btn sm" type="button" id="mvAim">Point T${MP.ti+1} at R${MP.ai+1}</button></p>`:"")(txAimOff(MP.rx))}
     ${(oi=>oi?`<p class="obline"><b>Main obstacle:</b> ${icn(oi.icon)} ${oi.kind} · ${esc(oi.name)} · ${oi.height} m · ${fmtD(oi.km)} km from T${MP.ti+1} · −${oi.loss.toFixed(1)} dB</p>`:"")(T&&MP.useTerrain?obstacleInfo(T,MP.tx,MP.rx):null)}
     ${MP.txs.length+MP.relays.length>1||pr.noServer?`<div class="tablewrap"><table class="fs srvtab"><tr><th>Transmitter</th><th>Distance</th><th>${isCell?CT.meas:"Field"}</th><th>Result</th></tr>${rows}</table></div>`:""}`;
   const tiles=[
@@ -8307,7 +8351,7 @@ function beamsOf(sel){
   if(MP.layer==="mobile"){ if((st.sector||"omni")==="omni") return [];
     return sectorAzs(st).map((az,k)=>({az,label:"S"+(k+1),name:`Sector ${k+1}`,set:v=>setSectorAz(st,k,v),col:TECH_COL[MP.cov.tech]||"#2f6fdf"})); }
   const a=st.ant; if(!a||a.az===undefined) return [];
-  return [{az:((a.az%360)+360)%360,label:"↻",name:"Beam direction",set:v=>{ a.az=((Math.round(v)%360)+360)%360; },col:sel.kind==="relay"?"#1d8a8a":"#d13b4f"}];
+  return [{az:((a.az%360)+360)%360,label:"↻",name:"Beam direction",set:v=>{ a.az=((Math.round(v)%360)+360)%360; a.manual=true; },col:sel.kind==="relay"?"#1d8a8a":"#d13b4f"}];
 }
 function selStation(){ const s=MP.lastSel&&MP.lastSel.kind!=="rx"?MP.lastSel:{kind:"tx",i:MP.ti}; return stationOf(s)?s:null; }
 /* ---- quick settings beside the selected transmitter pin ---- */
@@ -8460,7 +8504,7 @@ function bindAntForm(root,getAnt,setAnt,f){
   root.querySelectorAll("[data-ak]").forEach(el=>{
     const h=()=>{ const k=el.dataset.ak; let a=getAnt();
       if(k==="type"){ a=antDefault(el.value); setAnt(a,true); return; }
-      a[k]=+el.value; const lab=root.querySelector(`label[for="${el.id}"] .v`); if(lab) lab.textContent=el.value; setAnt(a,el.tagName==="SELECT"); };
+      a[k]=+el.value; if(k==="az") a.manual=true; const lab=root.querySelector(`label[for="${el.id}"] .v`); if(lab) lab.textContent=el.value; setAnt(a,el.tagName==="SELECT"); };
     el.addEventListener(el.tagName==="SELECT"?"change":"input",h); });
 }
 /* the physical antenna, drawn as a labelled sketch, with one line on how it works */
