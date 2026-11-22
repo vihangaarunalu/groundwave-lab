@@ -2543,7 +2543,8 @@ body:not(.an-scene) #animation .sc-only{display:none}
         <span><i class="k-fade"></i>Fading zone</span>
       </div>
       <p class="hint sc-only">Drag a mast up or down to change its height, drag the hilltop, or drag along the chart to move the receiver. Heights are exaggerated so you can see them.</p>
-      <p class="hint gs-only">Scroll or pinch to zoom, drag to pan. Heights are exaggerated (the axis on the left shows true kilometres) and wave tilt is drawn ×3 so you can see them. Choose 0–3000 km to see long skip distances.</p>
+      <p class="hint" id="ovHint" hidden>Link view: drag the <b>gold dot</b> on a beam to tilt the antenna, drag the transmitter mast up or down to change its height, and drag the receiver sideways (distance) or up and down (height).</p>
+      <p class="hint gs-only">Scroll or pinch to zoom, drag to pan (or + − and the arrow keys), double-click to reset. Heights are exaggerated (the axis on the left shows true kilometres) and wave tilt is drawn ×3 so you can see them. Choose 0–3000 km to see long skip distances.</p>
     </div>
 
     <aside class="stack">
@@ -3973,7 +3974,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v10.4</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v10.5</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -5712,22 +5713,44 @@ function bindAnim(){
   document.addEventListener("keydown",e=>{ if(currentTab!=="animation"||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
     if(e.key==="f"||e.key==="F"){ e.preventDefault(); toggleFull(); }
     if(e.key==="Escape"&&stage.classList.contains("is-expanded")){ stage.classList.remove("is-expanded"); setFullIcon(); }
-    if(e.key===" "&&document.activeElement===document.body){ e.preventDefault(); setPlaying(!AN.playing); } });
+    if(e.key===" "&&document.activeElement===document.body){ e.preventDefault(); setPlaying(!AN.playing); }
+    const free=document.activeElement===document.body||document.activeElement===anim||(stage.contains(document.activeElement)&&document.activeElement.tagName!=="BUTTON");
+    if(free&&!(AN.scene&&AN.scene!=="gs"&&!AN.ovOn)){ if(e.key==="+"||e.key==="="){ e.preventDefault(); zoomAt(0.8); } else if(e.key==="-"||e.key==="_"){ e.preventDefault(); zoomAt(1.25); }
+      else if(e.key==="ArrowLeft"||e.key==="ArrowRight"){ e.preventDefault(); const sp=AN.view.span; AN.view.d0=clamp(AN.view.d0+(e.key==="ArrowLeft"?-0.1:0.1)*sp,-sp*0.1,4000-sp*0.3); syncRx(); } } });
   $("aZoomIn").onclick=()=>zoomAt(0.6); $("aZoomOut").onclick=()=>zoomAt(1/0.6); $("aReset").onclick=resetView;
-  anim.addEventListener("wheel",e=>{ if(AN.scene&&AN.scene!=="gs") return; e.preventDefault(); const r=anim.getBoundingClientRect(); zoomAt(e.deltaY<0?0.8:1.25,e.clientX-r.left); },{passive:false});
+  const sceneMode=()=>AN.scene&&AN.scene!=="gs"&&!AN.ovOn;
+  anim.addEventListener("wheel",e=>{ if(sceneMode()) return; e.preventDefault(); const r=anim.getBoundingClientRect(); zoomAt(e.deltaY<0?0.8:1.25,e.clientX-r.left); },{passive:false});
   const pos=e=>{ const r=anim.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
   const dAtX=(x,y)=>{ const g=AN.geom; const a=Math.atan2(x-g.cx,g.cy-y); return AN.view.d0+(a+g.Tv/2)/g.Tv*AN.view.span; };
-  anim.addEventListener("pointerdown",e=>{ anim.setPointerCapture(e.pointerId); const q=pos(e); if(AN.scene&&AN.scene!=="gs"){ sceneDown(q); return; } AN.ptrs.set(e.pointerId,q);
+  const ovHit=q=>{ const O=AN.ovOn&&AN.ovH; if(!O) return null; const nr=(p,r)=>p&&Math.hypot(q.x-p[0],q.y-p[1])<r;
+    if(nr(O.tx.tip,16)) return "tiltTx"; if(nr(O.rx.tip,16)) return "tiltRx"; if(nr(O.T0,20)) return "mastTx"; if(nr(O.R0,24)) return "rxPt"; return null; };
+  anim.addEventListener("dblclick",()=>{ if(sceneMode()) return; if(AN.ovOn){ AN.fitDone=null; fitLink(); } else resetView(); });
+  anim.addEventListener("pointerdown",e=>{ anim.setPointerCapture(e.pointerId); const q=pos(e); if(sceneMode()){ sceneDown(q); return; } AN.ptrs.set(e.pointerId,q);
+    if(AN.ptrs.size===1){ const hh=ovHit(q); if(hh){ const O=AN.ovH;
+      if(hh==="tiltTx"||hh==="tiltRx") AN.drag={mode:"tilt",h:hh==="tiltTx"?"tx":"rx"};
+      else if(hh==="mastTx") AN.drag={mode:"mastTx",y:q.y,h0:MP.txH};
+      else AN.drag={mode:"rxPt",x:q.x,y:q.y,h0:MP.rx.h,dir:null};
+      return; } }
     if(AN.ptrs.size===2){ const [a,b]=[...AN.ptrs.values()]; AN.drag={mode:"pinch",dist:Math.hypot(a.x-b.x,a.y-b.y),span:AN.view.span}; return; }
     const g=AN.geom; if(!g) return; const [rx,ry]=g.map(AN.rx/RE,0);
     if(Math.hypot(q.x-rx,q.y-ry+14)<34){ AN.drag={mode:"rx"}; } else AN.drag={mode:"pan",x:q.x,d0:AN.view.d0}; });
-  anim.addEventListener("pointermove",e=>{ const q=pos(e); if(AN.scene&&AN.scene!=="gs"){ sceneMove(q); return; } if(AN.ptrs.has(e.pointerId)) AN.ptrs.set(e.pointerId,q);
+  anim.addEventListener("pointermove",e=>{ const q=pos(e); if(sceneMode()){ sceneMove(q); return; } if(AN.ptrs.has(e.pointerId)) AN.ptrs.set(e.pointerId,q);
     const g=AN.geom; if(!g) return;
+    if(!AN.drag&&AN.ovOn){ const hh=ovHit(q); AN.hov=hh; anim.style.cursor=hh==="mastTx"?"ns-resize":hh?"grab":"move"; anim.title=hh==="mastTx"?"Drag up or down: transmitter mast height":hh==="rxPt"?"Drag sideways: distance · up or down: receiver mast height":hh?"Drag to tilt the antenna beam":""; return; }
+    if(AN.drag&&AN.ovOn&&AN.ovH){ const O=AN.ovH, d=AN.drag;
+      if(d.mode==="tilt"){ const h=O[d.h], a=h.a; if(!a) return; let off=Math.atan2(q.y-h.p[1],q.x-h.p[0])-h.dir; off=((off+Math.PI*3)%(Math.PI*2))-Math.PI;
+        const dEl=toDeg(off)/4*h.sgn; a.tilt=clamp(Math.round((-(h.el+dEl))*10)/10,-10,10); AN.tiltDirty=true; SCN.key=""; return; }
+      if(d.mode==="mastTx"){ MP.txH=clamp(Math.round(d.h0+(d.y-q.y)/Math.max(O.pxmT,0.5)),1,400); SCN.key=""; return; }
+      if(d.mode==="rxPt"){ if(!d.dir&&Math.hypot(q.x-d.x,q.y-d.y)>6) d.dir=Math.abs(q.y-d.y)>Math.abs(q.x-d.x)?"v":"h";
+        if(d.dir==="v"){ MP.rx.h=clamp(Math.round(d.h0+(d.y-q.y)/Math.max(O.pxmR,0.5)),1,300); SCN.key=""; }
+        else if(d.dir==="h"){ AN.rx=clamp(dAtX(q.x,q.y),0.05,4000); $("rxSlider").value=AN.rx; $("rxSlider2").value=AN.rx; AN.meterT=999; }
+        return; } }
     if(!AN.drag){ const [rx,ry]=g.map(AN.rx/RE,0); anim.style.cursor=Math.hypot(q.x-rx,q.y-ry+14)<34?"grab":"move"; return; }
     if(AN.drag.mode==="rx"){ AN.rx=clamp(dAtX(q.x,q.y),0.05,4000); $("rxSlider").value=AN.rx; $("rxSlider2").value=AN.rx; AN.scope=[]; AN.meterT=999; }
     else if(AN.drag.mode==="pan"){ const kmPerPx=AN.view.span/(g.x1-g.x0); AN.view.d0=clamp(AN.drag.d0-(q.x-AN.drag.x)*kmPerPx,-AN.view.span*0.1,4000-AN.view.span*0.3); }
     else if(AN.drag.mode==="pinch"&&AN.ptrs.size===2){ const [a,b]=[...AN.ptrs.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); const target=clamp(AN.drag.span*AN.drag.dist/Math.max(d,1),10,4000); zoomAt(target/AN.view.span,(a.x+b.x)/2); } });
-  const up=e=>{ SCN.drag=null; AN.ptrs.delete(e.pointerId); if(AN.ptrs.size===0){ AN.drag=null; syncRx(); } };
+  const up=e=>{ SCN.drag=null; AN.ptrs.delete(e.pointerId); if(AN.ptrs.size===0){ const d=AN.drag; AN.drag=null; syncRx();
+      if(d&&["tilt","mastTx","rxPt"].includes(d.mode)){ MP.res.clear(); updateMap(); } } };
   anim.addEventListener("pointerup",up); anim.addEventListener("pointercancel",up);
 }
 function mixCol(a,b,u){ const pa=a.match(/\w\w/g).map(h=>parseInt(h,16)), pb=b.match(/\w\w/g).map(h=>parseInt(h,16)); return "rgb("+pa.map((v,i)=>Math.round(v+(pb[i]-v)*u)).join(",")+")"; }
@@ -6023,7 +6046,7 @@ function linkAt(TR,f,Dkm){ const n=TR.d.length, Dmax=TR.d[n-1], D=clamp(Dkm,0.05
   (TR.b||[]).forEach(([bd,bh])=>{ if(bd>0.02&&bd<D-0.02) pts.push([bd,eAt(bd)+bh]); }); pts.sort((a,b)=>a[0]-b[0]);
   const R={T:{prof:{d:pts.map(q=>q[0]),h:pts.map(q=>q[1])},peakName:null},f,txH:MP.txH,rxH:MP.rx.h,P:null,rx:MP.rx,tx:MP.tx};
   const kk=AN.scene==="refract"?SCN.k:4/3; return {R,G:realGeom(R,kk),kk,eAt,D}; }
-function drawAntIcon(c,p0,p1,a){ const dir=Math.atan2(p1[1]-p0[1],p1[0]-p0[0]), ty=a?a.type:"dip", directional=["yagi","lpda","panel","corner","dish"].includes(ty);
+function drawAntIcon(c,p0,p1,a,off){ const dir=Math.atan2(p1[1]-p0[1],p1[0]-p0[0])+(off||0), ty=a?a.type:"dip", directional=["yagi","lpda","panel","corner","dish"].includes(ty);
   if(directional){ const bw=clamp(antBeamwidths(a).v||20,6,40), Lb=Math.min(160,Math.hypot(p1[0]-p0[0],p1[1]-p0[1])*0.3); c.fillStyle="rgba(98,206,255,.14)"; c.beginPath(); c.moveTo(p0[0],p0[1]);
     for(let k=-1;k<=1;k+=0.1){ const ang=dir+k*rad(bw)/2*1.2, rr=Lb*Math.pow(Math.cos(k*Math.PI/2),0.5); c.lineTo(p0[0]+Math.cos(ang)*rr,p0[1]+Math.sin(ang)*rr); } c.closePath(); c.fill(); }
   c.save(); c.translate(p0[0],p0[1]); c.rotate(directional?dir:0); c.strokeStyle="#eef1f5"; c.lineCap="round";
@@ -6061,7 +6084,16 @@ function drawLinkOverlay(c,o){ const {map,TR,tAlt,tEx,altScale,p,t,W,H,OV}=o, L=
   // masts at true height, antennas, receiver
   const mast=(dm,top,cc)=>{ const base=pt(dm,top-(dm===0?G.A-G.ph[0]:G.B-G.ph[G.n-1])), tp=pt(dm,top); c.strokeStyle="#eef1f5"; c.lineWidth=2.6; c.beginPath(); c.moveTo(base[0],base[1]); c.lineTo(tp[0],Math.min(tp[1],base[1]-6)); c.stroke(); c.fillStyle=cc; c.strokeStyle="#102C40"; c.lineWidth=2; c.beginPath(); c.arc(tp[0],Math.min(tp[1],base[1]-6),5.5,0,7); c.fill(); c.stroke(); return [tp[0],Math.min(tp[1],base[1]-6)]; };
   const T0=mast(0,G.A,"#d13b4f"), R0=mast(D,G.B,"#1f5fd1");
-  const LB=linkBudget(R,G); drawAntIcon(c,T0,R0,LB.ta); drawAntIcon(c,R0,T0,LB.ra||{type:"dip"});
+  const LB=linkBudget(R,G);
+  /* beam tilt, drawn ×4 so a few degrees are visible: a beam pointing above the receiver turns up on screen */
+  const TV=4, DIRA=["yagi","lpda","panel","corner","dish"], hp=(p0,p1,a,el,sgn)=>{ const dirn=DIRA.includes(a&&a.type); const dEl=-(a&&a.tilt||0)-el, off=dirn?sgn*rad(clamp(dEl*TV,-60,60)):0, dir=Math.atan2(p1[1]-p0[1],p1[0]-p0[0]); return {p:p0,dir,off,el,sgn,dirn,a,tip:dirn?[p0[0]+Math.cos(dir+off)*78,p0[1]+Math.sin(dir+off)*78]:null}; };
+  const hT=hp(T0,R0,LB.ta,LB.elT,-1), hR=hp(R0,T0,LB.ra,LB.elR,1);
+  drawAntIcon(c,T0,R0,LB.ta,hT.off); drawAntIcon(c,R0,T0,LB.ra||{type:"dip"},hR.off);
+  { const ppm=(dm,h)=>(pt(dm,h)[1]-pt(dm,h+100)[1])/100; AN.ovH={tx:hT,rx:hR,T0,R0,pxmT:ppm(0,G.A),pxmR:ppm(D,G.B)}; }
+  [hT,hR].forEach(h=>{ if(!h.tip) return; const act=AN.drag&&AN.drag.mode==="tilt"&&AN.drag.h===(h===hT?"tx":"rx"), hov=AN.hov===(h===hT?"tiltTx":"tiltRx");
+    c.strokeStyle="rgba(240,180,60,.8)"; c.lineWidth=1.2; c.setLineDash([3,4]); c.beginPath(); c.moveTo(h.p[0],h.p[1]); c.lineTo(h.tip[0],h.tip[1]); c.stroke(); c.setLineDash([]);
+    c.fillStyle=act||hov?"#F0B43C":"rgba(240,180,60,.85)"; c.strokeStyle="#102C40"; c.lineWidth=2; c.beginPath(); c.arc(h.tip[0],h.tip[1],act||hov?8:6,0,7); c.fill(); c.stroke();
+    if(act||hov){ const tl=h.a.tilt||0, gT=h===hT?LB.Gt:LB.Gr; pill(c,`Tilt ${Math.abs(tl).toFixed(1)}° ${tl>=0?"down":"up"} · ${gT.toFixed(1)} dBi toward ${h===hT?"RX":"TX"} · aim ${Math.abs(h.el).toFixed(1)}° ${h.el>0?"up":"down"} for the best`,h.tip[0],h.tip[1]-22,{size:11.5,accent:"240,180,60"}); } });
   // at the map's own receiver position, the terrain loss is the certified ITU-R P.1812 delta-Bullington result
   let meth="ITU-R P.526 J(ν), Deygout"; { const r=MP.res.get(MP.rx.id); if(r&&r.T&&isFinite(r.T.loss)&&r.P&&Math.abs(D/1000-r.P.dist)<0.3&&sc!=="refract"){ const dL=r.T.loss-LB.Lx; LB.Lx=r.T.loss; LB.Pr-=dL; LB.M-=dL; meth="ITU-R P.1812 delta-Bullington"; } }
   const aimOff=LB.ta&&["yagi","lpda","panel","corner","dish"].includes(LB.ta.type)&&LB.ta.az!=null?Math.abs((((bearing(MP.tx,MP.rx)-LB.ta.az)%360)+540)%360-180):0;
@@ -6091,7 +6123,8 @@ function drawLinkOverlay(c,o){ const {map,TR,tAlt,tEx,altScale,p,t,W,H,OV}=o, L=
       +`<div class="src">Free space ITU-R P.525 · terrain ${meth} · judged as ${isLink?"a link receiver":"a broadcast listener"}</div>`;
     if(bt&&bt.dataset.h!==bh){ bt.innerHTML=bh; bt.dataset.h=bh; } }
   { const html=lines.map(([tx,cc])=>cc?`<span class="${cc==="#CDF23A"?"ok":cc==="#F0B43C"?"w":"no"}">${esc(tx)}</span>`:esc(tx)).join("\n"), pe=$("lmP");
-    if(pe&&pe.dataset.h!==html){ pe.innerHTML=html; pe.dataset.h=html; $("lmT").textContent=`Link budget · ${{los:"line of sight",tworay:"reflection",refract:"refraction",knife:"diffraction"}[sc]}`; }
+    if(pe&&pe.dataset.h!==html){ pe.innerHTML=html; pe.dataset.h=html; }
+    { const tt=`Link budget · ${{los:"line of sight",tworay:"reflection",refract:"refraction",knife:"diffraction"}[sc]}`, te=$("lmT"); if(te&&te.textContent!==tt) te.textContent=tt; }
     const ab=$("lmAim"); if(ab) ab.hidden=!(aimOff>20); }
   AN.realG=G; AN.linkR=R; const k2=JSON.stringify([sc,Math.round(AN.rx*10),SCN.k,rxSens(MP.rx),MP.txH,MP.rx.h,MP.rx.ant,MP.tx.ant,MP.tx.tpo]); if(k2!==SCN.key){ SCN.key=k2; sceneTiles(); syncSceneInputs(); pickBadges(); } }
 function renderSkipCard(p,io,SG){
@@ -6558,7 +6591,7 @@ function animTick(now){
   const dt=clamp(now-AN.last,0,100); AN.last=now;
   if(currentTab!=="animation") return;
   if(AN.playing){ AN.t+=dt*AN.speed; if(AN.cycle){ AN.hour=(AN.hour+dt*AN.speed/1000*0.8)%24; $("hour").value=AN.hour; } }
-  try{ const ov=ovActive(); if(AN.ovOn!==ov){ const sb=$("animSub"); if(sb) sb.textContent=ov?"The Map's link as a moving picture: the direct ray over the real terrain, with ground reflection, refraction and diffraction, and the full link budget.":"The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere."; } AN.ovOn=ov; if(ov&&txAutoAim(MP.rx)){ SCN.key=""; updateMap(); } document.body.classList.toggle("an-scene",AN.scene!=="gs"&&!ov); if(AN.scene&&AN.scene!=="gs"&&!ov) drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
+  try{ const ov=ovActive(); if(AN.ovOn!==ov){ const sb=$("animSub"); { const oh=$("ovHint"); if(oh) oh.hidden=!ov; } if(sb) sb.textContent=ov?"The Map's link as a moving picture: the direct ray over the real terrain, with ground reflection, refraction and diffraction, and the full link budget.":"The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere."; } AN.ovOn=ov; if(ov&&txAutoAim(MP.rx)){ SCN.key=""; updateMap(); } document.body.classList.toggle("an-scene",AN.scene!=="gs"&&!ov); if(AN.scene&&AN.scene!=="gs"&&!ov) drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
   catch(e){ if(!AN.errShown){ AN.errShown=true; const el=$("animErr"); el.hidden=false; el.textContent="This model can't be animated: "+e.message+". Pick another model or change its settings."; console.error(e); } }
 }
 
