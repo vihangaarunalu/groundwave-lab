@@ -265,3 +265,11 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
 - The Map verdict, the Animation HUD and the maths panel use the same setting, so they always agree.
 - In full screen the propagation buttons are always in one row.
 - `index.html` is now served with `Cache-Control: no-cache`, so a new version shows at once.
+
+## v10.4: professional link view, part 1
+
+- **Automatic antenna aiming.** A Yagi, dish or corner antenna, or any directional antenna feeding a link receiver, now aims at its receiver automatically, as link-planning tools do. Aiming it by hand (beam handle or azimuth field) switches this off.
+  - The Map warns when a transmitter points away from the receiver and offers **Point T1 at R1**.
+- **Link budget table** in the Animation: Transmitter | Path | Receiver, then the fade margin and the standards used. The step-by-step equations are still one click away (**Equations**).
+- Numbers no longer wrap: the main unit is large and the second unit small, on the Map and in the readout.
+- On a VHF/UHF link the ionosphere is dimmed and unlabelled, and the Animation heading describes the link.
