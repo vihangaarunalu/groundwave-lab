@@ -294,6 +294,9 @@ select.mapbtn{width:auto;border-radius:var(--r-sm);font-size:13px}
 @media (max-width:900px){.mapresult{grid-template-columns:1fr}}
 .verdict .big{font-family:var(--font-display);font-size:24px;font-weight:600;line-height:1.2}
 .verdict .val{font-family:var(--font-mono);font-size:clamp(22px,2.2vw,30px);line-height:1.2}
+.vertab td,.vertab th{white-space:nowrap}
+.vertab td.num{text-align:right;font-family:var(--font-mono)}
+.vertab .ok{color:var(--good-ink);font-weight:600}.vertab .no{color:var(--bad-ink);font-weight:600}
 .chart-head .inl{font-size:13px;color:var(--muted);margin:0 6px 0 4px}
 #profK{width:auto;display:inline-block;min-height:34px;padding:4px 30px 4px 10px;font-size:13px}
 .verdict .val .u1,.hud-val .u1{white-space:nowrap}
@@ -1275,6 +1278,7 @@ footer{color:var(--muted)}
 
 @media (prefers-reduced-motion: reduce){.hero-cta:active{transform:none}}
 @media print{.hero{display:none!important}}
+@media print{body.print-verif #methods > *:not(#verif){display:none!important}body.print-verif #verif .btn{display:none!important}}
 .bandwrap{scroll-margin-top:var(--appbar-h,112px)}
 @media (max-width:760px){.bandwrap{scroll-margin-top:96px}}
 
@@ -3050,6 +3054,16 @@ body:not(.an-scene) #animation .sc-only{display:none}
 <!-- ======================= MODELS & EQUATIONS ======================= -->
 <section class="wrap" id="methods" role="tabpanel" aria-labelledby="tab-methods" hidden>
   <div class="intro"><div class="stack" style="gap:4px"><h2 class="th"><span class="ti ti-models" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M44 14H20L34 32L20 50H44"/><circle class="dot" cx="50" cy="50" r="2.6"/></svg></span>Models &amp; equations</h2><p>Every number in this app comes from the equations below. Pick a model to see the calculation step by step, which checks pass, and where the model stops being valid. Lecturers can use this to discuss accuracy and limitations.</p></div></div>
+  <section class="panel card" id="verif" aria-labelledby="verH">
+    <div class="chart-head"><h2 id="verH">Verification</h2><div class="row"><button class="btn primary" id="verRun" type="button">Run the ITU-R P.1812-6 check</button><button class="btn" id="verCsv" type="button" disabled>Download CSV</button><button class="btn" id="verPrint" type="button">Print</button></div></div>
+    <p class="hint">Is the arithmetic right? The site's own functions are run on cases with a known answer: closed-form references, and the 19 terrain profiles of the ITU-R P.1812-6 validation set with the results of the reference implementation approved by ITU-R Working Party 3K. This checks the implementation, not the accuracy of the models against real measurements (for that, see the Digital shadow).</p>
+    <div class="tiles" id="verSum"></div>
+    <h3 style="margin-top:14px">Closed-form reference checks</h3>
+    <div class="tablewrap"><table class="fs vertab" id="verA"></table></div>
+    <h3 style="margin-top:14px">ITU-R P.1812-6 validation profiles (p = 50 % time, 50 % locations)</h3>
+    <div class="tablewrap"><table class="fs vertab" id="verB"><tr><td class="muted">Press <b>Run the ITU-R P.1812-6 check</b>. It loads 19 terrain profiles (260 kB) and runs the site's P.1812 code on each.</td></tr></table></div>
+    <p class="muted" id="verSrc" style="font-size:12.5px;margin-top:8px"></p>
+  </section>
   <section class="panel card mxcalc" aria-labelledby="mxH">
     <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><div class="row"><button class="btn" type="button" data-eqed="latex">Equation editor</button><button class="btn" id="mxCopy" type="button">Copy steps</button><button class="btn" id="mxPrint" type="button"><svg class=ic aria-hidden=true><use href=#i-print /></svg> Print / PDF report</button></div></div>
     <div id="rptHead" class="rpthead"></div>
@@ -3982,7 +3996,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v10.6</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v10.7</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4181,7 +4195,7 @@ function norton(d,f,g){
   const p=Math.PI*d/(lam*x)*Math.cos(b);
   return {A:(2+0.3*p)/(2+p+0.6*p*p), p, x};
 }
-const kFac=p=>({sub:1.0,standard:4/3,super:2.0})[p.refr]||4/3;
+const kFac=p=>p.k>0?p.k:({sub:1.0,standard:4/3,super:2.0})[p.refr]||4/3;
 function critDist(f,p){ return 80/Math.cbrt(f)*Math.pow(kFac(p)/(4/3),2/3); }
 function curvLoss(d,f,p){ const dc=critDist(f,p); return d>dc ? 3.2*(d/dc-1) : 0; }
 /* ITU-R P.368 (GRWAVE method): exact Sommerfeld–Norton flat earth, Fock/Wait residue series for the curved earth */
@@ -4623,19 +4637,22 @@ function smoothSurface(di,hi,hts,hrs){ // P.1812 Attachment 1 §5.6
 function p1812(dkm,p,prof){
   const fG=p.f/1000, kf=kFac(p), ae=kf*6371, lam=0.3/fG, d=Math.max(dkm,0.25);
   let di,hi;
-  if(prof&&prof.d&&prof.d.length>2&&Math.abs(prof.d[prof.d.length-1]-d)<0.05*d+0.1){ di=prof.d; hi=prof.h; }
+  let ht=null; // bare terrain (no clutter): P.1812 §3.2 uses it for the smooth-earth surface and the horizon angles, and terrain + clutter for diffraction
+  if(prof&&prof.d&&prof.d.length>2&&Math.abs(prof.d[prof.d.length-1]-d)<0.05*d+0.1){ di=prof.d; hi=prof.h; if(prof.t&&prof.t.length===prof.h.length) ht=prof.t; }
   else { const n=41; di=Array.from({length:n},(_,i)=>d*i/(n-1)); hi=new Array(n).fill(0); }
+  ht=ht||hi;
   const n=di.length, hts=hi[0]+(p.htx||30), hrs=hi[n-1]+(p.hrx||10), om=p.seaFrac??(p.ground==="sea"||p.ground==="seaLow"?1:0), pol=p.pol||"v";
-  const dfs=Math.sqrt(d*d+((hts-hrs)/1000)**2), Lbfs=92.44+20*Math.log10(fG)+20*Math.log10(dfs);
-  const Ba=bullington(d,hi,di,hts,hrs,ae,lam), ss=smoothSurface(di,hi,hts,hrs);
+  const dfs=Math.sqrt(d*d+((hts-hrs)/1000)**2), Lbfs=92.4+20*Math.log10(fG)+20*Math.log10(dfs); // P.1812-6 Eq. (8)
+  const Ba=bullington(d,hi,di,hts,hrs,ae,lam), ss=smoothSurface(di,ht,hts,hrs);
   const htsp=hts-ss.hstd, hrsp=hrs-ss.hsrd, Bs=bullington(d,new Array(n).fill(0),di,htsp,hrsp,ae,lam);
   const Lsph=ldsph(d,htsp,hrsp,ae,fG,om,pol), Ld=Ba.L+Math.max(Lsph-Bs.L,0);
   // angular distance θ (mrad), Attachment 1 §5.1–5.5
-  let tmax=-Infinity, rmax=-Infinity; for(let i=1;i<n-1;i++){ tmax=Math.max(tmax,(hi[i]-hts)/di[i]-500*di[i]/ae); rmax=Math.max(rmax,(hi[i]-hrs)/(d-di[i])-500*(d-di[i])/ae); }
-  const ttd=(hrs-hts)/d-500*d/ae, trd=(hts-hrs)/d-500*d/ae, trans=tmax>ttd;
+  let tmax=-Infinity, rmax=-Infinity; const mr=x=>1000*Math.atan(x/1000); // P.1812-6 Eqs (77)-(82): elevation angles in mrad
+  for(let i=1;i<n-1;i++){ tmax=Math.max(tmax,mr((ht[i]-hts)/di[i]-500*di[i]/ae)); rmax=Math.max(rmax,mr((ht[i]-hrs)/(d-di[i])-500*(d-di[i])/ae)); }
+  const ttd=mr((hrs-hts)/d-500*d/ae), trd=mr((hts-hrs)/d-500*d/ae), trans=tmax>ttd;
   const th=(trans?tmax:ttd)+(trans?rmax:trd)+1000*d/ae;
   const fl=Math.log10(fG), Lf=25*fl-2.5*Math.log10(fG/2)**2, N0=p.N0??360;
-  const Ag=(fG>=1?gasSpecific(fG):0.005)*d, Lbs=190.1+Lf+20*Math.log10(d)+0.573*th-0.15*N0+0.051+Ag;
+  const Lbs=190.1+Lf+20*Math.log10(d)+0.573*th-0.15*N0; // P.1812-6 Eq. (44) at p = 50 %
   const Lbd=Lbfs+Ld, Lbc=-5*Math.log10(Math.pow(10,-0.2*Lbs)+Math.pow(10,-0.2*Lbd)), Lb50=Math.max(Lbfs,Lbc);
   return {Lbfs,Ld,Lbulla:Ba.L,Lbulls:Bs.L,Lsph,Lbs,Lbd,Lbc,Lb50,theta:th,trans,los:Ba.los,bp:Ba.bp,dfs,hstd:ss.hstd,hsrd:ss.hsrd,htsp,hrsp,N0};
 }
@@ -7532,7 +7549,8 @@ function renderActive(){
     ["Buildings on path",T?(T.osm?String(T.osm.buildings.length):(T.osmPending?"loading…":T.osmTried?"busy":"off")):"…",T&&T.osm&&T.osm.buildings.length?`tallest ${Math.round(Math.max(...T.osm.buildings.map(b=>b.h)))} m${T.osm.partial?" · within 8 km of each end":""}`:(T&&T.osm&&T.osm.partial?"checked within 8 km of each end":(T&&T.osmTried&&!T.osm?"OpenStreetMap servers busy; change a setting or wait a minute to retry":"OpenStreetMap")),"info"],
     ["Sun at midpoint",`${sunEl.toFixed(0)}°`,phTxt,ph==="day"?"info":ph==="dusk"?"warn":"bad"],
     ...(isCell?[["Cell edge",`${CT.thr} dBm`,`${CT.meas} · uplink ≤ ${CT.ul} dB`,"info"],["Typical real cell radius",`${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][0]}–${CT.real[MP.cov.env==="industrial"?"urban":MP.cov.env][1]} km`,`${CT.sys} · ${MP.cov.env}`,"info"]]
-      :[["Ground / sky wave",`${fmtField(pr.g,p.f)}`,`sky: ${pr.s===null?"none":fmtField(pr.s,p.f)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],["Needed",fmtField(pr.thr,p.f),pr.link?`link: ${pr.link.sens} dBm receiver, ${pr.link.G.toFixed(1)} dBi antenna`:"minimum usable (broadcast listener)","info"]])];
+      :[["Ground / sky wave",`${fmtField(pr.g,p.f)}`,`sky: ${pr.s===null?"none":fmtField(pr.s,p.f)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],["Needed",fmtField(pr.thr,p.f),pr.link?`link: ${pr.link.sens} dBm receiver, ${pr.link.G.toFixed(1)} dBi antenna`:"minimum usable (broadcast listener)","info"],...(p.f>=30&&isFinite(pr.t)?(()=>{ const ls=locStats(p), sg=ls.sig, base=pr.t-invQ(pLoc(p)/100)*sg, Eq=q=>base+invQ(q)*sg, m95=Eq(0.95)-pr.thr;
+        return [["Locations covered",`95 %: ${fmtField(Eq(0.95),p.f).split(" · ")[0]}`,`σL ${sg.toFixed(1)} dB (ITU-R P.1812) · 50 %: ${fmtField(Eq(0.5),p.f).split(" · ")[0]} · 90 %: ${fmtField(Eq(0.9),p.f).split(" · ")[0]} · 99 %: ${fmtField(Eq(0.99),p.f).split(" · ")[0]} · margin at 95 %: ${m95>=0?"+":"−"}${Math.abs(m95).toFixed(1)} dB`,m95>=0?"good":"warn"]]; })():[])])];
   $("tSum").innerHTML=`<span class="pill ${pr.cls}">${pr.verdict}</span><span class="mono">${lvl(pr.t,pr)}</span><span class="muted">${fmtD(P.dist)} km · ${T?(T.loss>0.05?"terrain −"+T.loss.toFixed(1)+" dB":"no terrain loss"):"terrain loading…"} · ${T?(T.los?"line of sight clear":"line of sight blocked"):""}</span>`;
   renderClearance(P,T,p);
   $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
@@ -8906,14 +8924,14 @@ function explainCalc(p,d){
     step(`Location margin for ${pl}% of locations`,"−I(pL/100)·σ   (I = inverse complementary normal, P.1812 Att. 2)",-invQ(pl/100)*ls.sig,"dB"); };
   const p1812Steps=(r,cl)=>{
     head("ITU-R P.1812 (p = 50% time)");
-    step("Free-space basic loss Lbfs","92.44 + 20·log f[GHz] + 20·log d_fs[km]",r.Lbfs,"dB");
+    step("Free-space basic loss Lbfs","92.4 + 20·log f[GHz] + 20·log d_fs[km]  (P.1812-6 Eq. 8)",r.Lbfs,"dB");
     step("Bullington loss, actual profile","Luc = J(ν_max or ν_b);  L_bull = Luc + (1 − e^(−Luc/6))·(10 + 0.02d)",r.Lbulla,"dB");
     step("Effective heights above smooth surface","h′ts = hts − hstd,  h′rs = hrs − hsrd",null,`${r.htsp.toFixed(1)} m / ${r.hrsp.toFixed(1)} m`);
     step("Spherical-earth loss Ldsph (P.526 first term)","F(X) + G(Yt) + G(Yr), X = 21.88β(f/a²)^⅓d, Y = 0.9575β(f²/a)^⅓h",r.Lsph,"dB");
     step("Bullington loss, smooth profile","same as above with all heights = 0",r.Lbulls,"dB");
     step("Delta-Bullington diffraction Ld","L_bulla + max(Ldsph − L_bulls, 0)",r.Ld,"dB");
     step("Angular distance θ","θt + θr + 1000·d/ae",r.theta,"mrad");
-    step("Troposcatter Lbs","190.1 + Lf + 20·log d + 0.573θ − 0.15N0 + Lc + Ag  (N0 = "+r.N0+")",r.Lbs,"dB");
+    step("Troposcatter Lbs","190.1 + Lf + 20·log d + 0.573θ − 0.15N0  (P.1812-6 Eq. 44, p = 50 %; N0 = "+r.N0+")",r.Lbs,"dB");
     step("Combined median loss Lb50","max(Lbfs, −5·log(10^(−0.2Lbs) + 10^(−0.2(Lbfs + Ld))))",r.Lb50,"dB");
     if(cl) step(`Receiver clutter (ITU-R P.2108 §3.1, ${cl.c.name}, R = ${cl.c.R} m)`,cl.c.type==="hg"?"−K_h2·log(h/R), K_h2 = 21.8 + 6.2·log f":"J(ν) − 6.03, ν = K_ν·√(h_dif·θ_clut), w_s = 27 m",cl.L,"dB");
     (r.trans?warn:ok)(r.trans?"Trans-horizon path: the result is set by diffraction and troposcatter.":"Line-of-sight path to the receiver.");
@@ -9087,7 +9105,7 @@ const MODEL_LIB=[
   eq:["f ≤ fo·sec φ (reflection condition)","foE ≈ 0.9·[(180 + 1.44R)·cos χ]^0.25","L_abs = 677.2·I·sec φ / ((f + 1.4)^1.98 + 10.2) per hop"],
   valid:"Median trends for teaching skip zones and day/night behaviour.",lim:["Full P.533 needs the P.1239 foF2 maps: use ITURHFProp for planning.","No MUF statistics, sporadic-E or polar effects."]},
  {id:"p1812",name:"VHF/UHF · ITU-R P.1812",band:"30 MHz – 6 GHz, 0.25 – 3000 km",ref:"ITU-R P.1812-6 (troposcatter per P.1812-6 as advised for -7/-8)",
-  eq:["Lbfs = 92.44 + 20·log f + 20·log d_fs","Ld = L_bulla + max(Ldsph − L_bulls, 0)  (delta-Bullington, P.526-15 §4.5)","Lbs = 190.1 + Lf + 20·log d + 0.573θ − 0.15N0 + Lc + Ag","Lb50 = max(Lbfs, −5·log(10^(−0.2Lbs) + 10^(−0.2(Lbfs + Ld))))","E = 199.36 + 20·log f[GHz] − Lb + 10·log P[kW ERP]"],
+  eq:["Lbfs = 92.4 + 20·log f + 20·log d_fs  (P.1812-6 Eq. 8)","Ld = L_bulla + max(Ldsph − L_bulls, 0)  (delta-Bullington, P.526-15 §4.5)","Lbs = 190.1 + Lf + 20·log d + 0.573θ − 0.15N0  (P.1812-6 Eq. 44)","Lb50 = max(Lbfs, −5·log(10^(−0.2Lbs) + 10^(−0.2(Lbfs + Ld))))","E = 199.36 + 20·log f[GHz] − Lb + 10·log P[kW ERP]"],
   valid:"Path-specific; real terrain + buildings from the map, or a smooth earth in the Lab.",lim:["Ducting / layer reflection (§4.5) omitted; matters for p < 50% time.","N0 = 360 N-units by default (P.1812 uses the N050 map)."]},
  {id:"p2108",name:"Receiver clutter · ITU-R P.2108 §3.1",band:"30 MHz – 3 GHz",ref:"ITU-R P.2108-1",
   eq:["Height-gain (rural, sea): A_h = −K_h2·log(h/R),  K_h2 = 21.8 + 6.2·log f[GHz]","Diffraction (suburban, urban): A_h = J(ν) − 6.03,  ν = K_ν√(h_dif·θ_clut),  K_ν = 0.342√f","R = 10 m rural/suburban, 15 m urban, 20 m dense urban; w_s = 27 m"],
@@ -10663,6 +10681,10 @@ init();
       if(Math.abs(M[c][c])<1e-9) return null; for(let r=0;r<n;r++) if(r!==c){ const f=M[r][c]/M[c][c]; for(let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; } }
     return M.map((r,i)=>r[n]/M[i][i]); }
   const rmsOn=(fn,set)=>set.length?Math.sqrt(set.reduce((s,p)=>s+(p.meas-fn(p))**2,0)/set.length):NaN;
+  /* error statistics, e = measured − predicted: n, mean (bias), standard deviation, RMS, largest |e|, correlation */
+  const errStats=(fn,set)=>{ const n=set.length; if(!n) return null; const e=set.map(p=>p.meas-fn(p)), m=e.reduce((a,b)=>a+b,0)/n, sd=n>1?Math.sqrt(e.reduce((a,b)=>a+(b-m)**2,0)/(n-1)):NaN;
+    const x=set.map(fn), y=set.map(p=>p.meas), mx=x.reduce((a,b)=>a+b,0)/n, my=y.reduce((a,b)=>a+b,0)/n; let sxy=0,sxx=0,syy=0; for(let i=0;i<n;i++){ sxy+=(x[i]-mx)*(y[i]-my); sxx+=(x[i]-mx)**2; syy+=(y[i]-my)**2; }
+    return {n,mean:m,sd,rms:Math.sqrt(e.reduce((a,b)=>a+b*b,0)/n),max:Math.max(...e.map(Math.abs)),r:sxx&&syy?sxy/Math.sqrt(sxx*syy):NaN}; };
   function rms(fn){ return rmsOn(fn,SH.pts.filter(p=>isFinite(p.meas)&&shown(p))); }
   const hint=t=>{ $("shHint").textContent=t; };
 
@@ -10796,7 +10818,8 @@ init();
     $("shErr").innerHTML=plan?`<div class="tile info"><span class="k">Planning mode</span><span class="val">—</span><span class="sub">errors are shown for the measured station</span></div>`
       :`<div class="tile ${cls(before)}"><span class="k">Error before</span><span class="val">±${fx(before)} dB</span><span class="sub">RMS over ${tr.length} readings${SH.hold?" (training)":""}</span></div>
       <div class="tile ${SH.cal?cls(after):"info"}"><span class="k">After calibration</span><span class="val">${SH.cal?"±"+fx(after)+" dB":"—"}</span><span class="sub">${SH.cal?Math.max(0,Math.round(100*(1-after/before)))+"% lower":"press Calibrate"}</span></div>
-      ${SH.hold?`<div class="tile ${SH.cal?cls(ta):"info"}"><span class="k">Test points (not used)</span><span class="val">${SH.cal?"±"+fx(ta)+" dB":"±"+fx(tb)+" dB"}</span><span class="sub">${te.length} points · before ±${fx(tb)} dB</span></div>`:""}`;
+      ${SH.hold?`<div class="tile ${SH.cal?cls(ta):"info"}"><span class="k">Test points (not used)</span><span class="val">${SH.cal?"±"+fx(ta)+" dB":"±"+fx(tb)+" dB"}</span><span class="sub">${te.length} points · before ±${fx(tb)} dB</span></div>`:""}
+      ${(st=>st?`<div class="tile info"><span class="k">Error statistics${SH.cal?" (after)":""}${SH.hold&&te.length?" · test points":""}</span><span class="val">mean ${st.mean>=0?"+":"−"}${fx(Math.abs(st.mean))} dB · σ ${fx(st.sd)} dB</span><span class="sub">n = ${st.n} · RMS ${fx(st.rms)} dB · max |e| ${fx(st.max)} dB · r = ${isFinite(st.r)?st.r.toFixed(2):"—"} · e = measured − predicted</span></div>`:"")(errStats(SH.cal?predBase:rawModel,SH.hold&&te.length?te:tr))}`;
     const c=SH.cal, used=i=>c&&c.cols.includes(i);
     $("shFit").innerHTML=c?`<b>What the model learned</b> from ${c.n} readings${c.nTest?` (${c.nTest} kept for testing)`:""}:<ul>
       <li>System offset <b>${c.b[0]>0?"+":""}${fx(c.b[0])} dB</b>: real power, cable or antenna losses.</li>
@@ -11208,6 +11231,52 @@ init();
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{ const q=$("txQuick"); if(q) q.hidden=true; }));
 })();
 
+
+/* ===================== VERIFICATION (Models tab) ===================== */
+(function(){
+  const $=id=>document.getElementById(id); if(!$("verif")) return;
+  const fx=(v,n)=>isFinite(v)?v.toFixed(n):"—", sg=(v,n)=>isFinite(v)?(v>=0?"+":"−")+Math.abs(v).toFixed(n):"—";
+  // exact knife-edge loss from the Fresnel integrals (ITU-R P.526 §4.1 Eq. 26), by Simpson integration
+  function fresnelCS(v){ const N=4000, h=v/N; let c=0,s=0; for(let i=0;i<=N;i++){ const t=i*h, w=i===0||i===N?1:(i%2?4:2), a=Math.PI*t*t/2; c+=w*Math.cos(a); s+=w*Math.sin(a); } return [c*h/3,s*h/3]; }
+  function Jexact(v){ const [C,S]=fresnelCS(v); return -20*Math.log10(Math.sqrt((1-C-S)**2+(C-S)**2)/2); }
+  const ROWS=[]; let B=null;
+  function analytic(){ const R=[];
+    [[100,10],[1000,50],[3000,2]].forEach(([f,d])=>{ const ref=20*Math.log10(4*Math.PI*d*1000/(299.792458/f)), site=p1812(d,{f,htx:10,hrx:10,k:4/3},null).Lbfs;
+      R.push(["Free-space basic loss","ITU-R P.525 / P.1812 Eq. (8)",`${f} MHz, ${d} km`,ref,site,0.1,"dB"]); });
+    [0,0.5,1,2,3].forEach(v=>R.push(["Knife-edge loss J(ν) (approximation vs exact Fresnel integral)","ITU-R P.526 Eqs (26), (31)",`ν = ${v}`,Jexact(v),Jnu(v),0.6,"dB"]));
+    [[0.1,1.2815516],[0.5,0],[0.9,-1.2815516],[0.95,-1.6448536],[0.99,-2.3263479]].forEach(([x,ref])=>R.push(["Inverse complementary normal I(x)","ITU-R P.1812 Attachment 2",`x = ${x}`,ref,invQ(x),0.00054,""]));
+    R.push(["Effective earth radius","ITU-R P.453 / P.834","k = 4/3",8494.67,(4/3)*6371,0.5,"km"]);
+    return R; }
+  function renderA(){ const R=analytic(); ROWS.length=0; R.forEach(r=>ROWS.push(r));
+    $("verA").innerHTML=`<tr><th>Check</th><th>Standard</th><th>Case</th><th>Reference</th><th>This site</th><th>Difference</th><th>Tolerance</th><th>Result</th></tr>`+R.map(([n,st,cs,ref,site,tol,u])=>{ const df=site-ref, ok=Math.abs(df)<=tol, dp=u===""?5:2;
+      return `<tr><td>${n}</td><td>${st}</td><td>${cs}</td><td class="num">${fx(ref,dp)} ${u}</td><td class="num">${fx(site,dp)} ${u}</td><td class="num">${sg(df,dp+ (u===""?0:1))}</td><td class="num">±${tol} ${u}</td><td class="${ok?"ok":"no"}">${ok?"Pass":"Fail"}</td></tr>`; }).join("");
+    summary(); }
+  function runCase(c){ const n=c.d.length, D=c.d[n-1], g=c.h.map((h,i)=>i===0||i===n-1?h:h+c.R[i]), k=157/(157-c.DN);
+    const om=c.z.reduce((a,z,i)=>a+(z===1?((i<n-1?(c.d[i+1]-c.d[i])/2:0)+(i>0?(c.d[i]-c.d[i-1])/2:0)):0),0)/D;
+    return p1812(D,{f:c.f,htx:c.htg,hrx:c.hrg,k,N0:c.N0,pol:c.pol===1?"h":"v",seaFrac:om},{d:c.d,h:g,t:c.h}); }
+  async function runB(){ const bt=$("verRun"); bt.disabled=true; bt.textContent="Running…";
+    try{ const r=await fetch("assets/p1812_validation.json"); const J=await r.json(); B=J.cases.map(c=>{ const s=runCase(c); return {c,s}; });
+      $("verSrc").textContent="Reference data: "+J.source;
+      $("verB").innerHTML=`<tr><th>Profile</th><th>f</th><th>Path</th><th>Pol.</th><th>Lbfs ref / Δ</th><th>Ld50 ref / Δ</th><th>Lbs ref / Δ</th><th>θ ref / Δ (mrad)</th><th>Lb reference</th><th>Lb this site</th><th>Δ Lb</th><th>Result</th></tr>`+
+        B.map(({c,s})=>{ const d=s.Lb50-c.ref.Lb, ok=Math.abs(d)<=0.1, pr=(a,b)=>`${fx(a,2)} / ${sg(b-a,3)}`;
+          return `<tr><td>${c.name.replace(/_/g," ")}</td><td class="num">${fx(c.f,1)} MHz</td><td class="num">${fx(c.d[c.d.length-1],1)} km</td><td>${c.pol===1?"H":"V"}</td><td class="num">${pr(c.ref.Lbfs,s.Lbfs)}</td><td class="num">${pr(c.ref.Ld50,s.Ld)}</td><td class="num">${pr(c.ref.Lbs,s.Lbs)}</td><td class="num">${pr(c.ref.theta,s.theta)}</td><td class="num">${fx(c.ref.Lb,3)} dB</td><td class="num">${fx(s.Lb50,3)} dB</td><td class="num">${sg(d,3)}</td><td class="${ok?"ok":"no"}">${ok?"Pass":"Fail"}</td></tr>`; }).join("");
+      $("verCsv").disabled=false; summary(); bt.textContent="Run again"; }
+    catch(e){ $("verB").innerHTML=`<tr><td>Could not load the validation data (${String(e.message||e)}). Check the connection and press Run again.</td></tr>`; bt.textContent="Run the ITU-R P.1812-6 check"; }
+    bt.disabled=false; }
+  function summary(){ const aOk=ROWS.filter(([,, ,ref,site,tol])=>Math.abs(site-ref)<=tol).length;
+    let t=`<div class="tile ${aOk===ROWS.length?"good":"bad"}"><span class="k">Closed-form checks</span><span class="val">${aOk} / ${ROWS.length} pass</span><span class="sub">free space, J(ν), I(x), k-factor</span></div>`;
+    if(B){ const e=B.map(({c,s})=>s.Lb50-c.ref.Lb), mx=Math.max(...e.map(Math.abs)), mean=e.reduce((a,b)=>a+b,0)/e.length, rms=Math.sqrt(e.reduce((a,b)=>a+b*b,0)/e.length);
+      t+=`<div class="tile ${mx<=0.1?"good":"bad"}"><span class="k">ITU-R P.1812-6 profiles</span><span class="val">${B.filter((x,i)=>Math.abs(e[i])<=0.1).length} / ${B.length} pass</span><span class="sub">tolerance ±0.1 dB on Lb</span></div>
+        <div class="tile info"><span class="k">Largest |ΔLb|</span><span class="val">${fx(mx,3)} dB</span><span class="sub">mean ${sg(mean,3)} dB · RMS ${fx(rms,3)} dB · n = ${e.length}</span></div>`; }
+    $("verSum").innerHTML=t; }
+  $("verRun").addEventListener("click",runB);
+  $("verCsv").addEventListener("click",()=>{ if(!B) return; const L=["# Groundwave Propagation Lab "+(document.querySelector("footer b")||{}).textContent+" vs ITU-R P.1812-6 reference results (p = 50 %)","profile,f_MHz,d_km,pol,Lbfs_ref,Lbfs_site,Ld50_ref,Ld50_site,Lbs_ref,Lbs_site,theta_ref_mrad,theta_site_mrad,Lb_ref_dB,Lb_site_dB,dLb_dB"];
+    B.forEach(({c,s})=>L.push([c.name,c.f,c.d[c.d.length-1],c.pol===1?"H":"V",c.ref.Lbfs,s.Lbfs.toFixed(4),c.ref.Ld50,s.Ld.toFixed(4),c.ref.Lbs,s.Lbs.toFixed(4),c.ref.theta,s.theta.toFixed(4),c.ref.Lb,s.Lb50.toFixed(4),(s.Lb50-c.ref.Lb).toFixed(4)].join(",")));
+    L.push("","check,standard,case,reference,site,difference,tolerance"); ROWS.forEach(([n,st,cs,ref,site,tol])=>L.push([`"${n}"`,`"${st}"`,`"${cs}"`,ref,site,(site-ref),tol].join(",")));
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([L.join("\n")],{type:"text/csv"})); a.download="groundwave-lab-verification.csv"; document.body.appendChild(a); a.click(); a.remove(); });
+  $("verPrint").addEventListener("click",()=>{ document.body.classList.add("print-verif"); window.print(); setTimeout(()=>document.body.classList.remove("print-verif"),500); });
+  renderA();
+})();
 </script>
 </body>
 </html>

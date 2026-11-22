@@ -82,12 +82,52 @@ The tower ERP is estimated from the median reading (unknown for operator sites);
 the remaining terms. Measure the same route twice, ideally with two phones, and report the difference as
 measurement uncertainty. RSRP absolute accuracy of phones is limited (3GPP TS 36.133, about ±6 dB).
 
-## 6. Honest limitations (put these in the paper)
+## 6. Verification of the implementation (Models tab → Verification)
+
+**External reference.** The site's ITU-R P.1812 code was run on the 19 terrain profiles of the ITU-R P.1812-6
+validation set. The site's values were compared with the results of the reference implementation approved by
+ITU-R Working Party 3K (Stevanovic, doi:10.5281/zenodo.6141558) at p = 50 % time and 50 % locations.
+
+| Quantity | Largest difference over 19 profiles |
+|---|---|
+| Free-space loss Lbfs (Eq. 8) | 0.000 dB |
+| Bullington losses Lbulla, Lbulls | 0.000 dB |
+| Spherical-earth diffraction Ldsph | 0.005 dB |
+| Median diffraction loss Ld50 | 0.005 dB |
+| Troposcatter loss Lbs (Eq. 44) | 0.000 dB |
+| Path angular distance θ | 0.000 mrad |
+| **Basic transmission loss Lb** | **0.003 dB** (mean −0.000 dB, RMS 0.001 dB, n = 19) |
+
+The profiles cover 95–500 MHz, 1–235 km, horizontal and vertical polarization, rural, urban and dense-urban clutter,
+and line-of-sight and trans-horizon paths. Re-run it in the browser; **Download CSV** gives the full table.
+
+While building this check, two differences from P.1812-6 were found and corrected (v10.7):
+1. The troposcatter loss had a gas-absorption and coupling term that Eq. (44) of P.1812-6 does not have. At 96 km this added about 0.5 dB.
+2. The horizon angles used terrain plus clutter. P.1812 §3.2 uses bare terrain for them, and terrain plus clutter only for diffraction.
+
+**Closed-form checks** (14 of 14 pass):
+- Free-space loss against 20·log(4πd/λ): −0.05 dB, the rounding of the 92.4 constant.
+- The P.526 J(ν) approximation against the exact Fresnel-integral knife-edge loss: within 0.11 dB for ν from 0 to 3.
+- The P.1812 Attachment 2 inverse-normal approximation: within its stated 0.00054.
+- The effective earth radius for k = 4/3.
+
+Suggested wording: "The implementation of ITU-R P.1812-6 was verified against the ITU-R Working Party 3K reference
+implementation on its 19 validation profiles; the basic transmission loss agreed within 0.003 dB in every case."
+
+**Measurement statistics** (Digital shadow): the tile gives n, mean error (bias), standard deviation, RMS,
+largest error and the correlation r, with e = measured − predicted. Report them for the training points and, separately, the test points.
+
+**Location variability** (Map): coverage at 50, 90, 95 and 99 % of locations from σL (ITU-R P.1812). Example:
+Colombo → Yatiyantota, 312.1 MHz, σL = 3.7 dB, fade margin +36.4 dB at 50 % and +30.2 dB at 95 % of locations.
+
+## 7. Honest limitations (put these in the paper)
 
 - Results in this phase come from simulated sensors (software-in-the-loop); SDR measurements are
   planned under the grant.
+- P.1812 is implemented for p = 50 % time only (no ducting or anomalous propagation at small time percentages).
 - P.1812 uses a straight-line ground profile from the end-point heights when the elevation service
   is unavailable.
+- The ground-wave model (P.368) has not yet been compared with GRWAVE reference output.
 - Buildings: OpenStreetMap footprints, heights from tags or floors × 3.2 m (editable); two strongest
   knife edges, not a full multiple-edge or ray-tracing method.
 - Antenna patterns are horizontal only (no vertical pattern or tilt).
@@ -95,10 +135,11 @@ measurement uncertainty. RSRP absolute accuracy of phones is limited (3GPP TS 36
 - AI-assisted development: disclose it according to the conference policy, and state that the authors
   verified the models and results.
 
-## 7. BibTeX
+## 8. BibTeX
 
 ```bibtex
 @misc{itu_p1812, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.1812: A path-specific propagation prediction method for point-to-area terrestrial services in the frequency range 30 {MHz} to 6000 {MHz}}, institution={International Telecommunication Union}, address={Geneva}}
+@software{stevanovic_p1812, author={Stevanovic, Ivica}, title={{MATLAB/Octave} Implementation of Recommendation {ITU-R} {P}.1812-6}, version={6.0}, doi={10.5281/zenodo.6141558}, url={https://github.com/eeveetza/p1812}}
 @misc{itu_p526, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.526: Propagation by diffraction}, institution={International Telecommunication Union}, address={Geneva}}
 @misc{itu_p2109, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.2109: Prediction of building entry loss}, institution={International Telecommunication Union}, address={Geneva}}
 @misc{itu_p533, author={{ITU-R}}, title={Recommendation {ITU-R} {P}.533: Method for the prediction of the performance of {HF} circuits}, institution={International Telecommunication Union}, address={Geneva}}

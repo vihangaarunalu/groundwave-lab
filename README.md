@@ -290,3 +290,17 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
   - Step (a): 1.0 F1 at k = 4/3.
   - Step (c): at kₑ (default 2/3, editable, read from P.530 Fig. 3 for the path length), 0.6 F1 in a tropical climate for paths over about 30 km, or 0.3 F1 in a temperate climate (0.0 F1 for one isolated obstacle).
   - The climate is chosen automatically from the latitude and can be changed.
+
+## v10.7: verification and accuracy evidence
+
+- **Verification** panel (Models tab):
+  - The site's ITU-R P.1812 code runs on the 19 profiles of the ITU-R P.1812-6 validation set. The results are compared with the reference implementation approved by ITU-R Working Party 3K. The basic transmission loss agrees within **0.003 dB** on all 19 profiles.
+  - 14 closed-form checks: free space, J(ν) against the exact Fresnel integral, the inverse-normal approximation, and the k-factor.
+  - CSV download and print.
+  - The reference data is in `assets/p1812_validation.json`, copied with acknowledgement from https://github.com/eeveetza/p1812 (doi:10.5281/zenodo.6141558).
+- **P.1812 aligned with P.1812-6:**
+  - Troposcatter Eq. (44) no longer has a gas or coupling term.
+  - Horizon angles use bare terrain and the exact arctangent.
+  - The free-space constant is 92.4.
+- **Map:** coverage at 50, 90, 95 and 99 % of locations, with σL and the margin at 95 %.
+- **Digital shadow:** error statistics. The tile gives n, mean error (bias), σ, RMS, the largest error and the correlation r.
