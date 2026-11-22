@@ -304,3 +304,10 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
   - The free-space constant is 92.4.
 - **Map:** coverage at 50, 90, 95 and 99 % of locations, with σL and the margin at 95 %.
 - **Digital shadow:** error statistics. The tile gives n, mean error (bias), σ, RMS, the largest error and the correlation r.
+
+## v10.8: usability fixes
+
+- The frequency strip (LF … UHF) is hidden on tabs with their own settings: Cellular, Shadow, Learn, Experiments and Quiz. It no longer says "1 MHz" above a 433 MHz station.
+- Map: the pin buttons (Settings, Rename, Delete) appear only after you select a pin, instead of covering the map on load. The map fills the screen height on desktop. The opening hint matches Select mode, and the path summary shows the transmitter's own frequency and power.
+- Animation: on wide screens the signal readout appears once, in the side panel, and on the picture only in full screen and in the link view. "Guided tour" is renamed "Explain the picture" so it isn't confused with the site Guide.
+- Models: Verification moved below the step-by-step calculation, with left-aligned headings.
