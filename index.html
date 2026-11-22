@@ -295,6 +295,7 @@ select.mapbtn{width:auto;border-radius:var(--r-sm);font-size:13px}
 .verdict .big{font-family:var(--font-display);font-size:24px;font-weight:600;line-height:1.2}
 .verdict .val{font-family:var(--font-mono);font-size:clamp(22px,2.2vw,30px);line-height:1.2}
 .vertab td,.vertab th{white-space:nowrap}
+.vertab th{text-align:left}
 .vertab td.num{text-align:right;font-family:var(--font-mono)}
 .vertab .ok{color:var(--good-ink);font-weight:600}.vertab .no{color:var(--bad-ink);font-weight:600}
 .chart-head .inl{font-size:13px;color:var(--muted);margin:0 6px 0 4px}
@@ -2164,6 +2165,14 @@ body:not(.an-scene) #animation .sc-only{display:none}
 .keysgrid h3{font-size:var(--fs-ui);margin:0 0 6px}
 .keysgrid dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 12px;margin:0;font-size:var(--fs-meta);align-items:center}
 .keysgrid dt{white-space:nowrap}.keysgrid dd{margin:0}
+
+/* ---- v10.8 usability fixes ---- */
+/* the shared frequency strip only drives Lab, Animation, Map, Terrain and Models: hide it where the tab has its own settings */
+body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab="quiz"] .bandwrap,body[data-tab="exp"] .bandwrap,body[data-tab="mobile"] .bandwrap{display:none}
+/* a taller map on desktop: the map is the work surface */
+@media (min-width:900px){#map{height:clamp(560px,calc(100vh - 200px),880px)}}
+/* the readout already sits in the side panel on wide screens: show it on the picture only in full screen, on narrow screens and in the link view */
+@media (min-width:1100px){.stage:not(.is-expanded):not(:fullscreen) #rxHud{display:none}body.an-ov .stage #rxHud{display:grid}}
 </style>
 </head>
 <body data-tab="lab">
@@ -2485,7 +2494,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
     </div>
     <div class="row">
       <button class="btn" id="animMapTx" type="button" title="Animate the real path from the Map tab: transmitter to the selected receiver">Animate my map path</button>
-      <button class="btn primary gs-only" id="tourBtn" type="button"><svg class=ic aria-hidden=true><use href=#i-play /></svg> Guided tour</button>
+      <button class="btn primary gs-only" id="tourBtn" type="button"><svg class=ic aria-hidden=true><use href=#i-play /></svg> Explain the picture</button>
       <label class="check"><input type="checkbox" id="explainT" checked> Show labels</label>
       <button class="btn" id="playBtn" type="button" data-kbd="Space" data-tiptext="Play / pause"><svg class=ic aria-hidden=true><use href=#i-pause /></svg> Pause</button>
       <div class="field"><label for="speed">Speed</label><input type="range" id="speed" min="0.25" max="3" step="0.25" value="1" style="width:110px"></div>
@@ -2701,7 +2710,7 @@ body:not(.an-scene) #animation .sc-only{display:none}
       <label class="covsel"><span>Coverage</span><select id="covMode"><option value="contour">Antenna contour</option><option value="heat">Contour + heat map</option><option value="off">Off</option></select></label>
       <span class="toolsave"><button class="btn" id="scnBtn" type="button" title="Load a worked SLBC example">Example: City FM</button><button class="btn" id="shareBtn" type="button" title="Copy a link that opens this exact scenario"><svg class=ic aria-hidden=true><use href=#i-link /></svg> Share link</button></span>
     </div>
-    <p class="modehint" id="modeHint" aria-live="polite">Click the map to add a receiver.</p>
+    <p class="modehint" id="modeHint" aria-live="polite">Click a pin to select it, drag to pan, scroll to zoom. Nothing is placed until you choose a button above.</p>
   </div>
   <div class="mapbox">
     <canvas id="map" aria-label="Map. Click to place the transmitter or receivers."></canvas>
@@ -3054,16 +3063,6 @@ body:not(.an-scene) #animation .sc-only{display:none}
 <!-- ======================= MODELS & EQUATIONS ======================= -->
 <section class="wrap" id="methods" role="tabpanel" aria-labelledby="tab-methods" hidden>
   <div class="intro"><div class="stack" style="gap:4px"><h2 class="th"><span class="ti ti-models" aria-hidden="true"><svg viewBox="0 0 64 64"><path class="d" pathLength="1" style="--d:0s" d="M44 14H20L34 32L20 50H44"/><circle class="dot" cx="50" cy="50" r="2.6"/></svg></span>Models &amp; equations</h2><p>Every number in this app comes from the equations below. Pick a model to see the calculation step by step, which checks pass, and where the model stops being valid. Lecturers can use this to discuss accuracy and limitations.</p></div></div>
-  <section class="panel card" id="verif" aria-labelledby="verH">
-    <div class="chart-head"><h2 id="verH">Verification</h2><div class="row"><button class="btn primary" id="verRun" type="button">Run the ITU-R P.1812-6 check</button><button class="btn" id="verCsv" type="button" disabled>Download CSV</button><button class="btn" id="verPrint" type="button">Print</button></div></div>
-    <p class="hint">Is the arithmetic right? The site's own functions are run on cases with a known answer: closed-form references, and the 19 terrain profiles of the ITU-R P.1812-6 validation set with the results of the reference implementation approved by ITU-R Working Party 3K. This checks the implementation, not the accuracy of the models against real measurements (for that, see the Digital shadow).</p>
-    <div class="tiles" id="verSum"></div>
-    <h3 style="margin-top:14px">Closed-form reference checks</h3>
-    <div class="tablewrap"><table class="fs vertab" id="verA"></table></div>
-    <h3 style="margin-top:14px">ITU-R P.1812-6 validation profiles (p = 50 % time, 50 % locations)</h3>
-    <div class="tablewrap"><table class="fs vertab" id="verB"><tr><td class="muted">Press <b>Run the ITU-R P.1812-6 check</b>. It loads 19 terrain profiles (260 kB) and runs the site's P.1812 code on each.</td></tr></table></div>
-    <p class="muted" id="verSrc" style="font-size:12.5px;margin-top:8px"></p>
-  </section>
   <section class="panel card mxcalc" aria-labelledby="mxH">
     <div class="chart-head"><h2 id="mxH">Step-by-step calculation</h2><div class="row"><button class="btn" type="button" data-eqed="latex">Equation editor</button><button class="btn" id="mxCopy" type="button">Copy steps</button><button class="btn" id="mxPrint" type="button"><svg class=ic aria-hidden=true><use href=#i-print /></svg> Print / PDF report</button></div></div>
     <div id="rptHead" class="rpthead"></div>
@@ -3075,6 +3074,16 @@ body:not(.an-scene) #animation .sc-only{display:none}
     <ul class="mxchecks" id="mxChecks" aria-label="Validity checks"></ul>
     <div class="tablewrap"><table class="fs mxsteps" id="mxSteps"></table></div>
     <p class="hint">“!” marks a check that fails or a known simplification. Values update as you move the distance slider or change the model in the Lab.</p>
+  </section>
+  <section class="panel card" id="verif" aria-labelledby="verH">
+    <div class="chart-head"><h2 id="verH">Verification</h2><div class="row"><button class="btn primary" id="verRun" type="button">Run the ITU-R P.1812-6 check</button><button class="btn" id="verCsv" type="button" disabled>Download CSV</button><button class="btn" id="verPrint" type="button">Print</button></div></div>
+    <p class="hint">Is the arithmetic right? The site's own functions are run on cases with a known answer: closed-form references, and the 19 terrain profiles of the ITU-R P.1812-6 validation set with the results of the reference implementation approved by ITU-R Working Party 3K. This checks the implementation, not the accuracy of the models against real measurements (for that, see the Digital shadow).</p>
+    <div class="tiles" id="verSum"></div>
+    <h3 style="margin-top:14px">Closed-form reference checks</h3>
+    <div class="tablewrap"><table class="fs vertab" id="verA"></table></div>
+    <h3 style="margin-top:14px">ITU-R P.1812-6 validation profiles (p = 50 % time, 50 % locations)</h3>
+    <div class="tablewrap"><table class="fs vertab" id="verB"><tr><td class="muted">Press <b>Run the ITU-R P.1812-6 check</b>. It loads 19 terrain profiles (260 kB) and runs the site's P.1812 code on each.</td></tr></table></div>
+    <p class="muted" id="verSrc" style="font-size:12.5px;margin-top:8px"></p>
   </section>
   <section class="panel card" aria-labelledby="mxVerH">
     <div class="chart-head"><h2 id="mxVerH">Verification tests</h2><div class="row"><span id="mxVerSum" class="pill info">not run yet</span><button class="btn primary" id="mxRunVer" type="button">Run tests</button></div></div>
@@ -3996,7 +4005,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v10.7</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v10.8</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -6616,7 +6625,7 @@ function animTick(now){
   const dt=clamp(now-AN.last,0,100); AN.last=now;
   if(currentTab!=="animation") return;
   if(AN.playing){ AN.t+=dt*AN.speed; if(AN.cycle){ AN.hour=(AN.hour+dt*AN.speed/1000*0.8)%24; $("hour").value=AN.hour; } }
-  try{ const ov=ovActive(); if(AN.ovOn!==ov){ const sb=$("animSub"); { const oh=$("ovHint"); if(oh) oh.hidden=!ov; } if(sb) sb.textContent=ov?"The Map's link as a moving picture: the direct ray over the real terrain, with ground reflection, refraction and diffraction, and the full link budget.":"The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere."; } AN.ovOn=ov; if(ov&&txAutoAim(MP.rx)){ SCN.key=""; updateMap(); } document.body.classList.toggle("an-scene",AN.scene!=="gs"&&!ov); if(AN.scene&&AN.scene!=="gs"&&!ov) drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
+  try{ const ov=ovActive(); if(AN.ovOn!==ov){ document.body.classList.toggle("an-ov",ov); const sb=$("animSub"); { const oh=$("ovHint"); if(oh) oh.hidden=!ov; } if(sb) sb.textContent=ov?"The Map's link as a moving picture: the direct ray over the real terrain, with ground reflection, refraction and diffraction, and the full link budget.":"The same prediction as a moving picture: the ground wave crossing the terrain and, at night, the sky wave returning from the ionosphere."; } AN.ovOn=ov; if(ov&&txAutoAim(MP.rx)){ SCN.key=""; updateMap(); } document.body.classList.toggle("an-scene",AN.scene!=="gs"&&!ov); if(AN.scene&&AN.scene!=="gs"&&!ov) drawScene(dt); else drawAnim(dt); if(AN.errShown){ AN.errShown=false; $("animErr").hidden=true; } }
   catch(e){ if(!AN.errShown){ AN.errShown=true; const el=$("animErr"); el.hidden=false; el.textContent="This model can't be animated: "+e.message+". Pick another model or change its settings."; console.error(e); } }
 }
 
@@ -7154,7 +7163,7 @@ function drawMap(){
     const s=MP.lastSel&&arrOf(MP.lastSel.kind)[MP.lastSel.i]?MP.lastSel:{kind:"rx",i:MP.ai};
     const pt=arrOf(s.kind)[s.i], box=$("pinTools"), bt=$("pinDel");
     if(pt){ const [x,y]=proj(pt.lon,pt.lat), off=beamsOf(s).length?BEAM.R+22:8; // keep the buttons clear of the beam handles
-      box.hidden=x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+off)+"px";
+      box.hidden=!MP.lastSel||x<0||y<0||x>W||y>H; box.style.left=x+"px"; box.style.top=(y+off)+"px";
       $("pinPanel").innerHTML="<svg class=ic aria-hidden=true><use href=#i-gear /></svg> Panel"; $("pinPanel").hidden=s.kind==="rx";
       $("pinSet").innerHTML=`<svg class=ic aria-hidden=true><use href=#i-gear /></svg> ${s.kind==="rx"?`T${MP.ti+1} settings`:"Settings"}`;
       $("pinAim").hidden=s.kind==="rx"; $("pinSet").hidden=false;
@@ -7516,7 +7525,7 @@ function updateMapNow(){
 }
 /* one-line summary so the setup block can stay folded */
 function setupSummary(){ const el=$("setupSum"); if(!el) return; const p=baseModel().p, mob=MP.layer==="mobile";
-  el.textContent=`T${MP.ti+1} ${MP.tx.name} → ${mob?"P":"R"}${MP.ai+1} ${MP.rx.name} · ${mob?TECH_LABEL[MP.cov.tech]+" "+fmtF(CELL_TECH[MP.cov.tech].f):fmtF(p.f)+" · "+fmtP(p.P)} · ${MP.txH} m / ${mob?"1.5":MP.rx.h} m · ${toLocalInput(MP.date).replace("T"," ")}`; }
+  el.textContent=`T${MP.ti+1} ${MP.tx.name} → ${mob?"P":"R"}${MP.ai+1} ${MP.rx.name} · ${mob?TECH_LABEL[MP.cov.tech]+" "+fmtF(CELL_TECH[MP.cov.tech].f):fmtF(MP.tx.f||p.f)+" · "+fmtP(MP.tx.aui&&MP.tx.tpo?MP.tx.tpo:p.P)} · ${MP.txH} m / ${mob?"1.5":MP.rx.h} m · ${toLocalInput(MP.date).replace("T"," ")}`; }
 function renderActive(){
   const P=MP.path, r=MP.res.get(MP.rx.id); if(!P||!r) return;
   const p=paramsFor(P,MP.rx,r.T), pr=r.pred, T=r.T;
