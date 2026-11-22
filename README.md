@@ -280,3 +280,13 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
 - **Antenna tilt:** drag the gold dot on a transmitter or receiver beam. The beam is drawn ×4 so small angles are visible. The label shows the tilt, the gain toward the far end, and the best aim.
   - The gain uses the antenna's vertical pattern, so the budget, readout and Map update live.
 - Drag the transmitter mast up or down to change its height. Drag the receiver sideways to change the distance, or up and down to change its height. The Map recalculates when you let go.
+
+## v10.6: engineering path profile (Terrain profile tab)
+
+- **Earth bulge selector:** auto (k = 4/3 for VHF/UHF, flat below 30 MHz), none, k = 4/3, k = 1, k = 2/3.
+- **First Fresnel zone** drawn around the direct line, with the 0.6 F1 limit dashed, as in Pathloss and Radio Mobile.
+- **Worst-point marker:** clearance in F1 radii and metres, at the chosen k. Terrain and OSM buildings both count.
+- **Full ITU-R P.530 §2.2.2 clearance check** next to the quick 0.6 F1 rule:
+  - Step (a): 1.0 F1 at k = 4/3.
+  - Step (c): at kₑ (default 2/3, editable, read from P.530 Fig. 3 for the path length), 0.6 F1 in a tropical climate for paths over about 30 km, or 0.3 F1 in a temperate climate (0.0 F1 for one isolated obstacle).
+  - The climate is chosen automatically from the latitude and can be changed.
