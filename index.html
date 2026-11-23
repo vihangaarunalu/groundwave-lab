@@ -298,6 +298,8 @@ select.mapbtn{width:auto;border-radius:var(--r-sm);font-size:13px}
 .vertab th{text-align:left}
 .vertab td.num{text-align:right;font-family:var(--font-mono)}
 .vertab .ok{color:var(--good-ink);font-weight:600}.vertab .no{color:var(--bad-ink);font-weight:600}
+.calcbox{margin:8px 0;border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 12px}
+.calcbox summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center}
 .chart-head .inl{font-size:13px;color:var(--muted);margin:0 6px 0 4px}
 #profK{width:auto;display:inline-block;min-height:34px;padding:4px 30px 4px 10px;font-size:13px}
 .verdict .val .u1,.hud-val .u1{white-space:nowrap}
@@ -2856,6 +2858,19 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
     <p class="hint" id="p530Note">ITU-R P.530 §2.2.2: (a) 1.0 F1 at the median k (4/3 if unknown); (c) at kₑ, read for your path length from P.530 Fig. 3 (2/3 is a common conservative value): temperate 0.0 F1 for one isolated obstacle or 0.3 F1 for terrain along the path, tropical 0.6 F1 for paths longer than about 30 km. Use the larger antenna heights of (a) and (c).</p>
   </section>
 
+  <section class="panel card" id="availCard" hidden aria-labelledby="availH">
+    <div class="chart-head"><h2 id="availH">Link availability</h2><span class="muted">ITU-R P.530-18 §2.3 multipath fading, average worst month and average year</span></div>
+    <p class="big" id="availVerdict"></p>
+    <div class="tiles" id="availTiles"></div>
+    <div class="row" id="availCtl" style="margin-top:10px;gap:14px;align-items:flex-end;flex-wrap:wrap">
+      <div class="field" style="margin:0"><label for="avLogK">Geoclimatic factor log K</label><input type="number" id="avLogK" step="0.01" min="-8" max="0" placeholder="from LogK.csv" style="width:130px"></div>
+      <div class="field" style="margin:0"><label for="avDN">dN75 (N-units)</label><input type="number" id="avDN" step="1" min="0" max="2000" placeholder="from dN75.csv" style="width:130px"></div>
+      <div class="field" style="margin:0"><label for="avFiles">Or read both from the ITU-R map files</label><input type="file" id="avFiles" accept=".csv,.txt" multiple></div>
+      <span class="muted" id="avSrc" style="font-size:13px"></span>
+    </div>
+    <p class="hint">Get <b>LogK.csv</b> and <b>dN75.csv</b> from the ITU-R P.530-18 page (itu.int, Recommendation P.530, "ZIP" download) and choose both files here; they are read on your computer and interpolated at the path midpoint, as P.530 prescribes. The ITU does not allow these maps to be redistributed, so the site does not include them. Fade margin = the link's flat fade margin from the Map (receiver judged as a link). Rain attenuation is not included: ITU-R P.838 starts at 1 GHz, and rain loss is negligible at VHF/UHF.</p>
+  </section>
+
   <section class="panel card" id="terrCard">
     <div class="chart-head"><h2>Terrain profile: <span id="profName" class="muted"></span></h2>
       <div class="row"><span class="legend"><span><i style="border-top:8px solid rgba(40,50,70,.9);width:6px"></i>Building (OSM)</span><span>▲ Named peak</span><span><b style="color:#c2413a;font-weight:400" aria-hidden="true">▼</b> Main obstacle</span></span><label class="inl" for="profK">Earth bulge</label><select id="profK" aria-label="Earth bulge on the profile (effective earth-radius factor k)"><option value="auto">Auto</option><option value="0">None (flat)</option><option value="1.3333">k = 4/3 (median)</option><option value="1">k = 1</option><option value="0.6667">k = 2/3 (sub-refraction)</option></select></div></div>
@@ -4005,7 +4020,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v10.8</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v10.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4840,6 +4855,7 @@ function antBeamwidths(a){ const st=antStats(a), pk=Math.sqrt(st.max), half=pk/M
 const FEEDERS={ldf4:{name:"1/2\" foam coax (LDF4-50A class)",a100:2.17},ldf5:{name:"7/8\" foam coax (LDF5-50A class)",a100:1.2},ldf7:{name:"1-5/8\" foam coax (LDF7-50A class)",a100:0.72},
   rig3:{name:"3-1/8\" rigid line",a100:0.33},rig6:{name:"6-1/8\" rigid line",a100:0.2},open:{name:"Open-wire / short strap (MF)",a100:0.05}};
 /* attenuation in dB per 100 m from typical datasheet values at 100 MHz, scaled with √f (conductor loss) */
+const RX_CABLES={rg58:{name:"RG-58 class (thin coax)",a100:16.1},rg213:{name:"RG-213 class",a100:6.2},lmr400:{name:"LMR-400 class (low-loss 10 mm)",a100:3.9},ldf4:FEEDERS.ldf4,ldf5:FEEDERS.ldf5};
 function feederLoss(t,f){ const F=FEEDERS[t.feeder||(f<30?"open":"ldf7")]||FEEDERS.ldf7, L=t.flen??((t.h||30)+20); return F.a100*Math.sqrt(Math.max(f,0.1)/100)*L/100; }
 function vswrGamma(s){ s=Math.max(1,s||1.1); return (s-1)/(s+1); }
 function txPanelValues(t,p){
@@ -7561,7 +7577,7 @@ function renderActive(){
       :[["Ground / sky wave",`${fmtField(pr.g,p.f)}`,`sky: ${pr.s===null?"none":fmtField(pr.s,p.f)}`,pr.g!==null&&pr.g>=pr.thr?"good":"warn"],["Needed",fmtField(pr.thr,p.f),pr.link?`link: ${pr.link.sens} dBm receiver, ${pr.link.G.toFixed(1)} dBi antenna`:"minimum usable (broadcast listener)","info"],...(p.f>=30&&isFinite(pr.t)?(()=>{ const ls=locStats(p), sg=ls.sig, base=pr.t-invQ(pLoc(p)/100)*sg, Eq=q=>base+invQ(q)*sg, m95=Eq(0.95)-pr.thr;
         return [["Locations covered",`95 %: ${fmtField(Eq(0.95),p.f).split(" · ")[0]}`,`σL ${sg.toFixed(1)} dB (ITU-R P.1812) · 50 %: ${fmtField(Eq(0.5),p.f).split(" · ")[0]} · 90 %: ${fmtField(Eq(0.9),p.f).split(" · ")[0]} · 99 %: ${fmtField(Eq(0.99),p.f).split(" · ")[0]} · margin at 95 %: ${m95>=0?"+":"−"}${Math.abs(m95).toFixed(1)} dB`,m95>=0?"good":"warn"]]; })():[])])];
   $("tSum").innerHTML=`<span class="pill ${pr.cls}">${pr.verdict}</span><span class="mono">${lvl(pr.t,pr)}</span><span class="muted">${fmtD(P.dist)} km · ${T?(T.loss>0.05?"terrain −"+T.loss.toFixed(1)+" dB":"no terrain loss"):"terrain loading…"} · ${T?(T.los?"line of sight clear":"line of sight blocked"):""}</span>`;
-  renderClearance(P,T,p);
+  renderClearance(P,T,p); renderAvail(P,T,p,pr);
   $("mapTiles").innerHTML=tiles.map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join("");
   $("osmLink").href=`https://www.openstreetmap.org/?mlat=${MP.rx.lat.toFixed(4)}&mlon=${MP.rx.lon.toFixed(4)}#map=${Math.round(clamp(defaultView("path").z,2,14))}/${P.mid.lat.toFixed(3)}/${P.mid.lon.toFixed(3)}`;
   const note=$("terrainNote");
@@ -7820,6 +7836,11 @@ function bindMap(){
   $("txH").addEventListener("change",e=>{ MP.txH=clamp(+e.target.value||1,1,1000); updateMap(); });
   $("rxH").addEventListener("change",e=>{ MP.rx.h=clamp(+e.target.value||0,0,500); updateMap(); });
   $("useTerrain").addEventListener("change",e=>{ MP.useTerrain=e.target.checked; updateMap(); });
+  $("avLogK").addEventListener("change",e=>{ MP.p530=MP.p530||{ke:2/3,clim:"auto"}; const v=parseFloat(e.target.value); MP.p530.logK=isFinite(v)?v:null; MP.p530.src=isFinite(v)?"typed":""; renderActive(); });
+  $("avDN").addEventListener("change",e=>{ MP.p530=MP.p530||{ke:2/3,clim:"auto"}; const v=parseFloat(e.target.value); MP.p530.dN75=isFinite(v)?v:null; MP.p530.src=isFinite(v)?"typed":""; renderActive(); });
+  $("avFiles").addEventListener("change",async e=>{ MP.p530=MP.p530||{ke:2/3,clim:"auto"}; const lat=(MP.tx.lat+MP.rx.lat)/2, lon=(MP.tx.lon+MP.rx.lon)/2, got=[];
+    for(const fl of e.target.files){ try{ const tx=await fl.text(), v=ituGridAt(tx,lat,lon); if(/logk/i.test(fl.name)&&isFinite(v)){ MP.p530.logK=v; got.push("log K"); } else if(/dn75/i.test(fl.name)&&isFinite(v)){ MP.p530.dN75=v; got.push("dN75"); } }catch(err){} }
+    MP.p530.src=got.length?`read ${got.join(" and ")} at ${lat.toFixed(2)}°, ${lon.toFixed(2)}° from the ITU-R map file${got.length>1?"s":""}`:"those files were not LogK.csv or dN75.csv"; renderActive(); });
   $("p530Clim").addEventListener("change",e=>{ MP.p530=MP.p530||{ke:2/3,clim:"auto"}; MP.p530.clim=e.target.value; renderActive(); });
   $("p530Ke").addEventListener("change",e=>{ MP.p530=MP.p530||{ke:2/3,clim:"auto"}; MP.p530.ke=clamp(+e.target.value||2/3,0.3,1.34); renderActive(); });
   $("profK").addEventListener("change",e=>{ MP.profK=e.target.value; renderActive(); });
@@ -8033,6 +8054,43 @@ function bindMap(){
 }
 
 
+
+/* ---- ITU-R P.530-18 §2.3 multipath fading and availability ---- */
+function p530pw(o,A){ const ep=Math.abs(o.hr-o.he)/o.d, hc=(o.hr+o.he)/2-o.d*o.d/102-o.ht, hL=Math.min(o.he,o.hr);
+  const vsrlim=o.dN75*Math.pow(o.d,1.5)*Math.sqrt(o.f)/24730, vsr=Math.min(Math.pow(o.dN75/50,1.8)*Math.exp(-hc/(2.5*Math.sqrt(o.d))),vsrlim);
+  return o.K*Math.pow(o.d,3.51)*Math.pow(o.f*o.f+13,0.447)*Math.pow(10,-0.376*Math.tanh((hc-147)/125)-0.334*Math.pow(ep,0.39)-0.00027*hL+17.85*vsr-A/10); } // Eq. (7), % of worst month
+function p530all(o,A){ const p0=p530pw(o,0), At=25+1.2*Math.log10(p0); // §2.3.2
+  if(A>=At) return {pw:p0*Math.pow(10,-A/10),p0,At,deep:true};
+  const pt=p0*Math.pow(10,-At/10), qap=-20*Math.log10(-Math.log((100-pt)/100))/At, qt=(qap-2)/((1+0.3*Math.pow(10,-At/20))*Math.pow(10,-0.016*At))-4.3*(Math.pow(10,-At/20)+At/800);
+  const qa=2+(1+0.3*Math.pow(10,-A/20))*Math.pow(10,-0.016*A)*(qt+4.3*(Math.pow(10,-A/20)+A/800)); return {pw:100*(1-Math.exp(-Math.pow(10,-qa*A/20))),p0,At,deep:false}; }
+function p530annual(o,pw,lat){ const ep=Math.abs(o.hr-o.he)/o.d, xi=Math.abs(lat); // §2.3.4, ΔG ≤ 10.8 dB
+  let DG=10.5-5.6*Math.log10(1.1+Math.sign(45-xi)*Math.pow(Math.abs(Math.cos(2*xi*Math.PI/180)),0.7))-2.7*Math.log10(o.d)+1.7*Math.log10(1+ep); DG=Math.min(DG,10.8); return {p:Math.pow(10,-DG/10)*pw,DG}; }
+function renderAvail(P,T,p,pr){ const card=$("availCard"); if(!card) return; const f=p&&p.f;
+  if(!T||!(f>=30)||MP.layer==="mobile"){ card.hidden=true; return; } card.hidden=false;
+  MP.p530=MP.p530||{ke:2/3,clim:"auto"}; const A=MP.p530, set=(id,v)=>{ const e=$(id); if(e&&document.activeElement!==e) e.value=v==null?"":v; };
+  set("avLogK",A.logK!=null?A.logK.toFixed(3):null); set("avDN",A.dN75!=null?Math.round(A.dN75):null); $("avSrc").textContent=A.src||"";
+  const n=T.e.length, Dkm=T.d[n-1]/1000, he=T.e[0]+T.txH, hr=T.e[n-1]+T.rxH, ht=T.e.reduce((a,b)=>a+(isFinite(b)?b:0),0)/n, fG=f/1000, lat=(MP.tx.lat+MP.rx.lat)/2;
+  const v=$("availVerdict"), tl=$("availTiles"), link=pr&&pr.link;
+  if(!link){ v.textContent="Judge the receiver as a link to get its fade margin."; v.style.color="var(--muted)"; tl.innerHTML=`<div class="tile info" style="grid-column:1/-1"><span class="k">Why</span><span class="sub">Availability is the share of time a link's fade margin is not used up by fading. A broadcast listener has no single fade margin. Open the receiver's Antenna settings on the Map and set <b>Judge this receiver as: link receiver</b> (a Yagi or dish does this automatically).</span></div>`; return; }
+  if(A.logK==null||A.dN75==null){ v.textContent="Add log K and dN75 for this location to compute the availability."; v.style.color="var(--muted)";
+    tl.innerHTML=`<div class="tile info"><span class="k">Flat fade margin</span><span class="val">${link.M>=0?"+":""}${link.M.toFixed(1)} dB</span><span class="sub">from the Map's link budget</span></div><div class="tile info"><span class="k">Path</span><span class="val">${Dkm.toFixed(1)} km</span><span class="sub">${fmtF(f)} · antennas ${Math.round(he)} / ${Math.round(hr)} m above sea level</span></div>`; return; }
+  const o={K:Math.pow(10,A.logK),dN75:A.dN75,d:Dkm,f:fG,he,hr,ht}, Am=link.M, fmin=15/Dkm;
+  if(Am<0){ v.textContent="No fade margin: the link is below the receiver sensitivity."; v.style.color="var(--bad-ink)"; tl.innerHTML=""; return; }
+  const r=Dkm<5?{pw:0,p0:0,At:NaN,deep:true}:p530all(o,Am), an=Dkm<5?{p:0,DG:NaN}:p530annual(o,r.pw,lat), av=100-an.p;
+  const secM=r.pw/100*30*86400, minY=an.p/100*365.25*1440, fmt=x=>x>=0.01?x.toFixed(x<1?3:2):x.toExponential(1);
+  v.textContent=Dkm<5?"Multipath fading can be neglected on paths shorter than 5 km (P.530 §2.3.1).":`Availability ${av>=99.9999?av.toFixed(5):av.toFixed(4)} % of the year · about ${minY<1?Math.round(minY*60)+" s":minY<120?minY.toFixed(1)+" min":(minY/60).toFixed(1)+" h"} of multipath outage a year`;
+  v.style.color=av>=99.99?"var(--good-ink)":av>=99.9?"var(--warn-ink)":"var(--bad-ink)";
+  tl.innerHTML=[["Flat fade margin",`${Am>=0?"+":""}${Am.toFixed(1)} dB`,"from the Map's link budget (receiver judged as a link)","info"],
+    ["Fade occurrence p₀",`${fmt(r.p0)} %`,`K = 10^${A.logK.toFixed(2)} · dN75 ${Math.round(A.dN75)} · Eq. (7)`,"info"],
+    ["Worst month",`${fmt(r.pw)} %`,`about ${secM<60?secM.toFixed(0)+" s":(secM/60).toFixed(1)+" min"} below sensitivity${r.deep?" (deep-fade range)":" (§2.3.2 shallow-fade method)"}`,r.pw<0.01?"good":r.pw<0.1?"warn":"bad"],
+    ["Average year",`${fmt(an.p)} %`,`ΔG = ${isFinite(an.DG)?an.DG.toFixed(1):"–"} dB (§2.3.4) · availability ${av.toFixed(4)} %`,av>=99.99?"good":av>=99.9?"warn":"bad"],
+    ["Path inclination",`${(Math.abs(hr-he)/Dkm).toFixed(1)} mrad`,`antennas ${Math.round(he)} / ${Math.round(hr)} m a.s.l. · mean terrain ${Math.round(ht)} m`,"info"],
+    ["Validity",fG>=fmin?"in range":"below f_min",`f ≥ 15/d = ${(fmin*1000).toFixed(0)} MHz · d ≥ 5 km`,fG>=fmin?"good":"warn"]]
+    .map(t=>`<div class="tile ${t[3]}"><span class="k">${t[0]}</span><span class="val">${t[1]}</span><span class="sub">${t[2]}</span></div>`).join(""); }
+/* read a value from an ITU 0.25° global grid (rows 90 → −90° lat, columns −180 → 180° lon), bilinear as in the ITU-R digital products */
+function ituGridAt(text,lat,lon){ const rows=text.split(/\r?\n/).filter(l=>/\d/.test(l)); let R=rows; if(R.length>721) R=R.slice(R.length-721);
+  const lo=90-lat, ln=lon+180, sp=0.25, i=Math.floor(lo/sp), j=Math.floor(ln/sp), fr=lo/sp-i, fc=ln/sp-j, row=k=>R[Math.min(k,R.length-1)].split(/[,;\s]+/).filter(x=>x!=="").map(Number);
+  const r1=row(i), r2=row(i+1), v=(r,c)=>r[Math.min(c,r.length-1)], y1=v(r1,j)+fc*(v(r1,j+1)-v(r1,j)), y2=v(r2,j)+fc*(v(r2,j+1)-v(r2,j)); return y1+fr*(y2-y1); }
 /* ---- mast clearance: the number a tower plan actually turns on ---- */
 function renderClearance(P,T,p){
   const card=$("clearCard"); if(!card) return;
@@ -8709,6 +8767,14 @@ function renderAuiRx(t){ const f=baseModel().p.f, mob=MP.layer==="mobile";
     <div class="field"><label for="auiRL">Cable loss to the receiver (dB)</label><input type="number" id="auiRL" min="0" max="20" step="0.5" value="${loss}"></div></div>
     <div class="two"><div class="field"><label for="auiJudge">Judge this receiver as</label><select id="auiJudge"><option value="auto"${!t.judge||t.judge==="auto"?" selected":""}>Automatic (directional antenna = link)</option><option value="broadcast"${t.judge==="broadcast"?" selected":""}>Broadcast listener (ITU minimum field strength)</option><option value="link"${t.judge==="link"?" selected":""}>Link receiver (sensitivity + antenna)</option></select></div>
     <div class="field"><label for="auiSens">Receiver sensitivity (dBm)</label><input type="number" id="auiSens" min="-130" max="-40" step="1" value="${rxSens(t)}"></div></div>
+    <details class="calcbox"><summary>Work out the cable loss and the sensitivity</summary>
+      <div class="two"><div class="field"><label for="rcCab">Cable</label><select id="rcCab">${Object.entries(RX_CABLES).map(([k,v])=>`<option value="${k}"${(t.rxCab||"lmr400")===k?" selected":""}>${esc(v.name)}</option>`).join("")}</select></div>
+        <div class="field"><label for="rcLen">Cable length (m)</label><input type="number" id="rcLen" min="0" max="500" step="1" value="${t.rxLen??((t.h||10)+10)}"></div></div>
+      <p class="hint" id="rcOut"></p><button class="btn sm" type="button" id="rcUse">Use this cable loss</button>
+      <div class="two" style="margin-top:10px"><div class="field"><label for="snB">Channel bandwidth (kHz)</label><input type="number" id="snB" min="1" max="20000" step="1" value="${t.snB??200}"></div>
+        <div class="field"><label for="snNF">Noise figure (dB)</label><input type="number" id="snNF" min="0" max="20" step="0.5" value="${t.snNF??3}"></div></div>
+      <div class="field"><label for="snCN">Required C/N for the modulation (dB, from the equipment data sheet)</label><input type="number" id="snCN" min="-10" max="40" step="0.5" value="${t.snCN??15}"></div>
+      <p class="hint" id="snOut"></p><button class="btn sm" type="button" id="snUse">Use this sensitivity</button></details>
     <label class="check"><input type="checkbox" id="auiAim" ${t.aim!==false?"checked":""}> Point the antenna at the transmitter automatically</label>
     <p class="hint">Now judged as a <b>${rxJudgeLink(t)?"link receiver":"broadcast listener"}</b>. The Map and the Animation use the same judgement.</p></section>
   <section class="auisec"><h3>Receiving antenna</h3><div id="rxAnt">${antFormHTML(a,f,"ra")}</div>
@@ -8724,6 +8790,13 @@ function renderAuiRx(t){ const f=baseModel().p.f, mob=MP.layer==="mobile";
   $("auiJudge").addEventListener("change",e=>{ t.judge=e.target.value; MP.res.clear(); updateMap(); renderAui(); });
   $("auiSens").addEventListener("change",e=>{ t.sens=clamp(Math.round(+e.target.value)||-90,-130,-40); MP.res.clear(); updateMap(); renderAui(); });
   $("auiAim").addEventListener("change",e=>{ t.aim=e.target.checked; renderAui(); });
+  { const cabL=()=>{ const C=RX_CABLES[$("rcCab").value]||RX_CABLES.lmr400, L=clamp(+$("rcLen").value||0,0,500), c=C.a100*Math.sqrt(Math.max(f,1)/100)*L/100; return {c,tot:c+0.2,C,L}; },
+      snS=()=>{ const B=clamp(+$("snB").value||200,1,20000), NF=+$("snNF").value||0, CN=+$("snCN").value||0, N=-174+10*Math.log10(B*1000); return {S:N+NF+CN,N,NF,CN,B}; },
+      upd=()=>{ const a=cabL(), b=snS(); $("rcOut").textContent=`${a.L} m × ${(a.C.a100*Math.sqrt(Math.max(f,1)/100)).toFixed(2)} dB/100 m at ${fmtF(f)} = ${a.c.toFixed(2)} dB, plus 0.2 dB for two connectors → ${a.tot.toFixed(1)} dB (typical data-sheet attenuation, scaled with √f).`;
+        $("snOut").textContent=`Noise floor kT₀B = −174 dBm/Hz + 10·log(${b.B*1000} Hz) = ${b.N.toFixed(1)} dBm; + NF ${b.NF} dB + C/N ${b.CN} dB → sensitivity ${b.S.toFixed(1)} dBm (T₀ = 290 K).`; };
+    ["rcCab","rcLen","snB","snNF","snCN"].forEach(id=>$(id).addEventListener("input",upd)); upd();
+    $("rcUse").addEventListener("click",()=>{ const a=cabL(); t.rxCab=$("rcCab").value; t.rxLen=a.L; t.rxLoss=+a.tot.toFixed(1); MP.res.clear(); updateMap(); renderAui(); });
+    $("snUse").addEventListener("click",()=>{ const b=snS(); t.snB=b.B; t.snNF=b.NF; t.snCN=b.CN; t.sens=Math.round(b.S); MP.res.clear(); updateMap(); renderAui(); }); }
   bindAntForm($("rxAnt"),()=>t.ant,(na,full)=>{ if(t.aim!==false&&na.az!=null) na.az=Math.round(bearing(t,MP.tx)); t.ant=na; if(full) renderAui(); else { drawPolar($("rxPolar"),t.ant); drawElev($("rxElev"),t.ant); drawAntShape($("rxShape"),t.ant,f); } renderSites(); },f);
   requestAnimationFrame(()=>{ drawPolar($("rxPolar"),a); drawElev($("rxElev"),a); drawAntShape($("rxShape"),a,f); const hw=$("rxHow"); if(hw) hw.textContent="How it works: "+(ANT_HOW[a.type]||""); }); }
 function renderAui(){

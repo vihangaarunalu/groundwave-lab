@@ -120,6 +120,35 @@ largest error and the correlation r, with e = measured − predicted. Report the
 **Location variability** (Map): coverage at 50, 90, 95 and 99 % of locations from σL (ITU-R P.1812). Example:
 Colombo → Yatiyantota, 312.1 MHz, σL = 3.7 dB, fade margin +36.4 dB at 50 % and +30.2 dB at 95 % of locations.
 
+## 6b. Link availability of the STL (Terrain profile tab → Link availability)
+
+Method: ITU-R P.530-18 §2.3.
+- §2.3.1, Eq. (7): multipath fading in the average worst month.
+- §2.3.2: all fade depths.
+- §2.3.4: conversion to the average year, with ΔG ≤ 10.8 dB.
+
+Inputs:
+- Path length, frequency, and antenna heights above sea level, all from the terrain profile.
+- Mean terrain height.
+- Flat fade margin from the link budget (receiver judged as a link).
+- Geoclimatic factor log K and dN75, read at the path midpoint from the ITU-R P.530-18 digital maps
+  **LogK.csv** and **dN75.csv**. Download them from itu.int and choose them in the card; the ITU does not
+  allow the maps to be redistributed, so the site does not include them.
+
+Validity: d ≥ 5 km and f ≥ 15/d GHz (251 MHz for the 60 km Colombo → Yatiyantota path, so 312.1 MHz is inside).
+Rain attenuation is not included: ITU-R P.838 starts at 1 GHz, and rain is negligible at VHF/UHF.
+
+The computation was checked against an independent calculation from the equations.
+An open MATLAB implementation exists (github.com/eeveetza/p530, marked untested by its author). It applies
+`max` where P.530 Eq. (31) caps ΔG at 10.8 dB, so do not use it for the annual figure without correcting this.
+
+Report: worst-month and annual percentage of time below sensitivity, availability % and outage minutes per year.
+**Use the real map values for the paper; the example numbers produced while testing the code came from synthetic maps.**
+
+Receiver panel helpers:
+- Cable loss from a cable class and length (typical data-sheet attenuation at 100 MHz, scaled with √f, plus 0.2 dB for connectors).
+- Sensitivity = −174 dBm/Hz + 10·log B + NF + C/N (T₀ = 290 K).
+
 ## 7. Honest limitations (put these in the paper)
 
 - Results in this phase come from simulated sensors (software-in-the-loop); SDR measurements are
