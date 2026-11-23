@@ -329,3 +329,17 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
 - The Animation's Quick settings have a **Transmitter antenna** control for LF/MF/HF too, with a **Settings** button that opens the same transmitter panel as the Map.
 - Link-view sliders and antenna choices update the Map as well.
 - **Fix:** Map paths now carry the local solar time at the midpoint. Before, the ITU-R P.1147 sky wave could not tell 05:00 before sunrise from 19:00 after sunset, so the Map and Animation could differ by about 3 dB. They now agree exactly.
+
+## v11.1: Engineering display style
+
+- A new **Style: Engineering / Teaching** switch in the Animation. Engineering is the default, and the choice is remembered.
+- Engineering style:
+  - flat background with a true-height and distance grid;
+  - ionospheric layers as outlined bands with text labels;
+  - the ground wave as a clean field-strength envelope with no oscillating wave;
+  - static sky rays with no travelling glow;
+  - no sun, moon, stars, weather pictures, blinking light or pulsing halos;
+  - flat, smaller label boxes;
+  - local solar time and sun elevation shown as text.
+- Teaching style keeps the original illustrated look for students.
+- **Fix:** the signal readout shows again in the link view.
