@@ -300,6 +300,8 @@ select.mapbtn{width:auto;border-radius:var(--r-sm);font-size:13px}
 .vertab .ok{color:var(--good-ink);font-weight:600}.vertab .no{color:var(--bad-ink);font-weight:600}
 .calcbox{margin:8px 0;border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 12px}
 .calcbox summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center}
+.inl-sel{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.inl-sel select{width:auto;min-height:40px;padding:6px 30px 6px 10px}
 .chart-head .inl{font-size:13px;color:var(--muted);margin:0 6px 0 4px}
 #profK{width:auto;display:inline-block;min-height:34px;padding:4px 30px 4px 10px;font-size:13px}
 .verdict .val .u1,.hud-val .u1{white-space:nowrap}
@@ -2174,7 +2176,7 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
 /* a taller map on desktop: the map is the work surface */
 @media (min-width:900px){#map{height:clamp(560px,calc(100vh - 200px),880px)}}
 /* the readout already sits in the side panel on wide screens: show it on the picture only in full screen, on narrow screens and in the link view */
-@media (min-width:1100px){.stage:not(.is-expanded):not(:fullscreen) #rxHud{display:none}body.an-ov .stage #rxHud{display:grid}}
+@media (min-width:1100px){.stage:not(.is-expanded):not(:fullscreen) #rxHud{display:none}body.an-ov .stage #rxHud{display:grid!important}}
 </style>
 </head>
 <body data-tab="lab">
@@ -2497,6 +2499,7 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
     <div class="row">
       <button class="btn" id="animMapTx" type="button" title="Animate the real path from the Map tab: transmitter to the selected receiver">Animate my map path</button>
       <button class="btn primary gs-only" id="tourBtn" type="button"><svg class=ic aria-hidden=true><use href=#i-play /></svg> Explain the picture</button>
+      <label class="inl-sel" for="anStyle"><span>Style</span><select id="anStyle"><option value="eng">Engineering</option><option value="teach">Teaching</option></select></label>
       <label class="check"><input type="checkbox" id="explainT" checked> Show labels</label>
       <button class="btn" id="playBtn" type="button" data-kbd="Space" data-tiptext="Play / pause"><svg class=ic aria-hidden=true><use href=#i-pause /></svg> Pause</button>
       <div class="field"><label for="speed">Speed</label><input type="range" id="speed" min="0.25" max="3" step="0.25" value="1" style="width:110px"></div>
@@ -4021,7 +4024,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v11.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v11.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -5824,6 +5827,7 @@ function niceStep(span){ const raw=span/6, p=Math.pow(10,Math.floor(Math.log10(r
 /* label pill with optional leader line to (tx,ty) */
 let PILLS=null;   /* boxes already placed this frame, so labels never sit on top of each other */
 function pill(c,text,x,y,o={}){
+  const ENGP=typeof AN!=="undefined"&&AN.style==="eng"; if(ENGP){ o=Object.assign({},o,{size:Math.min(o.size||12,11),bold:false,bg:o.bg||"rgba(9,20,31,.9)"}); }
   c.font=`${o.bold===false?500:600} ${o.size||12}px `+cssVar("--font-body");
   const w=c.measureText(text).width+14, h=(o.size||12)+10, W=c.canvas.clientWidth; let bx=o.align==="right"?x-w:o.align==="left"?x:x-w/2;
   bx=clamp(bx,6,W-w-6); let by=y-h/2;
@@ -5833,7 +5837,7 @@ function pill(c,text,x,y,o={}){
     PILLS.push({x:bx,y:by,w,h}); }
   const yc=by+h/2;
   if(o.to){ c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=1.2; c.beginPath(); c.moveTo(clamp(o.to[0],bx,bx+w),by+(o.to[1]>yc?h:0)); c.lineTo(o.to[0],o.to[1]); c.stroke(); c.fillStyle="#F7FAFC"; c.beginPath(); c.arc(o.to[0],o.to[1],2.5,0,7); c.fill(); }
-  c.fillStyle=o.bg||SC.label; c.beginPath(); c.roundRect?c.roundRect(bx,by,w,h,6):c.rect(bx,by,w,h); c.fill();
+  c.fillStyle=o.bg||SC.label; c.beginPath(); c.roundRect?c.roundRect(bx,by,w,h,ENGP?3:6):c.rect(bx,by,w,h); c.fill(); if(ENGP){ c.strokeStyle="rgba(236,244,252,.22)"; c.lineWidth=1; c.stroke(); }
   if(o.accent){ c.fillStyle=`rgb(${o.accent})`; c.fillRect(bx,by+4,3,h-8); }
   c.fillStyle=o.fg||"#F7FAFC"; c.textAlign="left"; c.textBaseline="middle"; c.fillText(text,bx+7+(o.accent?2:0),yc+0.5); c.textBaseline="alphabetic";
 }
@@ -5851,8 +5855,15 @@ function drawAnim(dt){
   const map=(th,alt)=>{ const a=(th-th0)/thS*Tv-Tv/2, r=Rpx+alt*altScale; return [cx+r*Math.sin(a), cy-r*Math.cos(a)]; };
   const angAt=d=>(d/RE-th0)/thS*Tv-Tv/2;
   AN.geom={cx,cy,Tv,map,x0,x1};
-  const t=AN.t, dA=d0-span*0.15, dB=d0+span*1.15;
+  const t=AN.t, dA=d0-span*0.15, dB=d0+span*1.15, ENG=AN.style==="eng";
   // sky background
+  if(ENG){ /* engineering style: flat background, true-height grid, no decoration */
+    c.fillStyle=cosC>0.05?"#13283a":cosC>-0.2?"#101f2e":"#0b1621"; c.fillRect(0,0,W,H);
+    c.strokeStyle="rgba(236,244,252,.07)"; c.lineWidth=1; for(const hk of [50,100,150,200,250,300,350,400]){ c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,hk); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); }
+    { const st0=niceStep(span); for(let d=Math.ceil(Math.max(d0,0)/st0)*st0; d<=d0+span; d+=st0){ const [xa,ya]=map(d/RE,0), [xb,yb]=map(d/RE,400); c.beginPath(); c.moveTo(xa,ya); c.lineTo(xb,yb); c.stroke(); } }
+    c.font="11px "+cssVar("--font-mono"); c.fillStyle="rgba(236,244,252,.7)"; c.textAlign="left"; c.textBaseline="top";
+    if(!AN.ovOn) c.fillText(`local solar time ${String(Math.floor(AN.hour)%24).padStart(2,"0")}:${String(Math.floor((AN.hour%1)*60)).padStart(2,"0")} · sun ${toDeg(Math.asin(clamp(cosC,-1,1))).toFixed(0)}° elevation`,14,66); c.textBaseline="alphabetic"; c.textAlign="left"; }
+  else {
   const [top,bot]=skyCols(cosC); const gr=c.createLinearGradient(0,0,0,H); gr.addColorStop(0,top); gr.addColorStop(1,bot); c.fillStyle=gr; c.fillRect(0,0,W,H);
   { const dayA=clamp((cosC+0.2)/0.6,0,1), duskA=clamp(1-Math.abs(cosC)/0.3,0,1);
     const hg=c.createRadialGradient(cx,gTop+40,10,cx,gTop+40,Math.max(W,H)*0.75);
@@ -5867,15 +5878,19 @@ function drawAnim(dt){
     c.fillStyle=hgr; c.beginPath(); c.arc(x,y,r*halo,0,7); c.fill(); c.fillStyle=col; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); return [x,y]; };
   if(sunU>-0.05&&sunU<1.05){ const [sx,sy]=body(sunU,"rgb(255,214,102)",13,4.2); if(flareLevel(p)>0){ c.strokeStyle="rgba(255,138,64,.9)"; c.lineWidth=2; c.lineCap="round"; for(let i=0;i<14;i++){ const a=i/14*Math.PI*2+t/1100, L=24+6*Math.sin(t/140+i); c.beginPath(); c.moveTo(sx+Math.cos(a)*17,sy+Math.sin(a)*17); c.lineTo(sx+Math.cos(a)*L,sy+Math.sin(a)*L); c.stroke(); } c.lineCap="butt"; } }
   else { const mu=((AN.hour+6)%24)/12; const [mx,my]=body(mu,"rgb(238,242,226)",10,3.2); c.fillStyle=top; c.beginPath(); c.arc(mx+5,my-4,9.5,0,7); c.fill(); }
+  }
 
   // ionosphere layers
   /* soft, feathered layers: a radial gradient centred on the earth gives exact curved edges; a slow shimmer keeps them alive */
-  const band=(h1,h2,rgb,a)=>{ const pad=(h2-h1)*0.45, r1=Rpx+(h1-pad)*altScale, r2=Rpx+(h2+pad)*altScale; if(r2<=0) return;
+  const band=(h1,h2,rgb,a)=>{ if(ENG){ const edge=hh=>{ c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,hh); i?c.lineTo(x,y):c.moveTo(x,y);} };
+      c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1); c.lineTo(x,y);} c.closePath(); c.fillStyle=`rgba(${rgb},${0.05+a*0.12})`; c.fill();
+      c.strokeStyle=`rgba(${rgb},.55)`; c.lineWidth=1; edge(h1); c.stroke(); edge(h2); c.stroke(); return; }
+    const pad=(h2-h1)*0.45, r1=Rpx+(h1-pad)*altScale, r2=Rpx+(h2+pad)*altScale; if(r2<=0) return;
     const g=c.createRadialGradient(cx,cy,Math.max(0,r1),cx,cy,r2), sh=1+0.12*Math.sin(t/1400+h1);
     g.addColorStop(0,`rgba(${rgb},0)`); g.addColorStop(0.3,`rgba(${rgb},${a*0.55*sh})`); g.addColorStop(0.5,`rgba(${rgb},${a*sh})`); g.addColorStop(0.7,`rgba(${rgb},${a*0.55*sh})`); g.addColorStop(1,`rgba(${rgb},0)`);
     c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h2+pad); i?c.lineTo(x,y):c.moveTo(x,y);} for(let i=60;i>=0;i--){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,h1-pad); c.lineTo(x,y);} c.closePath(); c.fillStyle=g; c.fill();
     c.strokeStyle=`rgba(${rgb},${Math.min(0.9,a*1.4)})`; c.lineWidth=1; c.setLineDash([2,6]); c.lineDashOffset=-t/90; c.beginPath(); for(let i=0;i<=60;i++){ const [x,y]=map((dA+(dB-dA)*i/60)/RE,(h1+h2)/2); i?c.lineTo(x,y):c.moveTo(x,y);} c.stroke(); c.setLineDash([]); c.lineDashOffset=0; };
-  const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); pill(c,txt,W-66,y,{align:"right",accent:rgb,size:11.5}); };
+  const layerTag=(txt,h,rgb)=>{ const [,y]=map((d0+span*0.97)/RE,h); if(ENG){ c.font="11px "+cssVar("--font-body"); c.fillStyle=`rgb(${rgb})`; c.textAlign="right"; c.fillText(txt,W-70,y+4); c.textAlign="left"; return; } pill(c,txt,W-66,y,{align:"right",accent:rgb,size:11.5}); };
   const ionoOff=!!AN.ovOn; c.globalAlpha=fa("iono")*(ionoOff?0.3:1);
   const dDens=clamp((io.I-0.08)/1.2,0,1)*(flareLevel(p)>0&&cosC>0?1+0.15*flareLevel(p):1);
   if(dDens>0.02) band(60,90,SC.D,clamp(dDens*0.7,0.08,0.8));
@@ -5935,7 +5950,7 @@ function drawAnim(dt){
 
   // weather
   const g1=effGround(p.ground,p), wet=g1.kind==="land"&&!p.frozen?p.moisture:"normal";
-  if((wet==="wet"||wet==="saturated"||p.storm!=="none")&&p.f<30){
+  if(!ENG&&(wet==="wet"||wet==="saturated"||p.storm!=="none")&&p.f<30){
     const n=p.storm==="local"||wet==="saturated"?7:4;
     for(let i=0;i<n;i++){ const [x,y]=map((d0+span*(0.12+i*0.8/n))/RE,0); const yy=y-112;
       c.fillStyle=p.storm==="local"?"rgba(95,105,125,.93)":cosC<0?"rgba(150,160,185,.85)":"rgba(240,244,250,.93)";
@@ -5943,7 +5958,7 @@ function drawAnim(dt){
       if(wet!=="normal"||p.storm==="local"){ c.strokeStyle="rgba(170,205,255,.85)"; c.lineWidth=1.2; for(let k=0;k<6;k++){ const ry=((t/6+k*13+i*7)%70); c.beginPath(); c.moveTo(x-13+k*5,yy+14+ry); c.lineTo(x-15+k*5,yy+21+ry); c.stroke(); } }
       if(p.storm!=="none"&&i%2===0&&Math.floor(t/160+i)%6===0){ c.strokeStyle="#fff6a8"; c.lineWidth=2.4; c.beginPath(); c.moveTo(x,yy+12); c.lineTo(x-7,yy+34); c.lineTo(x+3,yy+34); c.lineTo(x-5,yy+60); c.stroke(); } }
   }
-  if(p.frozen){ c.fillStyle="rgba(255,255,255,.9)"; for(let i=0;i<50;i++){ c.fillRect((i*71.3+t/30)%W,(i*37.1+t/14)%gTop,2,2);} }
+  if(p.frozen&&!ENG){ c.fillStyle="rgba(255,255,255,.9)"; for(let i=0;i<50;i++){ c.fillRect((i*71.3+t/30)%W,(i*37.1+t/14)%gTop,2,2);} }
 
   // analysis (zones), cached
   const aKey=JSON.stringify(m.p)+"|"+Math.round(AN.hour*4);
@@ -5964,9 +5979,9 @@ function drawAnim(dt){
   c.globalAlpha=OV?0:fa("tx");
   c.strokeStyle="#eef1f5"; c.lineWidth=2.4; c.beginPath(); c.moveTo(tx,ty); c.lineTo(tx,ty-58); c.stroke();
   c.lineWidth=1; for(let k=1;k<6;k++){ c.beginPath(); c.moveTo(tx-5+k*0.7,ty-k*10); c.lineTo(tx+5-k*0.7,ty-k*10-6); c.stroke(); }
-  c.fillStyle=Math.floor(t/500)%2?"#ff4d4d":"#7a1d1d"; c.beginPath(); c.arc(tx,ty-60,3,0,7); c.fill();
-  for(let k=0;k<3;k++){ const r=((t/12+k*20)%60), e=r/60; c.strokeStyle=`rgba(${SC.gw},${0.75*(1-e)*(1-e)})`; c.lineWidth=2-e; c.beginPath(); c.arc(tx,ty-58,4+r,-Math.PI*0.95,-Math.PI*0.05); c.stroke(); }
-  { const lg=c.createRadialGradient(tx,ty-60,0,tx,ty-60,10); lg.addColorStop(0,`rgba(255,77,77,${Math.floor(t/500)%2?0.55:0.12})`); lg.addColorStop(1,"rgba(255,77,77,0)"); c.fillStyle=lg; c.beginPath(); c.arc(tx,ty-60,10,0,7); c.fill(); }
+  if(!ENG){ c.fillStyle=Math.floor(t/500)%2?"#ff4d4d":"#7a1d1d"; c.beginPath(); c.arc(tx,ty-60,3,0,7); c.fill(); }
+  if(!ENG) for(let k=0;k<3;k++){ const r=((t/12+k*20)%60), e=r/60; c.strokeStyle=`rgba(${SC.gw},${0.75*(1-e)*(1-e)})`; c.lineWidth=2-e; c.beginPath(); c.arc(tx,ty-58,4+r,-Math.PI*0.95,-Math.PI*0.05); c.stroke(); }
+  if(!ENG){ const lg=c.createRadialGradient(tx,ty-60,0,tx,ty-60,10); lg.addColorStop(0,`rgba(255,77,77,${Math.floor(t/500)%2?0.55:0.12})`); lg.addColorStop(1,"rgba(255,77,77,0)"); c.fillStyle=lg; c.beginPath(); c.arc(tx,ty-60,10,0,7); c.fill(); }
   { // transmitter marked like its pin on the Map tab
     const geo=p.path==="geo", S=MP.S.bcast, mt=S.txs[S.ti]||S.txs[0], px=tx, py=ty-86;
     c.fillStyle="#d13b4f"; c.strokeStyle="#F7FAFC"; c.lineWidth=2; c.beginPath(); c.arc(px,py-8,11,Math.PI*0.85,Math.PI*0.15,false); c.lineTo(px,py+8); c.closePath(); c.fill(); c.stroke();
@@ -5987,6 +6002,11 @@ function drawAnim(dt){
     c.beginPath(); AN.gw.forEach((q,i)=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), A2=ampQ(q); const x=gx+Math.sin(a)*A2, y=gy-Math.cos(a)*A2; i?c.lineTo(x,y):c.moveTo(x,y); });
     for(let i=AN.gw.length-1;i>=0;i--){ const [gx,gy]=map(AN.gw[i].d/RE,tAlt(AN.gw[i].d)); c.lineTo(gx,gy); } c.closePath();
     { const fg=c.createLinearGradient(0,gTop-60,0,gTop+10); fg.addColorStop(0,`rgba(${SC.gw},.34)`); fg.addColorStop(1,`rgba(${SC.gw},.06)`); c.fillStyle=fg; c.fill(); }
+    if(ENG){ /* field-strength envelope: height = level above the minimum, no oscillation */
+      c.strokeStyle=`rgb(${SC.gw})`; c.lineWidth=1.8; c.lineJoin="round"; c.beginPath(); let on=false;
+      AN.gw.forEach(q=>{ const A2=ampQ(q); if(A2<0.5){ on=false; return; } const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), x=gx+Math.sin(a)*A2, y=gy-Math.cos(a)*A2; on?c.lineTo(x,y):c.moveTo(x,y); on=true; }); c.stroke();
+      }
+    else {
     const lamV=span/16, ph=t/1000*2*Math.PI*0.9;
     { const ptG=q=>{ const a=angAt(q.d), [gx,gy]=map(q.d/RE,tAlt(q.d)), o=ampQ(q)*(0.5+0.5*Math.sin(2*Math.PI*q.d/lamV-ph)); return [gx+Math.sin(a)*o, gy-Math.cos(a)*o]; };
       c.lineCap="round"; c.lineJoin="round"; c.lineWidth=9; c.strokeStyle=`rgba(${SC.gw},.16)`; c.beginPath(); let on=false;
@@ -5997,6 +6017,7 @@ function drawAnim(dt){
       const [ax,ay]=pt(q0),[bx,by]=pt(q1); c.strokeStyle=`rgba(${SC.gw},${clamp(A2/48+0.3,0,1)})`; c.beginPath(); c.moveTo(ax,ay); c.lineTo(bx,by); c.stroke(); }
     if(p.f<30) for(let k=0;k<22;k++){ const d=d0+(((k*lamV+(ph/(2*Math.PI))*lamV)%(span*1.12))+span*1.12)%(span*1.12); if(d<1) continue; const q=AN.gw[Math.min(AN.gw.length-1,Math.max(0,Math.round((d-d0)/(span*1.12)*300)))]; const A2=ampQ(q); if(A2<1) continue;
       const a=angAt(d), [gx,gy]=map(d/RE,tAlt(d)), L=A2+10; c.strokeStyle=`rgba(236,250,200,${clamp(A2/48,0.1,0.75)})`; c.lineWidth=1.2; c.beginPath(); c.moveTo(gx,gy); c.lineTo(gx+Math.sin(a+tilt)*L, gy-Math.cos(a+tilt)*L); c.stroke(); }
+    }
     c.lineCap="butt";
     // VHF / UHF: line of sight and radio horizon
     if(p.f>=30){ const hz=radioHorizon(p); const [hx,hy]=map(hz/RE,0);
@@ -6006,7 +6027,7 @@ function drawAnim(dt){
     const r=AN.svc; if(r&&r<d0+span*1.05&&r>d0){ const [xr,y]=map(r/RE,0); c.strokeStyle="rgba(255,255,255,.85)"; c.setLineDash([3,3]); c.lineWidth=1.2; c.beginPath(); c.moveTo(xr,y); c.lineTo(xr,y-80); c.stroke(); c.setLineDash([]);
       pill(c,`${p.f>=30?"Coverage":"Ground-wave"} limit ${fmtD(r)} km`,xr,y-92,{accent:SC.gw}); }
     if(AN.labels&&!TR&&span<=1200){ const dl=clamp((r||span)*0.35,d0+span*0.1,d0+span*0.45); const q=AN.gw[Math.min(300,Math.max(0,Math.round((dl-d0)/(span*1.12)*300)))]; const [gx,gy]=map(dl/RE,0);
-      pill(c,p.type==="cell"?`${(CELL_TECH[p.tech]||{}).name||"Mobile"}: ${cellMethod(p)}`:p.f>=30?"Space wave: direct + reflected, line of sight":"Ground wave: follows the curve, fades with distance",gx+30,gy-amp(q.v)-78,{to:[gx,gy-amp(q.v)*0.6],accent:SC.gw}); }
+      pill(c,p.type==="cell"?`${(CELL_TECH[p.tech]||{}).name||"Mobile"}: ${cellMethod(p)}`:p.f>=30?"Space wave: direct + reflected, line of sight":(ENG?"Ground-wave field strength (line height = dB above the minimum)":"Ground wave: follows the curve, fades with distance"),gx+30,gy-amp(q.v)-78,{to:[gx,gy-amp(q.v)*0.6],accent:SC.gw}); }
     c.globalAlpha=1;
   }
 
@@ -6029,7 +6050,7 @@ function drawAnim(dt){
       for(let i=1;i<pts.length;i++){ const [xa,ya]=map(pts[i-1][0],pts[i-1][1]),[xb,yb]=map(pts[i][0],pts[i][1]); c.strokeStyle=h?`rgba(${SC.sky},${clamp(alph[i]*0.8,0.06,0.8)})`:`rgba(${SC.esc},${clamp(alph[i]*0.35,0.05,0.35)})`; c.beginPath(); c.moveTo(xa,ya); c.lineTo(xb,yb); c.stroke(); }
       c.setLineDash([]);
       const n=pts.length, sp=n/(h?3600*hops/1.2:2400);
-      for(let k=0;k<2;k++){ const u=((t*sp)+ix*17+k*n/2)%n; const i=Math.floor(u); const a=alph[i];
+      if(!ENG) for(let k=0;k<2;k++){ const u=((t*sp)+ix*17+k*n/2)%n; const i=Math.floor(u); const a=alph[i];
         if(h&&a>0.05){ const [hx,hy]=map(pts[i][0],pts[i][1]); const hg2=c.createRadialGradient(hx,hy,0,hx,hy,9); hg2.addColorStop(0,`rgba(${SC.sky},${clamp(a*0.6,0,0.6)})`); hg2.addColorStop(1,`rgba(${SC.sky},0)`); c.fillStyle=hg2; c.beginPath(); c.arc(hx,hy,9,0,7); c.fill(); }
         for(let q=0;q<7;q++){ const j=i-q; if(j<0) break; const [x,y]=map(pts[j][0],pts[j][1]); c.fillStyle=h?`rgba(${SC.sky},${clamp(a*(1-q/7),0,1)})`:`rgba(${SC.esc},${clamp(a*0.7*(1-q/7),0,1)})`; c.beginPath(); c.arc(x,y,q===0?3.4:2.2,0,7); c.fill(); } }
       if(h&&apex&&!apexLabel&&ed>=12) apexLabel={pt:map(apex[0],apex[1]),txt:`Sky wave bends back at the ${lname} layer`,ab};
@@ -6049,7 +6070,7 @@ function drawAnim(dt){
       segp(0,0,L.th,L.h); segp(L.th,L.h,2*L.th,0);
       const path=()=>{ c.beginPath(); pts.forEach((q,i)=>{ const [x,y]=map(q[0],q[1]); i?c.lineTo(x,y):c.moveTo(x,y); }); };
       c.lineCap="round"; c.lineJoin="round"; path(); c.strokeStyle="rgba(205,242,58,.22)"; c.lineWidth=8; c.stroke();
-      path(); c.strokeStyle="rgba(205,242,58,.95)"; c.lineWidth=2.2; c.setLineDash([9,6]); c.lineDashOffset=-t/60; c.stroke(); c.setLineDash([]); c.lineDashOffset=0;
+      path(); c.strokeStyle="rgba(205,242,58,.95)"; c.lineWidth=2.2; c.setLineDash([9,6]); c.lineDashOffset=ENG?0:-t/60; c.stroke(); c.setLineDash([]); c.lineDashOffset=0;
       // layer height
       const [ax,ay]=map(L.th,L.h), [gx,gy]=map(L.th,0);
       c.strokeStyle="rgba(236,244,252,.75)"; c.lineWidth=1; c.setLineDash([3,4]); c.beginPath(); c.moveTo(ax,ay); c.lineTo(gx,gy); c.stroke(); c.setLineDash([]);
@@ -6085,7 +6106,7 @@ function drawAnim(dt){
     c.fillStyle="#102C40"; c.strokeStyle="#F7FAFC"; c.lineWidth=1.5; c.beginPath(); c.roundRect?c.roundRect(-14,-19,28,17,4):c.rect(-14,-19,28,17); c.fill(); c.stroke();
     c.beginPath(); c.moveTo(7,-19); c.lineTo(13,-36); c.stroke();
     { const rv=evalP(p,Math.max(AN.rx,0.05),io).t, ok=rv!==null&&rv>=thr, col=ok?SC.gw:SC.skip, pulse=0.55+0.45*Math.sin(t/260);
-      const lg=c.createRadialGradient(-5,-10,0,-5,-10,11); lg.addColorStop(0,`rgba(${col},${0.55*pulse})`); lg.addColorStop(1,`rgba(${col},0)`); c.fillStyle=lg; c.beginPath(); c.arc(-5,-10,11,0,7); c.fill();
+      if(!ENG){ const lg=c.createRadialGradient(-5,-10,0,-5,-10,11); lg.addColorStop(0,`rgba(${col},${0.55*pulse})`); lg.addColorStop(1,`rgba(${col},0)`); c.fillStyle=lg; c.beginPath(); c.arc(-5,-10,11,0,7); c.fill(); }
       c.fillStyle=`rgb(${col})`; c.beginPath(); c.arc(-5,-10,3.6,0,7); c.fill(); }
     c.restore();
     pill(c,`Receiver ${fmtD(AN.rx)} km`,rx,ry-58,{size:11.5,to:[rx,ry-40]});
@@ -6125,8 +6146,8 @@ function drawLinkOverlay(c,o){ const {map,TR,tAlt,tEx,altScale,p,t,W,H,OV}=o, L=
   // Fresnel zone
   c.fillStyle="rgba(98,206,255,.13)"; c.strokeStyle="rgba(98,206,255,.5)"; c.lineWidth=1; c.beginPath();
   for(let i=0;i<=80;i++){ const dm=D*i/80, [x,y]=pt(dm,rayT(dm)+G.r1(dm)); i?c.lineTo(x,y):c.moveTo(x,y); } for(let i=80;i>=0;i--){ const dm=D*i/80, [x,y]=pt(dm,rayT(dm)-G.r1(dm)); c.lineTo(x,y); } c.closePath(); c.fill(); c.stroke();
-  const glow=(ptsS,cc,ph)=>{ let Lt=0; const sg=[]; for(let i=1;i<ptsS.length;i++){ const l=Math.hypot(ptsS[i][0]-ptsS[i-1][0],ptsS[i][1]-ptsS[i-1][1]); sg.push(l); Lt+=l; } if(!Lt) return; for(let k=0;k<3;k++){ let s2=((t*0.12+(ph||0))+k*Lt/3)%Lt, i=0; while(i<sg.length-1&&s2>sg[i]){ s2-=sg[i]; i++; } const u=sg[i]?s2/sg[i]:0, x=ptsS[i][0]+(ptsS[i+1][0]-ptsS[i][0])*u, y=ptsS[i][1]+(ptsS[i+1][1]-ptsS[i][1])*u, gl=c.createRadialGradient(x,y,0,x,y,10); gl.addColorStop(0,`rgba(${cc},.95)`); gl.addColorStop(1,`rgba(${cc},0)`); c.fillStyle=gl; c.beginPath(); c.arc(x,y,10,0,7); c.fill(); } };
-  const poly=(ptsS,cc,w,dash)=>{ c.strokeStyle=`rgba(${cc},.95)`; c.lineWidth=w||2.2; c.setLineDash(dash||[3,6]); c.lineDashOffset=dash?0:-t/40; c.beginPath(); ptsS.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])); c.stroke(); c.setLineDash([]); c.lineDashOffset=0; };
+  const glow=(ptsS,cc,ph)=>{ if(AN.style==="eng") return; let Lt=0; const sg=[]; for(let i=1;i<ptsS.length;i++){ const l=Math.hypot(ptsS[i][0]-ptsS[i-1][0],ptsS[i][1]-ptsS[i-1][1]); sg.push(l); Lt+=l; } if(!Lt) return; for(let k=0;k<3;k++){ let s2=((t*0.12+(ph||0))+k*Lt/3)%Lt, i=0; while(i<sg.length-1&&s2>sg[i]){ s2-=sg[i]; i++; } const u=sg[i]?s2/sg[i]:0, x=ptsS[i][0]+(ptsS[i+1][0]-ptsS[i][0])*u, y=ptsS[i][1]+(ptsS[i+1][1]-ptsS[i][1])*u, gl=c.createRadialGradient(x,y,0,x,y,10); gl.addColorStop(0,`rgba(${cc},.95)`); gl.addColorStop(1,`rgba(${cc},0)`); c.fillStyle=gl; c.beginPath(); c.arc(x,y,10,0,7); c.fill(); } };
+  const poly=(ptsS,cc,w,dash)=>{ c.strokeStyle=`rgba(${cc},.95)`; c.lineWidth=w||2.2; c.setLineDash(dash||[3,6]); c.lineDashOffset=dash||AN.style==="eng"?0:-t/40; c.beginPath(); ptsS.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])); c.stroke(); c.setLineDash([]); c.lineDashOffset=0; };
   const ray=[]; for(let i=0;i<=80;i++){ const dm=D*i/80; ray.push(pt(dm,rayT(dm))); }
   const txTop=pt(0,G.A), rxTop=pt(D,G.B);
   let banner="", bcol=col, extra=[];
@@ -6605,6 +6626,8 @@ function bindScenes(){
   $("scToMap").addEventListener("click",()=>go("map"));
   const lmView=v=>{ $("linkMath").classList.toggle("eqv",v==="eq"); $("lmTabB").setAttribute("aria-pressed",String(v!=="eq")); $("lmTabE").setAttribute("aria-pressed",String(v==="eq")); try{ localStorage.setItem("gw-lmview",v); }catch(e){} $("lmP").dataset.h=""; };
   document.addEventListener("click",e=>{ if(!(e.target.closest&&e.target.closest("#mvAim"))) return; const a=MP.tx.ant; if(!a) return; delete a.manual; a.az=Math.round(bearing(MP.tx,MP.rx)); MP.res.clear(); updateMap(); });
+  { const sty=$("anStyle"); let v="eng"; try{ v=localStorage.getItem("gw-anstyle")||"eng"; }catch(e){} AN.style=v; sty.value=v;
+    sty.addEventListener("change",e=>{ AN.style=e.target.value; try{ localStorage.setItem("gw-anstyle",AN.style); }catch(err){} AN.gwKey=""; }); }
   $("lmTabB").addEventListener("click",()=>lmView("budget")); $("lmTabE").addEventListener("click",()=>lmView("eq"));
   try{ if(localStorage.getItem("gw-lmview")==="eq") lmView("eq"); }catch(e){}
   $("lmMin").addEventListener("click",()=>{ const m=$("linkMath").classList.toggle("min"); $("lmMin").textContent=m?"Show":"Hide"; $("lmMin").setAttribute("aria-expanded",String(!m)); });
