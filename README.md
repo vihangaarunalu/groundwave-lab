@@ -311,3 +311,14 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
 - Map: the pin buttons (Settings, Rename, Delete) appear only after you select a pin, instead of covering the map on load. The map fills the screen height on desktop. The opening hint matches Select mode, and the path summary shows the transmitter's own frequency and power.
 - Animation: on wide screens the signal readout appears once, in the side panel, and on the picture only in full screen and in the link view. "Guided tour" is renamed "Explain the picture" so it isn't confused with the site Guide.
 - Models: Verification moved below the step-by-step calculation, with left-aligned headings.
+
+## v10.9: STL link engineering (Package B)
+
+- **Link availability** (Terrain profile tab):
+  - Uses ITU-R P.530-18 §2.3: multipath fading in the worst month and over the average year, from the link's flat fade margin.
+  - Gives the worst-month and annual outage, the availability % and the outage minutes per year.
+  - log K and dN75 can be typed, or read at the path midpoint from the ITU-R map files LogK.csv and dN75.csv. You choose the files and they are read in the browser; the maps are not redistributed.
+  - Validity checks: d ≥ 5 km and f ≥ 15/d.
+- **Receiver panel:**
+  - Cable-loss calculator (RG-58, RG-213, LMR-400, ½″ and ⅞″ foam coax; √f scaling plus connectors).
+  - Sensitivity calculator: kT₀B + NF + C/N.
