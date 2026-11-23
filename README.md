@@ -343,3 +343,14 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
   - local solar time and sun elevation shown as text.
 - Teaching style keeps the original illustrated look for students.
 - **Fix:** the signal readout shows again in the link view.
+
+## v11.2: live weather in the prediction
+
+- A **Live weather** card on the Map, Terrain profile and Animation. The location is the path midpoint (default), the transmitter, the receiver, your own location or a custom point.
+- With **Use in the prediction** switched on, live Open-Meteo data sets:
+  - the k-factor, from the refractivity gradient in the lowest kilometre (ITU-R P.453/P.834), with a ducting warning;
+  - the rain rate (P.838);
+  - the ground moisture category (P.527);
+  - frozen ground;
+  - local thunderstorms (P.372).
+- It refreshes every 15 minutes. If it is offline, the manual settings are used. The choice is remembered.

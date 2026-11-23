@@ -149,6 +149,24 @@ Receiver panel helpers:
 - Cable loss from a cable class and length (typical data-sheet attenuation at 100 MHz, scaled with √f, plus 0.2 dB for connectors).
 - Sensitivity = −174 dBm/Hz + 10·log B + NF + C/N (T₀ = 290 K).
 
+## 6c. Live weather as a model input (Map, Terrain profile, Animation)
+
+Source: the Open-Meteo forecast API (hourly, about 10–25 km grid), at the path midpoint (default), the transmitter,
+the receiver, the user's own location or a custom point. When "Use in the prediction" is on:
+
+| Live value | Derived input | Standard |
+|---|---|---|
+| T, RH, surface pressure | Surface refractivity Ns = 77.6/T·(P + 4810·e/T), e from RH with the P.453 saturation formula | ITU-R P.453 |
+| T, RH at 1000/925/850/700 hPa plus geopotential height | Refractivity at 1 km above ground → dN/dh → k = 157/(157 + dN/dh); ducting if dN/dh ≤ −157 N/km | ITU-R P.453, P.834 |
+| Precipitation (mm/h) | Rain rate for the specific attenuation | ITU-R P.838 |
+| Soil moisture 0–1 cm | Ground category (dry/normal/wet/saturated), an approximate mapping | ITU-R P.527 |
+| Soil temperature | Frozen ground | ITU-R P.527 |
+| Weather code 95/96/99 (thunderstorm) | Local storm → atmospheric noise warning at LF–HF | ITU-R P.372 |
+
+Limits: the values come from a weather model, not from measurements at the site. Thin ducting layers can fall between
+the model's pressure levels. The P.1812 verification (section 6) uses standard conditions and is not affected.
+For the digital shadow, record the weather with each measurement and compare prediction errors on wet and dry days.
+
 ## 7. Honest limitations (put these in the paper)
 
 - Results in this phase come from simulated sensors (software-in-the-loop); SDR measurements are

@@ -2177,6 +2177,22 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
 @media (min-width:900px){#map{height:clamp(560px,calc(100vh - 200px),880px)}}
 /* the readout already sits in the side panel on wide screens: show it on the picture only in full screen, on narrow screens and in the link view */
 @media (min-width:1100px){.stage:not(.is-expanded):not(:fullscreen) #rxHud{display:none}body.an-ov .stage #rxHud{display:grid!important}}
+
+/* ---- live weather card ---- */
+.lwbox{font-size:13.5px;min-width:0;max-width:100%;box-sizing:border-box}
+.lwbox dd{overflow-wrap:anywhere}
+.lwbox .field label{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-weight:600}
+section.lwbox{padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md,12px);background:var(--panel)}
+.lwbox .lwh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.lwbox .lwh h3{margin:0;font:600 15px var(--font-body)}
+.lwbox .lwrow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:8px}
+.lwbox .lwrow .field{margin:0}
+.lwbox select,.lwbox input[type=number]{min-height:36px}
+.lwbox dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 12px;margin:10px 0 0}
+.lwbox dt{color:var(--muted)} .lwbox dd{margin:0;font-family:var(--font-mono);font-size:12.5px}
+.lwbox dd small{font-family:var(--font-body);color:var(--muted)}
+.lwbox .lwwarn{margin-top:8px;padding:6px 10px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--warn) 14%,transparent)}
+.lwin{border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
 </style>
 </head>
 <body data-tab="lab">
@@ -2629,7 +2645,8 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
         <div class="field"><label for="aAnt">Transmitter antenna</label><div class="row" style="gap:8px;flex-wrap:nowrap"><select id="aAnt" style="flex:1;min-width:0"></select><button class="btn sm" type="button" id="aAntSet">Settings</button></div><p class="hint" id="aAntInfo" style="margin:4px 0 0"></p></div>
         <div class="field"><label for="aGround">Ground</label><select id="aGround"></select></div>
         <div class="field"><label for="aFlare">Solar flare</label><select id="aFlare"><option value="0">None</option><option value="1">R1 · M1</option><option value="2">R2 · M5</option><option value="3">R3 · X1</option><option value="4">R4 · X10</option><option value="5">R5 · X20</option></select><span class="hint" id="aFlareNote"></span></div>
-        <div class="field"><span class="lbl">Weather</span><div class="chips" id="aWx"></div></div>
+        <div class="lwbox lwin" aria-label="Live weather"></div>
+        <div class="field"><span class="lbl">Weather (manual)</span><div class="chips" id="aWx"></div></div>
       </section>
       <section class="panel card gs-only">
         <div class="card-h"><h3>Time of day</h3><span class="pill info" id="phase">Day</span></div>
@@ -2754,6 +2771,7 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
 
   <div class="mapresult" id="mapResult">
     <section class="panel card verdict" aria-live="polite" id="mapVerdict"></section>
+    <section class="panel card lwbox" aria-label="Live weather"></section>
     <section class="panel card">
       <div class="tiles" id="mapTiles"></div>
     </section>
@@ -2850,6 +2868,7 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
       <div class="tsum" id="tSum" aria-live="polite"></div>
     </div>
   </section>
+  <section class="panel card lwbox" aria-label="Live weather"></section>
   <section class="panel card" id="clearCard" hidden>
     <div class="chart-head"><h2>Mast clearance</h2><span class="muted" id="clearRule">60% of the first Fresnel zone, earth bulge at k = 4/3</span></div>
     <p class="big" id="clearVerdict"></p>
@@ -4024,7 +4043,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v11.1</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v11.2</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -4431,7 +4450,7 @@ const CELL_TECH={
   "5gmm":{name:"5G mmWave 28 GHz",f:28000,P:3.16,thr:-110,sys:"NR n257",meas:"SS-RSRP",off:32.0,ul:130,ueP:23,bw:"200 MHz, 1584 subcarriers",bands:[-80,-90,-100],real:{urban:[0.1,0.3],suburban:[0.1,0.4],rural:[0.2,1]}}
 };
 const dBm=kW=>10*Math.log10(kW*1e6);
-function rainRate(p){ if(p.storm==="local") return 100; if(p.moisture==="saturated") return 50; if(p.storm==="distant") return 25; if(p.moisture==="wet") return 10; return 0; }
+function rainRate(p){ if(p.rainR!=null&&isFinite(p.rainR)) return p.rainR; if(p.storm==="local") return 100; if(p.moisture==="saturated") return 50; if(p.storm==="distant") return 25; if(p.moisture==="wet") return 10; return 0; }
 /* ITU-R P.838-3 horizontal-polarisation coefficients (log-interpolated) */
 const P838=[[1,0.0000259,0.9691],[2,0.0000847,1.0664],[4,0.0001071,1.6009],[6,0.0007056,1.5900],[8,0.004115,1.3905],[10,0.01217,1.2571],[12,0.02386,1.1825],[15,0.04481,1.1233],[20,0.09164,1.0568],[25,0.1571,0.9991],[30,0.2403,0.9485],[40,0.4431,0.8673]];
 function rainSpecific(fGHz,R){ if(R<=0||fGHz<1) return 0; const t=P838; let i=0; while(i<t.length-2&&fGHz>t[i+1][0]) i++;
@@ -5637,7 +5656,7 @@ const AN={id:null,hour:12,cycle:false,playing:!window.matchMedia("(prefers-reduc
 const cosFromHour=h=>Math.cos(2*Math.PI*(h-12)/24);
 const hourFromCos=c=>12-Math.acos(clamp(c,-1,1))*12/Math.PI;
 function animModel(){ return models.find(m=>m.id===AN.id)||sel(); }
-function animParams(){ const m=animModel(); return Object.assign({},m.p,{cosChi:cosFromHour(AN.hour),hour:AN.hour}); }
+function animParams(){ const m=animModel(); const q=Object.assign({},m.p,{cosChi:cosFromHour(AN.hour),hour:AN.hour}); return window.applyLiveWx?applyLiveWx(q):q; }
 function resetView(){ const span=+$("animRange").value; AN.view={d0:-span*0.03,span}; syncRx(); }
 /* ---- quick settings: edit the animated model directly ---- */
 const A_FREQS=[["LF 200k",0.2],["MW 1M",1],["HF 7M",7],["HF 15M",15],["VHF 100M",100],["UHF 600M",600]];
@@ -6786,6 +6805,7 @@ function paramsFor(P,rx,T,tx){
     gmlat:+geomagLat(mid.lat,mid.lon).toFixed(1),azi:+bearing(tx,rx).toFixed(0),seaFrac:clamp(1-P.landPct/100,0,1),
     pathLabel:`${tx.name} → ${rx.name}, ${P.landPct}% land`});
   if(!ct) applyStation(p,tx,rx);
+  if(window.applyLiveWx) applyLiveWx(p);
   return p;
 }
 /* dipole geomagnetic latitude (IGRF-13 pole 80.65° N, 72.68° W) */
@@ -6993,7 +7013,7 @@ function predictMulti0(rx,Tsel){
     return {...base,ok:false,fading:false,verdict:ct?`No ${TECH_LABEL[ct]||ct} transmitter on the map`:"No reliable reception",cls:"bad",servers:all,server:null,noServer:!any}; }
   const b=cand[0]; return {...b.pred,servers:all,server:b,ranked:cand};
 }
-function siteSig(rx){ const b=baseModel(); return JSON.stringify([rx.judge,rx.sens,rx.rxLoss,rx.aim,rx.ant&&rx.ant.type,rx.ant&&rx.ant.el,MP.txs.map(t=>[t.lat,t.lon,t.h,t.techs,t.sector,t.az,t.tilt]),MP.ti,MP.layer,MP.benv,MP.relays.map(r=>[r.lat,r.lon,r.h,r.P,r.f,r.src,r.feed&&[r.feed.kind,r.feed.f,r.feed.erp,r.feed.gRx],(r.services||[]).map(v=>[v.f,v.P,v.share,v.on])]),MP.cov&&[MP.cov.tech,MP.cov.env,MP.cov.indoor,MP.cov.pL,MP.cov.lb,MP.cov.eirp],MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
+function siteSig(rx){ const b=baseModel(); return JSON.stringify([window.LW&&LW.on&&LW.d?LW.d.at:0,rx.judge,rx.sens,rx.rxLoss,rx.aim,rx.ant&&rx.ant.type,rx.ant&&rx.ant.el,MP.txs.map(t=>[t.lat,t.lon,t.h,t.techs,t.sector,t.az,t.tilt]),MP.ti,MP.layer,MP.benv,MP.relays.map(r=>[r.lat,r.lon,r.h,r.P,r.f,r.src,r.feed&&[r.feed.kind,r.feed.f,r.feed.erp,r.feed.gRx],(r.services||[]).map(v=>[v.f,v.P,v.share,v.on])]),MP.cov&&[MP.cov.tech,MP.cov.env,MP.cov.indoor,MP.cov.pL,MP.cov.lb,MP.cov.eirp],MP.tx.lat,MP.tx.lon,rx.lat,rx.lon,rx.h,MP.txH,MP.date.getTime(),b.id,b.p,$("mapLand").value,MP.useTerrain,MP.useBuildings,MP.manual,rx.manualElev,MP.source]); }
 let siteQueue=Promise.resolve();
 function refreshSites(){
   for(const rx of MP.rxs){
@@ -11401,6 +11421,73 @@ init();
   $("verPrint").addEventListener("click",()=>{ document.body.classList.add("print-verif"); window.print(); setTimeout(()=>document.body.classList.remove("print-verif"),500); });
   renderA();
 })();
+
+/* ===================== LIVE WEATHER (Open-Meteo) → model inputs ===================== */
+var LW={on:false,loc:"auto",custom:null,d:null,err:null,key:"",busy:false,timer:null};
+var LW_DEFAULT={lat:6.8836,lon:79.8839,name:"OUSL Nawala"};
+try{ const sv=JSON.parse(localStorage.getItem("gw-livewx")||"null"); if(sv){ LW.on=!!sv.on; LW.loc=sv.loc||"auto"; LW.custom=sv.custom||null; } }catch(e){}
+function lwSave(){ try{ localStorage.setItem("gw-livewx",JSON.stringify({on:LW.on,loc:LW.loc,custom:LW.custom})); }catch(e){} }
+function lwPoint(){ const has=typeof MP!=="undefined"&&MP.layer==="bcast"&&MP.tx&&MP.rx;
+  if(LW.loc==="custom"&&LW.custom) return LW.custom;
+  if(LW.loc==="me"&&LW.me) return LW.me;
+  if(LW.loc==="tx"&&has) return {lat:MP.tx.lat,lon:MP.tx.lon,name:MP.tx.name};
+  if(LW.loc==="rx"&&has) return {lat:MP.rx.lat,lon:MP.rx.lon,name:MP.rx.name};
+  if(has){ const m=gcPoint(MP.tx,MP.rx,0.5); return {lat:m.lat,lon:m.lon,name:`midpoint ${MP.tx.name} → ${MP.rx.name}`}; }
+  return LW_DEFAULT; }
+/* ITU-R P.453: water-vapour pressure from relative humidity, and refractivity N = 77.6/T·(P + 4810·e/T) */
+function lwN(tC,rh,P){ const T=tC+273.15, EF=1+1e-4*(7.2+P*(0.0320+5.9e-6*tC*tC)), es=EF*6.1121*Math.exp(17.502*tC/(tC+240.97)), e=rh/100*es; return 77.6/T*(P+4810*e/T); }
+async function lwFetch(force){ const pt=lwPoint(), key=pt.lat.toFixed(2)+","+pt.lon.toFixed(2);
+  if(!force&&LW.d&&LW.key===key&&Date.now()-LW.d.fetched<15*60e3) return; if(LW.busy) return; LW.busy=true; LW.err=null; lwRender();
+  const lv=[1000,925,850,700], hv=["soil_moisture_0_to_1cm","soil_temperature_0cm",...lv.flatMap(l=>[`temperature_${l}hPa`,`relative_humidity_${l}hPa`,`geopotential_height_${l}hPa`])];
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${pt.lat.toFixed(4)}&longitude=${pt.lon.toFixed(4)}&current=temperature_2m,relative_humidity_2m,surface_pressure,precipitation,weather_code&hourly=${hv.join(",")}&forecast_days=1&timezone=GMT`;
+  try{ const r=await fetch(url); if(!r.ok) throw new Error("HTTP "+r.status); const j=await r.json(), cu=j.current||{}, H=j.hourly||{};
+    const now=new Date(), stamp=now.toISOString().slice(0,13)+":00"; let hi=(H.time||[]).indexOf(stamp); if(hi<0) hi=Math.min(now.getUTCHours(),(H.time||[1]).length-1);
+    const elev=isFinite(j.elevation)?j.elevation:0, Ns=lwN(cu.temperature_2m,cu.relative_humidity_2m,cu.surface_pressure);
+    const prof=[{h:elev,N:Ns}]; lv.forEach(l=>{ const t=H[`temperature_${l}hPa`]&&H[`temperature_${l}hPa`][hi], rh=H[`relative_humidity_${l}hPa`]&&H[`relative_humidity_${l}hPa`][hi], z=H[`geopotential_height_${l}hPa`]&&H[`geopotential_height_${l}hPa`][hi]; if(isFinite(t)&&isFinite(rh)&&isFinite(z)&&z>elev+20) prof.push({h:z,N:lwN(t,rh,l)}); });
+    prof.sort((a,b)=>a.h-b.h); const h1=elev+1000; let N1=null; for(let i=1;i<prof.length;i++){ if(prof[i].h>=h1){ const a=prof[i-1], b=prof[i]; N1=a.N+(b.N-a.N)*(h1-a.h)/(b.h-a.h); break; } }
+    const dN=N1!=null?N1-Ns:null; // N-units per km over the lowest kilometre (P.453 ΔN = −dN)
+    const sm=H.soil_moisture_0_to_1cm&&H.soil_moisture_0_to_1cm[hi], st=H.soil_temperature_0cm&&H.soil_temperature_0cm[hi], wc=cu.weather_code;
+    LW.d={at:cu.time||stamp,fetched:Date.now(),pt,elev,T:cu.temperature_2m,RH:cu.relative_humidity_2m,P:cu.surface_pressure,rain:cu.precipitation,wc,sm,st,Ns,dN,levels:prof.length-1};
+    LW.key=key; }
+  catch(e){ LW.err="Live weather unavailable ("+(e.message||e)+"). The manual settings are in use."; }
+  LW.busy=false; lwChanged(); }
+/* what the live values do to the model (returned for display, applied to p) */
+function lwDerived(){ const d=LW.d; if(!d) return null; const o={};
+  if(d.dN!=null&&isFinite(d.dN)){ o.dN=d.dN; o.duct=d.dN<=-157; o.k=o.duct?10:clamp(157/(157+d.dN),0.5,10); }
+  if(isFinite(d.rain)) o.rainR=Math.max(0,d.rain);
+  if(isFinite(d.sm)) o.moisture=d.sm<0.12?"dry":d.sm<0.25?"normal":d.sm<0.38?"wet":"saturated";
+  if(isFinite(d.st)) o.frozen=d.st<0;
+  o.storm=[95,96,99].includes(d.wc)?"local":"none"; return o; }
+function applyLiveWx(p){ if(!LW.on||!LW.d) return p; const o=lwDerived(); if(!o) return p;
+  if(o.k) p.k=o.k; if(o.rainR!=null) p.rainR=o.rainR; if(o.moisture) p.moisture=o.moisture; if(o.frozen!=null) p.frozen=o.frozen; p.storm=o.storm; p.liveWx=true; return p; }
+function lwChanged(){ lwRender(); try{ if(typeof MP!=="undefined"){ MP.res.clear(); updateMap(); } }catch(e){} if(typeof AN!=="undefined"){ AN.gwKey=""; AN.anaKey=""; AN.scope=[]; } }
+const WCODE={0:"clear",1:"mainly clear",2:"partly cloudy",3:"overcast",45:"fog",48:"fog",51:"drizzle",53:"drizzle",55:"drizzle",61:"light rain",63:"rain",65:"heavy rain",80:"showers",81:"showers",82:"violent showers",95:"thunderstorm",96:"thunderstorm, hail",99:"thunderstorm, hail"};
+function lwRender(){ const boxes=document.querySelectorAll(".lwbox"); if(!boxes.length) return; const d=LW.d, o=lwDerived(), pt=lwPoint(), f1=v=>isFinite(v)?(+v).toFixed(1):"–";
+  const t=d?new Date(d.at+(/Z$/.test(d.at)?"":"Z")):null, tt=t&&!isNaN(t)?t.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
+  const html=`<div class="lwh"><h3>Live weather</h3><label class="check" style="margin:0"><input type="checkbox" data-lw="on" ${LW.on?"checked":""}> Use in the prediction</label></div>
+    <div class="lwrow"><div class="field"><label>Location<select data-lw="loc">${[["auto","Auto: path midpoint"],["tx","Transmitter"],["rx","Receiver"],["me","My location"],["custom","Custom point"]].map(([v,l])=>`<option value="${v}"${LW.loc===v?" selected":""}>${l}</option>`).join("")}</select></label></div>
+      ${LW.loc==="custom"?`<div class="field"><label>Lat<input type="number" step="0.0001" data-lw="clat" value="${LW.custom?LW.custom.lat:pt.lat.toFixed(4)}" style="width:110px"></label></div><div class="field"><label>Lon<input type="number" step="0.0001" data-lw="clon" value="${LW.custom?LW.custom.lon:pt.lon.toFixed(4)}" style="width:110px"></label></div>`:""}
+      <button class="btn sm" type="button" data-lw="refresh">${LW.busy?"Updating…":"Refresh"}</button></div>
+    <p class="muted" style="margin:6px 0 0;font-size:12.5px">${esc(pt.name||"")} · ${pt.lat.toFixed(3)}°, ${pt.lon.toFixed(3)}°${tt?` · Open-Meteo, ${tt}`:""}${LW.on?"":" · not applied (manual settings in use)"}</p>
+    ${LW.err?`<p class="lwwarn">${esc(LW.err)}</p>`:""}
+    ${d?`<dl>
+      <dt>Air</dt><dd>${f1(d.T)} °C · ${Math.round(d.RH)} % RH · ${Math.round(d.P)} hPa</dd>
+      <dt>Refractivity</dt><dd>N<sub>s</sub> = ${Math.round(d.Ns)} · ${o&&o.dN!=null?`dN/dh = ${Math.round(o.dN)} N/km → <b>k = ${o.duct?"duct":o.k.toFixed(2)}</b>`:"gradient not available"} <small>ITU-R P.453, P.834 (standard: −40 N/km, k = 4/3)</small></dd>
+      <dt>Rain</dt><dd>${f1(d.rain)} mm/h${o.rainR>0?` <small>→ ITU-R P.838 rain loss above 1 GHz</small>`:""}</dd>
+      <dt>Ground</dt><dd>${isFinite(d.sm)?`soil moisture ${Math.round(d.sm*100)} % → ${o.moisture}`:"–"}${o.frozen?" · frozen":""} <small>approximate category for the ground constants (ITU-R P.527)</small></dd>
+      <dt>Weather</dt><dd>${WCODE[d.wc]||"code "+d.wc}${o.storm==="local"?` <small>→ atmospheric noise at LF–HF (ITU-R P.372)</small>`:""}</dd></dl>
+      ${o&&o.duct?`<p class="lwwarn"><b>Ducting likely</b> (dN/dh ≤ −157 N/km): VHF/UHF signals can travel far beyond the horizon and cause interference. The model level spacing is coarse, so treat this as an indication.</p>`:""}
+      <p class="hint" style="margin:6px 0 0">Weather-model values on a 10–25 km grid, hourly, not measurements at the mast. Refreshes every 15 minutes.</p>`:LW.busy?"":`<p class="hint" style="margin:8px 0 0">Press Refresh to load the weather for this location.</p>`}`;
+  boxes.forEach(b=>{ if(b.dataset.h!==html){ b.innerHTML=html; b.dataset.h=html; } }); }
+document.addEventListener("change",e=>{ const el=e.target.closest&&e.target.closest("[data-lw]"); if(!el||!el.closest(".lwbox")) return; const k=el.dataset.lw;
+  if(k==="on"){ LW.on=el.checked; lwSave(); if(LW.on) lwFetch(); lwChanged(); }
+  else if(k==="loc"){ LW.loc=el.value; lwSave();
+    if(LW.loc==="me"&&navigator.geolocation){ navigator.geolocation.getCurrentPosition(q=>{ LW.me={lat:q.coords.latitude,lon:q.coords.longitude,name:"my location"}; lwFetch(true); },()=>{ LW.err="Location permission was not given; using the path midpoint."; LW.loc="auto"; lwFetch(true); }); }
+    else { if(LW.loc==="custom"&&!LW.custom){ const pt=lwPoint(); LW.custom={lat:+pt.lat.toFixed(4),lon:+pt.lon.toFixed(4),name:"custom point"}; } lwFetch(true); } }
+  else if(k==="clat"||k==="clon"){ const c=LW.custom||{lat:0,lon:0,name:"custom point"}; const v=parseFloat(el.value); if(isFinite(v)){ c[k==="clat"?"lat":"lon"]=k==="clat"?clamp(v,-89,89):clamp(v,-180,180); LW.custom=c; lwSave(); lwFetch(true); } } });
+document.addEventListener("click",e=>{ const el=e.target.closest&&e.target.closest('[data-lw="refresh"]'); if(el) lwFetch(true); });
+setInterval(()=>{ if(LW.on&&!document.hidden) lwFetch(); },60e3);
+setTimeout(()=>{ lwRender(); if(LW.on) lwFetch(); },800);
 </script>
 </body>
 </html>
