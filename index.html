@@ -2623,6 +2623,7 @@ body[data-tab="shadow"] .bandwrap,body[data-tab="learn"] .bandwrap,body[data-tab
         <div class="field"><label for="aPow">Power <span class="v" id="aPowV"></span></label>
           <div class="chips" id="aPowChips"></div>
           <input type="range" id="aPow" min="-3" max="3.7" step="0.01" aria-label="Fine-tune power"></div>
+        <div class="field"><label for="aAnt">Transmitter antenna</label><div class="row" style="gap:8px;flex-wrap:nowrap"><select id="aAnt" style="flex:1;min-width:0"></select><button class="btn sm" type="button" id="aAntSet">Settings</button></div><p class="hint" id="aAntInfo" style="margin:4px 0 0"></p></div>
         <div class="field"><label for="aGround">Ground</label><select id="aGround"></select></div>
         <div class="field"><label for="aFlare">Solar flare</label><select id="aFlare"><option value="0">None</option><option value="1">R1 · M1</option><option value="2">R2 · M5</option><option value="3">R3 · X1</option><option value="4">R4 · X10</option><option value="5">R5 · X20</option></select><span class="hint" id="aFlareNote"></span></div>
         <div class="field"><span class="lbl">Weather</span><div class="chips" id="aWx"></div></div>
@@ -4020,7 +4021,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v10.9</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v11.0</b> · Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data © OpenStreetMap contributors · Elevation: Copernicus DEM GLO-90 · Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -5644,6 +5645,11 @@ function syncAnimControls(){
   $("aFreq").value=Math.log10(p.f); $("aFreqV").textContent=`${fmtF(p.f)} · ${band(p.f)}`;
   document.querySelectorAll("#aFreqChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(Math.abs(+b.dataset.f-p.f)<1e-6)));
   $("aPow").value=Math.log10(p.P); $("aPowV").textContent=fmtP(p.P);
+  { const as=$("aAnt"); if(as){ const bd=antBand(p.f), types=Object.entries(ANT_TYPES).filter(([,v])=>v.band===bd), cur=p.ant&&ANT_TYPES[p.ant.type]&&ANT_TYPES[p.ant.type].band===bd?p.ant.type:"";
+      const html=(m.live?"":`<option value="">Reference (${p.f<30?"short monopole":"half-wave dipole"}, no pattern)</option>`)+types.map(([k,v])=>`<option value="${k}">${esc(v.name)}</option>`).join("");
+      if(as.dataset.h!==html){ as.innerHTML=html; as.dataset.h=html; } if(document.activeElement!==as) as.value=cur||(m.live&&types[0]?types[0][0]:"");
+      let g=""; try{ if(cur) g=` · peak ${antStats(p.ant).Gmax.toFixed(1)} dBi`; }catch(e){}
+      $("aAntInfo").textContent=(cur?ANT_TYPES[cur].name.split(" (")[0]:"Reference antenna")+g+(m.live?` · shared with the Map (T${MP.ti+1} ${MP.tx.name})`:" · this Lab model only"); } }
   $("aFlare").value=String(flareLevel(p)); $("aFlareNote").textContent=flareLevel(p)?flareImpact(Object.assign({},p,{cosChi:cosFromHour(AN.hour),hour:AN.hour})).short:"";
   renderPowChips("aPowChips",p,kW=>animSet({P:kW}));
   $("aGround").value=p.ground; $("aGround").disabled=p.path==="geo";
@@ -5651,12 +5657,16 @@ function syncAnimControls(){
   const wk=weatherKey(p); document.querySelectorAll("#aWx .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===wk)));
 }
 function animSet(obj,autoRange){
-  const m=animModel(); if(!m) return; const oldBand=band(m.p.f); Object.assign(m.p,obj);
+  const m=animModel(); if(!m) return; const oldBand=band(m.p.f); Object.assign(m.p,obj); if("ant" in obj&&!obj.ant) delete m.p.ant;
+  if(m.live&&MP.layer==="bcast"){ let ch=false; if(obj.P!=null){ MP.tx.tpo=obj.P; ch=true; } if(obj.f!=null){ MP.tx.f=obj.f; ch=true; } if("ant" in obj){ MP.tx.ant=obj.ant?JSON.parse(JSON.stringify(obj.ant)):null; ch=true; } if(ch) mapChanged(); }
   AN.gwKey=""; AN.anaKey=""; AN.scope=[];
   if(autoRange&&band(m.p.f)!==oldBand&&!m.p.rxDist){ const span=m.p.type==="cell"?30:m.p.f>=30?300:m.p.f>3?3000:1000; $("animRange").value=String(span); resetView(); }
   syncAnimControls(); if(m.id===selId){ syncControls(); } renderList();
 }
 function bindAnimQuick(){
+  $("aAnt").addEventListener("change",e=>{ const m=animModel(); if(!m) return; const v=e.target.value; let a=v?antDefault(v):null;
+    if(a&&a.az!=null){ a.az=m.live?Math.round(bearing(MP.tx,MP.rx)):(m.p.antAz??0); } animSet({ant:a}); });
+  $("aAntSet").addEventListener("click",()=>{ const m=animModel(); if(m&&m.live&&MP.layer==="bcast"){ openAui("tx",MP.ti); } else { go("lab"); setTimeout(()=>{ const el=$("labAntOn")||$("labAnt"); if(el){ el.scrollIntoView({block:"center"}); el.focus(); } },200); } });
   const fc=$("aFreqChips"); A_FREQS.forEach(([l,f])=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=l; b.dataset.f=f;
     b.onclick=()=>{ if(f===1800) animSet({type:"cell",tech:"4g",f,P:1,htx:30,hrx:1.5},true); else if(f===3500) animSet({type:"cell",tech:"5g",f,P:10,htx:30,hrx:1.5},true); else animSet({f,type:animModel().p.type==="cell"?"combined":animModel().p.type},true); }; fc.appendChild(b); });
   const wc=$("aWx"); WEATHER.forEach(w=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.k=w.k; b.title=w.label; b.innerHTML=`${icn(w.ico)}${w.label}`; b.onclick=()=>animSet(Object.assign({},w.set)); wc.appendChild(b); });
@@ -5667,7 +5677,7 @@ function bindAnimQuick(){
   $("aFlare").addEventListener("change",e=>animSet({flareR:+e.target.value,flare:false}));
   const g=$("aGround"); g.innerHTML=Object.entries(GROUNDS).filter(([k])=>k!=="custom").map(([k,v])=>`<option value="${k}">${v.name}</option>`).join(""); g.addEventListener("change",e=>animSet({ground:e.target.value}));
 }
-function setAnimModel(id){ AN.id=id; const m=animModel(); AN.hour=hourFromCos(cosChiOf(m.p)); $("hour").value=AN.hour;
+function setAnimModel(id){ AN.id=id; const m=animModel(); AN.hour=(m.p.hour!=null&&isFinite(m.p.hour))?m.p.hour:hourFromCos(cosChiOf(m.p)); $("hour").value=AN.hour;
   let span=+$("animRange").value;
   if(m.p.rxDist){ AN.rx=m.p.rxDist; span=m.p.rxDist>900?3000:m.p.rxDist>280?1000:300; }
   else if(m.p.type==="cell") span=30; else if(m.p.f>=30) span=300; else if(m.p.f>3) span=3000;
@@ -6590,8 +6600,8 @@ function bindScenes(){
   buildSeg(); document.addEventListener("click",e=>{ const b=e.target.closest(".pseg [data-scn]"); if(b) setScene(b.dataset.scn); });
   $("scK").addEventListener("change",e=>{ SCN.k=+e.target.value; SCN.key=""; });
   $("scSrc").addEventListener("change",e=>{ SCN.src=+e.target.value; SCN.key=""; if(SCN.src>=0){ try{ refreshSites(); }catch(x){} MP.ai=SCN.src; try{ const m=pathModel(); setAnimModel(m.id); $("animModel").value=String(m.id); }catch(x){} } setScene(AN.scene); });
-  $("scRT").addEventListener("input",e=>{ MP.txH=+e.target.value; SCN.key=""; });
-  $("scRR").addEventListener("input",e=>{ const rx=MP.rxs[SCN.src]; if(rx){ rx.h=+e.target.value; SCN.key=""; } });
+  $("scRT").addEventListener("input",e=>{ MP.txH=+e.target.value; SCN.key=""; mapChanged(); });
+  $("scRR").addEventListener("input",e=>{ const rx=MP.rxs[SCN.src]; if(rx){ rx.h=+e.target.value; SCN.key=""; mapChanged(); } });
   $("scToMap").addEventListener("click",()=>go("map"));
   const lmView=v=>{ $("linkMath").classList.toggle("eqv",v==="eq"); $("lmTabB").setAttribute("aria-pressed",String(v!=="eq")); $("lmTabE").setAttribute("aria-pressed",String(v==="eq")); try{ localStorage.setItem("gw-lmview",v); }catch(e){} $("lmP").dataset.h=""; };
   document.addEventListener("click",e=>{ if(!(e.target.closest&&e.target.closest("#mvAim"))) return; const a=MP.tx.ant; if(!a) return; delete a.manual; a.az=Math.round(bearing(MP.tx,MP.rx)); MP.res.clear(); updateMap(); });
@@ -6604,8 +6614,8 @@ function bindScenes(){
     const full=()=>document.fullscreenElement===st||st.classList.contains("is-expanded");
     const wake=()=>{ st.classList.remove("idle"); clearTimeout(tm); tm=setTimeout(()=>{ if(full()&&!bar.matches(":hover")&&!bar.matches(":focus-within")) st.classList.add("idle"); },3500); };
     if(st&&bar){ ["pointermove","pointerdown","keydown","touchstart","wheel"].forEach(ev=>st.addEventListener(ev,wake,{passive:true})); document.addEventListener("fullscreenchange",wake); bar.addEventListener("focusin",wake); } }
-  $("scTxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; const a=antDefault(e.target.value); if(rx&&a.az!=null) a.az=Math.round(bearing(MP.tx,rx)); MP.tx.ant=a; MP.tx.aui=true; MP.res.clear(); SCN.key=""; });
-  $("scRxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const a=antDefault(e.target.value); if(a.az!=null) a.az=Math.round(bearing(rx,MP.tx)); rx.ant=a; rx.aim=true; SCN.key=""; });
+  $("scTxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; const a=antDefault(e.target.value); if(rx&&a.az!=null) a.az=Math.round(bearing(MP.tx,rx)); MP.tx.ant=a; MP.tx.aui=true; SCN.key=""; mapChanged(); });
+  $("scRxAnt").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const a=antDefault(e.target.value); if(a.az!=null) a.az=Math.round(bearing(rx,MP.tx)); rx.ant=a; rx.aim=true; SCN.key=""; mapChanged(); });
   $("scSens").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]||MP.rx; rx.sens=clamp(Math.round(+e.target.value)||-90,-130,-40); MP.res.clear(); updateMap(); SCN.key=""; });
   $("scJudge").addEventListener("change",e=>{ const rx=MP.rxs[SCN.src]||MP.rx; rx.judge=e.target.value; MP.res.clear(); updateMap(); SCN.key=""; });
   $("scAimTx").addEventListener("click",()=>{ const rx=MP.rxs[SCN.src]; if(!rx) return; const f=baseModel().p.f; if(!MP.tx.ant||!ANT_TYPES[MP.tx.ant.type]||ANT_TYPES[MP.tx.ant.type].band!==antBand(f)) MP.tx.ant=antFor(f); if(MP.tx.ant.az!=null){ MP.tx.ant.az=Math.round(bearing(MP.tx,rx)); delete MP.tx.ant.manual; } MP.tx.aui=true; MP.res.clear(); updateMap(); SCN.key=""; });
@@ -6729,7 +6739,7 @@ function computePathFor(a,b){
   if(segs.length) segs[segs.length-1].end=dist;
   const landKm=samples.filter(s=>s.land).length/samples.length*dist;
   const sp=sunPos(MP.date), mid=gcPoint(a,b,0.5);
-  return {dist,samples,segs,landPct:Math.round(landKm/dist*100),brg:bearing(a,b),sp,mid,cosMid:cosZen(mid.lat,mid.lon,sp),cosTx:cosZen(a.lat,a.lon,sp),cosRx:cosZen(b.lat,b.lon,sp)};
+  return {dist,samples,segs,landPct:Math.round(landKm/dist*100),brg:bearing(a,b),sp,mid,cosMid:cosZen(mid.lat,mid.lon,sp),hourMid:((12+(((mid.lon-sp.subLon)%360+540)%360-180)/15)%24+24)%24,cosTx:cosZen(a.lat,a.lon,sp),cosRx:cosZen(b.lat,b.lon,sp)};
 }
 function computePath(){ MP.path=computePathFor(MP.tx,MP.rx); }
 function baseModel(){ return models.find(m=>String(m.id)===$("mapModel").value)||sel(); }
@@ -6748,7 +6758,7 @@ function paramsFor(P,rx,T,tx){
   if(ct) Object.assign(p,cellParams(ct,tx.h)); else { if(p.type==="cell") p.type="gw"; p.env=MP.benv; }
   const phone=!!ct||p.type==="cell";
   const mid=gcPoint(tx,rx,0.5);
-  Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,rxDist:Math.max(P.dist,0.5),
+  Object.assign(p,{path:"geo",segs:P.segs.map(s=>({...s})),ground:$("mapLand").value,cosChi:P.cosMid,hour:P.hourMid,rxDist:Math.max(P.dist,0.5),
     htx:tx.h,hrx:phone?1.5:rx.h,terrainLossDb:(MP.useTerrain&&T)?T.loss:0,profile:(MP.useTerrain&&T&&T.prof)?T.prof:null,
     gmlat:+geomagLat(mid.lat,mid.lon).toFixed(1),azi:+bearing(tx,rx).toFixed(0),seaFrac:clamp(1-P.landPct/100,0,1),
     pathLabel:`${tx.name} → ${rx.name}, ${P.landPct}% land`});
@@ -7483,11 +7493,20 @@ function terrainSnapshot(T){
   return {d,e,b:(T.buildings||[]).slice(0,500).map(b=>[+(b.dm/1000).toFixed(4),Math.round(b.h)]),pk:(T.osm?T.osm.peaks:[]).filter(p=>p.xt<3000).slice(0,12).map(p=>[+(p.dm/1000).toFixed(2),p.name,isFinite(p.ele)?Math.round(p.ele):null]),ob,manual:T.manual,txH:T.txH,rxH:T.rxH};
 }
 function toLocalInput(d){ const z=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
+/* the animated map path is a live view of the Map's station, not a copy: every Map change flows in, and
+   power, frequency and antenna changed in the Animation flow back to the Map's transmitter (one shared station record) */
+function syncLiveModels(){ const m=models.find(x=>x.live&&x.id===MP.lastModelId); if(!m||MP.layer!=="bcast"||!MP.path) return;
+  const keep=m.p.type, p=mapParams(), r=MP.res.get(MP.rx.id); p.terrain=terrainSnapshot(r&&r.T)||m.p.terrain;
+  if(keep&&keep!=="cell"&&p.type!=="cell") p.type=keep;
+  const name=`${MP.tx.name} → ${MP.rx.name}`, changed=JSON.stringify([m.p.f,m.p.P,m.p.ant,m.p.htx,m.p.hrx,m.p.rxDist,m.name])!==JSON.stringify([p.f,p.P,p.ant,p.htx,p.hrx,p.rxDist,name]);
+  m.p=p; m.name=name; if(changed){ AN.gwKey=""; AN.anaKey=""; AN.scope=[]; SCN.key=""; try{ syncModelSelects(); if(AN.id===m.id) syncAnimControls(); }catch(e){} } }
+let MAPSYNC=null; function mapChanged(){ MP.res.clear(); clearTimeout(MAPSYNC); MAPSYNC=setTimeout(()=>updateMap(),250); }
 function pathModel(){
   const p=mapParams(); const name=`${MP.tx.name} → ${MP.rx.name}`;
-  let m=models.find(x=>x.id===MP.lastModelId && x.name===name);
+  let m=models.find(x=>x.id===MP.lastModelId && (x.live||x.name===name));
   const r=MP.res.get(MP.rx.id); p.terrain=terrainSnapshot(r&&r.T);
-  if(m){ m.p=p; } else { m=mk(name,p); models.push(m); MP.lastModelId=m.id; }
+  if(m){ m.p=p; m.name=name; } else { m=mk(name,p); models.push(m); MP.lastModelId=m.id; }
+  m.live=true;
   selId=m.id; currentPreset=-1; return m;
 }
 /* every broadcast station carries an antenna, so it can be aimed straight after a click */
@@ -7528,7 +7547,7 @@ function updateMap(){
 }
 function updateMapNow(){
   if(MP.source==="loading"){ drawMap(); return; }
-  ensureAnts(); computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderRelayTable(); renderActive(); renderMyCoverage(); saveState();
+  ensureAnts(); computePath(); refreshSites(); drawMap(); renderSites(); renderTxTable(); renderRelayTable(); renderActive(); renderMyCoverage(); saveState(); syncLiveModels();
   $("txLat").value=MP.tx.lat.toFixed(4); $("txLon").value=MP.tx.lon.toFixed(4); $("rxLat").value=MP.rx.lat.toFixed(4); $("rxLon").value=MP.rx.lon.toFixed(4);
   $("rxH").value=MP.rx.h; $("txH").value=MP.txH;
   const ts=$("txCity"); ts.innerHTML=MP.txs.map((t,i)=>`<option value="tx:${i}">T${i+1} · ${esc(t.name)}</option>`).join("")+`<optgroup label="Move selected transmitter to a city">`+CITIES.map(c=>`<option value="city:${esc(c[0])}">${esc(c[0])}</option>`).join("")+`</optgroup>`;

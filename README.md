@@ -322,3 +322,10 @@ margin; k-factor for refraction, two-ray terms for reflection). The view zooms t
 - **Receiver panel:**
   - Cable-loss calculator (RG-58, RG-213, LMR-400, ½″ and ⅞″ foam coax; √f scaling plus connectors).
   - Sensitivity calculator: kT₀B + NF + C/N.
+
+## v11.0: one shared station record (digital shadow)
+
+- The animated map path is now a live view of the Map's station, not a copy. A change on the Map (antenna, power, frequency, mast, receiver) appears in the Animation, and the reverse also works.
+- The Animation's Quick settings have a **Transmitter antenna** control for LF/MF/HF too, with a **Settings** button that opens the same transmitter panel as the Map.
+- Link-view sliders and antenna choices update the Map as well.
+- **Fix:** Map paths now carry the local solar time at the midpoint. Before, the ITU-R P.1147 sky wave could not tell 05:00 before sunrise from 19:00 after sunset, so the Map and Animation could differ by about 3 dB. They now agree exactly.
