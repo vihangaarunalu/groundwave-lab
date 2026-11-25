@@ -16,11 +16,16 @@
 %   S3  realistic sensor, reality follows an independent model (3GPP close-in, n = 3)
 %   S4  realistic sensor, reality follows an independent model (exact two-ray)
 %
-% Output: icarc-sent.csv, the log of every reading sent and the true values.
+% Sensitivity analysis: icarc_validation('sensitivity') starts from the realistic
+% sensor of S2 and makes one sensor problem worse at a time (GPS error, drift,
+% fading averaging, display step, lost readings, shadowing).
+%
+% Output: icarc-sent.csv (or icarc-sens-sent.csv), the log of every reading sent and the true values.
 % Works in MATLAB R2016b+ and GNU Octave 7+, no toolboxes. Uses curl in Octave.
-% Run:  icarc_validation   (from the folder holding wisdom-plan.csv)
+% Run:  icarc_validation   or   icarc_validation('sensitivity')   (from the folder holding wisdom-plan.csv)
 
-function icarc_validation()
+function icarc_validation(experiment)
+if nargin < 1, experiment = 'main'; end
 
 PLAN_FILE = 'wisdom-plan.csv';
 SENT_FILE = 'icarc-sent.csv';
@@ -39,13 +44,27 @@ if exist('rng','builtin') || exist('rng','file'), rng(SEED); end
 P = ic_readplan(PLAN_FILE);
 fprintf('Plan: %d points, station %.5f, %.5f, %g MHz, ERP %g kW\n', numel(P.lat), P.tw.lat, P.tw.lon, P.tw.f, P.tw.erp);
 
-SC = {'S0', NONE, IDEAL; 'S1', HIDDEN, IDEAL; 'S2', HIDDEN, REAL; 'S3', HIDDEN, setfield(REAL,'truth_model','closein'); 'S4', HIDDEN, setfield(REAL,'truth_model','tworay')};
+if strcmp(experiment, 'sensitivity')
+  % one factor at a time, everything else as the realistic sensor of S2
+  SENT_FILE = 'icarc-sens-sent.csv'; REPS = 4;
+  F = {'gps_m', [0 3 10 25]; 'drift_db_h', [0 0.5 2 5]; 'fade_k', [0 1 10 40]; 'quant_db', [0 1 3]; 'loss_pct', [0 20 50]; 'shadow_db', [2 4 6]};
+  SC = {}; RUNS = struct();
+  for fi = 1:size(F, 1)
+    for v = F{fi, 2}
+      key = sprintf('E_%s_%s', strrep(F{fi,1}, '_', ''), strrep(sprintf('%g', v), '.', 'p'));
+      SC(end+1, :) = {key, HIDDEN, setfield(REAL, F{fi,1}, v), F{fi,1}, v}; %#ok<AGROW>
+      RUNS.(key) = REPS;
+    end
+  end
+else
+  SC = {'S0', NONE, IDEAL, 'none', 0; 'S1', HIDDEN, IDEAL, 'none', 0; 'S2', HIDDEN, REAL, 'none', 0; 'S3', HIDDEN, setfield(REAL,'truth_model','closein'), 'none', 0; 'S4', HIDDEN, setfield(REAL,'truth_model','tworay'), 'none', 0};
+end
 fs = fopen(SENT_FILE, 'w');
-fprintf(fs, 'channel,scenario,run,sensor,lat,lon,level_sent,equation_only,true_level_noiseless,dist_km,built,indoor,truth_model,offset,built_loss,indoor_loss,trend\n');
+fprintf(fs, 'channel,scenario,run,sensor,lat,lon,level_sent,equation_only,true_level_noiseless,dist_km,built,indoor,truth_model,offset,built_loss,indoor_loss,trend,factor,value\n');
 for s = 1:size(SC,1)
-  name = SC{s,1}; TR = SC{s,2}; S = SC{s,3};
+  name = SC{s,1}; TR = SC{s,2}; S = SC{s,3}; fac = SC{s,4}; val = SC{s,5};
   for r = 1:RUNS.(name)
-    ch = sprintf('icarc-%s-r%02d', lower(name), r);
+    ch = lower(strrep(sprintf('icarc-%s-r%02d', name, r), '_', '-'));
     idx = randperm(numel(P.lat)); pick = idx(1:N_POINTS);
     [lv, la, lo, keep, Enl] = ic_sense(P, pick, TR, S);
     t = P.tw;
@@ -54,7 +73,7 @@ for s = 1:size(SC,1)
     for j = find(keep)
       i = pick(j); sn = sprintf('%s-r%02d-p%03d', name, r, j);
       parts{end+1} = sprintf('{"sensor":"%s","lat":%.7f,"lon":%.7f,"level":%.4f,"f_mhz":%g,"h":%g,"built":%d,"indoor":%d,"fixed":0,"src":"octave"}', sn, la(j), lo(j), lv(j), t.f, P.h(i), P.built(i), P.indoor(i)); %#ok<AGROW>
-      fprintf(fs, '%s,%s,%d,%s,%.7f,%.7f,%.4f,%.4f,%.4f,%.4f,%d,%d,%s,%g,%g,%g,%g\n', ch, name, r, sn, la(j), lo(j), lv(j), P.model(i), Enl(j), P.dist(i), P.built(i), P.indoor(i), S.truth_model, TR.offset, TR.built, TR.indoor, TR.trend);
+      fprintf(fs, '%s,%s,%d,%s,%.7f,%.7f,%.4f,%.4f,%.4f,%.4f,%d,%d,%s,%g,%g,%g,%g,%s,%g\n', ch, name, r, sn, la(j), lo(j), lv(j), P.model(i), Enl(j), P.dist(i), P.built(i), P.indoor(i), S.truth_model, TR.offset, TR.built, TR.indoor, TR.trend, fac, val);
     end
     ic_send(sprintf('%s?ch=%s', URL, ch), ['{"readings":[' strjoin(parts, ',') ']}']);
     fprintf('%s: sent %d readings to channel %s\n', name, numel(parts), ch);
