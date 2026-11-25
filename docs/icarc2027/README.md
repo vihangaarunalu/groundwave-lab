@@ -1,8 +1,8 @@
 # ICARC 2027 paper: manuscript draft and validation experiment
 
-- `ICARC2027_manuscript_draft.docx`: the manuscript in IEEE conference layout (US Letter, two columns), with Word comments that list what the authors must confirm.
+- `ICARC2027_manuscript_clean.docx` (no comments) and `ICARC2027_manuscript_with_comments.docx` (Word comments listing what the authors must confirm): the manuscript in IEEE conference layout (US Letter, two columns).
 - `ICARC2027_manuscript_draft_preview.pdf`: a PDF rendering of the same file, for reading.
-- `build_manuscript.js`: regenerates the .docx from the data (`node build_manuscript.js`). This writes a fresh copy without the Word comments.
+- `build_manuscript.js`: regenerates the .docx from the data (`node build_manuscript.js`). This writes ICARC2027_manuscript_draft.docx without comments.
 - `figures/`: Fig. 1–4 (300 dpi).
 - `data/`: everything behind the numbers in Section V.
 
