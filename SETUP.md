@@ -117,3 +117,34 @@ or submits the quiz. Once only, dismissible, never blocking. A permanent
 - No analytics service, no account outside your own, no personal data stored.
 - If you later add a custom domain, that is the one other public name to pick
   carefully.
+
+---
+
+## Other free hosts
+
+### GitHub Pages
+
+1. Create a public repository, for example `groundwave-lab`.
+2. Upload `index.html` (and `_headers`, which GitHub ignores harmlessly).
+3. **Settings → Pages → Build and deployment → Deploy from a branch → main / root → Save**.
+4. After a minute the site is at `https://<your-username>.github.io/groundwave-lab/`.
+
+### Netlify Drop
+
+Go to https://app.netlify.com/drop and drag this folder in. Create a free account to keep the site permanently.
+
+---
+
+These hosts serve the page but do not run `functions/`, so the visit counter, feedback inbox and live measurement link need Cloudflare Pages.
+
+---
+
+## Fair use of the free map and terrain services
+
+- **OpenStreetMap tiles** (tile.openstreetmap.org) are run by volunteers. They are fine for an educational site with normal traffic. They are not meant for heavy commercial use.
+  - Keep the on-map attribution visible.
+  - If the site becomes very busy, switch the default style to "OpenStreetMap light" (CARTO) or use a commercial tile key.
+  - Usage policy: https://operations.osmfoundation.org/policies/tiles/
+- **OpenTopoMap**: free, with attribution (CC-BY-SA).
+- **Terrain heights**: Open-Meteo Elevation API (Copernicus DEM GLO-90). It is free for non-commercial use. Credit: "Elevation data: Copernicus DEM GLO-90 via Open-Meteo".
+- If a page is opened straight from disk (`file://`), OpenStreetMap's own tile servers refuse it ("Access blocked"). The lab then starts on the CARTO style. Hosting the folder fixes this.
