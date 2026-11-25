@@ -49,3 +49,23 @@ Reproduce:
 1. In MATLAB or Octave, run `icarc_validation('sensitivity')`. This writes `icarc-sens-sent.csv` and posts to channels `icarc-e-…`.
 2. Process each channel on the Shadow tab as above. Save the results as `icarc-sens-page-results.csv`.
 3. Run `python3 assets/icarc_sensitivity.py <folder>`.
+
+## Education-track manuscript (submission version)
+
+Title: *Applying the Digital Shadow Concept to Wireless Communication Education: A Browser-Based, ITU-R-Verified Learning Environment*
+
+- `ICARC2027_education_manuscript.docx`: clean copy, 6 pages, IEEE two-column.
+- `ICARC2027_education_manuscript_with_comments.docx`: the same text, with notes for the authors.
+- `ICARC2027_education_manuscript_preview.pdf`: preview.
+- `build_manuscript_edu.js`: rebuilds the clean copy from the data (`node build_manuscript_edu.js`).
+
+Sections:
+- Introduction
+- Existing work
+- The learning environment, with six data-integration methods: API, simulator, physical sensors, smartphone, files, environmental data
+- Interactive learning design: learning cycle, seven laboratories, learning outcomes, instructor's "mystery channel"
+- Validation of the learning environment
+- Discussion: why a digital shadow matters for wireless education, simulated data as a teaching asset, course integration, limitations and planned evaluation
+- Conclusion
+
+The earlier technical manuscript (`ICARC2027_manuscript_*.docx`) is kept for reference.
