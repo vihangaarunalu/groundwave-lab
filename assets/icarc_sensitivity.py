@@ -32,8 +32,8 @@ for (ch, info), pr in zip(sorted(runs.items()), res):
                  "eq_rms_test": rms(e_eq), "cal_rms_test": rms(e_cal),
                  "offset_err": abs(float(pr["offset_dB"]) - off_true)})
 
-LABEL = {"gps_m": "GPS error (m)", "drift_db_h": "Receiver drift (dB/h)", "fade_k": "Fading samples averaged, K",
-         "quant_db": "Display step (dB)", "loss_pct": "Readings lost (%)", "shadow_db": "Shadowing σ (dB)"}
+LABEL = {"gps_m": "GPS error (m)", "drift_db_h": "Drift (dB/h)", "fade_k": "Fading samples K",
+         "quant_db": "Display step (dB)", "loss_pct": "Lost readings (%)", "shadow_db": "Shadowing σ (dB)"}
 summary = []
 for fac in LABEL:
     for v in sorted({r["value"] for r in rows if r["factor"] == fac}):

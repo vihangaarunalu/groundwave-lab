@@ -31,3 +31,21 @@ An external MATLAB/Octave simulator plays the sensor network and sends readings 
 4. Run `python3 assets/icarc_analysis.py <folder>` to get `icarc-summary.csv`, `icarc-coefficients.csv` and the figures.
 
 The reported runs used a controlled setting: flat ground at 10 m and no building geometry. Building and indoor effects enter through the flags in the plan. This isolates the interface and the sensor effects. On the live site the ground comes from the Copernicus DEM, so the absolute levels differ, but the method is the same.
+
+## Sensitivity analysis (Table V, Fig. 5)
+
+Starting from the realistic sensor of S2, one imperfection is made worse at a time, with 4 runs per level (84 runs, 6,501 readings):
+
+| Imperfection | Levels | Test RMS after calibration (dB) |
+|---|---|---|
+| GPS error (m) | 0 / 3 / 10 / 25 | 4.6 / 4.2 / 4.3 / 4.8 |
+| Receiver drift (dB/h) | 0 / 0.5 / 2 / 5 | 4.1 / 4.2 / 3.9 / 4.8 |
+| Fading samples averaged K | none / 1 / 10 / 40 | 4.6 / 7.5 / 4.7 / 4.6 |
+| Display step (dB) | 0 / 1 / 3 | 4.0 / 4.6 / 4.1 |
+| Readings lost (%) | 0 / 20 / 50 | 4.1 / 4.8 / 4.1 |
+| Shadowing σ (dB) | 2 / 4 / 6 | 2.1 / 4.1 / 6.2 |
+
+Reproduce:
+1. In MATLAB or Octave, run `icarc_validation('sensitivity')`. This writes `icarc-sens-sent.csv` and posts to channels `icarc-e-…`.
+2. Process each channel on the Shadow tab as above. Save the results as `icarc-sens-page-results.csv`.
+3. Run `python3 assets/icarc_sensitivity.py <folder>`.
