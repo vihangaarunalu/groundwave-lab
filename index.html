@@ -4043,7 +4043,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">鈥
   <button type="button" id="moreFb"><svg class=ic aria-hidden=true><use href=#i-pencil /></svg> Give feedback</button>
 </div>
 <div class="sitestat"><span id="visitLine" hidden></span><span id="progLine" hidden></span><a id="fbFoot" href="#" hidden>Give feedback</a><a class="staff-link" href="feedback.html">Feedback inbox (staff)</a></div>
-<footer><b>Groundwave Propagation Lab v11.2</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
+<footer><b>Groundwave Propagation Lab v11.3</b> 路 Teaching and first-cut planning tool. Ground wave: ITU-R P.368 (GRWAVE method) with Millington mixed paths. LF/MF sky wave: ITU-R P.1147; HF: P.533-style teaching approximation. VHF/UHF and relays: ITU-R P.1812 (delta-Bullington, troposcatter) with P.2108 clutter and P.2109 building entry. Mobile: ITU-R P.529, M.2412 and P.1812. Reception levels: ITU-R BS.703, BS.412, BT.417. Every equation, validity check and verification test is in the Models tab. Map data 漏 OpenStreetMap contributors 路 Elevation: Copernicus DEM GLO-90 路 Space weather: NOAA SWPC.</footer></div>
 
 <script>
 "use strict";
@@ -11045,7 +11045,9 @@ init();
       const fl=v=>v==="1"?true:v==="0"?false:null, mb=fl(c[3]), mi=fl(c[5]);
       out.push({id:SH.nextId++,name:"Upload "+(out.length+1),lat:la,lon:lo,meas:lv,manB:mb,built:!!mb,manI:mi,indoor:!!mi,h:isFinite(+c[4])&&c[4]!==""?+c[4]:1.5,sensor:c[6]==="1",src:"csv",g:null}); });
     return out; }
-  function exportCSV(){ const lines=["name,lat,lon,ground_m,antenna_m,fixed,built,indoor,building_loss_dB,entry_loss_dB,model_dBuV_m,measured_dBuV_m,difference_dB"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,p.lat.toFixed(6),p.lon.toFixed(6),p.g==null?"":Math.round(p.g),p.h,p.sensor?1:0,p.built?1:0,p.indoor?1:0,p.ana?p.ana.Lb.toFixed(1):"",p.ana&&p.ana.indoor?p.ana.indoor.L.toFixed(1):"",fx(pred(p)),fx(p.meas),fx(p.meas-pred(p))].join(",")));
+  function exportCSV(){ const f2=v=>isFinite(v)?(+v).toFixed(3):"";
+    /* model_dBuV_m: what the page shows now (calibrated and what-if if on); equation_only: the ITU-R model alone; calibrated: equation + fitted terms */
+    const lines=["name,source,lat,lon,dist_km,ground_m,antenna_m,fixed,built,indoor,building_loss_dB,entry_loss_dB,model_dBuV_m,measured_dBuV_m,difference_dB,equation_only_dBuV_m,calibrated_dBuV_m,test_point"].concat(SH.pts.map(p=>[`"${p.name.replace(/"/g,"'")}"`,srcOf(p),p.lat.toFixed(6),p.lon.toFixed(6),hav(tx(),p).toFixed(4),p.g==null?"":Math.round(p.g),p.h,p.sensor?1:0,p.built?1:0,p.indoor?1:0,p.ana?p.ana.Lb.toFixed(1):"",p.ana&&p.ana.indoor?p.ana.indoor.L.toFixed(1):"",f2(pred(p)),f2(p.meas),f2(p.meas-pred(p)),f2(rawModel(p)),f2(predBase(p)),isTest(p)?1:0].join(",")));
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"})); a.download="wisdom-shadow.csv"; document.body.appendChild(a); a.click(); a.remove(); hint("Exported "+SH.pts.length+" readings as wisdom-shadow.csv."); }
 
   /* ---------- phone measurements: logs from G-NetTrack, NetMonster, Network Cell Info or any CSV ----------
